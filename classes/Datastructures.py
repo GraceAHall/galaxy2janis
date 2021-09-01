@@ -79,29 +79,7 @@ class Container:
         print(f'image: {self.image}')
 
 
-class Param:
-    def __init__(self, name, param_type):
-        self.name = name
-        self.type = param_type
-        self.prefix = None
-        self.default_value = None
-        self.help_text = None
-        self.is_optional = False
-        self.is_argument = False
-        self.local_path = None
-        
 
-
-    def print(self):
-        print('\nclass: param')
-        print(f'name: {self.name}')
-        print(f'local_path: {self.local_path}')
-        print(f'type: {self.type}')
-        print(f'prefix: {self.prefix}')
-        print(f'default: {self.default_value}')
-        print(f'help_text: {self.help_text}')
-        print(f'is_optional: {self.is_optional}')
-        print(f'is_argument: {self.is_argument}')
 
 
 

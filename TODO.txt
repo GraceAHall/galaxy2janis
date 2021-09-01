@@ -1,0 +1,11 @@
+
+ignore tests
+ignore outputs
+confirm all local paths are correct.  
+
+param types
+tokens
+file imports
+
+
+

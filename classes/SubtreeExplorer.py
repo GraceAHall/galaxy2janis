@@ -1,12 +1,17 @@
 
 
-from classes.Datastructures import Tool, MacroList, Macro, Container, Param
+from classes.Param import Param
+from classes.Datastructures import Tool, MacroList, Macro, Container
+from copy import deepcopy
+
+
 
 class SubtreeParser:
-    def __init__(self, root, tree_position):
+    def __init__(self, root, tree_path):
         self.root = root
-        self.tree_position = tree_position
+        self.tree_path = tree_path
         self.galaxy_depth_elems = ['conditional', 'section']
+        self.ignore_elems = ['outputs', 'tests']
         self.parsable_elems = None
         self.subtree_elems = None
         self.subtree_parser = None  # set when instantiating class
@@ -15,33 +20,43 @@ class SubtreeParser:
     # explore
     def parse(self):
         children = self.root.getchildren()
-        print()
+        print() #placeholder
         for child in children:
-            self.explore_node(child, self.tree_position)
+            if self.should_descend(child):
+                self.explore_node(child, self.tree_path)
         self.print()
 
 
     # recursively explore node
-    def explore_node(self, node, position):
+    def explore_node(self, node, prev_path):
         # would this node count as a galaxy level?
+        curr_path = deepcopy(prev_path)
         if node.tag in self.galaxy_depth_elems:
-            position.append(node.attrib['name'])
+            curr_path.append(node.attrib['name'])
 
         # Should we parse this node or just continue?
         if node.tag in self.parsable_elems:
-            self.parse_elem(node, position)
+            self.parse_elem(node, curr_path)
 
         # Should we parse node as new independent subtree?
         if node.tag in self.subtree_elems:
-            self.parse_subtree(node, position)
+            self.parse_subtree(node, curr_path)
 
         # descend to child nodes
         children = node.getchildren()
+
         for child in children:
-            self.explore_node(child, position)
+            if self.should_descend(child):
+                self.explore_node(child, curr_path)
 
 
-    def parse_elem(self, node, position):
+    def should_descend(self, node):
+        if node.tag in self.ignore_elems:
+            return False
+        return True
+
+
+    def parse_elem(self, node, tree_path):
         if node.tag == 'token':
             self.parse_token(node)
         elif node.tag == 'citations':
@@ -53,11 +68,11 @@ class SubtreeParser:
         elif node.tag == 'help':
             self.parse_help(node)
         elif node.tag == 'param':
-            self.parse_param(node, position)
+            self.parse_param(node, tree_path)
         elif node.tag == 'expand':
-            self.parse_expand(node, position)
+            self.parse_expand(node, tree_path)
         elif node.tag == 'repeat':
-            self.parse_repeat(node, position)
+            self.parse_repeat(node, tree_path)
         elif node.tag == 'import':
             self.import_xml(node)
 
@@ -84,56 +99,18 @@ class SubtreeParser:
         pass
 
 
-    def parse_param(self, node, position):
-        param_name = self.get_attribute_value(node, 'name')
-        param_type = self.get_param_type(node)
-
-        # param basics
-        new_param = Param(param_name, param_type)
-        new_param.default_value = self.get_attribute_value(node, 'value')
-        new_param.help_text = self.get_attribute_value(node, 'help')
-
-        # is param optional?
-        if self.get_attribute_value(node, 'optional') == "true":
-            new_param.is_optional = True
-        
-        # is param an argument param?
-        if self.get_attribute_value(node, 'argument') is not None:
-            argument = self.get_attribute_value(node, 'argument')
-            new_param.name = argument.lstrip('-').replace('-', '_') 
-            new_param.prefix = argument 
-            new_param.is_argument = True
-
-        # set param local path
-        local_path = '.'.join(position)
-        if local_path == '':
-            new_param.local_path = new_param.name
-        else:
-            new_param.local_path = local_path + f'.{new_param.name}'
-            
-        self.add_param(new_param)
+    def parse_param(self, node, tree_path):
+        param = Param(node, tree_path)
+        param.parse()
+        self.add_param(param)
 
 
-    def get_param_type(self, node):
+    def parse_expand(self, node, tree_path):
         pass
 
 
-    def parse_expand(self, node, position):
+    def parse_repeat(self, node, tree_path):
         pass
-
-
-    def parse_repeat(self, node, position):
-        pass
-
-
-    def get_attribute_value(self, node, attribute):
-        '''
-        accepts node, returns attribute value or None 
-        '''
-        for key, val in node.attrib.items():
-            if key == attribute:
-                return val
-        return None
 
     
     def print_details(self, classname, entity):
@@ -177,9 +154,9 @@ class SubtreeParser:
 
 
 class ToolParser(SubtreeParser):
-    def __init__(self, root, tree_position):
-        super().__init__(root, tree_position)
-        self.parsable_elems = ['token', 'description', 'expand', 'command', 'param', 'repeat', 'tests', 'help', 'citations']
+    def __init__(self, root, tree_path):
+        super().__init__(root, tree_path)
+        self.parsable_elems = ['token', 'description', 'expand', 'command', 'param', 'repeat', 'help', 'citations']
         self.subtree_elems = ['macros']
         self.tool = Tool()
         self.set_metadata()
@@ -198,10 +175,10 @@ class ToolParser(SubtreeParser):
         pass
 
 
-    def parse_subtree(self, node, position):
+    def parse_subtree(self, node, tree_path):
         # create new Parser to parse subtree. 
         # override.
-        mp = MacrosParser(node, position)
+        mp = MacrosParser(node, tree_path)
         mp.parse()
         self.tool.macros += mp.macrolist.macros
         
@@ -221,8 +198,8 @@ class ToolParser(SubtreeParser):
 
 # parse all macros inside a <macros> element
 class MacrosParser(SubtreeParser):
-    def __init__(self, root, tree_position):
-        super().__init__(root, tree_position)
+    def __init__(self, root, tree_path):
+        super().__init__(root, tree_path)
         self.parsable_elems = ['import', 'token'] 
         self.subtree_elems = ['macro', 'xml']
         self.subtrees = [] # will only be MacroParser
@@ -240,10 +217,10 @@ class MacrosParser(SubtreeParser):
         pass
 
 
-    def parse_subtree(self, node, position):
+    def parse_subtree(self, node, tree_path):
         # create new Parser to parse subtree. 
         # override.
-        macro = MacroParser(node, position)
+        macro = MacroParser(node, tree_path)
         macro.parse()
         # absorb results into current MacrosParser
         self.macrolist.add_macro(macro) # will be a single Macro()
@@ -258,9 +235,9 @@ class MacrosParser(SubtreeParser):
 
 # parse a single <macro> or <xml> element
 class MacroParser(SubtreeParser):
-    def __init__(self, root, tree_position):
-        super().__init__(root, tree_position)
-        self.parsable_elems = ['token', 'description', 'expand', 'param', 'repeat', 'tests', 'help', 'citations', 'container']
+    def __init__(self, root, tree_path):
+        super().__init__(root, tree_path)
+        self.parsable_elems = ['token', 'description', 'expand', 'param', 'repeat', 'help', 'citations', 'container']
         self.subtree_elems = []  # macros can't have macro definitions inside. Can reference other macros. 
         self.set_tag_tokens()
         self.macro = Macro(self.root.attrib['name'])

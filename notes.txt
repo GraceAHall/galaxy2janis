@@ -1,6 +1,50 @@
 
 
 
+if a param is not resolved in command (ie it is just for UI formatting), dont include. 
+each param needs to be present in command. Eg
+
+<conditional name="lineage">
+    <param name="lineage_mode" type="select" label="Auto-detect or select lineage?" help="">
+        <option value="auto_detect">Auto-detect</option>
+        <option value="select_lineage">Select lineage</option>
+    </param>
+    <when value="auto_detect">
+        <param name="auto_lineage" type="select" label="Run auto-lineage to find optimal lineage path">
+            <option value="--auto-lineage">Run auto-lineage to find optimum lineage path</option>
+            <option value="--auto-lineage-prok">Run auto-lineage just on non-eukaryote trees to find optimum lineage path</option>
+            <option value="--auto-lineage-euk">Run auto-placement just on eukaryote tree to find optimum lineage path</option>
+        </param>
+    </when>
+    <when value="select_lineage">
+        <param argument="--lineage_dataset" type="select" label="Lineage">
+            <expand macro="lineages" />
+        </param>
+    </when>
+</conditional>
+
+
+lineage.lineage_mode is just for UI.
+In the command, it is referenced in a line which contains #if directive. Simply for selecting. 
+
+probably need to have a way to split up cheetah conditionals in the command. 
+
+
+Sometimes there are 2 params which refer to the same command line arg.
+
+command parser needs to identify standalone aguments and params.  
+command parser needs to associate flags to their variables. might be 1 or more if poorly written xml. 
+
+
+
+
+
+
+
+
+
+
+
 Classes
 
 ToolParser
