@@ -1,9 +1,13 @@
 
-ignore tests
-ignore outputs
-confirm all local paths are correct.  
 
-param types
+build tests for current work
+param datatypes:
+ - gather each galaxy datatype
+ - list all examples
+ - decide on real datatypes
+
+
+notify which tools were successfully parsed, and which experienced warnings or errors. 
 tokens
 file imports
 
