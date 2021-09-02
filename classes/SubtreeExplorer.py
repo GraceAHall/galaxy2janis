@@ -19,9 +19,7 @@ class SubtreeParser:
 
     # explore
     def parse(self):
-        children = self.root.getchildren()
-        print() #placeholder
-        for child in children:
+        for child in self.root:
             if self.should_descend(child):
                 self.explore_node(child, self.tree_path)
         self.print()
@@ -43,9 +41,7 @@ class SubtreeParser:
             self.parse_subtree(node, curr_path)
 
         # descend to child nodes
-        children = node.getchildren()
-
-        for child in children:
+        for child in node:
             if self.should_descend(child):
                 self.explore_node(child, curr_path)
 

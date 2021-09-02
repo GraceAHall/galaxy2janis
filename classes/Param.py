@@ -1,24 +1,33 @@
 
-from classes.Logger import Logger
+# pyright: strict
 
+from collections import Counter
+from classes.Logger import Logger
+from xml.etree import ElementTree
+
+# Optional[str] means the type can be str or None. 
 
 class Param:
-    def __init__(self, node, tree_path):
-        self.logger = Logger()
+    def __init__(self, node: ElementTree.Element, local_path: list[str]):
+        # other helper classes
+        self.logger: Logger = Logger()   
         self.node = node
-        self.tree_path: str = tree_path
-        self.name: str = None
-        self.type: str = None
-        self.local_path: str = None
-        self.default_value: str = None
-        self.prefix: str = None
-        self.help_text: str = None
+
+        # param attributes
+        self.name: str = ""
+        self.type: str = ""
+        self.local_path = local_path
+        self.default_value: str = ""
+        self.prefix: str = ""
+        self.help_text: str = ""
         self.is_optional: bool = False
         self.is_argument: bool = False
         self.is_ui_param: bool = False
+
+        # for param type extraction 
         self.parseable_datatypes = [
             "text",
-            "integer",
+            "integer", 
             "float",
             "boolean",
             "select",
@@ -81,7 +90,6 @@ class Param:
     def parse(self) -> None:
         self.set_basic_details()
         self.set_argument_info()
-        self.type = self.infer_janis_type()
 
 
     def set_basic_details(self) -> None:
@@ -94,17 +102,19 @@ class Param:
         if self.get_attribute_value('optional') == "true":
             self.is_optional = True
 
-        
+
     def set_argument_info(self) -> None:
         # is param an argument param?
         if self.get_attribute_value('argument') is not None:
+            self.is_argument = True
+
+            # set name and prefix accordingly
             argument = self.get_attribute_value('argument')
             self.name = argument.lstrip('-').replace('-', '_') 
             self.prefix = argument 
-            self.is_argument = True
             
         
-    def infer_janis_type(self) -> str:
+    def infer_janis_type(self) -> None:
         """
         try to guess the real param datatype as would appear in janis tool description. 
         not an exact science due to galaxy flexability.
@@ -187,24 +197,28 @@ class Param:
 
     def extract_type_from_select_param(self) -> str:
         """
-        
+        infers select param type. 
+        Uses the different values in the option elems 
         """
-        pass
+        for child in self.node:
+            if child.tag == 'option':
+                
+        return ""
 
 
-    def extract_type_from_data_param(self):
+    def extract_type_from_data_param(self) -> str:
         """
         datatype hints found in "format" attribute
         sometimes this will be all that's needed, other times we need to do more work. 
         If select: is this string
         """
-        pass
+        return ""
 
 
-    def extract_type_from_data_collection_param(self):
+    def extract_type_from_data_collection_param(self) -> str:
         """
         """
-        pass
+        return ""
 
 
     def get_text_type(self):
@@ -227,33 +241,50 @@ class Param:
 
 
     def can_cast_to_float(self):
-        pass
+        pass 
 
 
     def can_cast_to_int(self):
         pass
 
 
-    def get_extensions(self, the_list: list[str]) -> list[str]:
-        pass
+    def get_shared_extension(self, the_list: list[str]) -> str: 
+        """
+        identifies whether a list of items has a common extension. 
+        all items must share the same extension. 
+        will return the extension if true, else will return ""
+        """
 
+        try:
+            ext_list = [item.rsplit('.', 1)[1] for item in the_list]
+            exts = Counter(ext_list)
+        except IndexError:  # one or more items do not have an extension
+            return "" 
+           
+        if len(exts) == 1:  
+            ext, count = exts.popitem() 
+            if count == len(the_list):  # does every item have the extension?
+                return ext 
+
+        return ""
+      
 
     def get_local_path(self) -> str:
-        local_path = '.'.join(self.tree_path)
+        local_path = '.'.join(self.local_path)
         if local_path == '':
             return self.name
         else:
             return local_path + f'.{self.name}'
 
 
-    def get_attribute_value(self, attribute):
+    def get_attribute_value(self, attribute: str) -> str:
         '''
         accepts node, returns attribute value or None 
         '''
         for key, val in self.node.attrib.items():
             if key == attribute:
                 return val
-        return None
+        return ""
 
 
     def print(self):
