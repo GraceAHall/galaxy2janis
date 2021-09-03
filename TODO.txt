@@ -1,6 +1,26 @@
 
 
-build tests for current work
+
+
+TODO:
+
+
+macro expansion
+ - write tests
+ - handle multiple imports (the below)
+ 
+
+
+
+ToolParser:
+ - MacroExpander() -> get & expand macros, gather tokens
+
+
+
+expand tokens
+build tests for param parsing
+parse param datatypes
+
 param datatypes:
  - gather each galaxy datatype
  - list all examples
@@ -10,6 +30,7 @@ param datatypes:
 notify which tools were successfully parsed, and which experienced warnings or errors. 
 tokens
 file imports
+add support for provided galaxy library macros (as imports)
 
 
 

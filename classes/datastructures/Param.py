@@ -105,7 +105,7 @@ class Param:
 
     def set_argument_info(self) -> None:
         # is param an argument param?
-        if self.get_attribute_value('argument') is not None:
+        if self.get_attribute_value('argument') != "":
             self.is_argument = True
 
             # set name and prefix accordingly
@@ -202,7 +202,7 @@ class Param:
         """
         for child in self.node:
             if child.tag == 'option':
-                
+                pass
         return ""
 
 

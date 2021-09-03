@@ -48,11 +48,18 @@
             "name": "XMLParser",
             "type": "python",
             "request": "launch",
-            "program": "XMLParser.py",
+            "program": "gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "tools/busco/busco.xml"
+                "busco.xml", "tools/busco"
             ]
+        },
+        {
+            "name": "macrotest",
+            "type": "python",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -1,0 +1,62 @@
+
+<tool id="test" name="test" version="1">
+
+    <inputs>
+        <param name="augustus_species" type="select" label="Augustus species model">
+            <expand macro="augustus_species" />
+        </param>
+    </inputs>
+
+    <placeholder>
+        <!-- recursive -->
+        <expand macro="citations" />
+        
+        <!-- tokens -->
+        <expand macro="color" default_color="#ff0000" />
+
+        <!-- yield -->
+        <expand macro="refGenomeSourceConditional">
+            <options from_data_table="tophat_indexes">
+                <filter type="sort_by" column="2"/>
+                <validator type="no_options" message="No genomes are available for the selected input dataset"/>
+            </options>
+        </expand>
+    </placeholder>
+    
+    <macros>
+        <token name="@TOOL_VERSION@">5.2.2</token>
+        <token name="@VERSION_SUFFIX@">1</token>
+
+        <xml name="augustus_species">
+            <!-- If you update this list, please also update it in maker and augustus tools (../maker/maker.xml and ../augustus/augustus.xml) -->
+            <option value="human">Homo sapiens</option>
+            <option value="fly">Drosophila melanogaster</option>
+            <option value="arabidopsis">Arabidopsis thaliana</option>
+        </xml>
+
+        <!-- recursive macros -->
+        <xml name="citations">
+            <citations>
+                <citation type="doi">10.1093/bioinformatics/btv351</citation>
+                <expand macro="another_citation" />
+            </citations>
+        </xml>
+
+        <xml name="another_citation">
+            <citation type="doi">another doi</citation>
+        </xml>
+
+        <!-- yield -->
+        <xml name="refGenomeSourceConditional">
+            <param name="index" type="select" label="Select a reference genome" help="If your genome of interest is not listed, contact the Galaxy team">
+                <yield />
+            </param>            
+        </xml>
+
+        <!-- tokens -->
+        <xml name="color" token_varname="myvar" token_default_color="#00ff00" token_label="Pick a color">
+            <param name="@VARNAME@" type="color" label="@LABEL@" value="@DEFAULT_COLOR@" />
+        </xml>
+
+    </macros>
+</tool>
