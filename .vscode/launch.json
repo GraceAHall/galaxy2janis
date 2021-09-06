@@ -68,7 +68,7 @@
             "program": "gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "busco.xml", "tools/busco"
+                "bwa-mem.xml", "tools/bwa"
             ]
         }
     ]

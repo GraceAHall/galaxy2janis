@@ -3,16 +3,28 @@
 # pyright: strict
 
 import xml.etree.ElementTree as et
-
+import os
 
 class MacroExpander:
     def __init__(self, workdir: str, filename: str):
         self.workdir = workdir
-        self.filename = filename 
-        self.tree = et.parse(f'{self.workdir}/{self.filename}')
+        self.filename = filename
+        self.set_tree()
         self.root = self.tree.getroot()
         self.tokens: dict[str, str] = {}
         self.macros: dict[str, et.Element] = {}
+
+
+    def set_tree(self) -> None:
+        filepath = ''
+        if os.path.exists(f'{self.workdir}/{self.filename}'):
+            filepath = f'{self.workdir}/{self.filename}'
+        elif os.path.exists(f'macros/{self.filename}'):
+            filepath = f'macros/{self.filename}'
+        else:
+            raise Exception(f'cannot find macro file {self.filename}')
+
+        self.tree = et.parse(filepath)
 
 
     def collect(self) -> None:
