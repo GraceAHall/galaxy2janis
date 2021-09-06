@@ -87,11 +87,6 @@ class Param:
         ]
 
 
-    def parse(self) -> None:
-        self.set_basic_details()
-        self.set_argument_info()
-
-
     def set_basic_details(self) -> None:
         # basic info
         self.name = self.get_attribute_value('name')
@@ -152,48 +147,6 @@ class Param:
 
         # format attribute only applies to 'data' and 'data_collection' types
 
-
-        """
-        data often tells you the exact type. 
-        The main types needed to resolve is the command line params.
-        File can be a good fallback here.
-        
-        eg --fasta: 
-         - is this single string referring to a filename, array?
-         - can we assume this has to be a fasta input? 
-         - if this is tricky, can ask simon to get list of successful jobs for each tool. can check extensions of each input file. 
-
-        text: string
-        integer: integer
-        float: float
-
-        boolean: 
-         - normal bool, but additionally has truevalue and falseval. map of 0/1 to strings
-         - are the strings always text, or do they sometimes map to integers or floats? 
-         - probably a good idea to collect all examples of this. 
- 
-        genomebuild # never used
-        select
-        color
-        data_column
-        hidden
-        hidden_data # never used
-        baseurl # rarely used
-        file # rarely used
-        ftpfile # never used
-        data:
-         - for tool io
-         - dataset from history
-         - 'format' determines datatype - format can be comma-separated list so multiple types. eg bamOrSamFile -> bam,sam. Is galaxy doing type conversion here? 
-         - some galaxy datatypes need to be mapped to real datatypes. eg interval -> BED? 
-         - multiple="true" specifies array of files as input
-         - select parameters with multiple="true": also are arrays
-         - group_tag never used
-
-        data_collection
-        library_data # never used
-        drill_down # never used
-        """
 
     def extract_type_from_select_param(self) -> str:
         """

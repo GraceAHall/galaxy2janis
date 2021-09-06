@@ -10,13 +10,12 @@ def main(argv):
     filename = argv[0]
     workdir = argv[1]
 
-    filepath = f'{workdir}/{filename}'
-    xml = et.parse(filepath)
-    root = xml.getroot()
-    assert(root.tag == 'tool')
-
-    doc = ToolParser(filename, workdir, root)
-    doc.parse()
+    tp = ToolParser(filename, workdir)
+    tp.expand_macros()
+    tp.resolve_tokens()
+    tp.set_tool_metadata()
+    tp.parse_command()
+    tp.write_tree('output.xml')
     print()
 
 

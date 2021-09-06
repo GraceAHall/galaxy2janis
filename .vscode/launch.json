@@ -58,8 +58,18 @@
             "name": "macrotest",
             "type": "python",
             "request": "launch",
-            "program": "test.py",
+            "program": "classes/MacroExpander.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "gxtool2janis",
+            "type": "python",
+            "request": "launch",
+            "program": "gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "busco.xml", "tools/busco"
+            ]
         }
     ]
 }
