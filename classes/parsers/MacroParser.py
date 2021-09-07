@@ -1,11 +1,11 @@
 
 
 # pyright: strict
-
+ 
 import xml.etree.ElementTree as et
 import os
 
-class MacroExpander:
+class MacroParser:
     def __init__(self, workdir: str, filename: str):
         self.workdir = workdir
         self.filename = filename
@@ -25,6 +25,11 @@ class MacroExpander:
             raise Exception(f'cannot find macro file {self.filename}')
 
         self.tree = et.parse(filepath)
+
+
+    def parse(self) -> None:
+        self.collect()
+        self.expand()
 
 
     def collect(self) -> None:

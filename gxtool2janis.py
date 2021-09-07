@@ -11,11 +11,25 @@ def main(argv):
     workdir = argv[1]
 
     tp = ToolParser(filename, workdir)
-    tp.expand_macros()
-    tp.resolve_tokens()
-    tp.set_tool_metadata()
-    tp.parse_command()
+
+    # preprocessing
+    tp.parse_macros()
+    tp.parse_tokens()
     tp.write_tree('output.xml')
+    
+    # params
+    tp.parse_params()
+    tp.write_tree('output.xml')
+    
+    # command
+    #tp.parse_command()
+    #tp.write_tree('output.xml')
+    
+    # metadata
+    #tp.parse_metadata()
+    #tp.write_tree('output.xml')
+
+    # generate janis! 
     print()
 
 

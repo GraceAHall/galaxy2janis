@@ -1,0 +1,10 @@
+
+
+
+repeat params handled
+
+can link galaxy variables to temp variables created by cheetah function calls
+
+tests extracted and automatically run
+
+

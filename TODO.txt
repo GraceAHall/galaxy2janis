@@ -3,6 +3,29 @@
 
 
 TODO:
+ - gather outputs
+ - param parsing done first
+ - command string diced up & cleaned
+ - for each param, find references in the command string
+ - for multiple references, prompt user on the fly about correct reference (can select one of the references, or none)
+ - report (in the janis tool def) if a param was not linked to a prefix (would happen for the above if none selected)
+
+ - handle stdio? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 macro expansion

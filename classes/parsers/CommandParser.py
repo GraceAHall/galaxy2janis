@@ -43,26 +43,15 @@ class CommandParser:
         out_tasks = []
 
         # initial split by bash tasks
-        tasks = the_string.split('&&')
-        #tasks = self.split_by_sep(tasks, ';')
+        command_list = the_string.split('&&')
+        # TODO: allow for linking variables set with cheetah functions
+        # command_list = self.remove_function_defs(command_list) # important!
+        command_list = self.split_by_sep(command_list, ';')
+        command_list = self.split_by_sep(command_list, '\n')
+        command_list = self.remove_comments(command_list) # removes comments
+        command_list = self.remove_cheetah_conditionals(command_list)
 
-        for task in tasks:
-            # third split by newlines
-            the_list = self.split_by_sep(task, '\n')
-            #the_list = self.split_by_sep(task, '\n')
-
-            # handle cheetah variable setting and logic
-            the_list = self.handle_cheetah(the_list)
-
-            # exclude tasks if they begin with banned linux terms?
-            
-            out_tasks.append(the_list)
-            print()
-        
-        # extract args
-        #the_list = self.extract_args(the_list)
-        
-        return out_tasks
+        return command_list
         
 
     def split_by_sep(self, the_input, sep: str) -> list[str]:
@@ -89,28 +78,31 @@ class CommandParser:
         return the_list
 
 
-    def handle_cheetah(self, the_list: list[str]) -> list[str]:
-        """
-        need to handle:
-            ## (comments) 
-            #set
-            #if
-            #else
-            #elif
-            #end if
-        """
-        the_list = self.clean_comments(the_list)
-        return the_list
-
-
-    def clean_comments(self, the_list: list[str]) -> list[str]:
+    def remove_comments(self, command_list: list[str]) -> list[str]:
         # removes cheetah comments from command lines
         clean_list = []
-        for item in the_list:
+        for item in command_list:
             item = item.split('##')[0]
             if item != '':
                 clean_list.append(item)
         return clean_list
+    
+
+    def remove_cheetah_conditionals(self, command_list: list[str]) -> list[str]:
+        """
+        cheetah follows python line syntax so #if etc directives should appear at start of line
+        """
+        cheetah_conditionals = ['#if', '#else', '#elif', '#end', '#while', '#return', '#import', '#def']
+        out_list = []
+        
+        for line in command_list:
+            if line.lsplit(' ', 1)[0] not in cheetah_conditionals:
+                out_list.append(line)
+
+        return out_list
+
+
+    
 
 
 
