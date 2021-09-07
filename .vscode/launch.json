@@ -62,13 +62,23 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "gxtool2janis",
+            "name": "bwa-mem",
             "type": "python",
             "request": "launch",
             "program": "gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
                 "bwa-mem.xml", "tools/bwa"
+            ]
+        },
+        {
+            "name": "busco",
+            "type": "python",
+            "request": "launch",
+            "program": "gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "busco.xml", "tools/busco"
             ]
         }
     ]

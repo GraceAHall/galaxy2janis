@@ -22,8 +22,8 @@ def main(argv):
     tp.write_tree('output.xml')
     
     # command
-    #tp.parse_command()
-    #tp.write_tree('output.xml')
+    tp.parse_command()
+    tp.pretty_print()
     
     # metadata
     #tp.parse_metadata()

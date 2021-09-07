@@ -54,7 +54,7 @@ class MetadataParser:
     def parse_container(self, node: et.Element) -> None:
         key = node.attrib['name']
         val = node.text or ""
-        self.tool.containers[key] = val
+        self.containers[key] = val
 
 
     def parse_help(self, node):

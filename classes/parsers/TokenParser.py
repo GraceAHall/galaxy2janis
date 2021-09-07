@@ -13,8 +13,9 @@ class TokenParser:
 
 
     def parse(self):
-        self.gather_tokens(self.root)
-        self.apply_tokens(self.root)
+        root = self.tree.getroot()
+        self.gather_tokens(root)
+        self.apply_tokens(root)
 
 
     def gather_tokens(self, node: et.Element) -> None:

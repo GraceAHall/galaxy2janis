@@ -1,9 +1,22 @@
 
 
+before 4pm:
+confirm argument params in command!
+handle param containing multiple --prefix in options
+handle param containing single boolean --prefix as options
 
-repeat params handled
+sort out if params are optional!
 
-can link galaxy variables to temp variables created by cheetah function calls
+params:
+    <repeat> tag 
+    <options> tag 
+
+param types TODO:
+    datacollection elem 
+    data_column elem 
+    hidden elem 
+
+link galaxy variables to temp variables created by cheetah function calls
 
 tests extracted and automatically run
 

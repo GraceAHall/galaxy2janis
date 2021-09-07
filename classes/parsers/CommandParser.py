@@ -2,14 +2,16 @@
 
 # pyright: basic
 
+from typing import Union
 import xml.etree.ElementTree as et
 
-from typing import Optional
+from classes.datastructures.Param import Param
 
 
 class CommandParser:
-    def __init__(self, tree: et.ElementTree):
+    def __init__(self, tree: et.ElementTree, params: dict[str, Param]):
         self.tree = tree
+        self.params = params
         self.banned_commands = [
             'cp', 'tar', 'mkdir', 'pwd',
             'which', 'cd', 'ls', 'cat', 'mv',
@@ -22,7 +24,11 @@ class CommandParser:
 
     def parse(self) -> None:
         command_string = self.get_command_string()
-        command_string = self.clean_command(command_string)
+        command_lines = self.clean_command(command_string)
+        self.link_prefixes_to_params(command_lines)
+        self.remove_ui_params()
+        self.resolve_multi_prefix_params()
+        self.split_flag_options_params()
         print()
 
 
@@ -54,14 +60,13 @@ class CommandParser:
         return command_list
         
 
-    def split_by_sep(self, the_input, sep: str) -> list[str]:
+    def split_by_sep(self, the_input: Union[list[str], str], sep: str) -> list[str]:
         # can handle strings or list of strings
         out_list: list[str] = []
 
         # if a string
         if type(the_input) == str:
-            elem = the_input
-            out_list += self.clean_split_string(elem, sep)
+            out_list += self.clean_split_string(the_input, sep) # type: ignore
 
         # if a list
         if type(the_input) == list:
@@ -96,19 +101,104 @@ class CommandParser:
         out_list = []
         
         for line in command_list:
-            if line.lsplit(' ', 1)[0] not in cheetah_conditionals:
+            if line.split(' ', 1)[0] in cheetah_conditionals:
+                for param in self.params.values():
+                    if self.find_param_in_line(param, line) != -1:
+                        # param var was found in line with conditional
+                        self.params[param.gx_var].appears_in_conditional = True
+            else:
                 out_list.append(line)
 
         return out_list
 
 
     
+    def link_prefixes_to_params(self, command_lines: list[str]) -> None:
+        """
+        do I have to worry about variables in paths? probs not 
+
+        """
+        for line in command_lines:
+            for param in self.params.values():
+                if param.is_argument == False:
+                    loc = self.find_param_in_line(param, line)
+                    if loc != -1:
+                        param.located_in_command = True
+                        self.attempt_prefix_link(param, loc, line)     
+        
+
+    def find_param_in_line(self, param: Param, command_line: str) -> int:
+        var = param.gx_var
+        command_list = command_line.split(' ')
+        
+        for i, word in enumerate(command_list):
+            if var in word:
+                if self.is_cheetah_var(var, word):
+                    return i
+        return -1
+
+
+    def attempt_prefix_link(self, param: Param, i: int, command_line: list[str]) -> None:
+        command_list = command_line.split(' ')
+        if self.is_cheetah_var(param.gx_var, command_list[i]):
+
+            # add the possible prefix to resolve later
+            param.prefix_collector.add(i, command_list, param.gx_var)
+
+
+    def is_cheetah_var(self, var: str, command_word: str) -> bool:
+        """
+        $var '${var}' "${var}" all valid. 
+        """
+
+        # type 1 above
+        openformat = '$'
+        closeformat = '' 
+
+        # type 2 & 3 above
+        if command_word[0] in ["'", '"']:
+            quote = command_word[0]
+            openformat = '{}{}'.format(quote, '${')
+            closeformat = '{}{}'.format('}', quote)
+
+        varopen, varclose = command_word.split(var)
+        if varopen == openformat and varclose == closeformat:
+            return True
+
+        return False
+
+
+    def remove_ui_params(self) -> None:
+        for param in self.params.values():
+            if param.prefix == '':
+                if param.appears_in_conditional and not param.located_in_command:
+                    param.is_ui_param = True
 
 
 
-    def extract_args(self, the_list: list[str]) -> dict[str, str]:
-        args = {}
+    def resolve_multi_prefix_params(self) -> None:
+        for param_var, param in self.params.items():
+            param.resolve_multiple_prefixes()
+            param.set_prefix_from_collector()
+            print()
+
+
+    def split_flag_options_params(self) -> None:
+        for param_var, param in self.params.items():
+            pass
+            # is the param missing a prefix?
+            # TODO this is not always the case! By coincidence
+            # another flag param (not included galaxy UI) might preceed!
+            # rare though. 
 
 
 
-        return args  # TODO fix pyright so it shuts up about partially known types
+
+            # check the following about param options: 
+            #   all start with '-'
+            #   all only consist of single word
+            
+            
+
+
+

@@ -4,7 +4,7 @@
 import xml.etree.ElementTree as et
 
 
-from classes.datastructures.Tool import Tool
+from classes.datastructures.Param import Param
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
 from classes.parsers.ParamParser import ParamParser
@@ -29,7 +29,7 @@ class ToolParser:
 
         self.tree_path: list[str] = []
         self.tokens: dict[str, str] = {}
-        self.tool: Tool = Tool()
+        self.params: dict[str, Param] = {}
 
 
     # 1st step: macro expansion (preprocessing)
@@ -58,15 +58,13 @@ class ToolParser:
         # includes outputs? 
         pp = ParamParser(self.tree)
         pp.parse()
-        self.tree = pp.tree
-        print()
+        self.params = pp.params
 
 
     # 4th step: command parsing & linking to params
     def parse_command(self):
-        cp = CommandParser(self.tree)
+        cp = CommandParser(self.tree, self.params)
         cp.parse()
-        self.tree = cp.tree
         print()
 
 
@@ -74,7 +72,6 @@ class ToolParser:
     def parse_metadata(self):
         mp = MetadataParser(self.tree)
         mp.parse()
-        self.tree = mp.tree
         print()
     
 
@@ -88,47 +85,14 @@ class ToolParser:
 
 
     def write_tree(self, filepath: str) -> None:
-        et.dump(self.root)
+        #et.dump(self.root)
         with open(filepath, 'w') as f:
             self.tree.write(f, encoding='unicode')
 
 
-    def pretty_print(self) -> str:
-        print(f'\n===== {classname} =====')
-        print(f'name: {entity.name}')
-
-        if hasattr(entity, 'version') and entity.version != None:
-            print(f'version: {entity.version}')
-        
-        if hasattr(entity, 'creator') and entity.creator != None:
-            print(f'creator: {entity.creator}')
-        
-        if hasattr(entity, 'help') and entity.help != None:
-            print(f'help: {entity.help}')
-        
-        if hasattr(entity, 'citations') and entity.citations != None:
-            print(f'citations: {entity.citations}')
-
-        if hasattr(entity, 'tokens') and len(entity.tokens) != 0:
-            print('\ntokens --------')
-            for key, val in entity.tokens.items():
-                print(f'{key}: {val}')
-
-        if hasattr(entity, 'params') and len(entity.params) != 0:
-            print('\nparams --------')
-            for param in entity.params:
-                param.print()
-
-        if hasattr(entity, 'containers') and len(entity.containers) != 0: 
-            print('\ncontainers --------')
-            for container in entity.containers:
-                container.print()
-        
-        if hasattr(entity, 'expands') and len(entity.expands) != 0: 
-            print('\nexpands --------')
-            for expand in entity.expands:
-                print(f'macro name: {expand.macro_reference}')
-                print(f'local path: {expand.local_path}')
+    def pretty_print(self) -> None:
+        for param in self.params.values():
+            print(param)
 
 
 

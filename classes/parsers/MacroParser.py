@@ -51,10 +51,10 @@ class MacroParser:
 
     def import_xml(self, node: et.Element) -> None:
         xml_file = node.text or ""
-        me = MacroExpander(self.workdir, xml_file)
-        me.collect()
-        self.tokens.update(me.tokens)
-        self.macros.update(me.macros)
+        mp = MacroParser(self.workdir, xml_file)
+        mp.collect()
+        self.tokens.update(mp.tokens)
+        self.macros.update(mp.macros)
 
 
     def add_token(self, node: et.Element) -> None:
@@ -169,6 +169,6 @@ class MacroParser:
 
 
     def write_tree(self, filepath: str) -> None:
-        et.dump(self.root)
+        #et.dump(self.root)
         with open(filepath, 'w') as f:
             self.tree.write(f, encoding='unicode')
