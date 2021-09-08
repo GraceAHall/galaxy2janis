@@ -4,7 +4,7 @@
 import xml.etree.ElementTree as et
 
 
-from classes.datastructures.Param import Param
+from classes.datastructures.Params import Param
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
 from classes.parsers.ParamParser import ParamParser

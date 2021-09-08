@@ -1,9 +1,18 @@
 
 
 before 4pm:
-confirm argument params in command!
-handle param containing multiple --prefix in options
-handle param containing single boolean --prefix as options
+
+
+
+TODO:
+    handle param containing single boolean --prefix as options
+    handle select containing multiple --prefix in options
+    confirm argument params in command
+    handle #set directives
+
+
+
+
 
 sort out if params are optional!
 

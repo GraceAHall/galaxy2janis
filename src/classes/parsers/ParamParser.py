@@ -3,7 +3,7 @@
 from copy import deepcopy
 from collections import Counter
 
-from classes.datastructures.Param import Param
+from classes.datastructures.Params import Param
 from classes.Logger import Logger
 from xml.etree import ElementTree as et
 
@@ -37,63 +37,7 @@ class ParamParser:
             "data_collection"
         ]
 
-        self.gx_janis_datatype_mapping = {
-            "bai": "BAI",
-            "bam": "BAM",
-            "bed": "bed",
-            "bed.gz": "BedGz",
-            "tabix": "BedTABIX",
-            "bool": "Boolean",
-            "tar.gz": "CompressedTarFile",
-            "brai": "CRAI",
-            "cram": "CRAM",
-            "CramPair": "CramPair",
-            "csv": "csv",
-            "directory": "Directory",
-            "double": "Double",
-            "fa": "Fasta",
-            "fna": "Fasta",
-            "fasta": "Fasta",
-            "FastaBwa": "FastaBwa",  # TODO
-            "fai": "FastaFai",  
-            "fasta.gz": "FastaGz",
-            "FastaGzBwa": "FastaGzBwa",  # TODO
-            "FastaGzFai": "FastaGzFai",  # TODO
-            "FastaGzWithIndexes": "FastaGzWithIndexes",
-            "FastaWithIndexes": "FastaWithIndexes",
-            "FastDict": "FastDict",
-            "FastGzDict": "FastGzDict",
-            "fq": "Fastq",
-            "fastq": "Fastq",
-            "fastqsanger": "Fastq",
-            "fastqillumina": "Fastq",
-            "fastq.gz": "FastqGz",
-            "fastqsanger.gz": "FastqGz",
-            "fastqillumina.gz": "FastqGz",
-            "file": "File",
-            "filename": "Filename",
-            "float": "Float",
-            "gz": "Gzip",
-            "html": "HtmlFile",
-            "IndexedBam": "IndexedBam",  # TODO
-            "integer": "Integer",
-            "json": "jsonFile",
-            "kallisto.idx": "KallistoIdx",
-            "sam": "SAM",
-            "stdout": "Stdout",
-            "string": "String",
-            "tar": "TarFile",
-            "txt": "TextFile",
-            "tsv": "tsv",
-            "vcf": "VCF",
-            "vcf_bgzip": "CompressedVCF",
-            "IndexedVCF": "IndexedVCF",  # TODO
-            "CompressedIndexedVCF": "CompressedIndexedVCF", # TODO?
-            "WhisperIdx": "WhisperIdx", # TODO
-            "zip": "Zip"
-        }
-
-
+    
     def parse(self) -> None:
         # parse params
         tree_path = []
@@ -138,119 +82,129 @@ class ParamParser:
     def parse_param(self, node: et.Element, tree_path: list[str]) -> Param:
         """
         parses a param elem. accepts a tree node, returns a new Param
+        RESTRUCTURE!
         """
-        new_param = Param(tree_path)
-        new_param = self.set_basic_details(node, new_param)
-        new_param = self.infer_janis_type(node, new_param)
+
+        # changed order! parse the command string before params!!!
+
+
+        param = Param(node, tree_path)
+        new_params = param.parse()
+
+        print(new_params)
+
+        # kill this stufff
+        self.set_basic_details(node, new_param)
+        self.handle_edge_cases(node, new_param)
+        self.infer_janis_type(node, new_param)
 
         return new_param
 
-    
-    def set_basic_details(self, node: et.Element, param: Param) -> Param:
-        # name (and prefix if argument param)
-        if self.get_attribute_value(node, 'argument') == "":
-            param.name = self.get_attribute_value(node, 'name')
-        else:
-            argument = self.get_attribute_value(node, 'argument')
-            param.name = argument.lstrip('-').replace('-', '_') 
-            param.prefix = argument # currently do not attempt to find alternate prefix in command string for argument params.  may need to do this for cheetah function parsing. 
-            param.is_argument = True
 
-        # defaults, optional, helptext    
-        param.default_value = self.get_attribute_value(node, 'value')
-        param.help_text = self.get_attribute_value(node, 'help')
-        if self.get_attribute_value(node, 'optional') == "true":
-            param.is_optional = True
-
-        # options if select param
-        if self.get_attribute_value(node, 'type') == 'select':
-            param.options = self.get_param_options(node)
-
-        param.gx_var = param.get_tree_path()
-
-        return param
-
-
-    def get_attribute_value(self, node: et.Element, attribute: str) -> str:
-        '''
-        accepts node, returns attribute value or "" 
-        '''
-        for key, val in node.attrib.items():
-            if key == attribute:
-                return val
-        return ""
-    
-
-    def get_param_options(self, node: et.Element) -> list[str]:
-        option_values = []
-
-        for child in node:
-            if child.tag == 'option':
-                optval = self.get_attribute_value(child, 'value')
-                option_values.append(optval)
-
-        return option_values
-
-
-
-    def infer_janis_type(self, node: et.Element, param: Param) -> Param:
-        """
-        good reporting here! 
-
-        try to guess the real param datatype as would appear in janis tool description. 
-        not an exact science due to galaxy flexability.
-
-        if this is too unreliable, can ask simon to get list of successful jobs for each tool. 
-        would then check what the variable is resolved to in the job script. can identify if its text, or a specific datatype if the argument is always a file with a particular extension.
-
-        janis "file" type is good fallback. 
+    def handle_edge_cases(self, node: et.Element, param: Param) -> None:
+        # booleans
+        if self.get_attribute_value(node, 'type') == 'boolean':
+            self.handle_bool_param(node, param)
         
-        format attribute only applies to 'data' and 'data_collection' types
+        # selects
+        if self.get_attribute_value(node, 'type') == 'select':
+            self.handle_select_param(node, param) 
+
+
+    # move to BoolParam
+    def handle_bool_param(self, node: et.Element, param: Param) -> None:
+        """
+        This should actually be 'handle_bool()' or something
+
+        possible types:
+
+        true bool
+         - no truevalue / falsevalue 
+         - can only be UI param
+
+        flag bool 
+         - either truevalue or falsevalue are str & start with '-' or '--'
+         - the other value is blank str
+         - interpret as flag boolean
+
+        2 value select bool
+         - both truevalue and falsevalue are set
+         - both do not begin with '-' or '--'
+         - interpret as string param, add both options to helptext: "options: tv or fv"
+
+        2 value flag bool
+         - both truevalue and falsevalue are set
+         - both begin with either '-' or '--'
+         - break into 2 individual flag bools
+
+        weird bool
+         - one of truevalue or falsevalue are set
+         - it does not start with '--' or '-'
+         - interpret as flag bool for now. TODO
         """
 
-        galaxy_type = self.get_attribute_value(node, 'type')
+        truevalue = self.get_attribute_value(node, 'truevalue')
+        falsevalue = self.get_attribute_value(node, 'falsevalue')
 
-        if galaxy_type in self.parseable_datatypes:
-            if galaxy_type == "text":
-                # don't differentiate between single string and comma-separated. User can read helptext for usage. 
-                param.type = "String"  
+        #true bool (UI param)
+        if truevalue == '' and falsevalue == '':
+            pass
 
-            elif galaxy_type == "integer":
-                param.type = "Integer"
+        #flag bool
+        if truevalue.startswith('-') and falsevalue == '':
+            pass
+        elif falsevalue.startswith('-') and truevalue == '':
+            pass
 
-            elif galaxy_type == "float":
-                param.type = "Float"
+        # 2 value select bool
 
-            elif galaxy_type == "boolean":
-                param.type = "String"  # TODO! this is a fallback
 
-            elif galaxy_type == "select":
+    # move to SelectParam
+    def handle_select_param(self, node: et.Element, param: Param) -> None:
+        param.options = self.get_param_options(node)
+
+
+    def infer_janis_type(self, node: et.Element, param: Param) -> None:
+        """
+        try to guess the real param datatype as would appear in janis tool description. 
+
+        more reporting here?
+        """
+
+        gx_type = self.get_attribute_value(node, 'type')
+
+        if gx_type in self.parseable_datatypes:
+            # straight conversions
+            if gx_type in ['text', 'integer', 'float', 'color']:
+                param.datatype = self.gx_janis_datatype_mapping[gx_type]
+
+            # special cases
+            elif gx_type == "data":
+                param.datatype = self.get_data_elem_type(node)
+
+            elif gx_type == "boolean":
+                param.datatype = self.get_bool_elem_type(node)
+            
+            elif gx_type == "select":
                 if self.get_attribute_value(node, 'multiple') == 'true':
                     param.is_array == True
-                param.type = self.get_select_elem_type(param)
+                param.datatype = self.get_select_elem_type(param)
 
-            elif galaxy_type == "color":
-                param.type = "String"  # usually color name or #hexcode
+            elif gx_type == "data_collection":
+                raise Exception('wtf error: param type="data_collection"')
+                
+            elif gx_type == "data_column":
+                raise Exception('wtf error: param type="data_column"')  # TODO
 
-            elif galaxy_type == "data_column":
-                pass  # TODO
-
-            elif galaxy_type == "hidden":
-                pass  # TODO
+            elif gx_type == "hidden":
+                raise Exception('wtf error: param type="hidden"')  # TODO
             
-            elif galaxy_type == "data":
-                param.type = self.get_data_elem_types(node)
-
-            elif galaxy_type == "data_collection":
-                param.is_array == True  # ?
-                param.type = self.get_data_collection_elem_types(node)
-        
         else:
-            self.logger.log(1, f'could not extract type from {galaxy_type} param')
+            self.logger.log(1, f'could not extract type from {gx_type} param')
 
-        if param.type == '':
+        if param.datatype == '':
             print()
-        return param
+        
 
 
     def get_select_elem_type(self, param: Param) -> str:
@@ -276,7 +230,7 @@ class ParamParser:
         return param_type
 
 
-    def get_data_elem_types(self, node: et.Element) -> list[str]:
+    def get_data_elem_type(self, node: et.Element) -> str:
         """
         datatype hints found in "format" attribute
         sometimes this will be all that's needed, other times we need to do more work. 
@@ -286,13 +240,6 @@ class ParamParser:
         type_list = list(set(type_list))
 
         return ','.join(type_list)
-
-
-    def get_data_collection_elem_types(self, node: et.Element) -> str:
-        """
-        TODO later
-        """
-        return ""
 
 
     def cast_list(self, the_list: list[str]) -> str:

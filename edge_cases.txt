@@ -1,0 +1,36 @@
+
+
+velvetg:
+#if $coverage.cutoff == "auto":
+    -cov_cutoff auto
+
+
+cheetah functions
+#def text_to_rstringarray($text)
+    #set $list = $text.strip().rstrip(',').split(',')
+
+    #set $rstringarray = "c("
+
+    #for $i in range(len($list))
+        #set $elem = $list[$i].strip()
+        #if $elem != ""
+            #set $rstringarray += '"'
+            #set $rstringarray += $elem
+            #set $rstringarray += '"'
+            #if $i != len($list) - 1
+                #set $rstringarray += ','
+            #end if
+        #end if
+    #end for
+
+    #set $rstringarray += ')'
+    #return $rstringarray
+    
+#end def
+
+
+
+
+
+
+

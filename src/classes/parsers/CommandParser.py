@@ -5,7 +5,7 @@
 from typing import Union
 import xml.etree.ElementTree as et
 
-from classes.datastructures.Param import Param
+from classes.datastructures.Params import Param
 
 
 class CommandParser:
@@ -26,7 +26,7 @@ class CommandParser:
         command_string = self.get_command_string()
         command_lines = self.clean_command(command_string)
         self.link_prefixes_to_params(command_lines)
-        self.remove_ui_params()
+        self.mark_ui_params()
         self.resolve_multi_prefix_params()
         self.split_flag_options_params()
         print()
@@ -61,22 +61,29 @@ class CommandParser:
         
 
     def split_by_sep(self, the_input: Union[list[str], str], sep: str) -> list[str]:
-        # can handle strings or list of strings
+        """
+        splits a list or string by sep
+        if list, attempts to split each elem using the sep
+        flattens the output list to 1 dimension. returns list.
+        """
         out_list: list[str] = []
 
         # if a string
         if type(the_input) == str:
-            out_list += self.clean_split_string(the_input, sep) # type: ignore
+            out_list += self.split_string_clean(the_input, sep) # type: ignore
 
         # if a list
         if type(the_input) == list:
             for elem in the_input:
-                out_list += self.clean_split_string(elem, sep)
+                out_list += self.split_string_clean(elem, sep)
                 
         return out_list
 
 
-    def clean_split_string(self, the_string: str, sep: str) -> list[str]:
+    def split_string_clean(self, the_string: str, sep: str) -> list[str]:
+        """
+        splits string, then removes empty elems and elem whitespace
+        """
         the_list = the_string.split(sep)
         the_list = [item.strip(' ').strip('\t') for item in the_list]
         the_list = [item for item in the_list if item != '']
@@ -84,7 +91,9 @@ class CommandParser:
 
 
     def remove_comments(self, command_list: list[str]) -> list[str]:
-        # removes cheetah comments from command lines
+        """
+        removes cheetah comments from command lines
+        """
         clean_list = []
         for item in command_list:
             item = item.split('##')[0]
@@ -95,7 +104,7 @@ class CommandParser:
 
     def remove_cheetah_conditionals(self, command_list: list[str]) -> list[str]:
         """
-        cheetah follows python line syntax so #if etc directives should appear at start of line
+        removes conditional logic from command. marks variables which appear in conditional logic (as may be solely UI params)
         """
         cheetah_conditionals = ['#if', '#else', '#elif', '#end', '#while', '#return', '#import', '#def']
         out_list = []
@@ -104,7 +113,7 @@ class CommandParser:
             if line.split(' ', 1)[0] in cheetah_conditionals:
                 for param in self.params.values():
                     if self.find_param_in_line(param, line) != -1:
-                        # param var was found in line with conditional
+                        # mark param as found in line with conditional
                         self.params[param.gx_var].appears_in_conditional = True
             else:
                 out_list.append(line)
@@ -115,8 +124,8 @@ class CommandParser:
     
     def link_prefixes_to_params(self, command_lines: list[str]) -> None:
         """
-        do I have to worry about variables in paths? probs not 
-
+        after param is found in command string, looks at prev word to identify 
+        whether it looks like a prefix
         """
         for line in command_lines:
             for param in self.params.values():
@@ -133,51 +142,65 @@ class CommandParser:
         
         for i, word in enumerate(command_list):
             if var in word:
-                if self.is_cheetah_var(var, word):
+                if self.confirm_cheetah_var(var, word):
                     return i
+
         return -1
+
+
+    def confirm_cheetah_var(self, var: str, command_word: str) -> bool:
+        """
+        $var '${var}' "${var}" '$var' "$var" all valid. 
+        """
+
+        # sometimes its last word in conditional logic line
+        command_word = command_word.rstrip(':')
+
+        # confirm quote pairs
+        if command_word[0] in ['"', "'"]:
+            if command_word[-1] != command_word[0]:
+                return False
+        command_word = command_word.strip('"').strip("'")
+
+        # confirm $ beginning
+        # possible values at this stage: [$var, ${var}]
+        if command_word[0] != '$':
+            return False
+        command_word = command_word.strip('$')
+        
+        # handle curly brackets
+        # possible values at this stage: [var, {var}]
+        if command_word[0] == '{':
+            if command_word[-1] != '}':
+                return False
+        command_word = command_word.strip('{').strip('}')
+
+        # command_word should now equal var
+        if command_word != var:
+            return False
+        
+        return True
+
 
 
     def attempt_prefix_link(self, param: Param, i: int, command_line: list[str]) -> None:
         command_list = command_line.split(' ')
-        if self.is_cheetah_var(param.gx_var, command_list[i]):
-
-            # add the possible prefix to resolve later
+        if self.confirm_cheetah_var(param.gx_var, command_list[i]):
             param.prefix_collector.add(i, command_list, param.gx_var)
 
 
-    def is_cheetah_var(self, var: str, command_word: str) -> bool:
-        """
-        $var '${var}' "${var}" all valid. 
-        """
-
-        # type 1 above
-        openformat = '$'
-        closeformat = '' 
-
-        # type 2 & 3 above
-        if command_word[0] in ["'", '"']:
-            quote = command_word[0]
-            openformat = '{}{}'.format(quote, '${')
-            closeformat = '{}{}'.format('}', quote)
-
-        varopen, varclose = command_word.split(var)
-        if varopen == openformat and varclose == closeformat:
-            return True
-
-        return False
-
-
-    def remove_ui_params(self) -> None:
+    def mark_ui_params(self) -> None:
         for param in self.params.values():
             if param.prefix == '':
                 if param.appears_in_conditional and not param.located_in_command:
                     param.is_ui_param = True
 
 
-
     def resolve_multi_prefix_params(self) -> None:
-        for param_var, param in self.params.items():
+        """
+        Just in case we find two possible valid prefixes for a param
+        """
+        for param in self.params.values():
             param.resolve_multiple_prefixes()
             param.set_prefix_from_collector()
             print()
@@ -190,9 +213,6 @@ class CommandParser:
             # TODO this is not always the case! By coincidence
             # another flag param (not included galaxy UI) might preceed!
             # rare though. 
-
-
-
 
             # check the following about param options: 
             #   all start with '-'
