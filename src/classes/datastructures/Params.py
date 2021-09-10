@@ -14,10 +14,11 @@ from utils.galaxy import get_common_extension, convert_extensions
 # missing logging: logger.log_unknown_type(1, item)
 
 class Param:
-    def __init__(self, node: et.Element, tree_path: list[str]):
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
         self.logger = Logger()
         self.node = node
         self.tree_path = tree_path
+        self.command_lines = command_lines
 
         # basic info for each Param subclass
         self.name: str = ''
@@ -106,8 +107,8 @@ class Param:
 
 
 class TextParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
         # type="color" is also TextParam
         self.datatype: str = 'String' #?
 
@@ -129,8 +130,8 @@ class TextParam(Param):
 
 
 class IntParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
         self.datatype: str = 'Integer'
 
 
@@ -140,8 +141,8 @@ class IntParam(Param):
 
 
 class FloatParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
         self.datatype: str = 'Float'
 
 
@@ -151,8 +152,8 @@ class FloatParam(Param):
 
 
 class DataParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
         self.datatype: str = ''
 
 
@@ -177,18 +178,63 @@ class DataParam(Param):
 
 
 class BoolParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
 
 
     def parse(self) -> None:
         pass
 
 
+    def handle_bool_param(self, node: et.Element, param: Param) -> None:
+        """
+        This should actually be 'handle_bool()' or something
+
+        possible types:
+
+        true bool
+         - no truevalue / falsevalue 
+         - can only be UI param
+
+        flag bool 
+         - either truevalue or falsevalue are str & start with '-' or '--'
+         - the other value is blank str
+         - interpret as flag boolean
+
+        2 value select bool
+         - both truevalue and falsevalue are set
+         - both do not begin with '-' or '--'
+         - interpret as string param, add both options to helptext: "options: tv or fv"
+
+        2 value flag bool
+         - both truevalue and falsevalue are set
+         - both begin with either '-' or '--'
+         - break into 2 individual flag bools
+
+        weird bool
+         - one of truevalue or falsevalue are set
+         - it does not start with '--' or '-'
+         - interpret as flag bool for now. TODO
+        """
+
+        truevalue = self.get_attribute_value(node, 'truevalue')
+        falsevalue = self.get_attribute_value(node, 'falsevalue')
+
+        #true bool (UI param)
+        if truevalue == '' and falsevalue == '':
+            pass
+
+        #flag bool
+        if truevalue.startswith('-') and falsevalue == '':
+            pass
+        elif falsevalue.startswith('-') and truevalue == '':
+            pass
+
+
 
 class SelectParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
         self.options: list[str] = []
         self.select_type: str = ''  # the flavour of select param
         self.get_param_options()
@@ -196,6 +242,29 @@ class SelectParam(Param):
 
     def parse(self) -> None:
         pass
+
+
+    def get_select_elem_type(self, param: Param) -> str:
+        """
+        infers select param type. 
+        Uses the different values in the option elems.
+        param options are already stored in param.options
+        """
+        param_type = "String"  # fallback
+
+        # are the option values all a particular type?
+        castable_type = self.cast_list(param.options)
+
+        # do the option values all have a common extension? 
+        common_extension = get_common_extension(param.options)
+        
+        # deciding what the type should be from our results
+        if common_extension != '':
+            param_type = common_extension
+        elif castable_type != '':
+            param_type = castable_type
+
+        return param_type
 
 
     def get_param_options(self) -> None:
@@ -211,8 +280,8 @@ class SelectParam(Param):
 
 
 class DataCollectionParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
 
 
     def parse(self) -> None:
@@ -221,8 +290,8 @@ class DataCollectionParam(Param):
 
 
 class DataColumnParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
 
 
     def parse(self) -> None:
@@ -231,8 +300,8 @@ class DataColumnParam(Param):
 
 
 class HiddenParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
-        super().__init__(node, tree_path)
+    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+        super().__init__(node, tree_path, command_lines)
 
     
     def parse(self) -> None:

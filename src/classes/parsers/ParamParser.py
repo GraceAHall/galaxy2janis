@@ -3,19 +3,22 @@
 from copy import deepcopy
 from collections import Counter
 
-from classes.datastructures.Params import Param
+from classes.datastructures.Params import Param, TextParam, IntParam, FloatParam, DataParam, BoolParam, SelectParam, DataCollectionParam, DataColumnParam, HiddenParam
 from classes.Logger import Logger
 from xml.etree import ElementTree as et
 
-"""
-iterates through xml tree nodes, parsing params if encountered. 
-"""
+
 
 class ParamParser:
-    def __init__(self, tree: et.ElementTree):
+    """
+    iterates through xml tree nodes, parsing params if encountered. 
+    """
+    
+    def __init__(self, tree: et.ElementTree, command_lines: list[str]):
         # other helper classes
         self.logger: Logger = Logger()   
         self.tree: et.ElementTree = tree
+        self.command_lines = command_lines
         self.param_list: list[Param] = []
         self.params: dict[str, Param] = {}
 
@@ -83,244 +86,144 @@ class ParamParser:
         """
         parses a param elem. accepts a tree node, returns a new Param
         RESTRUCTURE!
-        """
-
-        # changed order! parse the command string before params!!!
 
 
-        param = Param(node, tree_path)
-        new_params = param.parse()
-
-        print(new_params)
-
-        # kill this stufff
-        self.set_basic_details(node, new_param)
-        self.handle_edge_cases(node, new_param)
-        self.infer_janis_type(node, new_param)
-
-        return new_param
-
-
-    def handle_edge_cases(self, node: et.Element, param: Param) -> None:
-        # booleans
-        if self.get_attribute_value(node, 'type') == 'boolean':
-            self.handle_bool_param(node, param)
+        each param subclass gets:
+         - parent node
+         - command lines (incl conditionals)
         
-        # selects
-        if self.get_attribute_value(node, 'type') == 'select':
-            self.handle_select_param(node, param) 
+        Method
+        initialize_params()
+        
+
+        for each param:
+         - param.parse():
+         - param.parse_basic_details()
+         - param.parse_ 
+            - parse_
+         - param.parse_datatype()
+         - param.parse_datatype()
 
 
-    # move to BoolParam
-    def handle_bool_param(self, node: et.Element, param: Param) -> None:
-        """
-        This should actually be 'handle_bool()' or something
-
-        possible types:
-
-        true bool
-         - no truevalue / falsevalue 
-         - can only be UI param
-
-        flag bool 
-         - either truevalue or falsevalue are str & start with '-' or '--'
-         - the other value is blank str
-         - interpret as flag boolean
-
-        2 value select bool
-         - both truevalue and falsevalue are set
-         - both do not begin with '-' or '--'
-         - interpret as string param, add both options to helptext: "options: tv or fv"
-
-        2 value flag bool
-         - both truevalue and falsevalue are set
-         - both begin with either '-' or '--'
-         - break into 2 individual flag bools
-
-        weird bool
-         - one of truevalue or falsevalue are set
-         - it does not start with '--' or '-'
-         - interpret as flag bool for now. TODO
         """
 
-        truevalue = self.get_attribute_value(node, 'truevalue')
-        falsevalue = self.get_attribute_value(node, 'falsevalue')
+        params = self.initialize_params(node, tree_path)
+        for param in params:
+            param.parse()
+ 
 
-        #true bool (UI param)
-        if truevalue == '' and falsevalue == '':
-            pass
+    def initialize_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
+        # get param type
+        param_type = node.attrib['type']
 
-        #flag bool
-        if truevalue.startswith('-') and falsevalue == '':
-            pass
-        elif falsevalue.startswith('-') and truevalue == '':
-            pass
+        # params we can initalize immediately
+        if param_type in ['text', 'color']:
+            return [TextParam(node, tree_path, self.command_lines)]
 
-        # 2 value select bool
+        elif param_type == 'integer':
+            return [IntParam(node, tree_path, self.command_lines)]
 
+        elif param_type == 'data':
+            return [DataParam(node, tree_path, self.command_lines)]
 
-    # move to SelectParam
-    def handle_select_param(self, node: et.Element, param: Param) -> None:
-        param.options = self.get_param_options(node)
+        elif param_type == 'data_collection':
+            raise Exception('wtf error: param type="data_collection"')
+            return [DataCollectionParam(node, tree_path, self.command_lines)]
 
+        elif param_type == 'data_column':
+            raise Exception('wtf error: param type="data_column"')
+            return [DataColumnParam(node, tree_path, self.command_lines)]
 
-    def infer_janis_type(self, node: et.Element, param: Param) -> None:
-        """
-        try to guess the real param datatype as would appear in janis tool description. 
+        elif param_type == 'hidden':
+            raise Exception('wtf error: param type="hidden"')
+            return [HiddenParam(node, tree_path, self.command_lines)]
 
-        more reporting here?
-        """
+        # params which need more processing and potential splitting
+        elif param_type == 'boolean':
+            new_params = self.initialize_bool_params(node, tree_path)
+            return new_params
 
-        gx_type = self.get_attribute_value(node, 'type')
+        elif param_type == 'select':
+            new_params = self.initialize_select_params(node, tree_path)
+            return new_params
+    
 
-        if gx_type in self.parseable_datatypes:
-            # straight conversions
-            if gx_type in ['text', 'integer', 'float', 'color']:
-                param.datatype = self.gx_janis_datatype_mapping[gx_type]
+    def initialize_bool_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
+        tv = node.attrib['truevalue'] or ''  #TODO bring back get_attribute_value()
+        fv = node.attrib['falsevalue'] or ''  #TODO bring back get_attribute_value()
 
-            # special cases
-            elif gx_type == "data":
-                param.datatype = self.get_data_elem_type(node)
-
-            elif gx_type == "boolean":
-                param.datatype = self.get_bool_elem_type(node)
-            
-            elif gx_type == "select":
-                if self.get_attribute_value(node, 'multiple') == 'true':
-                    param.is_array == True
-                param.datatype = self.get_select_elem_type(param)
-
-            elif gx_type == "data_collection":
-                raise Exception('wtf error: param type="data_collection"')
-                
-            elif gx_type == "data_column":
-                raise Exception('wtf error: param type="data_column"')  # TODO
-
-            elif gx_type == "hidden":
-                raise Exception('wtf error: param type="hidden"')  # TODO
-            
+        if self.is_flag_param_list([tv, fv]):
+            # create 2 flag bools
+            label = node.attrib['label'] or ''
+            param1 = self.create_bool_node(tv, label)
+            param2 = self.create_bool_node(fv, label)
+            return [param1, param2]
         else:
-            self.logger.log(1, f'could not extract type from {gx_type} param')
-
-        if param.datatype == '':
-            print()
+            return [BoolParam(node, tree_path, self.command_lines)]
         
 
+        return []
 
-    def get_select_elem_type(self, param: Param) -> str:
-        """
-        infers select param type. 
-        Uses the different values in the option elems.
-        param options are already stored in param.options
-        """
-        param_type = "String"  # fallback
 
-        # are the option values all a particular type?
-        castable_type = self.cast_list(param.options)
+    def initialize_select_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
+        options = self.get_select_options(node)
 
-        # do the option values all have a common extension? 
-        common_extension = self.get_common_extension(param.options)
+        # should split into flag bools
+        if self.is_flag_param_list(options):
+            params = []
+
+            for opt in options:
+                temp_node = self.create_bool_node(opt['value'], opt['text'])
+                params.append(BoolParam(temp_node, tree_path, self.command_lines))
+            return params
+            
+        # dont split
+        else:
+            return [SelectParam(node, tree_path, self.command_lines)]            
+
+
+    def get_select_options(self, node: et.Element) -> list[dict]:
+        options = []
+
+        for child in node:
+            if child.tag == 'option':
+                opt = {'value': child.attrib['value'], 'text': child.text or ''}
+                options.append(opt)
         
-        # deciding what the type should be from our results
-        if common_extension != '':
-            param_type = common_extension
-        elif castable_type != '':
-            param_type = castable_type
-
-        return param_type
+        return options
 
 
-    def get_data_elem_type(self, node: et.Element) -> str:
-        """
-        datatype hints found in "format" attribute
-        sometimes this will be all that's needed, other times we need to do more work. 
-        """ 
-        type_list = self.get_attribute_value(node, 'format').split(',')
-        type_list = self.convert_extensions(type_list)
-        type_list = list(set(type_list))
-
-        return ','.join(type_list)
-
-
-    def cast_list(self, the_list: list[str]) -> str:
-        """
-        identifies whether all list items can be cast to a common datatype.
-        currently just float and int
-        """
-        castable_types = []
-
-        if self.can_cast_to_float(the_list):
-            castable_types.append('Float')
-        elif self.can_cast_to_int(the_list):
-            castable_types.append('Integer')
-
-        if 'Float' in castable_types:
-            if 'Integer' in castable_types:
-                return 'Integer'
-            else:
-                return 'Float'
-
-        return ''
+    def create_bool_node(self, val: str, text: str) -> et.Element:
+        attributes = {
+            'argument': val,
+            'label': text,
+            'type': 'boolean',
+            'checked': 'False',
+            'truevalue': val,
+            'falsevalue': ''
+        }
+        node = et.Element('param', attributes)
+        return node
 
 
-    def can_cast_to_float(self, the_list: list[str]) -> bool:
-        for item in the_list:
-            try:
-                float(item)
-            except ValueError:
-                return False
-        return True 
+    # write test?
+    def is_flag_param_list(self, options: list[str]) -> bool:
+        outcome = True
 
+        # check all the options start with '-'
+        for opt in options:
+            if not opt['value'].startswith('-'):
+                outcome = False
+                break
 
-    def can_cast_to_int(self, the_list: list[str]) -> bool:
-        for item in the_list:
-            if item[0] in ('-', '+'):
-                item = item[1:]
+        # ensure its just not because negative numbers
+        try: 
+            [float(opt['value']) for opt in options] 
+            outcome = False  # if reaches this point, all opts are float castable
+        except ValueError:
+            pass
 
-            if not item.isdigit():
-                return False
-
-        return True 
-
-
-    def get_common_extension(self, the_list: list[str]) -> str: 
-        """
-        identifies whether a list of items has a common extension. 
-        all items must share the same extension. 
-        will return the extension if true, else will return ""
-        """
-        
-        try:
-            ext_list = [item.rsplit('.', 1)[1] for item in the_list]
-        except IndexError:
-            return ''  # at least one item has no extension
-
-        ext_list = self.convert_extensions(ext_list)
-        ext_counter = Counter(ext_list)
-           
-        if len(ext_counter) == 1:  
-            ext, count = ext_counter.popitem() 
-            if count == len(the_list):  # does every item have the extension?
-                return ext 
-
-        return ""
-      
-
-    def convert_extensions(self, the_list: list[str]) -> list[str]:
-        """
-        converts galaxy extensions to janis. 
-        also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
-        """
-        out_list = []
-        for item in the_list:
-            if item in self.gx_janis_datatype_mapping:
-                ext = self.gx_janis_datatype_mapping[item]
-            else:
-                self.logger.log_unknown_type(1, item)
-                ext = 'String'  # fallback pretty bad but yeah. 
-            out_list.append(ext)
-
-        return out_list
+        return outcome
 
 
     def parse_repeat(self, node, tree_path):

@@ -22,14 +22,14 @@ class CommandParser:
         ]
 
 
-    def parse(self) -> None:
+    def parse(self) -> list[str]:
         command_string = self.get_command_string()
         command_lines = self.clean_command(command_string)
-        self.link_prefixes_to_params(command_lines)
-        self.mark_ui_params()
-        self.resolve_multi_prefix_params()
-        self.split_flag_options_params()
         print()
+        #self.link_prefixes_to_params(command_lines)
+        #self.mark_ui_params()
+        #self.resolve_multi_prefix_params()
+        return command_lines
 
 
     def get_command_string(self) -> str:
@@ -46,18 +46,11 @@ class CommandParser:
 
 
     def clean_command(self, the_string: str) -> list[str]:
-        out_tasks = []
-
-        # initial split by bash tasks
-        command_list = the_string.split('&&')
-        # TODO: allow for linking variables set with cheetah functions
-        # command_list = self.remove_function_defs(command_list) # important!
-        command_list = self.split_by_sep(command_list, ';')
-        command_list = self.split_by_sep(command_list, '\n')
-        command_list = self.remove_comments(command_list) # removes comments
-        command_list = self.remove_cheetah_conditionals(command_list)
-
-        return command_list
+        command_lines = the_string.split('&&')
+        command_lines = self.split_by_sep(command_lines, ';')
+        command_lines = self.split_by_sep(command_lines, '\n')
+        command_lines = self.remove_comments(command_lines)
+        return command_lines
         
 
     def split_by_sep(self, the_input: Union[list[str], str], sep: str) -> list[str]:
@@ -102,6 +95,7 @@ class CommandParser:
         return clean_list
     
 
+    # Param()
     def remove_cheetah_conditionals(self, command_list: list[str]) -> list[str]:
         """
         removes conditional logic from command. marks variables which appear in conditional logic (as may be solely UI params)
@@ -121,7 +115,7 @@ class CommandParser:
         return out_list
 
 
-    
+    # Param()
     def link_prefixes_to_params(self, command_lines: list[str]) -> None:
         """
         after param is found in command string, looks at prev word to identify 
@@ -136,6 +130,7 @@ class CommandParser:
                         self.attempt_prefix_link(param, loc, line)     
         
 
+    # Param()
     def find_param_in_line(self, param: Param, command_line: str) -> int:
         var = param.gx_var
         command_list = command_line.split(' ')
@@ -148,6 +143,7 @@ class CommandParser:
         return -1
 
 
+    # Param()
     def confirm_cheetah_var(self, var: str, command_word: str) -> bool:
         """
         $var '${var}' "${var}" '$var' "$var" all valid. 
@@ -182,20 +178,20 @@ class CommandParser:
         return True
 
 
-
+    # Param()
     def attempt_prefix_link(self, param: Param, i: int, command_line: list[str]) -> None:
         command_list = command_line.split(' ')
         if self.confirm_cheetah_var(param.gx_var, command_list[i]):
             param.prefix_collector.add(i, command_list, param.gx_var)
 
-
+    # Param()
     def mark_ui_params(self) -> None:
         for param in self.params.values():
             if param.prefix == '':
                 if param.appears_in_conditional and not param.located_in_command:
                     param.is_ui_param = True
 
-
+    # Param()
     def resolve_multi_prefix_params(self) -> None:
         """
         Just in case we find two possible valid prefixes for a param
@@ -205,19 +201,6 @@ class CommandParser:
             param.set_prefix_from_collector()
             print()
 
-
-    def split_flag_options_params(self) -> None:
-        for param_var, param in self.params.items():
-            pass
-            # is the param missing a prefix?
-            # TODO this is not always the case! By coincidence
-            # another flag param (not included galaxy UI) might preceed!
-            # rare though. 
-
-            # check the following about param options: 
-            #   all start with '-'
-            #   all only consist of single word
-            
             
 
 

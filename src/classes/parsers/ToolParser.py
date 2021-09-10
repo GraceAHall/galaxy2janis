@@ -22,6 +22,7 @@ class ToolParser:
         self.workdir = workdir
         self.tree: et.ElementTree = et.parse(f'{workdir}/{filename}')
         self.root: et.Element = self.tree.getroot()
+        self.command_lines: list[str] = [] 
 
         self.galaxy_depth_elems = ['conditional', 'section']
         self.ignore_elems = ['outputs', 'tests']
@@ -52,20 +53,22 @@ class ToolParser:
         print()
 
 
-    # 3rd step: param parsing
+    # 3rd step: command parsing & linking to params
+    def parse_command(self):
+        cp = CommandParser(self.tree, self.params)
+        self.command_lines = cp.parse()
+        print()
+
+
+    # 4th step: param parsing
     def parse_params(self):
         # includes repeats
         # includes outputs? 
-        pp = ParamParser(self.tree)
+        pp = ParamParser(self.tree, self.command_lines)
         pp.parse()
         self.params = pp.params
 
 
-    # 4th step: command parsing & linking to params
-    def parse_command(self):
-        cp = CommandParser(self.tree, self.params)
-        cp.parse()
-        print()
 
 
     # 5th step: parsing tool metadata

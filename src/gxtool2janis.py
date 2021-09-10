@@ -17,13 +17,13 @@ def main(argv):
     tp.parse_tokens()
     tp.write_tree('output.xml')
     
-    # params
-    tp.parse_params()
-    tp.write_tree('output.xml')
-    
     # command
     tp.parse_command()
     tp.pretty_print()
+    
+    # params
+    tp.parse_params()
+    tp.write_tree('output.xml')
     
     # metadata
     #tp.parse_metadata()

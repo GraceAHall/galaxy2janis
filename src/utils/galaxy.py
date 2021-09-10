@@ -101,3 +101,44 @@ def convert_extensions(the_list: list[str]) -> list[str]:
         out_list.append(ext)
 
     return out_list
+
+
+def cast_list(self, the_list: list[str]) -> str:
+    """
+    identifies whether all list items can be cast to a common datatype.
+    currently just float and int
+    """
+    castable_types = []
+
+    if self.can_cast_to_float(the_list):
+        castable_types.append('Float')
+    elif self.can_cast_to_int(the_list):
+        castable_types.append('Integer')
+
+    if 'Float' in castable_types:
+        if 'Integer' in castable_types:
+            return 'Integer'
+        else:
+            return 'Float'
+
+    return ''
+
+
+def can_cast_to_float(self, the_list: list[str]) -> bool:
+    for item in the_list:
+        try:
+            float(item)
+        except ValueError:
+            return False
+    return True 
+
+
+def can_cast_to_int(self, the_list: list[str]) -> bool:
+    for item in the_list:
+        if item[0] in ('-', '+'):
+            item = item[1:]
+
+        if not item.isdigit():
+            return False
+
+    return True 
