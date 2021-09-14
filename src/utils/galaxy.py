@@ -2,6 +2,7 @@
 
 
 from collections import Counter
+from xml.etree import ElementTree as et
 
 
 gx_janis_datatype_mapping = {
@@ -64,6 +65,24 @@ gx_janis_datatype_mapping = {
 }
 
 
+def get_attribute_value(node: et.Element, attribute: str) -> str:
+        '''
+        accepts node, returns attribute value or "" 
+        '''
+        for key, val in node.attrib.items():
+            if key == attribute:
+                return val
+        return ""
+
+
+def get_param_name(node: et.Element) -> str:
+    name = get_attribute_value(node, 'name')
+    if name == '':
+        name = get_attribute_value(node, 'argument').lstrip('-').replace('-', '_')
+    assert(name != '') 
+    return name
+
+
 def get_common_extension(the_list: list[str]) -> str: 
     """
     identifies whether a list of items has a common extension. 
@@ -103,16 +122,16 @@ def convert_extensions(the_list: list[str]) -> list[str]:
     return out_list
 
 
-def cast_list(self, the_list: list[str]) -> str:
+def cast_list(the_list: list[str]) -> str:
     """
     identifies whether all list items can be cast to a common datatype.
     currently just float and int
     """
     castable_types = []
 
-    if self.can_cast_to_float(the_list):
+    if can_cast_to_float(the_list):
         castable_types.append('Float')
-    elif self.can_cast_to_int(the_list):
+    elif can_cast_to_int(the_list):
         castable_types.append('Integer')
 
     if 'Float' in castable_types:
@@ -124,7 +143,7 @@ def cast_list(self, the_list: list[str]) -> str:
     return ''
 
 
-def can_cast_to_float(self, the_list: list[str]) -> bool:
+def can_cast_to_float(the_list: list[str]) -> bool:
     for item in the_list:
         try:
             float(item)
@@ -133,7 +152,7 @@ def can_cast_to_float(self, the_list: list[str]) -> bool:
     return True 
 
 
-def can_cast_to_int(self, the_list: list[str]) -> bool:
+def can_cast_to_int(the_list: list[str]) -> bool:
     for item in the_list:
         if item[0] in ('-', '+'):
             item = item[1:]

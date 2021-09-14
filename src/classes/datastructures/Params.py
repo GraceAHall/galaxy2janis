@@ -1,73 +1,86 @@
 
-# pyright: strict
+# pyright: basic
 
 # Optional[str] means the type can be str or None. 
 
 from xml.etree import ElementTree as et
+from typing import Optional
 
 from classes.Logger import Logger
-from classes.PrefixCollector import PrefixCollector
+from classes.VariableFinder import VariableFinder, VariableReference # type: ignore
 
-from utils.galaxy import get_common_extension, convert_extensions
+from utils.galaxy import get_common_extension, convert_extensions, cast_list, get_attribute_value
 
 
 # missing logging: logger.log_unknown_type(1, item)
 
 class Param:
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         self.logger = Logger()
         self.node = node
         self.tree_path = tree_path
-        self.command_lines = command_lines
+        self.cmd_lines = cmd_lines
 
         # basic info for each Param subclass
         self.name: str = ''
         self.gx_var: str = ''
+        self.datatype: str = ''
         self.default_value: str = ''
         self.help_text: str = ''
         self.is_optional: bool = False
+        self.cmd_references: list[VariableReference] = []
 
         # checks
-        self.located_in_command: bool = False
-        self.appears_in_conditional: bool = False
-        self.is_ui_param: bool = False  
+        self.has_command_ref: bool = False
+        self.has_conditional_ref: bool = False
         self.is_argument: bool = False   
 
-        # bools (probably will delete)
-        self.is_array: bool = False  
+        # other bools (probably will delete)
+        self.is_array: bool = False  # text?
+        self.validated: bool = False
 
         # linking to command string
-        self.prefix_collector = PrefixCollector()
-        self.prefix: str = ''
+        self.prefix: Optional[str] = None
 
         # galaxy stuff
         self.truths = ['true', 'True']
+
+
+    def parse_common_features(self) -> None:
+        self.set_basic_details()
+        self.set_gx_var()
+        self.set_references()
+        self.set_prefix()
+        self.validate()
         
 
     def set_basic_details(self) -> None:
-        if self.get_attribute_value(self.node, 'argument') == '':
-            self.name = self.get_attribute_value(self.node, 'name')
+        # name & prefix 
+        if get_attribute_value(self.node, 'argument') == '':
+            self.name = get_attribute_value(self.node, 'name')
         else:
-            argument = self.get_attribute_value(self.node, 'argument')
+            argument = get_attribute_value(self.node, 'argument')
             self.name = argument.lstrip('-').replace('-', '_') 
             self.prefix = argument  # TODO find this in command pls
             self.is_argument = True
 
-        # defaults, optional, helptext    
-        self.default_value = self.get_attribute_value(self.node, 'value')
-        self.help_text = self.get_attribute_value(self.node, 'help')
-        if self.get_attribute_value(self.node, 'optional') in self.truths:
+        # defaults    
+        self.default_value = get_attribute_value(self.node, 'value')
+
+        # help text
+        self.set_help_text()
+        
+        # is optional
+        if get_attribute_value(self.node, 'optional') in self.truths:
             self.is_optional = True
 
 
-    def get_attribute_value(self, node: et.Element, attribute: str) -> str:
-        '''
-        accepts node, returns attribute value or "" 
-        '''
-        for key, val in self.node.attrib.items():
-            if key == attribute:
-                return val
-        return ""
+    def set_help_text(self) -> None:
+        help_text = get_attribute_value(self.node, 'help')
+        label = get_attribute_value(self.node, 'label')
+        if help_text == '' and label != '':
+            help_text = label
+        self.help_text = help_text
 
 
     def set_gx_var(self) -> None:
@@ -78,173 +91,187 @@ class Param:
             self.gx_var = tree_path + f'.{self.name}'
 
 
-    # hmmmmm
-    def resolve_multiple_prefixes(self) -> None:
-        if len(self.prefix_collector.prefixes) > 1:
-            self.prefix_collector.user_select_prefix()
+    def set_references(self) -> None:
+        vf = VariableFinder(self.gx_var, self.cmd_lines) # type: ignore
+        self.cmd_references = vf.find() # type: ignore
+        self.set_cmd_ref_details()
 
-
-    # hmmmmm
-    def set_prefix_from_collector(self) -> None:
-        assert(len(self.prefix_collector.prefixes) in [0, 1])
-
-        if len(self.prefix_collector.prefixes) == 1:
-            if self.prefix != '':  # no idea if this would happen 
-                raise Exception('prefix is set but trying to set from PrefixCollector')
+    
+    def set_cmd_ref_details(self) -> None:
+        for ref in self.cmd_references:
+            if ref.in_conditional:
+                self.has_conditional_ref = True
             else:
-                self.prefix = self.prefix_collector.prefixes[0].text
-          
+                self.has_command_ref = True
+
+
+    def set_prefix(self):
+        """
+        single occurance in cmd string (ref) usually (ignoring cheetah 
+        conditional lines) 
+        multiple refs need human decision.
+        """
+        cmd_refs = self.cmd_references 
+        cmd_refs = [ref for ref in cmd_refs if not ref.in_conditional]  
+        
+        if len(cmd_refs) == 1:
+            self.prefix = cmd_refs[0].prefix
+        elif len(cmd_refs) > 1:
+            self.prefix = self.user_select_prefix()
+        
+ 
+    def user_select_prefix(self) -> str:
+        # print basics
+        print('--- prefix selection ---')
+        print(f'var: {self.gx_var}')
+        print('possible prefixes:\n')
+
+        # print each candidate prefix
+        for i, ref in enumerate(self.cmd_references):
+            print(f'reference {i}')
+            print(ref)
+        
+        selected_elem = int(input('correct prefix (num)'))
+        prefix = self.cmd_references[selected_elem].prefix
+        return prefix
+        
+
+    def validate(self) -> None:
+        # more to come? 
+        try:
+            assert(self.name != '')
+            assert(self.gx_var != None)
+            assert(self.node != None)
+            assert(self.has_command_ref or self.has_conditional_ref)
+            self.validated = True
+        except AssertionError:
+            print()
+
 
     def __str__(self):
         out_str = ''
         out_str += '\nparam --------------\n'
 
-        for key, val in dir(self):
-            out_str += f'{key}:\t{val}\n'
+        out_str += f'gx_var: {self.gx_var}\n'
+        out_str += f'prefix: {self.prefix}\n'
+        out_str += f'datatype: {self.datatype}\n'
+        out_str += f'default_value: {self.default_value}\n'
+        out_str += f'help_text: {self.help_text}\n'
+        out_str += f'is_optional: {self.is_optional}\n'
+        out_str += f'has_command_ref: {self.has_command_ref}\n'
+        out_str += f'validated: {self.validated}\n'
 
         return out_str
 
 
 
 class TextParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
         # type="color" is also TextParam
         self.datatype: str = 'String' #?
 
 
-    # generic structure
     def parse(self) -> None:
-        self.set_basic_details()
-        self.set_type()
-        self.locate_in_command()
-        self.set_prefix()
-        self.validate()
-
-        # returns list of generated Janis Params from the galaxy param
-        return self.params
-
-
-
+        self.parse_common_features()
 
 
 
 class IntParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
         self.datatype: str = 'Integer'
 
 
     def parse(self) -> None:
-        pass
+        self.parse_common_features()
 
 
 
 class FloatParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
         self.datatype: str = 'Float'
 
 
     def parse(self) -> None:
-        pass
+        self.parse_common_features()
 
 
 
 class DataParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
         self.datatype: str = ''
 
 
     def parse(self) -> None:
-        pass
+        self.parse_common_features()
+        self.set_datatype()
 
 
-    def set_datatype(self):
-        pass
-
-    # ?
-    def validate(self):
-        # for each param, param gets the command string & attempts to 
-        # find itself
-        pass
-
-
-    def set_prefix(self):
-        # param uses command string to find its --prefix (if correct param subclass)  uses PrefixCollector? 
-        pass
-
+    def set_datatype(self) -> None:
+        gx_format = get_attribute_value(self.node, 'format')
+        gx_datatypes = gx_format.split(',') 
+        datatypes = convert_extensions(gx_datatypes)
+        self.datatype = ','.join(datatypes)
 
 
 class BoolParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
+        self.datatype = 'Boolean'
 
 
     def parse(self) -> None:
-        pass
+        self.validate_value_order()
+        self.parse_common_features()
+        #self.set_flag()
 
 
-    def handle_bool_param(self, node: et.Element, param: Param) -> None:
-        """
-        This should actually be 'handle_bool()' or something
+    def validate_value_order(self) -> None:
+        tv = get_attribute_value(self.node, 'truevalue')
+        fv = get_attribute_value(self.node, 'falsevalue')
+        if tv == '' and fv != '':
+            self.node.attrib['truevalue'] = fv
+            self.node.attrib['falsevalue'] = tv
 
-        possible types:
 
-        true bool
-         - no truevalue / falsevalue 
-         - can only be UI param
+    def set_prefix(self):
+        self.prefix = get_attribute_value(self.node, 'truevalue')
 
-        flag bool 
-         - either truevalue or falsevalue are str & start with '-' or '--'
-         - the other value is blank str
-         - interpret as flag boolean
 
-        2 value select bool
-         - both truevalue and falsevalue are set
-         - both do not begin with '-' or '--'
-         - interpret as string param, add both options to helptext: "options: tv or fv"
-
-        2 value flag bool
-         - both truevalue and falsevalue are set
-         - both begin with either '-' or '--'
-         - break into 2 individual flag bools
-
-        weird bool
-         - one of truevalue or falsevalue are set
-         - it does not start with '--' or '-'
-         - interpret as flag bool for now. TODO
-        """
-
-        truevalue = self.get_attribute_value(node, 'truevalue')
-        falsevalue = self.get_attribute_value(node, 'falsevalue')
-
-        #true bool (UI param)
-        if truevalue == '' and falsevalue == '':
-            pass
-
-        #flag bool
-        if truevalue.startswith('-') and falsevalue == '':
-            pass
-        elif falsevalue.startswith('-') and truevalue == '':
-            pass
-
+    def set_flag(self) -> None:
+        self.flag = get_attribute_value(self.node, 'truevalue')
+        assert(self.flag != '')
 
 
 class SelectParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
         self.options: list[str] = []
         self.select_type: str = ''  # the flavour of select param
-        self.get_param_options()
     
 
     def parse(self) -> None:
-        pass
+        self.set_param_options()
+        self.parse_common_features()
+        self.set_datatype()
+        self.add_options_to_helptext()
 
 
-    def get_select_elem_type(self, param: Param) -> str:
+    def set_param_options(self) -> None:
+        option_values = []
+
+        for child in self.node:
+            if child.tag == 'option':
+                optval = get_attribute_value(child, 'value')
+                option_values.append(optval)  # type: ignore
+
+        self.options = option_values
+
+
+    def set_datatype(self) -> None:
         """
         infers select param type. 
         Uses the different values in the option elems.
@@ -253,10 +280,10 @@ class SelectParam(Param):
         param_type = "String"  # fallback
 
         # are the option values all a particular type?
-        castable_type = self.cast_list(param.options)
+        castable_type = cast_list(self.options)
 
         # do the option values all have a common extension? 
-        common_extension = get_common_extension(param.options)
+        common_extension = get_common_extension(self.options)
         
         # deciding what the type should be from our results
         if common_extension != '':
@@ -264,24 +291,23 @@ class SelectParam(Param):
         elif castable_type != '':
             param_type = castable_type
 
-        return param_type
+        self.datatype = param_type
 
 
-    def get_param_options(self) -> None:
-        option_values = []
+    def add_options_to_helptext(self) -> None:
+        options = ', '.join(self.options[:5])
 
-        for child in self.node:
-            if child.tag == 'option':
-                optval = self.get_attribute_value(child, 'value')
-                option_values.append(optval)  # type: ignore
+        # trail off if more than 5 options...
+        if len(self.options) > 5:
+            options += '...' 
 
-        self.options = option_values
+        self.help_text += f'  example values: {options}'
 
 
 
 class DataCollectionParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
 
 
     def parse(self) -> None:
@@ -290,8 +316,8 @@ class DataCollectionParam(Param):
 
 
 class DataColumnParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
 
 
     def parse(self) -> None:
@@ -300,8 +326,8 @@ class DataColumnParam(Param):
 
 
 class HiddenParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], command_lines: list[str]):
-        super().__init__(node, tree_path, command_lines)
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
 
     
     def parse(self) -> None:

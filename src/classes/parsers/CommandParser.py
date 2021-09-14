@@ -12,14 +12,7 @@ class CommandParser:
     def __init__(self, tree: et.ElementTree, params: dict[str, Param]):
         self.tree = tree
         self.params = params
-        self.banned_commands = [
-            'cp', 'tar', 'mkdir', 'pwd',
-            'which', 'cd', 'ls', 'cat', 'mv',
-            'rmdir', 'rm', 'touch', 'locate', 'find',
-            'grep', 'head', 'tail', 'chmod', 'chown', 
-            'wget', 'echo', 'zip', 'unzip', 'gzip',
-            'gunzip', 'export'
-        ]
+        
 
 
     def parse(self) -> list[str]:
@@ -96,23 +89,7 @@ class CommandParser:
     
 
     # Param()
-    def remove_cheetah_conditionals(self, command_list: list[str]) -> list[str]:
-        """
-        removes conditional logic from command. marks variables which appear in conditional logic (as may be solely UI params)
-        """
-        cheetah_conditionals = ['#if', '#else', '#elif', '#end', '#while', '#return', '#import', '#def']
-        out_list = []
-        
-        for line in command_list:
-            if line.split(' ', 1)[0] in cheetah_conditionals:
-                for param in self.params.values():
-                    if self.find_param_in_line(param, line) != -1:
-                        # mark param as found in line with conditional
-                        self.params[param.gx_var].appears_in_conditional = True
-            else:
-                out_list.append(line)
-
-        return out_list
+    
 
 
     # Param()
@@ -131,51 +108,11 @@ class CommandParser:
         
 
     # Param()
-    def find_param_in_line(self, param: Param, command_line: str) -> int:
-        var = param.gx_var
-        command_list = command_line.split(' ')
-        
-        for i, word in enumerate(command_list):
-            if var in word:
-                if self.confirm_cheetah_var(var, word):
-                    return i
-
-        return -1
+    
 
 
     # Param()
-    def confirm_cheetah_var(self, var: str, command_word: str) -> bool:
-        """
-        $var '${var}' "${var}" '$var' "$var" all valid. 
-        """
-
-        # sometimes its last word in conditional logic line
-        command_word = command_word.rstrip(':')
-
-        # confirm quote pairs
-        if command_word[0] in ['"', "'"]:
-            if command_word[-1] != command_word[0]:
-                return False
-        command_word = command_word.strip('"').strip("'")
-
-        # confirm $ beginning
-        # possible values at this stage: [$var, ${var}]
-        if command_word[0] != '$':
-            return False
-        command_word = command_word.strip('$')
-        
-        # handle curly brackets
-        # possible values at this stage: [var, {var}]
-        if command_word[0] == '{':
-            if command_word[-1] != '}':
-                return False
-        command_word = command_word.strip('{').strip('}')
-
-        # command_word should now equal var
-        if command_word != var:
-            return False
-        
-        return True
+    
 
 
     # Param()
