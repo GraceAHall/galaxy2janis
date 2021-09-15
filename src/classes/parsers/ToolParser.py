@@ -5,10 +5,13 @@ import xml.etree.ElementTree as et
 
 
 from classes.datastructures.Params import Param
+
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
-from classes.parsers.ParamParser import ParamParser
 from classes.parsers.CommandParser import CommandParser
+from classes.parsers.ParamParser import ParamParser
+from classes.ParamPostProcessor import ParamPostProcessor
+from classes.parsers.OutputParser import OutputParser
 from classes.parsers.MetadataParser import MetadataParser
 
 """
@@ -30,7 +33,16 @@ class ToolParser:
 
         self.tree_path: list[str] = []
         self.tokens: dict[str, str] = {}
-        self.params: dict[str, Param] = {}
+        self.params: list[Param] = []
+
+
+    def parse(self) -> None:
+        self.parse_macros()
+        self.parse_tokens()
+        self.parse_command()
+        self.parse_params()
+        self.parse_outputs()
+        self.parse_metadata()
 
 
     # 1st step: macro expansion (preprocessing)
@@ -55,23 +67,44 @@ class ToolParser:
 
     # 3rd step: command parsing & linking to params
     def parse_command(self):
-        cp = CommandParser(self.tree, self.params)
+        cp = CommandParser(self.tree)
         self.command_lines = cp.parse()
-        print()
 
 
     # 4th step: param parsing
     def parse_params(self):
-        # includes repeats
-        # includes outputs? 
+        # parse params
         pp = ParamParser(self.tree, self.command_lines)
-        pp.parse()
-        self.params = pp.params
+        params = pp.parse()
+
+        print('\n--- Before cleaning ---\n')
+        print(f'{"name":30}{"datatype":25}{"prefix":20}{"command":>10}')
+        print('-' * 75)
+        for param in params:
+            print(param)
+
+        # cleanup steps
+        ppp = ParamPostProcessor(params)
+        ppp.remove_duplicate_params()
+
+        print('\n--- After cleaning ---\n')
+        print(f'{"name":30}{"datatype":25}{"prefix":20}{"command":>10}')
+        print('-' * 75)
+        for param in ppp.params:
+            print(param)
+
+        # update params to cleaned param list
+        self.params = ppp.params
+        print()
 
 
+    # 5th step: output parsing
+    def parse_outputs(self):
+        op = OutputParser()
+        op.parse()
 
 
-    # 5th step: parsing tool metadata
+    # 6th step: parsing tool metadata
     def parse_metadata(self):
         mp = MetadataParser(self.tree)
         mp.parse()
@@ -94,8 +127,7 @@ class ToolParser:
 
 
     def pretty_print(self) -> None:
-        for param in self.params.values():
-            print(param)
+        pass
 
 
 

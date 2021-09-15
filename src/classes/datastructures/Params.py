@@ -9,7 +9,8 @@ from typing import Optional
 from classes.Logger import Logger
 from classes.VariableFinder import VariableFinder, VariableReference # type: ignore
 
-from utils.galaxy import get_common_extension, convert_extensions, cast_list, get_attribute_value
+from utils.galaxy_utils import get_common_extension, convert_extensions, cast_list
+from utils.etree_utils import get_attribute_value
 
 
 # missing logging: logger.log_unknown_type(1, item)
@@ -24,6 +25,7 @@ class Param:
         # basic info for each Param subclass
         self.name: str = ''
         self.gx_var: str = ''
+        self.janis_var: str = ''
         self.datatype: str = ''
         self.default_value: str = ''
         self.help_text: str = ''
@@ -120,18 +122,18 @@ class Param:
             self.prefix = self.user_select_prefix()
         
  
+    # this really should occur later in ParamPostProcessor
     def user_select_prefix(self) -> str:
         # print basics
-        print('--- prefix selection ---')
+        print(f'\n--- prefix selection ---')
         print(f'var: {self.gx_var}')
-        print('possible prefixes:\n')
 
         # print each candidate prefix
         for i, ref in enumerate(self.cmd_references):
-            print(f'reference {i}')
-            print(ref)
+            print(i, end=' ')
+            print(ref.command_line)
         
-        selected_elem = int(input('correct prefix (num)'))
+        selected_elem = int(input('Selected command line reference [int]: '))
         prefix = self.cmd_references[selected_elem].prefix
         return prefix
         
@@ -148,7 +150,7 @@ class Param:
             print()
 
 
-    def __str__(self):
+    def print_details(self):
         out_str = ''
         out_str += '\nparam --------------\n'
 
@@ -162,6 +164,15 @@ class Param:
         out_str += f'validated: {self.validated}\n'
 
         return out_str
+
+
+    def __str__(self):
+        temp_prefix = self.prefix or ''
+        datatype = self.datatype
+        if type(self).__name__ == "BoolParam":
+            datatype += f'({self.subtype})'
+        return f'{self.name:30}{datatype:25}{temp_prefix:20}{self.has_command_ref:>10}'
+
 
 
 
@@ -220,14 +231,16 @@ class DataParam(Param):
 class BoolParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
-        self.datatype = 'Boolean'
+        self.datatype: str = 'Boolean'
+        self.subtype: str = ''
 
 
     def parse(self) -> None:
         self.validate_value_order()
         self.parse_common_features()
-        #self.set_flag()
-
+        self.set_bool_subtype()
+        self.assert_structure()
+        
 
     def validate_value_order(self) -> None:
         tv = get_attribute_value(self.node, 'truevalue')
@@ -237,13 +250,27 @@ class BoolParam(Param):
             self.node.attrib['falsevalue'] = tv
 
 
+    def set_bool_subtype(self) -> None:
+        tv = get_attribute_value(self.node, 'truevalue')
+        fv = get_attribute_value(self.node, 'falsevalue')
+        if tv == '' and fv == '':
+            self.subtype = 'true_bool'
+        elif tv != '' and fv == '':
+            self.subtype = 'flag_bool'
+
+
+    def assert_structure(self) -> None:
+        tv = get_attribute_value(self.node, 'truevalue')
+        fv = get_attribute_value(self.node, 'falsevalue')
+        if self.subtype == 'true_bool':
+            assert(tv == '' and fv == '')
+        elif self.subtype == 'flag_bool':
+            assert(tv != '' and fv == '')
+
+
     def set_prefix(self):
         self.prefix = get_attribute_value(self.node, 'truevalue')
 
-
-    def set_flag(self) -> None:
-        self.flag = get_attribute_value(self.node, 'truevalue')
-        assert(self.flag != '')
 
 
 class SelectParam(Param):

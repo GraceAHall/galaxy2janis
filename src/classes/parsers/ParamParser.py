@@ -1,18 +1,36 @@
 
 
 from copy import deepcopy
-from collections import Counter
-
-from classes.datastructures.Params import Param, TextParam, IntParam, FloatParam, DataParam, BoolParam, SelectParam, DataCollectionParam, DataColumnParam, HiddenParam
-from classes.Logger import Logger
 from xml.etree import ElementTree as et
-from utils.galaxy import get_attribute_value, get_param_name
 
+from classes.Logger import Logger
+from classes.datastructures.Params import (
+    Param, 
+    TextParam, 
+    IntParam, 
+    FloatParam, 
+    DataParam, 
+    BoolParam, 
+    SelectParam, 
+    DataCollectionParam, 
+    DataColumnParam, 
+    HiddenParam
+) 
+from utils.galaxy_utils import is_flag_list, is_string_list
+from utils.etree_utils import ( 
+    get_attribute_value, 
+    get_select_options,
+    create_bool_elem, 
+    convert_bool_to_select_elem, 
+    convert_select_to_bool_elems, 
+)
 
 
 class ParamParser:
     """
-    iterates through xml tree nodes, parsing params if encountered. 
+    iterates through xml tree nodes, initializing param subclass if encountered.
+    most operations are imported from utils files.  
+    actual parsing of the param is delegated to the Param class. 
     """
     
     def __init__(self, tree: et.ElementTree, command_lines: list[str]):
@@ -41,17 +59,15 @@ class ParamParser:
             "data_collection"
         ]
 
-    
-    def parse(self) -> None:
+
+    # rename explore_tree?
+    def parse(self) -> list[Param]:
         # parse params
         tree_path = []
         for node in self.tree.getroot():
             self.explore_node(node, tree_path)
 
-        # remove dup params
-        for param in self.param_list:
-            print(param)
-        self.remove_duplicate_params()
+        return self.param_list
 
     
     def explore_node(self, node: et.Element, prev_path: list[str]) -> None:
@@ -158,14 +174,18 @@ class ParamParser:
         falseopt = {'value': fv, 'text': ''}
 
         # check if should split bool into 2 bools
-        if self.is_flag_param_list([trueopt, falseopt]):
+        if is_flag_list([trueopt, falseopt]):
             label = node.attrib['label'] or ''
-            out_params.append(self.create_bool_elem(node, tv, label))
-            out_params.append(self.create_bool_elem(node, fv, label))
+            # break into 2 et.Elements
+            tv_node = create_bool_elem(node, tv, label)
+            fv_node = create_bool_elem(node, fv, label)
+            # create a BoolParam for each elem
+            out_params.append(BoolParam(tv_node, tree_path, self.command_lines))
+            out_params.append(BoolParam(fv_node, tree_path, self.command_lines))
 
         # check if actually 2 option select
-        elif self.is_string_list([trueopt, falseopt]):
-            select_node = self.convert_bool_to_select_elem(node)
+        elif is_string_list([trueopt, falseopt]):
+            select_node = convert_bool_to_select_elem(node)
             out_params += self.initialize_select_params(select_node) 
 
         # is normal bool
@@ -175,60 +195,15 @@ class ParamParser:
         return out_params
 
 
-    # TODO untested
-    def is_string_list(self, the_list: list[str]) -> bool:
-        """
-        string list is list of values which do not look like prefixes ('-' at start)
-        """
-        for item in the_list:
-            val = item['value']
-            if val == '' or val[0] == '-':
-                return False
-        return True
-
-
-    # TODO untested
-    def convert_bool_to_select_elem(self, node: et.Element) -> et.Element:
-        # convert param attributes
-        attributes = {
-            'type': 'select',
-            'name': get_attribute_value(node, 'name'),
-            'label': get_attribute_value(node, 'label'),
-            'help': get_attribute_value(node, 'help'),
-            'multiple': 'False'
-        }
-        parent = et.Element('param', attributes)
-
-        # create child option for each bool value
-        tv = get_attribute_value(node, 'truevalue')
-        fv = get_attribute_value(node, 'falsevalue')
-
-        for val in [tv, fv]:
-            attributes = {'value': val}
-            child = et.Element('option', attributes)
-            parent.append(child)
-        
-        return parent
-
-
-    def get_attribute_value(self, node: et.Element, attribute: str) -> str:
-        '''
-        accepts node, returns attribute value or "" 
-        '''
-        for key, val in node.attrib.items():
-            if key == attribute:
-                return val
-        return ""
-
     def initialize_select_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
         out_params = []
 
         # get options list
-        options = self.get_select_options(node)
+        options = get_select_options(node)
 
         # check if should split into flag bools
-        if self.is_flag_param_list(options):
-            bool_elems = self.convert_select_to_bool_elems(node)
+        if is_flag_list(options):
+            bool_elems = convert_select_to_bool_elems(node)
             for elem in bool_elems:
                 out_params.append(BoolParam(elem, tree_path, self.command_lines))
                 
@@ -239,87 +214,8 @@ class ParamParser:
         return out_params     
 
 
-    def get_select_options(self, node: et.Element) -> list[dict]:
-        options = []
-
-        for child in node:
-            if child.tag == 'option':
-                opt = {'value': child.attrib['value'], 'text': child.text or ''}
-                options.append(opt)
-        
-        return options
-
-
-    def convert_select_to_bool_elems(self, node: et.Element) -> list[et.Element]:
-        out_elems = []
-        
-        options = self.get_select_options(node)
-        for opt in options:
-            bool_elem = self.create_bool_elem(node, opt['value'], opt['text'])
-            out_elems.append(bool_elem)
-
-        return out_elems
-
-
-    def create_bool_elem(self, node: et.Element, val: str, text: str) -> et.Element:
-        # bool elem
-        attributes = {
-            'name': get_attribute_value(node, 'name'),
-            'argument': get_attribute_value(node, 'argument'),
-            'label': text,
-            'type': 'boolean',
-            'checked': 'False',
-            'truevalue': val,
-            'falsevalue': ''
-        }
-        node = et.Element('param', attributes)
-        return node
-
-
-    # write test?
-    def is_flag_param_list(self, options: list[str]) -> bool:
-        outcome = True
-
-        # check all the options start with '-'
-        for opt in options:
-            if not opt['value'].startswith('-'):
-                outcome = False
-                break
-
-        # ensure its just not because negative numbers
-        try: 
-            [float(opt['value']) for opt in options] 
-            outcome = False  # if reaches this point, all opts are float castable
-        except ValueError:
-            pass
-
-        return outcome
-
-
     def parse_repeat_elem(self, node, tree_path):
         pass
 
 
-    def remove_duplicate_params(self) -> None:
-        clean_params = {}
-
-        for query_param in self.param_list:
-            if query_param.gx_var not in clean_params:
-                clean_params[query_param.gx_var] = query_param
-            else:
-                ref_param = clean_params[query_param.gx_var]
-                self.assert_duplicate_param(query_param, ref_param)
-                
-        self.params = clean_params
-
-
-    def assert_duplicate_param(self, query, ref) -> None:
-        assert(query.type == ref.type)
-        assert(query.default_value == ref.default_value)
-        assert(query.prefix == ref.prefix)
-        assert(query.help_text == ref.help_text)
-        assert(query.is_optional == ref.is_optional)
-        assert(query.is_argument == ref.is_argument)
-        assert(query.is_array == ref.is_array)
-        assert(query.options == ref.options)
         

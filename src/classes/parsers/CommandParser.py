@@ -9,19 +9,13 @@ from classes.datastructures.Params import Param
 
 
 class CommandParser:
-    def __init__(self, tree: et.ElementTree, params: dict[str, Param]):
+    def __init__(self, tree: et.ElementTree):
         self.tree = tree
-        self.params = params
         
-
 
     def parse(self) -> list[str]:
         command_string = self.get_command_string()
         command_lines = self.clean_command(command_string)
-        print()
-        #self.link_prefixes_to_params(command_lines)
-        #self.mark_ui_params()
-        #self.resolve_multi_prefix_params()
         return command_lines
 
 
@@ -87,58 +81,3 @@ class CommandParser:
                 clean_list.append(item)
         return clean_list
     
-
-    # Param()
-    
-
-
-    # Param()
-    def link_prefixes_to_params(self, command_lines: list[str]) -> None:
-        """
-        after param is found in command string, looks at prev word to identify 
-        whether it looks like a prefix
-        """
-        for line in command_lines:
-            for param in self.params.values():
-                if param.is_argument == False:
-                    loc = self.find_param_in_line(param, line)
-                    if loc != -1:
-                        param.located_in_command = True
-                        self.attempt_prefix_link(param, loc, line)     
-        
-
-    # Param()
-    
-
-
-    # Param()
-    
-
-
-    # Param()
-    def attempt_prefix_link(self, param: Param, i: int, command_line: list[str]) -> None:
-        command_list = command_line.split(' ')
-        if self.confirm_cheetah_var(param.gx_var, command_list[i]):
-            param.prefix_collector.add(i, command_list, param.gx_var)
-
-    # Param()
-    def mark_ui_params(self) -> None:
-        for param in self.params.values():
-            if param.prefix == '':
-                if param.appears_in_conditional and not param.located_in_command:
-                    param.is_ui_param = True
-
-    # Param()
-    def resolve_multi_prefix_params(self) -> None:
-        """
-        Just in case we find two possible valid prefixes for a param
-        """
-        for param in self.params.values():
-            param.resolve_multiple_prefixes()
-            param.set_prefix_from_collector()
-            print()
-
-            
-
-
-

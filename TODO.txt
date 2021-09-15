@@ -1,59 +1,24 @@
 
 
+currently might miss some variables. might not be the end of the world. 
 
 
-TODO:
- - gather outputs
- - param parsing done first
- - command string diced up & cleaned
- - for each param, find references in the command string
- - for multiple references, prompt user on the fly about correct reference (can select one of the references, or none)
- - report (in the janis tool def) if a param was not linked to a prefix (would happen for the above if none selected)
+TODO v0.1
 
- - handle stdio? 
+- parse outputs
 
+- format to janis tool definition
 
+- positional arguments? fffffff
 
+- parse tests
 
+- auto parsing, test running and reporting
 
-
+- write test suite
 
 
-
-
-
-
-
-
-
-
-
-macro expansion
- - write tests
- - handle multiple imports (the below)
- 
-
-
-
-ToolParser:
- - MacroExpander() -> get & expand macros, gather tokens
-
-
-
-expand tokens
-build tests for param parsing
-parse param datatypes
-
-param datatypes:
- - gather each galaxy datatype
- - list all examples
- - decide on real datatypes
-
-
-notify which tools were successfully parsed, and which experienced warnings or errors. 
-tokens
-file imports
-add support for provided galaxy library macros (as imports)
-
+test output checking:
+https://github.com/galaxyproject/galaxy/tree/dev/lib/galaxy/tool_util/verify/asserts
 
 
