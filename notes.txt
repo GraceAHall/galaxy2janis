@@ -1,7 +1,26 @@
 
 
 known limitations:
- - currently ignoring situations where the param.name is not unique (ie a genuinely different param has the same param.name but not the same param.gx_var)
+
+ignoring param.name is not unique 
+    ie param1.name = param2.name but param1.gx_var != param2.gx_var
+
+ignored complex or rare features 
+    data->change_format
+    data->actions
+    data->default_identifier_source
+    discover_datasets->recurse
+
+for loops over array variables ignored
+    #for $bed in $names.beds:
+        '${bed.input}'
+    #end for 
+
+ignoring <filter> inside of outputs. pretty important. 
+
+should I have a list of unhandled scenarios for runtime warnings? yes.
+
+
 
 
 

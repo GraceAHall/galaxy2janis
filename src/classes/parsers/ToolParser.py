@@ -5,6 +5,7 @@ import xml.etree.ElementTree as et
 
 
 from classes.datastructures.Params import Param
+from classes.datastructures.Output import Output
 
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
@@ -34,6 +35,7 @@ class ToolParser:
         self.tree_path: list[str] = []
         self.tokens: dict[str, str] = {}
         self.params: list[Param] = []
+        self.outputs: list[Output] = []
 
 
     def parse(self) -> None:
@@ -100,8 +102,8 @@ class ToolParser:
 
     # 5th step: output parsing
     def parse_outputs(self):
-        op = OutputParser()
-        op.parse()
+        op = OutputParser(self.tree, self.params)
+        self.outputs = op.parse()
 
 
     # 6th step: parsing tool metadata

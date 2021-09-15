@@ -9,6 +9,9 @@ TODO v0.1
 
 - format to janis tool definition
 
+# stop here tonight
+
+
 - positional arguments? fffffff
 
 - parse tests

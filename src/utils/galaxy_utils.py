@@ -79,7 +79,7 @@ def convert_extensions(the_list: list[str]) -> list[str]:
         if item in gx_janis_datatype_mapping:
             ext = gx_janis_datatype_mapping[item]
         else:
-            ext = 'String'  # fallback pretty bad but yeah. 
+            ext = 'File'  # fallback pretty bad but yeah. 
         out_list.append(ext)
 
     return out_list
