@@ -16,8 +16,6 @@ for loops over array variables ignored
         '${bed.input}'
     #end for 
 
-ignoring <filter> inside of outputs. pretty important. 
-
 should I have a list of unhandled scenarios for runtime warnings? yes.
 
 

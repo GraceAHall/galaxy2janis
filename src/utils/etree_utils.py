@@ -65,9 +65,23 @@ def create_bool_elem(node: et.Element, val: str, text: str) -> et.Element:
     return node
 
 
+def create_output_param(node: et.Element) -> et.Element:
+    # bool elem
+    attributes = {
+        'name': get_attribute_value(node, 'name'),
+        'type': 'data',
+        'format': get_attribute_value(node, 'format'),
+        'label': get_attribute_value(node, 'label')
+    }
+    node = et.Element('param', attributes)
+    return node
+
+
+
+
+
 
 # ---- reading node contents ---- #
-
 def get_attribute_value(node: et.Element, attribute: str) -> str:
         '''
         accepts node, returns attribute value or "" 

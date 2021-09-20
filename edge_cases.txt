@@ -1,32 +1,42 @@
 
 
 velvetg:
-#if $coverage.cutoff == "auto":
-    -cov_cutoff auto
+
+    #if $coverage.cutoff == "auto":
+        -cov_cutoff auto
 
 
-cheetah functions
-#def text_to_rstringarray($text)
-    #set $list = $text.strip().rstrip(',').split(',')
+assign_primary_output:
 
-    #set $rstringarray = "c("
+    <data name="output" format="tabular" label="${tool.name} on ${on_string}">
+        <discover_datasets directory="split" pattern="(?P&lt;designation&gt;.+)\.tab" format="tabular" visible="true" assign_primary_output="true"/>
+        <filter>split_output_cond['split_output_selector'] == 'no'</filter>
+    </data>
 
-    #for $i in range(len($list))
-        #set $elem = $list[$i].strip()
-        #if $elem != ""
-            #set $rstringarray += '"'
-            #set $rstringarray += $elem
-            #set $rstringarray += '"'
-            #if $i != len($list) - 1
-                #set $rstringarray += ','
+
+cheetah functions:
+
+    #def text_to_rstringarray($text)
+        #set $list = $text.strip().rstrip(',').split(',')
+
+        #set $rstringarray = "c("
+
+        #for $i in range(len($list))
+            #set $elem = $list[$i].strip()
+            #if $elem != ""
+                #set $rstringarray += '"'
+                #set $rstringarray += $elem
+                #set $rstringarray += '"'
+                #if $i != len($list) - 1
+                    #set $rstringarray += ','
+                #end if
             #end if
-        #end if
-    #end for
+        #end for
 
-    #set $rstringarray += ')'
-    #return $rstringarray
-    
-#end def
+        #set $rstringarray += ')'
+        #return $rstringarray
+        
+    #end def
 
 
 

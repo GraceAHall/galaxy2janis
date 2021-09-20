@@ -102,7 +102,7 @@ class ToolParser:
 
     # 5th step: output parsing
     def parse_outputs(self):
-        op = OutputParser(self.tree, self.params)
+        op = OutputParser(self.tree, self.params, self.command_lines)
         self.outputs = op.parse()
 
 

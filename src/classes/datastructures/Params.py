@@ -332,6 +332,15 @@ class SelectParam(Param):
 
 
 
+class OutputParam(Param):
+    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+        super().__init__(node, tree_path, cmd_lines)
+
+
+    def parse(self) -> None:
+        self.parse_common_features()
+
+
 class DataCollectionParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
@@ -349,6 +358,9 @@ class DataColumnParam(Param):
 
     def parse(self) -> None:
         pass
+
+
+
 
 
 
