@@ -130,6 +130,26 @@
             "args": [
                 "disco.xml", "tools/disco"
             ]
+        },
+        {
+            "name": "mothur_pca",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "pca.xml", "tools/mothur"
+            ]
+        },
+        {
+            "name": "filtlong",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "filtlong.xml", "tools/filtlong"
+            ]
         }
     ]
 }

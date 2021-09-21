@@ -6,11 +6,13 @@ from typing import Union
 import xml.etree.ElementTree as et
 
 from classes.datastructures.Params import Param
+from classes.Logger import Logger
 
 
 class CommandParser:
-    def __init__(self, tree: et.ElementTree):
+    def __init__(self, tree: et.ElementTree, logger: Logger):
         self.tree = tree
+        self.logger = logger
         
 
     def parse(self) -> list[str]:

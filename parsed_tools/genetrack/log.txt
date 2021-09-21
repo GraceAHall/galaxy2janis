@@ -1,0 +1,2 @@
+[WARN] variable not found in command string
+[ERROR] param required user input

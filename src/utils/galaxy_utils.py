@@ -66,10 +66,16 @@ gx_janis_datatype_mapping = {
 }
 
 
+type_consolidator = {
+    'fastqsanger': 'fastq',
+    'fastqsanger.gz': 'fastq.gz',
+    'tabular': 'tsv',
+}
+
 
 # ---- conversion to janis types ---- #
 
-def convert_extensions(the_list: list[str]) -> list[str]:
+def convert_types_to_janis(the_list: list[str]) -> list[str]:
     """
     converts galaxy extensions to janis. 
     also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
@@ -79,11 +85,29 @@ def convert_extensions(the_list: list[str]) -> list[str]:
         if item in gx_janis_datatype_mapping:
             ext = gx_janis_datatype_mapping[item]
         else:
-            ext = 'File'  # fallback pretty bad but yeah. 
+            ext = 'None'
         out_list.append(ext)
 
     return out_list
 
+
+# ---- consolidating types ---- #
+
+def consolidate_types(types: str) -> str:
+    # standardises types. ie fastq,fastqsanger -> fastq
+    out_types: set[str] = set()
+
+    type_list = types.split(',')
+    for old_type in type_list:
+        try:
+            new_type = type_consolidator[old_type]
+            out_types.add(new_type)
+        except KeyError:
+            out_types.add(old_type)
+    
+    out_types = list(out_types)
+    out_types.sort(key=lambda x: len(x))
+    return ','.join(out_types)
 
 
 # ---- list operations ---- #
@@ -100,7 +124,6 @@ def get_common_extension(the_list: list[str]) -> str:
     except IndexError:
         return ''  # at least one item has no extension
 
-    ext_list = convert_extensions(ext_list)
     ext_counter = Counter(ext_list)
         
     if len(ext_counter) == 1:  

@@ -14,33 +14,33 @@ class Logger:
         self.message_log = []
 
 
+    """
+    - complex regex - WARN [done]
+    - cannot find command line reference - WARN (due to current restrictions) [done]
+    - uses configfile - ERROR [done]
+    - needs user input (datatype / command line references) - ERROR [done]
+
+    BOOKMARK TODO HERE
+    - DETOUR: conversion to janis
+    - types - WARN []
+    """
+
+
     def log(self, level: int, message: str) -> None:
         log_type = self.map_level[level]
-        message = f'gxtool2janis: [{log_type}]: {message}'
+        message = f'[{log_type}] {message}\n'
         
         if message not in self.message_log:
             self.message_log.append(message)
-            print(message)
+            self.update_logs(message)
         
         if level == 2:
-            self.dump_logs()
             sys.exit()
 
 
-    def dump_logs(self) -> None:
-        with open(f'{self.outdir}/log.txt') as fp:
-            for message in self.message_log:
-                fp.write(message)
+    # TODO delete all files in the outdir at program start
+    def update_logs(self, message: str) -> None:
+        with open(f'{self.outdir}/log.txt', 'a') as fp:
+            fp.write(message)
 
 
-    def log_configfile_message(self) -> None:
-        message = ''
-
-
-    def log_unknown_type(self, level: int, datatype: str) -> None:
-        log_type = self.map_level[level]
-        message = f'gxtool2janis: [{log_type}]: cannot parse datatype: "{datatype}". Falling back to "String"'
-
-        if message not in self.message_log:
-            self.message_log.append(message)
-            print(message)

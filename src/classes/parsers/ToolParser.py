@@ -11,6 +11,7 @@ from classes.datastructures.Configfile import Configfile
 
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
+from classes.parsers.ConfigfileParser import ConfigfileParser
 from classes.parsers.CommandParser import CommandParser
 from classes.parsers.ParamParser import ParamParser
 from classes.ParamPostProcessor import ParamPostProcessor
@@ -34,6 +35,7 @@ class ToolParser:
         self.ignore_elems = ['outputs', 'tests']
         self.parsable_elems = ['description', 'command', 'param', 'repeat', 'help', 'citations']
 
+        # param and output parsing
         self.tree_path: list[str] = []
         self.tokens: dict[str, str] = {}
         self.command_lines: list[str] = [] 
@@ -41,12 +43,22 @@ class ToolParser:
         self.params: list[Param] = []
         self.outputs: list[Output] = []
 
+        # tool metadata
+        self.tool_name: str = ''
+        self.galaxy_version: str = ''
+        self.citations: list[dict[str, str]] = []
+        self.requirements: list[dict[str, str]] = []
+        self.description: str = ''
+        self.help: str = ''
+        self.containers: dict[str, str] = {}
+
         self.logger = Logger(self.outdir)
 
 
     def parse(self) -> None:
         self.parse_macros()
         self.parse_tokens()
+        self.parse_configfiles()
         self.parse_command()
         self.parse_params()
         self.parse_outputs()
@@ -61,7 +73,7 @@ class ToolParser:
         
         # update the xml tree
         self.tokens.update(mp.tokens)
-        self.root = self.tree.getroot() #type: ignore - is this necessary?
+        self.root = self.tree.getroot()
         self.check_macro_expansion(self.root)
 
 
@@ -82,47 +94,49 @@ class ToolParser:
 
     # 3rd step: command parsing & linking to params
     def parse_command(self):
-        cp = CommandParser(self.tree)
+        cp = CommandParser(self.tree, self.logger)
         self.command_lines = cp.parse()
 
 
     # 4th step: param parsing
     def parse_params(self):
         # parse params
-        pp = ParamParser(self.tree, self.command_lines)
+        pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
         print('\n--- Before cleaning ---\n')
-        print(f'{"name":30}{"datatype":25}{"prefix":20}{"command":>10}')
-        print('-' * 75)
-        for param in params:
-            print(param)
+        pp.pretty_print()
 
         # cleanup steps
-        ppp = ParamPostProcessor(params)
+        ppp = ParamPostProcessor(params, self.logger)
         ppp.remove_duplicate_params()
+        ppp.set_prefixes()
 
         print('\n--- After cleaning ---\n')
-        print(f'{"name":30}{"datatype":25}{"prefix":20}{"command":>10}')
-        print('-' * 75)
-        for param in ppp.params:
-            print(param)
+        ppp.pretty_print()
 
         # update params to cleaned param list
         self.params = ppp.params
-        print()
 
 
     # 5th step: output parsing
     def parse_outputs(self):
-        op = OutputParser(self.tree, self.params, self.command_lines)
+        op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
         self.outputs = op.parse()
+        op.pretty_print()
 
 
     # 6th step: parsing tool metadata
     def parse_metadata(self):
-        mp = MetadataParser(self.tree)
+        mp = MetadataParser(self.tree, self.logger)
         mp.parse()
+        self.tool_name = mp.tool_name
+        self.galaxy_version = mp.galaxy_version
+        self.citations = mp.citations
+        self.requirements = mp.requirements
+        self.description = mp.description
+        self.help = mp.help
+        self.containers = mp.containers
         print()
     
 

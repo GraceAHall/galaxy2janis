@@ -9,15 +9,12 @@ from typing import Optional
 from classes.Logger import Logger
 from classes.VariableFinder import VariableFinder, VariableReference # type: ignore
 
-from utils.galaxy_utils import get_common_extension, convert_extensions, cast_list
+from utils.galaxy_utils import get_common_extension, cast_list, consolidate_types
 from utils.etree_utils import get_attribute_value
 
 
-# missing logging: logger.log_unknown_type(1, item)
-
 class Param:
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        self.logger = Logger()
         self.node = node
         self.tree_path = tree_path
         if len(self.tree_path) == 0:
@@ -28,7 +25,8 @@ class Param:
         self.name: str = ''
         self.gx_var: str = ''
         self.janis_var: str = ''
-        self.datatype: str = ''
+        self.galaxy_type: str = ''
+        self.janis_type: str = ''
         self.default_value: str = ''
         self.help_text: str = ''
         self.is_optional: bool = False
@@ -37,9 +35,10 @@ class Param:
         # checks
         self.has_command_ref: bool = False
         self.has_conditional_ref: bool = False
-        self.is_argument: bool = False   
+        self.is_argument: bool = False  
+        # self.needed_user_input: bool = False 
 
-        # other bools (probably will delete)
+        # other bools
         self.is_array: bool = False  # text?
         self.validated: bool = False
 
@@ -54,7 +53,7 @@ class Param:
         self.set_basic_details()
         self.set_gx_var()
         self.set_references()
-        self.set_prefix()
+        self.remove_conditional_occurances()
         self.validate()
         
 
@@ -103,6 +102,14 @@ class Param:
         vf = VariableFinder(self.gx_var, self.cmd_lines) # type: ignore
         self.cmd_references = vf.find() # type: ignore
         self.set_cmd_ref_details()
+        
+
+    def remove_conditional_occurances(self) -> None:
+        non_conditional_refs: list[VariableReference] = []
+        for ref in self.cmd_references:
+            if not ref.in_conditional:
+                non_conditional_refs.append(ref)
+        self.cmd_references = non_conditional_refs
 
     
     def set_cmd_ref_details(self) -> None:
@@ -111,24 +118,9 @@ class Param:
                 self.has_conditional_ref = True
             else:
                 self.has_command_ref = True
-
-
-    def set_prefix(self):
-        """
-        single occurance in cmd string (ref) usually (ignoring cheetah 
-        conditional lines) 
-        multiple refs need human decision.
-        """
-        cmd_refs = self.cmd_references 
-        cmd_refs = [ref for ref in cmd_refs if not ref.in_conditional]  
-        
-        if len(cmd_refs) == 1:
-            self.prefix = cmd_refs[0].prefix
-        elif len(cmd_refs) > 1:
-            self.prefix = self.user_select_prefix()
         
  
-    # this really should occur later in ParamPostProcessor
+    # occurs during postprocessing. called from ParamPostProcessor
     def user_select_prefix(self) -> str:
         # print basics
         print(f'\n--- prefix selection ---')
@@ -162,7 +154,7 @@ class Param:
 
         out_str += f'gx_var: {self.gx_var}\n'
         out_str += f'prefix: {self.prefix}\n'
-        out_str += f'datatype: {self.datatype}\n'
+        out_str += f'datatype: {self.galaxy_type}\n'
         out_str += f'default_value: {self.default_value}\n'
         out_str += f'help_text: {self.help_text}\n'
         out_str += f'is_optional: {self.is_optional}\n'
@@ -174,10 +166,10 @@ class Param:
 
     def __str__(self):
         temp_prefix = self.prefix or ''
-        datatype = self.datatype
+        datatype = self.galaxy_type
         if type(self).__name__ == "BoolParam":
             datatype += f'({self.subtype})'
-        return f'{self.gx_var:50}{datatype:25}{temp_prefix:20}{self.has_command_ref:>10}'
+        return f'{self.gx_var[-49:]:50}{datatype[-24:]:25}{temp_prefix[-19:]:20}{self.has_command_ref:>10}'
 
 
 
@@ -186,7 +178,7 @@ class TextParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
         # type="color" is also TextParam
-        self.datatype: str = 'String' #?
+        self.galaxy_type: str = 'string' #?
 
 
     def parse(self) -> None:
@@ -197,7 +189,7 @@ class TextParam(Param):
 class IntParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
-        self.datatype: str = 'Integer'
+        self.galaxy_type: str = 'integer'
 
 
     def parse(self) -> None:
@@ -208,7 +200,7 @@ class IntParam(Param):
 class FloatParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
-        self.datatype: str = 'Float'
+        self.galaxy_type: str = 'float'
 
 
     def parse(self) -> None:
@@ -219,7 +211,6 @@ class FloatParam(Param):
 class DataParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
-        self.datatype: str = ''
 
 
     def parse(self) -> None:
@@ -228,16 +219,14 @@ class DataParam(Param):
 
 
     def set_datatype(self) -> None:
-        gx_format = get_attribute_value(self.node, 'format')
-        gx_datatypes = gx_format.split(',') 
-        datatypes = convert_extensions(gx_datatypes)
-        self.datatype = ','.join(datatypes)
+        temp_type = get_attribute_value(self.node, 'format')
+        self.galaxy_type = consolidate_types(temp_type)
 
 
 class BoolParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
-        self.datatype: str = 'Boolean'
+        self.galaxy_type: str = 'boolean'
         self.subtype: str = ''
 
 
@@ -310,7 +299,7 @@ class SelectParam(Param):
         Uses the different values in the option elems.
         param options are already stored in param.options
         """
-        param_type = "String"  # fallback
+        param_type = "string"  # fallback
 
         # are the option values all a particular type?
         castable_type = cast_list(self.options)
@@ -324,7 +313,7 @@ class SelectParam(Param):
         elif castable_type != '':
             param_type = castable_type
 
-        self.datatype = param_type
+        self.galaxy_type = consolidate_types(param_type)
 
 
     def add_options_to_helptext(self) -> None:

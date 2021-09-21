@@ -4,16 +4,18 @@
 
 from xml.etree import ElementTree as et
 
+from classes.Logger import Logger
 from classes.datastructures.Output import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
 from classes.datastructures.Params import Param, OutputParam
 from utils.etree_utils import get_attribute_value, create_output_param
 
 
 class OutputParser:
-    def __init__(self, tree: et.ElementTree, params: list[Param], command_lines: list[str]) -> None:
+    def __init__(self, tree: et.ElementTree, params: list[Param], command_lines: list[str], logger: Logger) -> None:
         self.tree = tree
         self.params = params
         self.command_lines = command_lines
+        self.logger = logger
         self.parsable_elems: list[str] = ['data', 'collection']
         self.outputs: list[Output] = [] 
 
@@ -31,8 +33,19 @@ class OutputParser:
         # parse all outputs
         for output in outputs:
             output.parse()
+            self.log_pattern_status(output)
 
-        return outputs
+        self.outputs = outputs
+        return self.outputs
+
+
+    def log_pattern_status(self, output: Output) -> None:
+        banned_substrings = ['?', '+', '<ext>', '[', ']', '(', ')']
+        pattern = output.selector_contents
+        for substr in banned_substrings:
+            if substr in pattern:
+                self.logger.log(1, 'complex regex')
+                break
 
     
     def get_all_outputs(self) -> list[et.Element]:
@@ -108,6 +121,14 @@ class OutputParser:
         new_param = OutputParam(node, [], self.command_lines)
         new_param.parse()
         return new_param
+
+
+    def pretty_print(self) -> None:
+        print('\n--- Outputs ---\n')
+        print(f'{"name":<30}{"datatype":>25}{"selector":>20}{"selector_contents":>20}{"collection":>15}')
+        print('-' * 110)
+        for output in self.outputs:
+            print(output)
 
 
     # def initialize_collection_output(self, node: et.Element) -> Output:

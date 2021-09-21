@@ -5,8 +5,8 @@
 # what if the same variable is used 2 times in a line? annoying
 
 class VariableReference:
-    def __init__(self, var: str, pos: int, command_line: list[str]):
-        self.var = var
+    def __init__(self, gx_var: str, pos: int, command_line: list[str]):
+        self.gx_var = gx_var
         self.pos = pos
         self.command_line = command_line.split(' ')
         self.in_conditional: bool = self.get_is_conditional()
@@ -35,7 +35,7 @@ class VariableReference:
 
     def __str__(self) -> str:
         out_str = ''
-        out_str += f'var: {self.var}\n'
+        out_str += f'var: {self.gx_var}\n'
         out_str += f'command_line: {self.command_line}\n'
         out_str += f'pos: {self.pos}\n'
         out_str += f'in_conditional: {self.in_conditional}\n'
@@ -46,7 +46,7 @@ class VariableReference:
 
 class VariableFinder:
     def __init__(self, var: str, command_lines: list[str]) -> None:
-        self.var = var
+        self.gx_var = var
         self.command_lines = command_lines
         self.references: list[VariableReference] = []
 
@@ -65,7 +65,7 @@ class VariableFinder:
             # TODO convert to list of locs incase appears 2+ times in line
             loc = self.find_param_in_line(line) 
             if loc != -1:
-                new_ref = VariableReference(self.var, loc, line)
+                new_ref = VariableReference(self.gx_var, loc, line)
                 self.add_ref(new_ref)
 
         #self.list_refs() debugging
@@ -76,7 +76,7 @@ class VariableFinder:
         command_list = command_line.split(' ')
         
         for i, word in enumerate(command_list):
-            if self.var in word:
+            if self.gx_var in word:
                 if self.confirm_cheetah_var(word):
                     return i
         return -1
@@ -87,10 +87,6 @@ class VariableFinder:
         strips cheetah var syntax to expose var as raw text
         $var '${var}' "${var}" '$var' "$var" all valid. 
         """
-
-        # sometimes its last word in conditional logic line
-        command_word = command_word.rstrip(':')
-
         # confirm quote pairs
         if command_word[0] in ['"', "'"]:
             if command_word[-1] != command_word[0]:
@@ -111,10 +107,37 @@ class VariableFinder:
         command_word = command_word.strip('{').strip('}')
 
         # command_word should now equal var
-        if command_word != self.var:
+        if command_word != self.gx_var:
             return False
         
         return True
+
+
+    def confirm_cheetah_var_future(self, command_word: str) -> bool:
+        """
+        future version. currently use confirm_cheetah_var. relies on the variable to appear by itself as a word (separated by ' ')
+        """
+        # get the match location
+        start_match = command_word.find(self.gx_var)
+        end_match = start_match + len(self.gx_var) - 1
+
+        # if bracket format ${var}
+        if command_word[start_match - 1] == '{':
+            if command_word[end_match + 1] != '}' or command_word[start_match - 2] != '$':
+                return False
+
+        # if naked $var
+        elif command_word[start_match - 1] != '$':
+            return False
+        
+        # check doesn't follow with a '.' (should actually lookup whether any param matches better)
+        elif len(command_word) > end_match + 1:
+            if command_word[end_match + 1] == '.':
+                return False
+
+        return True
+
+        
 
 
     def add_ref(self, new_ref) -> None:

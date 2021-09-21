@@ -33,11 +33,11 @@ class ParamParser:
     actual parsing of the param is delegated to the Param class. 
     """
     
-    def __init__(self, tree: et.ElementTree, command_lines: list[str]):
+    def __init__(self, tree: et.ElementTree, command_lines: list[str], logger: Logger):
         # other helper classes
-        self.logger: Logger = Logger()   
         self.tree: et.ElementTree = tree
         self.command_lines = command_lines
+        self.logger = logger
         self.param_list: list[Param] = []
         self.params: dict[str, Param] = {}
 
@@ -73,7 +73,15 @@ class ParamParser:
         for node in inputs_node:
             self.explore_node(node, tree_path)
 
+        self.check_param_command_refs()
+
         return self.param_list
+
+
+    def check_param_command_refs(self) -> None:
+        for param in self.param_list:
+            if not param.has_command_ref and not param.has_conditional_ref:
+                self.logger.log(1, 'variable not found in command string')
 
     
     def explore_node(self, node: et.Element, prev_path: list[str]) -> None:
@@ -219,11 +227,19 @@ class ParamParser:
         else:
             out_params.append(SelectParam(node, tree_path, self.command_lines)) 
 
-        return out_params     
+        return out_params
 
 
     def parse_repeat_elem(self, node, tree_path):
         pass
+
+
+    def pretty_print(self) -> None:
+        print('\n--- Params ---\n')
+        print(f'{"name":50}{"datatype":25}{"prefix":20}{"command":>10}')
+        print('-' * 105)
+        for param in self.param_list:
+            print(param)
 
 
         

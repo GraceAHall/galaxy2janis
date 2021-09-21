@@ -13,5 +13,6 @@
         "./tests",
         "-p",
         "*_test.py"
-    ]
+    ],
+    "python.linting.flake8Enabled": false
 }

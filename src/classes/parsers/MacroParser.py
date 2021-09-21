@@ -139,7 +139,7 @@ class MacroParser:
         # extract all tokens supplied in macro def
         for key, val in macro.attrib.items():
             if key.startswith('token_'):
-                token = '@' + key.lstrip('token_').upper() + '@'
+                token = '@' + key[6:].upper() + '@'
                 local_tokens[token] = val
 
         # resolve token values in the macro

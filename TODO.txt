@@ -5,22 +5,33 @@ currently might miss some variables. might not be the end of the world.
 
 TODO v0.1
 
-- parse outputs
-
 - write logging for tools which can't currently be parsed (uses configfile etc)
+    - complex regex
+    - types
+    - uses configfile
+    - needs user input (datatype / command line references)
 
 - format to janis tool definition
 
+- run on tools-iuc
 
-
+- get stats on num tools in each error type
 
 
 
 future:
 
+- allows more complex command structure
+    - (cutadapt) --minimum-length=$filter_options.minimum_length
+    - (cutadapt) '-a', "'${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'"
+
+- more complex discover_datasets regex
+    - currently anything between brackets gets removed
+    - can't contain anything except [a-zA-Z0-9], -, _, *, .
+
 - add support for configfiles -> write to file
 
-- positional arguments? fffffff
+- positional arguments
 
 - parse tests
 
@@ -28,6 +39,9 @@ future:
 
 - write test suite
 
+- supports common macros? is this done? 
+
+- restructuredText processing to make helptext nicer
 
 test output checking:
 https://github.com/galaxyproject/galaxy/tree/dev/lib/galaxy/tool_util/verify/asserts
