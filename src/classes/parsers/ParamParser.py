@@ -43,7 +43,7 @@ class ParamParser:
 
         self.galaxy_depth_elems = ['conditional', 'section']
         self.parsable_elems = ['param']  # just param for now
-        self.ignore_elems = ['macros', 'requirements', 'version_command', 'command', 'tests', 'help', 'citations', 'test']
+        self.ignore_elems = ['macros', 'requirements', 'version_command', 'command', 'tests', 'help', 'citations', 'test', 'xml', 'macro', 'outputs']
 
         # for param type extraction 
         self.parseable_datatypes = [
@@ -64,7 +64,13 @@ class ParamParser:
     def parse(self) -> list[Param]:
         # parse params
         tree_path = []
-        for node in self.tree.getroot():
+        root = self.tree.getroot()
+        inputs_node = root.find('inputs')
+
+        if inputs_node is None:
+            raise Exception('no <inputs> node found in tool xml')
+
+        for node in inputs_node:
             self.explore_node(node, tree_path)
 
         return self.param_list
@@ -76,6 +82,8 @@ class ParamParser:
         if node.tag in self.galaxy_depth_elems:
             curr_path.append(node.attrib['name'])
 
+        if get_attribute_value(node, 'name') == 'first_assembly_iter_param':
+            print()
         # Should we parse this node or just continue?
         if node.tag in self.parsable_elems:
             self.parse_elem(node, curr_path)
@@ -186,7 +194,7 @@ class ParamParser:
         # check if actually 2 option select
         elif is_string_list([trueopt, falseopt]):
             select_node = convert_bool_to_select_elem(node)
-            out_params += self.initialize_select_params(select_node) 
+            out_params += self.initialize_select_params(select_node, tree_path) 
 
         # is normal bool
         else:

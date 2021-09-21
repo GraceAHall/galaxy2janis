@@ -2,10 +2,12 @@
 # pyright: strict
 
 import xml.etree.ElementTree as et
+from classes.Logger import Logger
 
 
 from classes.datastructures.Params import Param
 from classes.datastructures.Output import Output
+from classes.datastructures.Configfile import Configfile
 
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
@@ -21,12 +23,12 @@ Tool.xml is parsed in a stepwise manner, where each step has its own class to pe
 """
 
 class ToolParser:
-    def __init__(self, filename: str, workdir: str):
+    def __init__(self, filename: str, workdir: str, outdir: str):
         self.filename = filename
         self.workdir = workdir
+        self.outdir = outdir
         self.tree: et.ElementTree = et.parse(f'{workdir}/{filename}')
         self.root: et.Element = self.tree.getroot()
-        self.command_lines: list[str] = [] 
 
         self.galaxy_depth_elems = ['conditional', 'section']
         self.ignore_elems = ['outputs', 'tests']
@@ -34,8 +36,12 @@ class ToolParser:
 
         self.tree_path: list[str] = []
         self.tokens: dict[str, str] = {}
+        self.command_lines: list[str] = [] 
+        self.configfiles: list[Configfile] = []
         self.params: list[Param] = []
         self.outputs: list[Output] = []
+
+        self.logger = Logger(self.outdir)
 
 
     def parse(self) -> None:
@@ -49,7 +55,7 @@ class ToolParser:
 
     # 1st step: macro expansion (preprocessing)
     def parse_macros(self) -> None:
-        mp = MacroParser(self.workdir, self.filename)
+        mp = MacroParser(self.workdir, self.filename, self.logger)
         mp.parse()
         self.tree = mp.tree 
         
@@ -61,10 +67,17 @@ class ToolParser:
 
     # 2nd step: token handling (preprocessing)
     def parse_tokens(self):
-        tp = TokenParser(self.tree, self.tokens)
+        tp = TokenParser(self.tree, self.tokens, self.logger)
         tp.parse()
         self.tree = tp.tree
         print()
+
+
+    # 2.5th step: configfiles (preprocessing)
+    def parse_configfiles(self):
+        cp = ConfigfileParser(self.tree, self.tokens, self.logger)
+        cp.parse()
+        self.configfiles = cp.configfiles
 
 
     # 3rd step: command parsing & linking to params

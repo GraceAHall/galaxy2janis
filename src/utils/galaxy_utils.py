@@ -114,10 +114,14 @@ def get_common_extension(the_list: list[str]) -> str:
 def is_string_list(the_list: list[str]) -> bool:
     """
     string list is list of values which do not look like prefixes ('-' at start)
+    TODO awful. refactor.
     """
     for item in the_list:
         val = item['value']
         if val == '' or val[0] == '-':
+            return False
+    if len(the_list) == 2:
+        if the_list[0]['value'] in ['true', 'false'] and the_list[1]['value'] in ['true', 'false']:
             return False
     return True
 

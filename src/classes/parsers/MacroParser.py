@@ -1,14 +1,17 @@
 
 
 # pyright: strict
- 
+
 import xml.etree.ElementTree as et
 import os
 
+from classes.Logger import Logger
+
 class MacroParser:
-    def __init__(self, workdir: str, filename: str):
+    def __init__(self, workdir: str, filename: str, logger: Logger) -> None:
         self.workdir = workdir
         self.filename = filename
+        self.logger = logger
         self.set_tree()
         self.root = self.tree.getroot()
         self.tokens: dict[str, str] = {}
@@ -51,7 +54,7 @@ class MacroParser:
 
     def import_xml(self, node: et.Element) -> None:
         xml_file = node.text or ""
-        mp = MacroParser(self.workdir, xml_file)
+        mp = MacroParser(self.workdir, xml_file, self.logger)
         mp.collect()
         self.tokens.update(mp.tokens)
         self.macros.update(mp.macros)
@@ -69,11 +72,11 @@ class MacroParser:
 
 
     def expand(self) -> None:
-        self.expand_macro(self.root)
+        self.expand_macros(self.root)
         self.check_macro_expansion(self.root)
 
 
-    def expand_macro(self, parent: et.Element) -> None:
+    def expand_macros(self, parent: et.Element) -> None:
         """
         expands <expand> elements
         <expand> yield statements are handled here
@@ -105,7 +108,7 @@ class MacroParser:
                     parent.insert(i+j+1, elem)
             
             # recursive (macro inside macro)
-            self.expand_macro(child)
+            self.expand_macros(child)
 
         
         for child in expand_elems_to_delete:  # type: ignore

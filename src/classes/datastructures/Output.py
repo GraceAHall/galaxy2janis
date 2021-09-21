@@ -97,21 +97,16 @@ class Output:
             return from_work_dir.rsplit('.', 1)[1]
 
         # fallback
-        elif auto_format == 'true':
-            return 'File'
-
+        # TODO log warning
         else:
-            raise Exception(f"can't get datatype for {self.node.attrib['name']}")
+            return 'File'
 
 
     def get_datatype_from_param(self, format_source: str) -> str:
         for param in self.params:
-            if format_source == param.gx_var:
+            if format_source == param.name:
                 return param.datatype
         raise Exception(f'could not find param: {format_source}')
-
-
-
 
 
 
@@ -176,9 +171,39 @@ class DiscoverDatasetsOutput(Output):
 
     def set_selector_contents(self) -> None:
         dd_node = self.node.find('discover_datasets')
-        pattern = get_attribute_value(dd_node, 'pattern') # type: ignore
         directory = get_attribute_value(dd_node, 'directory') # type: ignore
-        
+        pattern = self.extract_pattern(dd_node)
+        pattern = self.format_pattern_extension(dd_node)
+
+    
+    def extract_pattern(self, node: et.Element) -> str:
+        pattern = get_attribute_value(node, 'pattern') # type: ignore
+        pattern = self.transform_pattern(pattern)
+        return pattern
+
+
+    def transform_pattern(self, pattern: str) -> str:
+        transformer = {
+            '__designation__': '*',
+            '\\.': '.',
+        }
+
+        # remove anything in brackets containing designation pattern
+        pattern_list = pattern.split('(?P<designation>')
+        if len(pattern_list) == 2:
+            pattern_list[1] = pattern_list[1].split(')', 1)[-1]
+
+        pattern = pattern_list[0] + '*' + pattern_list[1]
+        # perform replacements
+        for key, val in transformer.items():
+            pattern = pattern.replace(key, val)
+
+        pattern = pattern.rstrip('$').lstrip('^')
+        return pattern
+
+
+    def format_pattern_extension(self, dd_node: et.Element) -> str:
+        pass
 
 
 

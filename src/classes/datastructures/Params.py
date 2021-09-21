@@ -20,6 +20,8 @@ class Param:
         self.logger = Logger()
         self.node = node
         self.tree_path = tree_path
+        if len(self.tree_path) == 0:
+            print()
         self.cmd_lines = cmd_lines
 
         # basic info for each Param subclass
@@ -88,9 +90,13 @@ class Param:
     def set_gx_var(self) -> None:
         tree_path = '.'.join(self.tree_path)
         if tree_path == '':
-            self.gx_var = self.name
+            self.update_gx_var(self.name)
         else:
-            self.gx_var = tree_path + f'.{self.name}'
+            self.update_gx_var(tree_path + f'.{self.name}')
+
+
+    def update_gx_var(self, new_var: str) -> None:
+        self.gx_var = new_var
 
 
     def set_references(self) -> None:
@@ -171,7 +177,7 @@ class Param:
         datatype = self.datatype
         if type(self).__name__ == "BoolParam":
             datatype += f'({self.subtype})'
-        return f'{self.name:30}{datatype:25}{temp_prefix:20}{self.has_command_ref:>10}'
+        return f'{self.gx_var:50}{datatype:25}{temp_prefix:20}{self.has_command_ref:>10}'
 
 
 

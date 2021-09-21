@@ -9,8 +9,10 @@ import xml.etree.ElementTree as et
 def main(argv):
     filename = argv[0]
     workdir = argv[1]
+    outdir = filename.split('.', 1)[0]
+    outdir = f'parsed_tools/{outdir}'
 
-    tp = ToolParser(filename, workdir)
+    tp = ToolParser(filename, workdir, outdir)
     tp.parse()
 
     # generate janis! 

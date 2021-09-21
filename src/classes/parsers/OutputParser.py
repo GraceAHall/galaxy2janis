@@ -34,7 +34,7 @@ class OutputParser:
 
         return outputs
 
-
+    
     def get_all_outputs(self) -> list[et.Element]:
         root = self.tree.getroot()
         output_section = root.find('outputs')
@@ -66,7 +66,7 @@ class OutputParser:
     def get_output_type(self, node: et.Element) -> str:
         if get_attribute_value(node, 'from_work_dir') != '':
             return 'workdir'
-        elif node.find('discover_dataset') is not None:
+        elif node.find('discover_datasets') is not None:
             return 'discover'
         else:
             # validate: locate the output name in the command string

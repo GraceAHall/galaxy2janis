@@ -100,6 +100,36 @@
             "args": [
                 "velvetg.xml", "tools/velvet"
             ]
+        },
+        {
+            "name": "cutadapt",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "cutadapt.xml", "tools/cutadapt"
+            ]
+        },
+        {
+            "name": "genetrack",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "genetrack.xml", "tools/genetrack"
+            ]
+        },
+        {
+            "name": "disco",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "disco.xml", "tools/disco"
+            ]
         }
     ]
 }

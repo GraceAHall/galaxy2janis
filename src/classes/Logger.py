@@ -1,7 +1,10 @@
 
 
+import sys
+
 class Logger:
-    def __init__(self) -> None:
+    def __init__(self, outdir: str) -> None:
+        self.outdir = outdir
         self.map_level = {
             0: "INFO",
             1: "WARN",
@@ -18,6 +21,20 @@ class Logger:
         if message not in self.message_log:
             self.message_log.append(message)
             print(message)
+        
+        if level == 2:
+            self.dump_logs()
+            sys.exit()
+
+
+    def dump_logs(self) -> None:
+        with open(f'{self.outdir}/log.txt') as fp:
+            for message in self.message_log:
+                fp.write(message)
+
+
+    def log_configfile_message(self) -> None:
+        message = ''
 
 
     def log_unknown_type(self, level: int, datatype: str) -> None:

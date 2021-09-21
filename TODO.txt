@@ -7,10 +7,18 @@ TODO v0.1
 
 - parse outputs
 
+- write logging for tools which can't currently be parsed (uses configfile etc)
+
 - format to janis tool definition
 
-# stop here tonight
 
+
+
+
+
+future:
+
+- add support for configfiles -> write to file
 
 - positional arguments? fffffff
 
