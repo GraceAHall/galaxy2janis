@@ -4,6 +4,7 @@
 from collections import Counter
 from xml.etree import ElementTree as et
 
+
 # TODO write tests for all these
 
 gx_janis_datatype_mapping = {
@@ -75,20 +76,65 @@ type_consolidator = {
 
 # ---- conversion to janis types ---- #
 
-def convert_types_to_janis(the_list: list[str]) -> list[str]:
+def convert_types_to_janis(param) -> str:
     """
     converts galaxy extensions to janis. 
     also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
     """
-    out_list = []
-    for item in the_list:
-        if item in gx_janis_datatype_mapping:
-            ext = gx_janis_datatype_mapping[item]
+    # handle the Union types - for now
+    # fallback to most common type?
+
+    # this has to check optional status!
+    # has to check whether is an array! 
+
+    status = 0
+
+    convert_type_list(param)
+    check_conversion(param)      
+    out_str = format_janis_typestr(param)
+
+    return out_str, status
+
+
+def convert_type_list(param) -> None:
+    out_list = [] 
+    galaxy_types = param.galaxy_type.split(',') 
+    for gtype in galaxy_types:
+        if gtype in gx_janis_datatype_mapping:
+            ext = gx_janis_datatype_mapping[gtype]
         else:
-            ext = 'None'
+            ext = 'none'
         out_list.append(ext)
 
-    return out_list
+    param.janis_type = ','.join(out_list)
+
+
+def check_conversion(param) -> None:
+    # check if conversion was fully successful
+    for jtype in param.janis_type:
+        if jtype == 'none':
+            status = 1
+            break
+
+
+# TODO ADD OPTIONALITY, ARRAYS
+def format_janis_typestr(param) -> str:
+    # init
+    out_str = ''
+    
+    # add janis type list
+    type_list = param.janis_type.split(',')
+    for jtype in type_list:
+        out_str += (f'{jtype}, ')
+    
+    # strip trailing comma
+    out_str = out_str.rstrip(', ')
+
+    # union wrapping needed? 
+    if len(type_list) > 1:
+        out_str = 'Union[{out_str}]'
+
+    return out_str
 
 
 # ---- consolidating types ---- #

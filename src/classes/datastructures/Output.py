@@ -23,7 +23,7 @@ class Output:
         self.selector_contents: str = ''
         self.help_text: str = ''  # ?
         self.is_hidden: bool = False
-        self.is_collection: bool = False
+        self.is_array: bool = False
 
         # i dont understand "metadata_source"
         # discover_datasets should be janis WildcardSelector with datatype = j.Array(j.File)
@@ -31,7 +31,7 @@ class Output:
 
     def __str__(self) -> str:
         galaxy_type = self.galaxy_type
-        return f'{self.name[-29:]:<30}{galaxy_type[-24:]:>25}{self.selector[-19:]:>20}{self.selector_contents[-19:]:>20}{self.is_collection:>15}'
+        return f'{self.name[-29:]:<30}{galaxy_type[-24:]:>25}{self.selector[-19:]:>20}{self.selector_contents[-19:]:>20}{self.is_array:>15}'
 
 
     def parse(self) -> None:
@@ -40,7 +40,7 @@ class Output:
         self.galaxy_type = self.get_datatype()
         self.galaxy_type = consolidate_types(self.galaxy_type)
         self.set_selector_contents()
-        self.set_is_collection()
+        self.set_is_array()
         self.set_janis_var()
 
 
@@ -64,19 +64,19 @@ class Output:
         pass
 
 
-    def set_is_collection(self) -> None:
+    def set_is_array(self) -> None:
         # has * in WildcardSelector
         if '*' in self.selector_contents:
-            self.is_collection = True
+            self.is_array = True
         
         # root is <data>, but has <discover_datasets> child
         elif self.node.tag == 'data':
             if self.node.find('discover_datasets') is not None:
-                self.is_collection = True
+                self.is_array = True
 
         # root is <collection>
         elif self.node.tag == 'collection':
-            self.is_collection = True        
+            self.is_array = True        
 
 
     def set_janis_var(self) -> None:

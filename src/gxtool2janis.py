@@ -1,49 +1,75 @@
 
 
+
+#pyright: strict
+
 import sys
 import os
+from typing import Tuple
+from classes.JanisFormatter import JanisFormatter
 
 from classes.parsers.ToolParser import ToolParser
 import xml.etree.ElementTree as et
 
 # main entry point
-def main(argv):
-    filename = argv[0]
-    workdir = argv[1]
-    outdir = init_outdir(filename, workdir)
+def main(argv: list[str]):
+    tool_xml = argv[0]
+    tool_workdir = argv[1]
+    
+    # check we have the right file
+    if is_valid_tool_xml(tool_xml, tool_workdir):
+        
+        # init outdir and contents
+        out_log, out_def = init_out_files(tool_xml, tool_workdir)
 
-    tp = ToolParser(filename, workdir, outdir)
-    tp.parse()
+        # parse tool 
+        tp = ToolParser(tool_xml, tool_workdir, out_log)
+        tp.parse()
 
-    # generate janis! 
-    print()
-
-
-def init_outdir(filename: str, workdir: str) -> str:
-    outdir = get_outdir_path(filename, workdir)
-    wipe_dir(outdir)
-    touch_log(outdir)
-    return outdir
+        # generate janis py
+        jf = JanisFormatter(tp, out_def)
+        jf.format()
+        jf.write()
+        print()
 
 
-def get_outdir_path(filename: str, workdir: str) -> str:
-    outdir = filename.split('.', 1)[0]
-    outdir = f'parsed_tools/{outdir}'
+def init_out_files(filename: str, workdir: str) -> Tuple[str, str]:
+    outdir = get_outdir_path(workdir)
+    out_log, out_def = get_filenames(filename, outdir)
+
+    for filename in [out_log, out_def]:
+        # wipe prev file
+        if os.path.exists(filename):
+            os.remove(filename)
+        
+        # touch new file
+        with open(filename, 'w') as fp:
+            pass
+
+    return out_log, out_def
+
+
+def get_outdir_path(workdir: str) -> str:
+    folder = workdir.rsplit('/', 1)[-1]
+    outdir = f'parsed_tools/{folder}'
     if not os.path.exists(outdir):
         os.mkdir(outdir) 
     return outdir
 
 
-def wipe_dir(direct: str) -> None:
-    files = os.listdir(direct)
-    for f in files:
-        os.remove(f'{direct}/{f}')
+def get_filenames(filename: str, outdir: str) -> Tuple[str, str]:
+    basename = filename.rstrip('.xml')
+    out_log = f'{outdir}/{basename}.log'
+    out_def = f'{outdir}/{basename}.py'
+    return out_log, out_def
 
 
-def touch_log(direct: str) -> None:
-    with open(f'{direct}/log.txt', 'w') as fp:
-        pass
-
+def is_valid_tool_xml(filename: str, workdir: str) -> bool:
+    tree = et.parse(f'{workdir}/{filename}')
+    root = tree.getroot()
+    if root.tag == 'tool':
+        return True
+    return False
 
 
 if __name__ == '__main__':

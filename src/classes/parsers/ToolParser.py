@@ -24,11 +24,11 @@ Tool.xml is parsed in a stepwise manner, where each step has its own class to pe
 """
 
 class ToolParser:
-    def __init__(self, filename: str, workdir: str, outdir: str):
-        self.filename = filename
-        self.workdir = workdir
-        self.outdir = outdir
-        self.tree: et.ElementTree = et.parse(f'{workdir}/{filename}')
+    def __init__(self, tool_xml: str, tool_workdir: str, out_log: str):
+        self.filename = tool_xml
+        self.workdir = tool_workdir
+        self.logfile = out_log
+        self.tree: et.ElementTree = et.parse(f'{self.workdir}/{self.filename}')
         self.root: et.Element = self.tree.getroot()
 
         self.galaxy_depth_elems = ['conditional', 'section']
@@ -52,7 +52,7 @@ class ToolParser:
         self.help: str = ''
         self.containers: dict[str, str] = {}
 
-        self.logger = Logger(self.outdir)
+        self.logger = Logger(self.logfile)
 
 
     def parse(self) -> None:

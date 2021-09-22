@@ -5,18 +5,26 @@ currently might miss some variables. might not be the end of the world.
 
 TODO v0.1
 
+- format to janis tool definition
+
 - write logging for tools which can't currently be parsed (uses configfile etc)
+    - types
+
+- develop run program
+
+- develop reporting program
+
+- duplicate name resolving to LCA in gx_var path
+
+
+
+Features
+
+- logging for tools which can't currently be parsed
     - complex regex
     - types
     - uses configfile
-    - needs user input (datatype / command line references)
-
-- format to janis tool definition
-
-- run on tools-iuc
-
-- get stats on num tools in each error type
-
+    - needs user input (datatype / command line references) *
 
 
 future:
@@ -34,6 +42,10 @@ future:
 - positional arguments
 
 - parse tests
+
+
+
+
 
 - auto parsing, test running and reporting
 

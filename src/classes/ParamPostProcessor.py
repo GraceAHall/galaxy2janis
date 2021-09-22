@@ -35,7 +35,7 @@ class ParamPostProcessor:
         for key, param_list in param_dict.items():
             if len(param_list) > 1:
                 # TEMP - stops execution rather than accepting user input to resolve
-                self.logger.log(2, 'param required user input')
+                self.logger.log(2, 'user input required')
                 param_list = self.user_resolve_datatype(param_list)
             clean_params += param_list
 
@@ -92,7 +92,7 @@ class ParamPostProcessor:
             if len(cmd_refs) == 1:
                 param.prefix = cmd_refs[0].prefix
             elif len(cmd_refs) > 1:
-                self.logger.log(2, 'param required user input')
+                self.logger.log(2, 'user input required')
                 param.prefix = param.user_select_prefix()
 
 
