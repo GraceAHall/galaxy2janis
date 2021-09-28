@@ -126,9 +126,15 @@ def can_cast_to_float(the_list: list[str]) -> bool:
 
 
 def can_cast_to_int(the_list: list[str]) -> bool:
+    # empty list
+    if len(the_list) == 0:
+        return False
+
     for item in the_list:
-        if item[0] in ('-', '+'):
-            item = item[1:]
+        # empty string
+        if len(item) > 0:
+            if item[0] in ('-', '+'):
+                item = item[1:]
 
         if not item.isdigit():
             return False

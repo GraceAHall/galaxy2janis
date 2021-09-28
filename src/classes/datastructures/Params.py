@@ -17,8 +17,6 @@ class Param:
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         self.node = node
         self.tree_path = tree_path
-        if len(self.tree_path) == 0:
-            print()
         self.cmd_lines = cmd_lines
 
         # basic info for each Param subclass
@@ -149,7 +147,7 @@ class Param:
             assert(self.has_command_ref)
             self.validated = True
         except AssertionError:
-            print()
+            pass
 
 
     def print_details(self):
@@ -353,6 +351,17 @@ class OutputParam(Param):
 
     def parse(self) -> None:
         self.parse_common_features()
+
+
+    # override
+    def set_help_text(self) -> None:
+        label = get_attribute_value(self.node, 'label')
+        if "${on_string}" in label:
+            label = label.rsplit("${on_string}", 1)[1]
+            label = label.strip(':')
+            label = label.strip(' ')
+            self.help_text = label
+
 
 
 

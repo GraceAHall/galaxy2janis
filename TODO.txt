@@ -5,15 +5,16 @@ currently might miss some variables. might not be the end of the world.
 
 TODO v0.1
 
-- write logging for tools which can't currently be parsed (uses configfile etc)
-    - types
-
-- develop run program
+- datatypes: arrays, optionality
 
 - develop reporting program
 
 - duplicate name resolving to LCA in gx_var path
 
+BUGS:
+- not reporting datatype which can't be converted (think this is set_datatype() issue)
+- InputSelecter needs to point to linked ToolInput
+    - names for multiple outputs which require ToolInput param? 
 
 
 Features

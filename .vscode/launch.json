@@ -150,6 +150,46 @@
             "args": [
                 "filtlong.xml", "tools/filtlong"
             ]
+        },
+        {
+            "name": "abricate",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abricate.xml", "tools/abricate"
+            ]
+        },
+        {
+            "name": "annotateBed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "annotateBed.xml", "tools/bedtools"
+            ]
+        },
+        {
+            "name": "spacingBed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "spacingBed.xml", "tools/bedtools"
+            ]
+        },
+        {
+            "name": "parse tools",
+            "type": "python",
+            "request": "launch",
+            "program": "src/parsing_manager.py",
+            "console": "integratedTerminal",
+            "args": [
+                "tools", "parsed_tools"
+            ]
         }
     ]
 }

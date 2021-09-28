@@ -25,6 +25,11 @@ class Output:
         self.is_hidden: bool = False
         self.is_array: bool = False
 
+        self.extension_mappings = {
+            'fasta': ['fa', 'fna', 'fasta'],
+            'fastq': ['fq', 'fastq']
+        }
+
 
         # i dont understand "metadata_source"
         # discover_datasets should be janis WildcardSelector with datatype = j.Array(j.File)
@@ -111,9 +116,11 @@ class Output:
 
 
     def get_datatype_from_param(self, format_source: str) -> str:
+        
         for param in self.params:
             if format_source == param.name:
                 return param.galaxy_type
+        
         raise Exception(f'could not find param: {format_source}')
 
 
@@ -123,8 +130,17 @@ class Output:
         
         # check if the pattern already ends with any of these datatypes
         for datatype in datatype_list:
-            if pattern.endswith(datatype):
-                return pattern
+            
+            # get all possible extensions for the datatype
+            if datatype in self.extension_mappings:
+                extensions = self.extension_mappings[datatype]
+            else:
+                extensions = [datatype]
+
+            # check if any are present
+            for ext in extensions:
+                if pattern.endswith('.' + ext):
+                    return pattern
 
         # if not, add the first to the pattern end (if not file)
         pattern = pattern.rstrip('.')

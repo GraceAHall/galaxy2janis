@@ -45,6 +45,7 @@ class ToolParser:
 
         # tool metadata
         self.tool_name: str = ''
+        self.tool_id: str = ''
         self.galaxy_version: str = ''
         self.citations: list[dict[str, str]] = []
         self.requirements: list[dict[str, Union[str, int]]] = []
@@ -81,7 +82,6 @@ class ToolParser:
         tp = TokenParser(self.tree, self.tokens, self.logger)
         tp.parse()
         self.tree = tp.tree
-        print()
 
 
     # 3rd step: parsing tool metadata
@@ -89,6 +89,7 @@ class ToolParser:
         mp = MetadataParser(self.tree, self.logger)
         mp.parse()
         self.tool_name = mp.tool_name
+        self.tool_id = mp.tool_id
         self.galaxy_version = mp.galaxy_version
         self.citations = mp.citations
         self.requirements = mp.requirements
@@ -118,16 +119,16 @@ class ToolParser:
         pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
-        print('\n--- Before cleaning ---\n')
-        pp.pretty_print()
+        #print('\n--- Before cleaning ---\n')
+        #pp.pretty_print()
 
         # cleanup steps
         ppp = ParamPostProcessor(params, self.logger)
         ppp.remove_duplicate_params()
         ppp.set_prefixes()
 
-        print('\n--- After cleaning ---\n')
-        ppp.pretty_print()
+        #print('\n--- After cleaning ---\n')
+        #ppp.pretty_print()
 
         # update params to cleaned param list
         self.params = ppp.params
@@ -137,7 +138,7 @@ class ToolParser:
     def parse_outputs(self):
         op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
         self.outputs = op.parse()
-        op.pretty_print()
+        #op.pretty_print()
 
 
     

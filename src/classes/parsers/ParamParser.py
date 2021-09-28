@@ -91,7 +91,7 @@ class ParamParser:
             curr_path.append(node.attrib['name'])
 
         if get_attribute_value(node, 'name') == 'first_assembly_iter_param':
-            print()
+            pass
         # Should we parse this node or just continue?
         if node.tag in self.parsable_elems:
             self.parse_elem(node, curr_path)
@@ -156,16 +156,18 @@ class ParamParser:
             return [DataParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'data_collection':
+            self.logger.log(2, 'unsupported param type: data_collection')
             return []
-            raise Exception('wtf error: param type="data_collection"')
             return [DataCollectionParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'data_column':
-            raise Exception('wtf error: param type="data_column"')
+            self.logger.log(2, 'unsupported param type: data_column')
+            return []
             return [DataColumnParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'hidden':
-            raise Exception('wtf error: param type="hidden"')
+            self.logger.log(2, 'unsupported param type: hidden')
+            return []
             return [HiddenParam(node, tree_path, self.command_lines)]
 
         # params which need more processing and potential splitting

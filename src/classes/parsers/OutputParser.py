@@ -44,7 +44,7 @@ class OutputParser:
         pattern = output.selector_contents
         for substr in banned_substrings:
             if substr in pattern:
-                self.logger.log(1, 'complex regex')
+                self.logger.log(2, 'complex regex')
                 break
 
     

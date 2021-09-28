@@ -137,7 +137,7 @@ class MetadataParser:
             self.logger.log(1, 'container requirement encountered')
             self.container = tool_req['name']
         elif tool_req['type'] == 'set_environment':
-            self.logger.log(2, 'chosen base command is set_environment')
+            self.logger.log(1, 'chosen base command is set_environment')
 
 
     def set_tool_version(self) -> None:

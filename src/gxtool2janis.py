@@ -30,7 +30,6 @@ def main(argv: list[str]):
         jf = JanisFormatter(tp, out_def)
         jf.format()
         jf.write()
-        print()
 
 
 def init_out_files(filename: str, workdir: str) -> Tuple[str, str]:

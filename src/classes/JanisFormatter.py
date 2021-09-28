@@ -156,7 +156,6 @@ class JanisFormatter:
         for param in self.tool.params:
             if param.validated:  # TODO this will rule out complex param syntax at this stage
                 param_string = self.format_param_to_string(param) 
-                self.update_datatype_imports(param)
                 inputs.append(param_string)
 
         return inputs
@@ -208,7 +207,7 @@ class JanisFormatter:
         # TODO has to check whether is an array! 
 
         self.convert_type_list(param)
-        self.check_conversion(param)      
+        self.update_datatype_imports(param)
         out_str = self.format_janis_typestr(param)
 
         return out_str
@@ -221,7 +220,6 @@ class JanisFormatter:
             if gtype in self.gx_janis_datatype_mapping:
                 ext = self.gx_janis_datatype_mapping[gtype]
             else:
-                # TODO here cry logger
                 self.logger.log(1, f'datatype conversion failed: {gtype}')
                 ext = 'File'
             out_list.append(ext)
@@ -229,6 +227,7 @@ class JanisFormatter:
         param.janis_type = ','.join(out_list)
 
 
+    # depricated?
     def check_conversion(self, param: Param) -> None:
         # check if conversion was fully successful
         for jtype in param.janis_type:
@@ -252,7 +251,7 @@ class JanisFormatter:
 
         # union wrapping needed? 
         if len(type_list) > 1:
-            out_str = 'Union[{out_str}]'
+            out_str = f'Union[{out_str}]'
 
         return out_str
 
@@ -273,7 +272,6 @@ class JanisFormatter:
 
         for output in self.tool.outputs:
             output_string = self.format_output_to_string(output) 
-            self.update_datatype_imports(output)
             self.update_component_imports(output)
             outputs.append(output_string)
 
@@ -347,7 +345,7 @@ class JanisFormatter:
         """
         each str elem in out list is tool output
         """
-        toolname = self.tool.tool_name
+        toolname = self.tool.tool_id.replace('-', '_')
         container = self.tool.container
         version = self.tool.tool_version
 
@@ -368,7 +366,7 @@ class JanisFormatter:
         """
         generates the __main__ call to translate to wdl on program exec
         """
-        toolname = self.tool.tool_name
+        toolname = self.tool.tool_id.replace('-', '_')
 
         out_str = '\n'
         out_str += 'if __name__ == "__main__":\n'

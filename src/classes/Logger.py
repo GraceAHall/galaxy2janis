@@ -2,6 +2,18 @@
 
 import sys
 
+"""
+Message logging for:
+    - Uses configfile
+    - User input required
+    - Datatype cannot convert to janis
+    - Input Param not found in command string (with this cause issue with output input params)
+    - container requirement chose as command
+    - set_environment requirement chosen as command
+    - complex WildcardSelector regex
+"""
+
+
 class Logger:
     def __init__(self, logfile: str) -> None:
         self.logfile = logfile
@@ -14,15 +26,6 @@ class Logger:
         self.message_log = []
 
 
-    """
-
-    BOOKMARK TODO HERE
-    - DETOUR: conversion to janis
-    - types - WARN []
-
-    """
-
-
     def log(self, level: int, message: str) -> None:
         log_type = self.map_level[level]
         message = f'{log_type},{message}\n'
@@ -31,11 +34,10 @@ class Logger:
             self.message_log.append(message)
             self.update_logs(message)
         
-        if level == 2:
-            sys.exit()
+        # if level == 2:
+        #     sys.exit()
 
 
-    # TODO delete all files in the outdir at program start
     def update_logs(self, message: str) -> None:
         with open(f'{self.logfile}', 'a') as fp:
             fp.write(message)
