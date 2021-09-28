@@ -49,6 +49,7 @@ class Param:
         self.truths = ['true', 'True']
 
 
+
     def parse_common_features(self) -> None:
         self.set_basic_details()
         self.set_gx_var()
@@ -66,9 +67,6 @@ class Param:
             self.name = argument.lstrip('-').replace('-', '_') 
             self.prefix = argument  # TODO find this in command pls
             self.is_argument = True
-
-        # defaults    
-        self.default_value = get_attribute_value(self.node, 'value')
 
         # help text
         self.set_help_text()
@@ -134,6 +132,11 @@ class Param:
         selected_elem = int(input('Selected command line reference [int]: '))
         prefix = self.cmd_references[selected_elem].prefix
         return prefix
+
+
+    # the default class method
+    def set_defaults(self) -> None:
+        self.default_value = get_attribute_value(self.node, 'value')
         
 
     def validate(self) -> None:
@@ -142,7 +145,8 @@ class Param:
             assert(self.name != '')
             assert(self.gx_var != None)
             assert(self.node != None)
-            assert(self.has_command_ref or self.has_conditional_ref)
+            #assert(self.has_command_ref or self.has_conditional_ref)
+            assert(self.has_command_ref)
             self.validated = True
         except AssertionError:
             print()
@@ -183,6 +187,7 @@ class TextParam(Param):
 
     def parse(self) -> None:
         self.parse_common_features()
+        self.set_defaults()
 
 
 
@@ -194,6 +199,7 @@ class IntParam(Param):
 
     def parse(self) -> None:
         self.parse_common_features()
+        self.set_defaults()
 
 
 
@@ -205,6 +211,7 @@ class FloatParam(Param):
 
     def parse(self) -> None:
         self.parse_common_features()
+        self.set_defaults()
 
 
 
@@ -216,6 +223,7 @@ class DataParam(Param):
     def parse(self) -> None:
         self.parse_common_features()
         self.set_datatype()
+        self.set_defaults()
 
 
     def set_datatype(self) -> None:
@@ -235,6 +243,7 @@ class BoolParam(Param):
         self.parse_common_features()
         self.set_bool_subtype()
         self.assert_structure()
+        self.set_prefix()
         
 
     def validate_value_order(self) -> None:
@@ -265,6 +274,7 @@ class BoolParam(Param):
 
     def set_prefix(self):
         self.prefix = get_attribute_value(self.node, 'truevalue')
+        pass
 
 
 
@@ -326,6 +336,15 @@ class SelectParam(Param):
         self.help_text += f'  example values: {options}'
 
 
+    def set_defaults(self) -> None:
+        for child in self.node:
+            if child.tag == 'option':
+                if get_attribute_value(child, 'selected') in self.truths:
+                    self.default_value = get_attribute_value(child, 'value')
+                    break
+
+
+
 
 class OutputParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
@@ -334,6 +353,7 @@ class OutputParam(Param):
 
     def parse(self) -> None:
         self.parse_common_features()
+
 
 
 class DataCollectionParam(Param):

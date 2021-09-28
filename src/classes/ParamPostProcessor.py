@@ -86,14 +86,15 @@ class ParamPostProcessor:
         multiple refs need human decision.
         """
         for param in self.params:
-            cmd_refs = param.cmd_references 
-            cmd_refs = [ref for ref in cmd_refs if not ref.in_conditional]  
-            
-            if len(cmd_refs) == 1:
-                param.prefix = cmd_refs[0].prefix
-            elif len(cmd_refs) > 1:
-                self.logger.log(2, 'user input required')
-                param.prefix = param.user_select_prefix()
+            if param.prefix is None:
+                cmd_refs = param.cmd_references 
+                cmd_refs = [ref for ref in cmd_refs if not ref.in_conditional]  
+                
+                if len(cmd_refs) == 1:
+                    param.prefix = cmd_refs[0].prefix
+                elif len(cmd_refs) > 1:
+                    self.logger.log(2, 'user input required')
+                    param.prefix = param.user_select_prefix()
 
 
     def pretty_print(self) -> None:

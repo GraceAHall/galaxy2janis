@@ -5,8 +5,6 @@ currently might miss some variables. might not be the end of the world.
 
 TODO v0.1
 
-- format to janis tool definition
-
 - write logging for tools which can't currently be parsed (uses configfile etc)
     - types
 
@@ -20,6 +18,8 @@ TODO v0.1
 
 Features
 
+- Only using latest biocontainer version 
+
 - logging for tools which can't currently be parsed
     - complex regex
     - types
@@ -29,7 +29,12 @@ Features
 
 future:
 
-- allows more complex command structure
+
+- extract base command extras?
+    - check for requirement with version token
+    - if none, do an alignment between each requirement and tool id. pick requirement with best alignment score. 
+
+- restructure command
     - (cutadapt) --minimum-length=$filter_options.minimum_length
     - (cutadapt) '-a', "'${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'"
 

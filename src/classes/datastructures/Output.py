@@ -25,6 +25,7 @@ class Output:
         self.is_hidden: bool = False
         self.is_array: bool = False
 
+
         # i dont understand "metadata_source"
         # discover_datasets should be janis WildcardSelector with datatype = j.Array(j.File)
 
@@ -233,7 +234,6 @@ class DiscoverDatasetsOutput(Output):
         # remove regex start and end patterns
         pattern = pattern.rstrip('$').lstrip('^')
         return pattern
-
 
 
 

@@ -3,7 +3,7 @@
 
 import xml.etree.ElementTree as et
 from classes.Logger import Logger
-
+from typing import Union
 
 from classes.datastructures.Params import Param
 from classes.datastructures.Output import Output
@@ -47,10 +47,9 @@ class ToolParser:
         self.tool_name: str = ''
         self.galaxy_version: str = ''
         self.citations: list[dict[str, str]] = []
-        self.requirements: list[dict[str, str]] = []
+        self.requirements: list[dict[str, Union[str, int]]] = []
         self.description: str = ''
         self.help: str = ''
-        self.containers: dict[str, str] = {}
 
         self.logger = Logger(self.logfile)
 
@@ -85,20 +84,35 @@ class ToolParser:
         print()
 
 
-    # 2.5th step: configfiles (preprocessing)
+    # 3rd step: parsing tool metadata
+    def parse_metadata(self):
+        mp = MetadataParser(self.tree, self.logger)
+        mp.parse()
+        self.tool_name = mp.tool_name
+        self.galaxy_version = mp.galaxy_version
+        self.citations = mp.citations
+        self.requirements = mp.requirements
+        self.description = mp.description
+        self.help = mp.help
+        self.base_command = mp.base_command
+        self.container = mp.container
+        self.tool_version = mp.tool_version
+
+
+    # 4th step: command parsing 
+    def parse_command(self):
+        cp = CommandParser(self.tree, self.logger)
+        self.command_lines = cp.parse()
+
+
+    # 5th step: configfile parsing
     def parse_configfiles(self):
         cp = ConfigfileParser(self.tree, self.tokens, self.logger)
         cp.parse()
         self.configfiles = cp.configfiles
 
 
-    # 3rd step: command parsing & linking to params
-    def parse_command(self):
-        cp = CommandParser(self.tree, self.logger)
-        self.command_lines = cp.parse()
-
-
-    # 4th step: param parsing
+    # 6th step: param parsing
     def parse_params(self):
         # parse params
         pp = ParamParser(self.tree, self.command_lines, self.logger)
@@ -119,25 +133,14 @@ class ToolParser:
         self.params = ppp.params
 
 
-    # 5th step: output parsing
+    # 7th step: output parsing
     def parse_outputs(self):
         op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
         self.outputs = op.parse()
         op.pretty_print()
 
 
-    # 6th step: parsing tool metadata
-    def parse_metadata(self):
-        mp = MetadataParser(self.tree, self.logger)
-        mp.parse()
-        self.tool_name = mp.tool_name
-        self.galaxy_version = mp.galaxy_version
-        self.citations = mp.citations
-        self.requirements = mp.requirements
-        self.description = mp.description
-        self.help = mp.help
-        self.containers = mp.containers
-        print()
+    
     
 
 
