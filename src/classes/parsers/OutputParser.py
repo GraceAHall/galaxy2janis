@@ -34,6 +34,7 @@ class OutputParser:
         for output in outputs:
             output.parse()
             self.log_pattern_status(output)
+            #self.log_datatype_status(output)
 
         self.outputs = outputs
         return self.outputs
@@ -48,6 +49,11 @@ class OutputParser:
                 break
 
     
+    def log_datatype_status(self, output: Output) -> None:
+        if output.galaxy_type == '':
+            self.logger.log(1, 'complex regex')
+
+
     def get_all_outputs(self) -> list[et.Element]:
         root = self.tree.getroot()
         output_section = root.find('outputs')

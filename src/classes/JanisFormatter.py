@@ -201,8 +201,6 @@ class JanisFormatter:
         also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
         """
         # TODO handle the Union types - for now
-        # fallback to most common type?
-
         # TODO this has to check optional status!
         # TODO has to check whether is an array! 
 
@@ -214,7 +212,7 @@ class JanisFormatter:
 
 
     def convert_type_list(self, param: Param) -> None:
-        out_list = [] 
+        out_list = set()
         galaxy_types = param.galaxy_type.split(',') 
         for gtype in galaxy_types:
             if gtype in self.gx_janis_datatype_mapping:
@@ -222,7 +220,7 @@ class JanisFormatter:
             else:
                 self.logger.log(1, f'datatype conversion failed: {gtype}')
                 ext = 'File'
-            out_list.append(ext)
+            out_list.add(ext)
 
         param.janis_type = ','.join(out_list)
 
@@ -249,9 +247,12 @@ class JanisFormatter:
         # strip trailing comma
         out_str = out_str.rstrip(', ')
 
+        # TODO here: ask richard about datatypes.
+
         # union wrapping needed? 
         if len(type_list) > 1:
-            out_str = f'Union[{out_str}]'
+            self.janis_import_dict['janis_core'].add('UnionType')
+            out_str = f'UnionType({out_str})'
 
         return out_str
 

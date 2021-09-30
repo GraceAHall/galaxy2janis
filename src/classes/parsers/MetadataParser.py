@@ -38,7 +38,7 @@ class MetadataParser:
 
         # tasks to do after info has been scraped
         self.align_requirements_to_toolname()
-        self.base_command = str(self.requirements[0]['name'])
+        self.set_base_command()
         self.set_container()
         self.set_tool_version()
 
@@ -121,6 +121,16 @@ class MetadataParser:
         return score # type: ignore
  
 
+    def set_base_command(self) -> None:
+        """
+        Workaround: some tools have no requirements. setting base command to the tool id. 
+        """
+        if len(self.requirements) == 0:
+            self.base_command = self.tool_id
+        else:
+            self.base_command = str(self.requirements[0]['name'])
+
+
     def set_container(self) -> None:
         """
         requirements have been sorted by alignment match to tool id
@@ -129,16 +139,28 @@ class MetadataParser:
         (subject to change) to set the container:
             if package, use requirement name to find biocontainer
             if container, use the requirement name directly
+
+        Workaround: some tools have no requirements. setting base command to the tool id.
         """
-        tool_req = self.requirements[0]
-        if tool_req['type'] == 'package':
-            self.container = f'quay.io/biocontainers/{tool_req["name"]}'
-        elif tool_req['type'] == 'container':
-            self.logger.log(1, 'container requirement encountered')
-            self.container = tool_req['name']
-        elif tool_req['type'] == 'set_environment':
-            self.logger.log(1, 'chosen base command is set_environment')
+        if len(self.requirements) == 0:
+            self.container = f'quay.io/biocontainers/{self.tool_id}'
+
+        else:
+            tool_req = self.requirements[0]
+            if tool_req['type'] == 'package':
+                self.container = f'quay.io/biocontainers/{tool_req["name"]}'
+            elif tool_req['type'] == 'container':
+                self.logger.log(1, 'container requirement encountered')
+                self.container = tool_req['name'] # type: ignore
+            elif tool_req['type'] == 'set_environment':
+                self.logger.log(1, 'chosen base command is set_environment')
 
 
     def set_tool_version(self) -> None:
-        self.tool_version = str(self.requirements[0]['version'])
+        """
+        Workaround: some tools have no requirements. setting base command to the tool id.
+        """
+        if len(self.requirements) == 0:
+            self.tool_version = str(self.galaxy_version)
+        else:
+            self.tool_version = str(self.requirements[0]['version'])

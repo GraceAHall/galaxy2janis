@@ -182,6 +182,56 @@
             ]
         },
         {
+            "name": "subtractBed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "subtractBed.xml", "tools/bedtools"
+            ]
+        },
+        {
+            "name": "collection_element_identifiers",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "collection_element_identifiers.xml", "tools/collection_element_identifiers"
+            ]
+        },
+        {
+            "name": "fastp",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "fastp.xml", "tools/fastp"
+            ]
+        },
+        {
+            "name": "kma_map",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "kma_map.xml", "tools/kma"
+            ]
+        },
+        {
+            "name": "deseq2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "deseq2.xml", "tools/deseq2"
+            ]
+        },
+        {
             "name": "parse tools",
             "type": "python",
             "request": "launch",

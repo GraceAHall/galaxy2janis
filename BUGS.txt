@@ -1,0 +1,20 @@
+
+
+fastp.xml
+raise Exception(f'could not find param: {format_source}')
+Exception: could not find param: in2
+# caused by #set in2 = (something referencing a param i forgot)
+
+flash.xml
+raise Exception(f'could not find param: {format_source}')
+Exception: could not find param: reads['forward']
+
+deseq2.xml
+for param in params:
+TypeError: 'NoneType' object is not iterable
+
+- not reporting datatype which can't be converted (think this is set_datatype() issue)
+- InputSelecter needs to point to linked ToolInput
+    - names for multiple outputs which require ToolInput param? 
+
+OSError: [Errno 22] Invalid argument: 'tools/bwa/read_group_macros.xml

@@ -20,6 +20,7 @@ def consolidate_types(types: str) -> str:
 
     type_list = types.split(',')
     for old_type in type_list:
+        old_type = old_type.replace('\n', '').strip(' ')
         try:
             new_type = type_consolidator[old_type]
             out_types.add(new_type)

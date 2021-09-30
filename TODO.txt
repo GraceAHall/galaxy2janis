@@ -6,15 +6,33 @@ currently might miss some variables. might not be the end of the world.
 TODO v0.1
 
 - datatypes: arrays, optionality
+    ASK RICHARD
+    single:
+        String(optional=True)
+            - appears in if/else block
+            - optional = 'true'/'True' is set in param
+    array:
+        Array(String(), optional=True)
+            - is_array
+    what about an optional uniontype array?
+        Array(UnionType(t1, t2), optional=True/False)
 
-- develop reporting program
+- Galaxy types: will we add to janis or just leave as 'File'?
+    ASK RICHARD
 
-- duplicate name resolving to LCA in gx_var path
+- complex command string (var_not_found)
+    ASK RICHARD
 
-BUGS:
-- not reporting datatype which can't be converted (think this is set_datatype() issue)
-- InputSelecter needs to point to linked ToolInput
-    - names for multiple outputs which require ToolInput param? 
+Setting variables
+- #set $in1 = $single_paired.paired_input.forward
+
+- unsupported_param (group_tag, data_collection, data_column, hidden)
+
+- duplicate name resolving to LCA in gx_var path?
+
+- tool tests
+
+
 
 
 Features
@@ -27,9 +45,7 @@ Features
     - uses configfile
     - needs user input (datatype / command line references) *
 
-
 future:
-
 
 - extract base command extras?
     - check for requirement with version token

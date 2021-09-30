@@ -33,7 +33,6 @@ class Param:
         # checks
         self.has_command_ref: bool = False
         self.has_conditional_ref: bool = False
-        self.is_argument: bool = False  
         # self.needed_user_input: bool = False 
 
         # other bools
@@ -58,13 +57,17 @@ class Param:
 
     def set_basic_details(self) -> None:
         # name & prefix 
-        if get_attribute_value(self.node, 'argument') == '':
-            self.name = get_attribute_value(self.node, 'name')
+        argument = get_attribute_value(self.node, 'argument')
+        name = get_attribute_value(self.node, 'name')
+
+        if argument != '':
+            self.prefix = argument
+            if name == '':
+                self.name = argument.lstrip('-').replace('-', '_') 
+            else:
+                self.name = name
         else:
-            argument = get_attribute_value(self.node, 'argument')
-            self.name = argument.lstrip('-').replace('-', '_') 
-            self.prefix = argument  # TODO find this in command pls
-            self.is_argument = True
+            self.name = name            
 
         # help text
         self.set_help_text()

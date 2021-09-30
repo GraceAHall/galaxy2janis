@@ -98,30 +98,32 @@ class Output:
         
         # easiest & most common option
         if gx_format != '':
-            return gx_format
+            datatype = gx_format
 
         # get datatype from referenced param
         elif format_source != '':
-            return self.get_datatype_from_param(format_source)
+            datatype = self.get_datatype_from_param(format_source)
 
         # get datatype from referenced file extension
         elif from_work_dir != '':
             assert('.' in from_work_dir)
-            return from_work_dir.rsplit('.', 1)[1]
+            datatype = from_work_dir.rsplit('.', 1)[1]
 
         # fallback
-        # TODO log warning
         else:
-            return 'File'
+            datatype = 'File'
+
+        return datatype
 
 
     def get_datatype_from_param(self, format_source: str) -> str:
-        
+        # not working
         for param in self.params:
             if format_source == param.name:
                 return param.galaxy_type
         
-        raise Exception(f'could not find param: {format_source}')
+        return '' # failed
+        #raise Exception(f'could not find param: {format_source}')
 
 
     def format_pattern_extension(self, pattern: str) -> str:
@@ -269,12 +271,9 @@ class TemplatedOutput(Output):
 
     def set_selector_contents(self) -> None:
         """
-        pattern=""
-        directory=""
-        visible="false" (default), is same as hidden
+        just sets to generated input param name
         """
-        # TODO BOOKMARK
-        pass
+        self.selector_contents = f'{self.input_param.name}'
     
 
 
