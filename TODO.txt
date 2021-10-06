@@ -1,12 +1,14 @@
 
 
-currently might miss some variables. might not be the end of the world. 
-
 
 TODO v0.1
 
+
+check janis-patterns github for tricky situations
+
+- add cache: biocontainer checking
+
 - datatypes: arrays, optionality
-    ASK RICHARD
     single:
         String(optional=True)
             - appears in if/else block
@@ -14,70 +16,94 @@ TODO v0.1
     array:
         Array(String(), optional=True)
             - is_array
+            - multiple="True" has to be set for a data param, or has to be data collection
     what about an optional uniontype array?
-        Array(UnionType(t1, t2), optional=True/False)
-
-- Galaxy types: will we add to janis or just leave as 'File'?
-    ASK RICHARD
-
-- complex command string (var_not_found)
-    ASK RICHARD
-
-Setting variables
-- #set $in1 = $single_paired.paired_input.forward
+        Array(UnionType(fastq, fastqgz), optional=True/False)
+        # verdict: don't use UnionType if possible. 
+        # uncompressed as default
+        # TODO make a note.
 
 - unsupported_param (group_tag, data_collection, data_column, hidden)
 
-- duplicate name resolving to LCA in gx_var path?
+- Add galaxy types automated from galaxy
+
+- improve command string parsing
+    - aliases 
+    - rework param variable detection
+    - compound params (multiple methods or using multiple params to set program flag)
+    - positional args
+    - (cutadapt) --minimum-length=$filter_options.minimum_length
+    - (cutadapt) '-a', "'${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'"
 
 - tool tests
+    - janis has the galaxy tests. parse to janis format
+    - galaxy test evalutation - https://github.com/galaxyproject/galaxy/tree/dev/lib/galaxy/tool_util/verify/asserts
+    - during tool testing - check whether WilcardSelector can handle the galaxy regex
+
+- duplicate name resolving to LCA in gx_var path?
 
 
 
+Milestones to v0.1 -------------------------------
 
-Features
+ - small additions (datatype tweaks, rare params) (hours) 
+ - configfiles (1 day)
+ - galaxy types integrated into janis (1-2 days)
+ - improved command string parsing (1-2 days)
+ - tool test platform parsing into janis (2-4 days?)
 
-- Only using latest biocontainer version 
+Achieving the above should be possible by next fornight meeting
+
+
+Rollout plan -------------------------------------
+
+ - finish v0.1 tasks above
+ - integrate passed tools into janis
+ - add extra features if necessary to parse remaining tools
+ - manually resolve non-passed tools
+ - integrate program into janis
+
+
+Future -------------------------------------------
+
+ - new tools added to toolshed automatically parsed 
+ - any which do not pass tests can have manual intervention (fornight / monthly activity)
+ - start galaxy workflow parser -> janis
+
+
+
+Notes --------------------------------------------
+
+Multithreading
+    - added multithreading because 'requests' module takes too long to ping biocontainers
+    - making 50-100 requests per sec to quay.io: am I gonna get banned? 
+    - doing this every 5 mins - 10 mins when i make changes and want to re-parse all tools-iuc tools
+
+non-wildcard Outputs
+    - currently just keeping as WilcardSelector. Not sure how glob works and is deprecated. 
+    - glob="output.fastq" works when path is directly known
+    - stringformatter for paths ie concatenating folder and filename
+
+Containers
+    - Only using latest biocontainer version
+
+Macros
+    - supports common macros? is this done? 
+
+Helptext
+    - restructuredText processing to make helptext nicer
+
+
+v0.1 Features ------------------------------------
+
+- automatic container detection
+    - just pings url using python 'requests' module
 
 - logging for tools which can't currently be parsed
     - complex regex
     - types
     - uses configfile
     - needs user input (datatype / command line references) *
-
-future:
-
-- extract base command extras?
-    - check for requirement with version token
-    - if none, do an alignment between each requirement and tool id. pick requirement with best alignment score. 
-
-- restructure command
-    - (cutadapt) --minimum-length=$filter_options.minimum_length
-    - (cutadapt) '-a', "'${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'"
-
-- more complex discover_datasets regex
-    - currently anything between brackets gets removed
-    - can't contain anything except [a-zA-Z0-9], -, _, *, .
-
-- add support for configfiles -> write to file
-
-- positional arguments
-
-- parse tests
-
-
-
-
-
-- auto parsing, test running and reporting
-
-- write test suite
-
-- supports common macros? is this done? 
-
-- restructuredText processing to make helptext nicer
-
-test output checking:
-https://github.com/galaxyproject/galaxy/tree/dev/lib/galaxy/tool_util/verify/asserts
+    - unresolved container url
 
 

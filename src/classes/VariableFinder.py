@@ -73,6 +73,26 @@ class VariableFinder:
                 
 
     def find_param_in_line(self, command_line: str) -> int:
+        """
+        dev notes:
+        "-a '${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'" (cutadapt)
+
+        can think of this as a compound variable
+            -a is the prefix, multiple params used to set
+            -a can be set using multiple methods (therefore multi params) - a file, or a string
+
+        probably best to just identify if the param (gx_var) is presnet in the line. 
+        for each command line, list the params that are found
+        identify the prefixes
+        identify all the ways that prefix can be set
+        don't worry about positional args right now. will do later. can probably do another string search to find the word in the command string most similar to the identified most likely requirement (the actual main program being called)
+
+        variablefinder needs to be its own independent step. should be in parampostprocessing. 
+            
+        """
+        if '=' in command_line or ':' in command_line:
+            if not any([p in command_line for p in ['#if', '#def', '#set', '#else', '#elif', '#for', '==', '!=', 'GALAXY_SLOTS']]):
+                print()
         command_list = command_line.split(' ')
         
         for i, word in enumerate(command_list):
@@ -138,7 +158,6 @@ class VariableFinder:
         return True
 
         
-
 
     def add_ref(self, new_ref) -> None:
         # check if identical ref already exists. not sure if this would occur. 

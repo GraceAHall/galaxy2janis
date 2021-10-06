@@ -5,8 +5,8 @@ from collections import defaultdict
 import os
 import sys
 import subprocess
+import threading
 from typing import Counter
-
 
 class Runner:
     def __init__(self, workdir: str, directories: list[str]):
@@ -14,21 +14,48 @@ class Runner:
         self.directories = directories
 
 
+    def worker(self, job: list[str]) -> None:
+        """
+        thread worker target function
+        """
+        print(job[2])
+        command = f'C:\\Users\\graci\\AppData\\Local\\Programs\\Python\\Python39\\python.exe src/gxtool2janis.py {job[2]} {job[0]}/{job[1]}'
+        subprocess.run(command, shell=True)
+
+
     def run(self) -> None:
-        # for each tool directory
+        TH_COUNT = 100
+        jobs = []
+
+        # set up all jobs to complete
         for tool_dir in self.directories:
             xmls = self.get_xmls(self.workdir, tool_dir)
-
-            # for each xml in the directory 
             for xml in xmls:
-                print('\n' + xml + '\n')
-                command = f'C:\\Users\\graci\\AppData\\Local\\Programs\\Python\\Python39\\python.exe src/gxtool2janis.py {xml} {self.workdir}/{tool_dir}'
-                subprocess.run(command, shell=True)
+                jobs.append([self.workdir, tool_dir, xml])
+
+        # execute jobs using threads
+        for i in range(0, len(jobs), TH_COUNT):
+            threads = []
+
+            for j in range(TH_COUNT):
+                if i + j < len(jobs):
+                    job = jobs[i + j]
+                    t = threading.Thread(target=self.worker, args=(job,))
+                    t.daemon = True
+                    threads.append(t)
+
+            for j in range(len(threads)):
+                threads[j].start()
+
+            for j in range(len(threads)):
+                threads[j].join()
+                
 
 
     def get_xmls(self, workdir, tool_dir) -> list[str]:
         files = os.listdir(f'{workdir}/{tool_dir}')
         xmls = [f for f in files if f.endswith('xml')]
+        xmls = [x for x in xmls if 'macros' not in x]
         return xmls
 
 
@@ -49,7 +76,7 @@ class Reporter:
             logfiles = [f for f in files if f.endswith('.log')]
 
             for logfile in logfiles:
-                print('\n' + logfile + '\n')
+                print(logfile)
                 self.tool_count += 1
                 filepath = f'{self.workdir}/{parsed_dir}/{logfile}'
                 self.update_errors(filepath)
@@ -123,6 +150,9 @@ class Reporter:
             
             elif 'unsupported param type' in message:
                 self.error_counter['unsupported_param'] += 1
+            
+            elif 'container could not be resolved' in message:
+                self.error_counter['unresolved_container'] += 1
         
 
     def print_report(self) -> None:

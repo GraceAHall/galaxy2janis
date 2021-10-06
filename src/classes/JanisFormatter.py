@@ -236,26 +236,82 @@ class JanisFormatter:
 
     # TODO ADD OPTIONALITY, ARRAYS
     def format_janis_typestr(self, param: Param) -> str:
-        # init
+        """
+        String
+        String(optional=True)
+        Array(String(), optional=True)
+        """
         out_str = ''
         
         # add janis type list
-        type_list = param.janis_type.split(',')
+        type_list = list(set(param.janis_type.split(',')))
+
+        # multiple types? 
+        if len(type_list) > 1:
+            type_list = self.reduce_datatype(type_list)
+
+        # Ask richard about arrays
+        # arrays
+        # optionality
+
         for jtype in type_list:
             out_str += (f'{jtype}, ')
         
         # strip trailing comma
         out_str = out_str.rstrip(', ')
 
-        # TODO here: ask richard about datatypes.
+        return out_str
+
+
+    def reduce_datatype(self, type_list: list[str]) -> list[str]:
+        """
+        selects a single datatype from list of types. 
+        should be either 
+            - the most accessible form of the datatype (raw rather than gz)
+            - the common format (bam rather than sam)
+            - anything except 'File' fallback
+        """
+        # remove 'File' type
+        type_list = [t for t in type_list if t != 'File']
+        
+        # only the 'File' type was present
+        if len(type_list) == 0:
+            return ['File']
+
+        # if had 2 types where 1 was 'File'
+        elif len(type_list) == 1:
+            return type_list
+
+        else:
+            # remove basic types (String, Integer etc) like above 'File'?
+            pass
+
+        # TODO change this laziness. just sorting alphabetically and on length. is this even stable sort? 
+        type_list.sort()
+        type_list.sort(key=lambda x: len(x))
+
+        return [type_list[0]]
+
+
+    def deprecated_format_janis_typestr(self, param: Param) -> str:
+        # init
+        out_str = ''
+        
+        # add janis type list
+        type_list = list(set(param.janis_type.split(',')))
+        for jtype in type_list:
+            out_str += (f'{jtype}, ')
+        
+        # strip trailing comma
+        out_str = out_str.rstrip(', ')
 
         # union wrapping needed? 
         if len(type_list) > 1:
-            self.janis_import_dict['janis_core'].add('UnionType')
-            out_str = f'UnionType({out_str})'
+            out_str = self.reduce_datatype()
+            #self.janis_import_dict['janis_core'].add('UnionType')
+            #out_str = f'UnionType({out_str})'
 
         return out_str
-
 
 
     def gen_outputs(self) -> list[str]:

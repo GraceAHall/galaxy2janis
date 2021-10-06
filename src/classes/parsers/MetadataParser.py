@@ -5,6 +5,7 @@
 from xml.etree import ElementTree as et
 from typing import Union
 from Bio import pairwise2
+import requests
 
 from classes.Logger import Logger
 from utils.etree_utils import get_attribute_value
@@ -142,18 +143,34 @@ class MetadataParser:
 
         Workaround: some tools have no requirements. setting base command to the tool id.
         """
+        container = ''
+
         if len(self.requirements) == 0:
-            self.container = f'quay.io/biocontainers/{self.tool_id}'
+            container = f'https://quay.io/biocontainers/{self.tool_id}'
 
         else:
             tool_req = self.requirements[0]
             if tool_req['type'] == 'package':
-                self.container = f'quay.io/biocontainers/{tool_req["name"]}'
+                container = f'https://quay.io/biocontainers/{tool_req["name"]}'
             elif tool_req['type'] == 'container':
+                # TODO this doesnt work. need to probably attempt to pull the container using docker and check if ok or not. how just ping the container url rather than actually pulling? 
                 self.logger.log(1, 'container requirement encountered')
-                self.container = tool_req['name'] # type: ignore
+                container = str(tool_req['name']) # type: ignore
             elif tool_req['type'] == 'set_environment':
                 self.logger.log(1, 'chosen base command is set_environment')
+
+        if self.check_container_url(container):
+            self.container = container
+        else:
+            self.logger.log(2, f'container could not be resolved: {container}')
+
+
+    def check_container_url(self, container_url: str) -> bool:
+        response = requests.get(container_url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
 
 
     def set_tool_version(self) -> None:

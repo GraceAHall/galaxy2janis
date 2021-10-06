@@ -13,12 +13,39 @@ class CommandParser:
     def __init__(self, tree: et.ElementTree, logger: Logger):
         self.tree = tree
         self.logger = logger
+        self.aliases: dict[str, str] = {}
         
 
     def parse(self) -> list[str]:
         command_string = self.get_command_string()
         command_lines = self.clean_command(command_string)
-        return command_lines
+        # get aliases
+        self.set_aliases(command_lines)
+        return command_lines #, self.aliases
+
+
+    def set_aliases(self, command_lines: list[str]) -> dict[str, str]:
+        """
+        finds all aliases in command string. 
+        aliases can arise from 
+            #set directives: #set var2 = var1, #set ext = '.fastq.gz'
+            function calls: #set temp = $to_string($proteins)
+            symbolic links:  ln -s '$in1' '$in1_name'
+            file copying: cp $var1 sample.fastq
+            #for directives: #for $bed in $names.beds:
+            export? export TERM=vt100 (mothur_pca)
+
+        from the above: 
+        { 
+            '$var1': '$var2',
+            '$proteins': '$temp',
+            '$in1': '$in1_name',
+            '$var1': 'sample.fastq'
+        }
+
+        can query the alias dict. ie for sample.fastq, what other aliases does it have? $var1 -> sample.fastq / $var2. list these as known aliases for the param
+        """
+        pass
 
 
     def get_command_string(self) -> str:
