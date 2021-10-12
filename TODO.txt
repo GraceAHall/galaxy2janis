@@ -4,30 +4,64 @@
 TODO v0.1
 
 
-check janis-patterns github for tricky situations
+NOTE check janis-patterns github for tricky situations
 
-- add cache: biocontainer checking
+currently at:
+    improved command string parsing
+    working on extracting bash conditionals
+    have pattern to find open / closing tags and check if either location is in quotes
 
-- datatypes: arrays, optionality
-    single:
-        String(optional=True)
-            - appears in if/else block
-            - optional = 'true'/'True' is set in param
-    array:
-        Array(String(), optional=True)
-            - is_array
-            - multiple="True" has to be set for a data param, or has to be data collection
-    what about an optional uniontype array?
-        Array(UnionType(fastq, fastqgz), optional=True/False)
-        # verdict: don't use UnionType if possible. 
-        # uncompressed as default
-        # TODO make a note.
+    command parsing
+        - bash logic uses ';' for syntax
+        - cheetah logic uses line breaks, tabs, and ':' for syntax
+        
 
+
+
+ON HOLD TILL COMMAND PARSER IS UPDATED
 - unsupported_param (group_tag, data_collection, data_column, hidden)
+    - data_collection
+        - paired files ie fastq will be two individual datasets or paired collection
+    - hidden
+        - parse as HiddenParam, resolve in parampostprocessor
+        - get all references to params with that variable name
+        - use the types and values to decide on one of three options:
 
-- Add galaxy types automated from galaxy
+            
+            as static var (create StaticVar?):
+                <param name="snpEff_rod_name" type="hidden" value="snpEff" label="ROD Name"/>
+
+            as flag bool:
+                <param name="EOL" type="hidden" value="--bol" />
+                <param name="EOL" type="hidden" value="--eol" />
+
+                either:
+                    - make a flag bool (across occurances, theres only 2 options: no value, or a string)
+                    - make a select param (if 2 or more vals)
+
+
+            ignore hidden param:
+                <param name="info_ids" type="hidden" value="" />
+                <param name="info_ids" type="text" value="" label="Limit INFO annotation to these INFO IDs" help="List is a comma separated list of fields. When blank, all INFO fields are included" >
+
+                <param name="output_full" type="hidden" value='F' />
+                <param name="output_full" type="select" label="Create a tabular output with coefficients for all predictors" >
+                
+
+    - group_tag
+
+
 
 - improve command string parsing
+    - CommandString becomes a class
+    - supports finding a query var and returns a VariableReference (move all VariableFinder logic to CommandString)
+    - finding variable references needs to be more flexible
+    - informs on the context of the variable (appears in #set, appears in conditional block etc)
+    - understands if the data is paired that galaxy will format to $var.forward and $var.reverse
+    - 
+
+
+
     - aliases 
     - rework param variable detection
     - compound params (multiple methods or using multiple params to set program flag)
@@ -66,6 +100,7 @@ Rollout plan -------------------------------------
 
 Future -------------------------------------------
 
+ - paired files & collections (short reads, composite types imzml)
  - new tools added to toolshed automatically parsed 
  - any which do not pass tests can have manual intervention (fornight / monthly activity)
  - start galaxy workflow parser -> janis
@@ -78,6 +113,10 @@ Multithreading
     - added multithreading because 'requests' module takes too long to ping biocontainers
     - making 50-100 requests per sec to quay.io: am I gonna get banned? 
     - doing this every 5 mins - 10 mins when i make changes and want to re-parse all tools-iuc tools
+
+- Galaxy types
+    - composite types like imzML? is there info on secondary type? 
+    - that kind of extra data can be found in the actual type class def. needed?  
 
 non-wildcard Outputs
     - currently just keeping as WilcardSelector. Not sure how glob works and is deprecated. 
@@ -98,6 +137,7 @@ v0.1 Features ------------------------------------
 
 - automatic container detection
     - just pings url using python 'requests' module
+    - cache stores previously checked urls
 
 - logging for tools which can't currently be parsed
     - complex regex

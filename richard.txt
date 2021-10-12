@@ -1,0 +1,9 @@
+
+
+
+
+string lists:
+ - should this be array? 
+ - eg columns to summarise data: 1,3,4,5
+ - just text which is a list of items. 
+ - in galaxy would evaluate to list of strings, which is then presented as a single comma sep string

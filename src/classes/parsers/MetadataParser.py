@@ -6,6 +6,8 @@ from xml.etree import ElementTree as et
 from typing import Union
 from Bio import pairwise2
 import requests
+import json
+import os
 
 from classes.Logger import Logger
 from utils.etree_utils import get_attribute_value
@@ -15,6 +17,7 @@ class MetadataParser:
     def __init__(self, tree: et.ElementTree, logger: Logger) -> None:
         self.tree = tree
         self.logger = logger
+        self.container_cache_path = 'container_cache/cache.json' 
 
         # tool metadata to collect:
         self.tool_name: str = ''
@@ -42,6 +45,9 @@ class MetadataParser:
         self.set_base_command()
         self.set_container()
         self.set_tool_version()
+
+
+
 
 
     def set_tool_metadata(self) -> None:
@@ -143,35 +149,79 @@ class MetadataParser:
 
         Workaround: some tools have no requirements. setting base command to the tool id.
         """
-        container = ''
 
+        container_cache = self.load_container_cache()
+        container_url = self.format_container_url()       
+
+        if self.container_exists(container_url, container_cache):
+            self.container = container_url
+            self.update_container_cache(container_url, container_cache)
+        else:
+            self.logger.log(2, f'container could not be resolved: {container_url}')
+
+
+    def load_container_cache(self) -> dict[str, str]:
+        # check file exists
+        if not os.path.exists(self.container_cache_path):
+            with open(self.container_cache_path, 'w') as fp:
+                fp.write('{}')
+
+        # load cache
+        with open(self.container_cache_path, 'r') as fp:
+            return json.load(fp)
+
+        
+    def format_container_url(self) -> str:
+        container_url = ''
         if len(self.requirements) == 0:
-            container = f'https://quay.io/biocontainers/{self.tool_id}'
+            container_url = f'https://quay.io/biocontainers/{self.tool_id}'
 
         else:
             tool_req = self.requirements[0]
             if tool_req['type'] == 'package':
-                container = f'https://quay.io/biocontainers/{tool_req["name"]}'
+                container_url = f'https://quay.io/biocontainers/{tool_req["name"]}'
             elif tool_req['type'] == 'container':
                 # TODO this doesnt work. need to probably attempt to pull the container using docker and check if ok or not. how just ping the container url rather than actually pulling? 
                 self.logger.log(1, 'container requirement encountered')
-                container = str(tool_req['name']) # type: ignore
+                container_url = str(tool_req['name']) # type: ignore
             elif tool_req['type'] == 'set_environment':
                 self.logger.log(1, 'chosen base command is set_environment')
 
-        if self.check_container_url(container):
-            self.container = container
-        else:
-            self.logger.log(2, f'container could not be resolved: {container}')
+        return container_url
 
 
-    def check_container_url(self, container_url: str) -> bool:
+    def container_exists(self, container_url: str, container_cache: dict[str, str]) -> bool:
+        if self.url_is_cached(container_url, container_cache):
+            return True
+        elif self.url_exists(container_url): 
+            return True
+        return False
+
+
+    def url_is_cached(self, container_url: str, container_cache: dict[str, str]) -> bool:
+        if self.tool_name in container_cache:
+            if container_cache[self.tool_name] == container_url:
+                return True
+        return False
+
+
+    def url_exists(self, container_url: str) -> bool:
         response = requests.get(container_url)
         if response.status_code == 200:
             return True
         else:
             return False
 
+
+    def update_container_cache(self, container_url: str, container_cache: dict[str, str]) -> None:
+        if self.tool_name not in container_cache or container_cache[self.tool_name] != container_url:
+            # update cache in mem
+            container_cache[self.tool_name] = container_url
+            
+            # write cache to file
+            with open(self.container_cache_path, 'w') as fp:
+                json.dump(container_cache, fp)
+        
 
     def set_tool_version(self) -> None:
         """

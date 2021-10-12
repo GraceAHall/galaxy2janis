@@ -27,17 +27,17 @@ class Param:
         self.janis_type: str = ''
         self.default_value: str = ''
         self.help_text: str = ''
-        self.is_optional: bool = False
         self.cmd_references: list[VariableReference] = []
+
+        # other bools
+        self.is_optional: bool = False
+        self.is_array: bool = False
+        self.validated: bool = False
 
         # checks
         self.has_command_ref: bool = False
         self.has_conditional_ref: bool = False
         # self.needed_user_input: bool = False 
-
-        # other bools
-        self.is_array: bool = False  # text?
-        self.validated: bool = False
 
         # linking to command string
         self.prefix: Optional[str] = None
@@ -46,20 +46,21 @@ class Param:
         self.truths = ['true', 'True']
 
 
-
     def parse_common_features(self) -> None:
-        self.set_basic_details()
+        self.set_name()
+        self.set_help_text()
         self.set_gx_var()
         self.set_references()
+        self.set_is_optional() # TODO potentially override func
+        self.set_is_array() # TODO potentially override func
         self.remove_conditional_occurances()
         self.validate()
         
 
-    def set_basic_details(self) -> None:
-        # name & prefix 
+    def set_name(self) -> None:
+        # name & prefix if argument 
         argument = get_attribute_value(self.node, 'argument')
         name = get_attribute_value(self.node, 'name')
-
         if argument != '':
             self.prefix = argument
             if name == '':
@@ -67,22 +68,22 @@ class Param:
             else:
                 self.name = name
         else:
-            self.name = name            
-
-        # help text
-        self.set_help_text()
-        
-        # is optional
-        if get_attribute_value(self.node, 'optional') in self.truths:
-            self.is_optional = True
+            self.name = name   
 
 
     def set_help_text(self) -> None:
         help_text = get_attribute_value(self.node, 'help')
         label = get_attribute_value(self.node, 'label')
-        if help_text == '' and label != '':
+       
+        help_list = list(set([help_text, label]))
+        help_list = [x for x in help_list if x != '']
+        help_str = '. '.join(help_list)
+
+        self.help_text = help_str
+
+        """if help_text == '' and label != '':
             help_text = label
-        self.help_text = help_text
+        self.help_text = help_text    """  
 
 
     def set_gx_var(self) -> None:
@@ -101,14 +102,6 @@ class Param:
         vf = VariableFinder(self.gx_var, self.cmd_lines) # type: ignore
         self.cmd_references = vf.find() # type: ignore
         self.set_cmd_ref_details()
-        
-
-    def remove_conditional_occurances(self) -> None:
-        non_conditional_refs: list[VariableReference] = []
-        for ref in self.cmd_references:
-            if not ref.in_conditional:
-                non_conditional_refs.append(ref)
-        self.cmd_references = non_conditional_refs
 
     
     def set_cmd_ref_details(self) -> None:
@@ -118,7 +111,34 @@ class Param:
             else:
                 self.has_command_ref = True
         
- 
+
+    def set_is_optional(self) -> None:
+        if get_attribute_value(self.node, 'optional') in self.truths:
+            self.is_optional = True
+
+        if self.has_conditional_ref and not self.has_command_ref:
+            self.is_optional = True
+        
+
+    def set_is_array(self) -> None:
+        param_type = get_attribute_value(self.node, 'type')
+        multiple = get_attribute_value(self.node, 'multiple')
+
+        if param_type == 'data_collection':
+            self.is_array = True
+        elif multiple in self.truths:
+            if param_type == 'data':
+                self.is_array = True
+        
+
+    def remove_conditional_occurances(self) -> None:
+        non_conditional_refs: list[VariableReference] = []
+        for ref in self.cmd_references:
+            if not ref.in_conditional:
+                non_conditional_refs.append(ref)
+        self.cmd_references = non_conditional_refs
+    
+       
     # occurs during postprocessing. called from ParamPostProcessor
     def user_select_prefix(self) -> str:
         # print basics
@@ -146,7 +166,6 @@ class Param:
             assert(self.name != '')
             assert(self.gx_var != None)
             assert(self.node != None)
-            #assert(self.has_command_ref or self.has_conditional_ref)
             assert(self.has_command_ref)
             self.validated = True
         except AssertionError:
@@ -367,27 +386,27 @@ class OutputParam(Param):
 
 
 
-
 class DataCollectionParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         super().__init__(node, tree_path, cmd_lines)
+        self.collection_type: str = ''
+        self.is_array: bool = True
 
 
     def parse(self) -> None:
-        pass
+        self.parse_common_features()
+        self.parse_collection_type()
+        self.set_datatype()
+        self.set_defaults()
 
 
-
-class DataColumnParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def parse_collection_type(self) -> None:
+        self.collection_type = get_attribute_value(self.node, 'collection_type')
 
 
-    def parse(self) -> None:
-        pass
-
-
-
+    def set_datatype(self) -> None:
+        temp_type = get_attribute_value(self.node, 'format')
+        self.galaxy_type = consolidate_types(temp_type)
 
 
 

@@ -4,12 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Python: Current File",
+            "name": "rip galaxy types",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
+            "program": "galaxy_types/parse_galaxy_types.py",
+            "console": "integratedTerminal",
+            "args": [
+                "galaxy_types", "datatypes_conf.xml.sample"
+            ]
         },
         {
             "name": "read_inputs",
@@ -230,6 +234,33 @@
             "args": [
                 "deseq2.xml", "tools/deseq2"
             ]
+        },
+        {
+            "name": "abyss-pe",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abyss-pe.xml", "tools/abyss"
+            ]
+        },
+        {
+            "name": "cat_bins",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "cat_bins.xml", "tools/cat"
+            ]
+        },
+        {
+            "name": "shlex testing",
+            "type": "python",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal"
         },
         {
             "name": "parse tools",

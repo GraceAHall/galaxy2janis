@@ -119,16 +119,16 @@ class ToolParser:
         pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
-        #print('\n--- Before cleaning ---\n')
-        #pp.pretty_print()
+        print('\n--- Before cleaning ---\n')
+        pp.pretty_print()
 
         # cleanup steps
         ppp = ParamPostProcessor(params, self.logger)
         ppp.remove_duplicate_params()
         ppp.set_prefixes()
 
-        #print('\n--- After cleaning ---\n')
-        #ppp.pretty_print()
+        print('\n--- After cleaning ---\n')
+        ppp.pretty_print()
 
         # update params to cleaned param list
         self.params = ppp.params

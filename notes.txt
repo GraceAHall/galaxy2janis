@@ -1,4 +1,29 @@
 
+Datatypes 
+
+UnionType 
+ - never used
+ - single datatype is selected instead 
+
+Optional
+ - if optional="true" in param
+ - if appears only in conditional line
+ - need to add in conditional block
+
+Array
+ - only if 
+    - data_collection param
+    - data param with multiple="True"
+    - collection output
+    - output with '*' or '.+' in 'pattern'
+
+
+
+
+
+
+
+
 
 known limitations:
 

@@ -24,7 +24,7 @@ class Runner:
 
 
     def run(self) -> None:
-        TH_COUNT = 100
+        TH_COUNT = 1
         jobs = []
 
         # set up all jobs to complete

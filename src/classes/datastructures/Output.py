@@ -24,6 +24,7 @@ class Output:
         self.help_text: str = ''  # ?
         self.is_hidden: bool = False
         self.is_array: bool = False
+        self.is_optional: bool = False # const
 
         self.extension_mappings = {
             'fasta': ['fa', 'fna', 'fasta'],

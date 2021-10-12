@@ -22,7 +22,11 @@ class JanisFormatter:
             'janis_core': {
                 'CommandToolBuilder', 
                 'ToolInput', 
-                'ToolOutput'
+                'ToolOutput',
+                'InputSelector',
+                'WildcardSelector',
+                'Array',
+                'Optional'
             },
             'bioinformatics_types': set(),
             'common_types': set(),
@@ -200,10 +204,6 @@ class JanisFormatter:
         converts galaxy extensions to janis. 
         also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
         """
-        # TODO handle the Union types - for now
-        # TODO this has to check optional status!
-        # TODO has to check whether is an array! 
-
         self.convert_type_list(param)
         self.update_datatype_imports(param)
         out_str = self.format_janis_typestr(param)
@@ -225,42 +225,44 @@ class JanisFormatter:
         param.janis_type = ','.join(out_list)
 
 
-    # depricated?
-    def check_conversion(self, param: Param) -> None:
-        # check if conversion was fully successful
-        for jtype in param.janis_type:
-            if jtype == 'none':
-                status = 1
-                break
-
-
-    # TODO ADD OPTIONALITY, ARRAYS
     def format_janis_typestr(self, param: Param) -> str:
         """
         String
         String(optional=True)
         Array(String(), optional=True)
         """
-        out_str = ''
+        janis_type = self.get_janis_type(param)
         
-        # add janis type list
-        type_list = list(set(param.janis_type.split(',')))
+        # not array not optional
+        if not param.is_optional and not param.is_array:
+            out_str = f'{janis_type}'
 
-        # multiple types? 
-        if len(type_list) > 1:
-            type_list = self.reduce_datatype(type_list)
-
-        # Ask richard about arrays
-        # arrays
-        # optionality
-
-        for jtype in type_list:
-            out_str += (f'{jtype}, ')
+        # array and not optional
+        elif not param.is_optional and param.is_array:
+            out_str = f'Array({janis_type})'
         
-        # strip trailing comma
-        out_str = out_str.rstrip(', ')
+        # not array and optional
+        elif param.is_optional and not param.is_array:
+            out_str = f'{janis_type}(optional=True)'
+        
+        # array and optional
+        elif param.is_optional and param.is_array:
+            out_str = f'Array({janis_type}(), optional=True)'
 
         return out_str
+        
+
+    def get_janis_type(self, param: Param) -> str:
+        out_str = ''
+
+        # get janis types (already converted from galaxy)
+        type_list = list(set(param.janis_type.split(',')))
+
+        # reduce to single type 
+        if len(type_list) > 1:
+            type_list = self.reduce_datatype(type_list)
+        
+        return type_list[0]
 
 
     def reduce_datatype(self, type_list: list[str]) -> list[str]:
@@ -291,27 +293,6 @@ class JanisFormatter:
         type_list.sort(key=lambda x: len(x))
 
         return [type_list[0]]
-
-
-    def deprecated_format_janis_typestr(self, param: Param) -> str:
-        # init
-        out_str = ''
-        
-        # add janis type list
-        type_list = list(set(param.janis_type.split(',')))
-        for jtype in type_list:
-            out_str += (f'{jtype}, ')
-        
-        # strip trailing comma
-        out_str = out_str.rstrip(', ')
-
-        # union wrapping needed? 
-        if len(type_list) > 1:
-            out_str = self.reduce_datatype()
-            #self.janis_import_dict['janis_core'].add('UnionType')
-            #out_str = f'UnionType({out_str})'
-
-        return out_str
 
 
     def gen_outputs(self) -> list[str]:

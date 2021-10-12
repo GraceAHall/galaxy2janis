@@ -1,0 +1,45 @@
+if [ -z "\$AUGUSTUS_CONFIG_PATH" ] ; then BUSCO_PATH=\$(dirname \$(which busco)) ; export AUGUSTUS_CONFIG_PATH=\$(realpath \${BUSCO_PATH}/../config) ; fi &&
+cp -r "\$AUGUSTUS_CONFIG_PATH/" augustus_dir/ &&
+export AUGUSTUS_CONFIG_PATH=`pwd`/augustus_dir/ &&
+
+#if $busco_mode.mode == 'geno' and $busco_mode.use_augustus.use_augustus_selector == 'yes' and $busco_mode.use_augustus.aug_prediction.augustus_mode == 'history':
+    ## Using an augustus model from history, we need to unzip it and let augustus find it
+    mkdir -p 'augustus_dir/species/' &&
+    tar -C 'augustus_dir/species/' -xzf '${busco_mode.use_augustus.aug_prediction.augustus_model}' &&
+#end if
+
+busco
+--in '${input}'
+--update-data
+--mode '${busco_mode.mode}'
+--out busco_galaxy
+--cpu \${GALAXY_SLOTS:-4}
+--evalue ${adv.evalue}
+--limit ${adv.limit}
+
+#if $lineage.lineage_mode == "auto_detect":
+    $lineage.auto_lineage
+#else if $lineage.lineage_mode == "select_lineage":
+    --lineage_dataset '${lineage.lineage_dataset}'
+#end if
+#if $busco_mode.mode == 'geno' and $busco_mode.use_augustus.use_augustus_selector == 'yes':
+
+    ${busco_mode.use_augustus.long}
+    --augustus
+
+    #if $busco_mode.use_augustus.aug_prediction.augustus_mode == 'builtin':
+        --augustus_species '${busco_mode.use_augustus.aug_prediction.augustus_species}'
+    #else if $busco_mode.use_augustus.aug_prediction.augustus_mode == 'history':
+        --augustus_species local
+    #end if
+#end if
+
+#if $adv.outputs and 'image' in $adv.outputs:
+    &&
+    mkdir BUSCO_summaries
+    &&
+    ls -l busco_galaxy/run_*/ &&
+    cp busco_galaxy/short_summary.*.txt BUSCO_summaries/
+    &&
+    generate_plot.py -wd BUSCO_summaries -rt specific
+#end if

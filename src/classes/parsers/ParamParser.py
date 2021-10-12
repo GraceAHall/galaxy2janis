@@ -13,7 +13,6 @@ from classes.datastructures.Params import (
     BoolParam, 
     SelectParam, 
     DataCollectionParam, 
-    DataColumnParam, 
     HiddenParam
 ) 
 from utils.galaxy_utils import is_flag_list, is_string_list
@@ -156,14 +155,10 @@ class ParamParser:
             return [DataParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'data_collection':
-            self.logger.log(2, 'unsupported param type: data_collection')
-            return []
             return [DataCollectionParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'data_column':
-            self.logger.log(2, 'unsupported param type: data_column')
-            return []
-            return [DataColumnParam(node, tree_path, self.command_lines)]
+            return [TextParam(node, tree_path, self.command_lines)]
 
         elif param_type == 'hidden':
             self.logger.log(2, 'unsupported param type: hidden')
