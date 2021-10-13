@@ -1,0 +1,15 @@
+binlinks
+-bin_size $bin_size
+#if str($link_end) != '':
+    -link_end '$link_end'
+#end if
+
+#if str($output_style) != '':
+    -output_style $output_style
+#end if
+
+$num
+$log
+$normalize
+
+< '$linksfile' | sed 's/ /\t/g' > '$outfile'

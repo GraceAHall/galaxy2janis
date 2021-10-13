@@ -1,0 +1,32 @@
+#set $section = $sec_restrict
+
+bcftools concat
+
+## Default section
+#set $section = $sec_default
+
+#if $section.mode.naive == "yes":
+    --naive
+#else:
+    #if $section.mode.overlaps.allow_overlaps == 'yes':
+        --allow-overlaps
+        #if $section.mode.overlaps.rm_dups:
+            --rm-dups $section.mode.overlaps.rm_dups
+        #end if
+    #end if
+    ${section.mode.ligate}
+#end if
+${section.compact_PS}
+#if str($section.min_PQ):
+    --min-PQ ${section.min_PQ}
+#end if
+
+#set $section = $sec_restrict
+
+
+## Primary Input/Outputs
+#if $sec_default.mode.naive == "yes" and $output_type == 'v':
+    > output.gz && bcftools index output.gz && bcftools view -O v -o '$output_file' output.gz
+#else:
+    > '$output_file'
+#end if

@@ -1,0 +1,7 @@
+--cpu \${GALAXY_SLOTS:-4}
+--update-data
+--evalue ${adv.evalue}
+--limit ${adv.limit}
+--in '${input}'
+--mode '${busco_mode.mode}'
+--out busco_galaxy

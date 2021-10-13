@@ -256,11 +256,28 @@
             ]
         },
         {
-            "name": "shlex testing",
+            "name": "pyPEG sketchpad",
             "type": "python",
             "request": "launch",
-            "program": "test.py",
+            "program": "command_parsing/pyPEG2.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "LARK sketchpad",
+            "type": "python",
+            "request": "launch",
+            "program": "command_parsing/LARK.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "pyPEG busco",
+            "type": "python",
+            "request": "launch",
+            "program": "command_parsing/command_parser.py",
+            "console": "integratedTerminal",
+            "args": [
+                "command_parsing/data/busco.txt"
+            ]
         },
         {
             "name": "parse tools",
