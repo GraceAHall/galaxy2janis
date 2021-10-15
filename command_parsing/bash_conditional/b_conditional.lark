@@ -1,0 +1,42 @@
+
+
+%import common.ESCAPED_STRING
+%import common.SIGNED_NUMBER
+%import common.WS
+%ignore WS
+
+
+
+// if [ "$stringvar" == "tux" ]; 
+// if [ -z "\$AUGUSTUS_CONFIG_PATH" ] ;
+
+// conditional : if_block elif_block* [else_block] "fi"
+conditional : if_block elif_block* [else_block] FI
+
+FI : "fi"
+
+if_block    : "if" condition body
+elif_block  : "elif" condition body
+else_block  : "else" body
+
+condition : _OPEN_BRACES WORD+ _CLOSE_BRACES ";" "then"
+
+// TODO here
+body    : statement+ 
+
+?statement : conditional 
+          | WORD+ ";"
+
+WORD : QUOTED_STRING
+     | STRING
+
+QUOTED_STRING   : /(".*?(?<!\\)")|('.*?(?<!\\)')/
+STRING          : /[^\s;]+/
+
+_OPEN_BRACES : /\[{1,2} /
+_CLOSE_BRACES : / \]{1,2}/
+
+
+// STATEMENT: many wordss
+// TEXT : /.+/
+// STATEMENT: 

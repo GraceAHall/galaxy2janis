@@ -1,0 +1,11 @@
+if [[ -f "\$GNM2TAB_PATH" ]] ; then
+    ln -s "\$GNM2TAB_PATH" gnm2tab ;
+elif [ -a hello ] ; then
+    if [ -b there ] ; then
+        spam the chat;
+    else 
+        die hitmap;
+    fi
+else
+    echo "Cannot find builtin gnm2tab file \$SPALN_LOCATION : \$GNM2TAB_PATH" >&2 ; exit 1 ;
+fi 

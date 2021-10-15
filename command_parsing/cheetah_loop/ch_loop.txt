@@ -1,0 +1,3 @@
+#for $hi, $data in enumerate($sec_tdd.data):
+    cp '${data.plot_format.data_source}' circos/data/data-${hi}.txt &&
+#end for

@@ -1,0 +1,32 @@
+
+%import common.ESCAPED_STRING
+%import common.SIGNED_NUMBER
+%import common.WS
+%ignore WS
+
+
+?plist : parameter*
+
+parameter : pname [_PSEP parg]
+
+pname : /-{1,2}(\w+-)*\w+/
+_PSEP : /\s+|:|=/
+parg : integer
+     | number
+     | string
+
+word : ESCAPED_STRING
+string : /\S+(?=\s*)/  // check if contains a single character?
+number : SIGNED_NUMBER
+integer : /\d+/
+// parg: /\S+(?=\s*)/
+
+
+
+// FLAG_NAME: /((?<=^)|(?<=\s))-{1,2}(\w+-)*\w+/
+// OPERATOR: /\+|\-|\*|\/|\=\=/
+// LITERAL: /\d*\.\d*|\d+|\".*?\"|'.*?'/
+// COMMENT: /(##.*)|(#\*(.|\n)*?\*#)/
+
+
+
