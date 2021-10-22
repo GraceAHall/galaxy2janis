@@ -19,6 +19,38 @@ assign_primary_output:
     </data>
 
 
+templating a string list (abyss)
+(in='reads1.fa reads2.fa'):
+
+#if str($se_reads) != 'None'
+    se='
+    #for $v in $se_reads
+        $v
+    #end for
+    '
+#end if
+
+
+dynamic setting kwarg (abyss)
+
+#for $i, $v in enumerate($long_seqs)
+    long${i}='$v'
+#end for
+
+More abyss shit:
+
+Library pea has reads in two files, pea_1.fa and pea_2.fa.
+Library peb has reads in two files, peb_1.fa and peb_2.fa.
+Single-end reads are stored in two files, se1.fa and se2.fa.
+
+lib='pea peb' \
+pea='pea_1.fa pea_2.fa' peb='peb_1.fa peb_2.fa' \
+se='se1.fa se2.fa'
+
+
+
+
+
 cheetah functions:
 
     #def text_to_rstringarray($text)

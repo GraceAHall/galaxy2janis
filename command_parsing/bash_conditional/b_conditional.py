@@ -3,19 +3,7 @@
 from lark import Lark
 from lark import Transformer
 
-with open('command_parsing/bash_conditional/b_conditional2.txt', 'r') as fp:
-    text = fp.read()
 
-with open('command_parsing/bash_conditional/b_conditional.lark', 'r') as fp:
-    ruleset = fp.read()
-
-
-class BConditionalTransformer(Transformer):
-    def condition(self, string_list):
-        return ' '.join(string_list)
-    
-    def instruction(self, string_list):
-        return ' '.join(string_list)
 
 
 #text = 'if [ "$stringvar" == "tux" ] ; then'
@@ -23,14 +11,6 @@ class BConditionalTransformer(Transformer):
 #text = 'if [ -z "\$AUGUSTUS_CONFIG_PATH" ] ; \n then'
 #text = 'if [[ -f "\$GNM2TAB_PATH" ]] ; then'
 
-if_text = """
-if [ -b there ] ; then 
-    if [ -b there ] ; then 
-        die ;
-    fi
-    die chafit;
-fi
-"""
 
 elif_text = """
 elif [ -b there ] ; then 
@@ -50,26 +30,49 @@ else
 fi
 """
 
+if_text1 = """
+if [ -b there ] ; then 
+    die chafit;
+fi
+"""
 
-parser = Lark(ruleset, start='if_block')
-print('\n', parser.parse(if_text).pretty())
-print()
+if_text2 = """
+if [ -b there ] ; then die chafit ; fi
+"""
 
-parser = Lark(ruleset, start='elif_block')
-print('\n', parser.parse(elif_text).pretty())
-print()
+if_text3 = """
+if [ -b there ] ; then 
+    if [ -b there ] ; then 
+        die ;
+    fi
+    die chafit;
+fi
+"""
 
-parser = Lark(ruleset, start='else_block')
-print('\n', parser.parse(else_text).pretty())
-print()
+if_text4 = """
+if [ -b there ] ; then if [ -b there ] ; then die ; fi die chafit; fi
+"""
+
+with open('command_parsing/bash_conditional/b_conditional3.txt', 'r') as fp:
+    loaded_text = fp.read()
+
+with open('command_parsing/bash_conditional/b_conditional.lark', 'r') as fp:
+    ruleset = fp.read()
 
 parser = Lark(ruleset, start='conditional')
-print('\n', parser.parse(cond_text).pretty())
-print()
+print('before transformation')
+print('\n', parser.parse(loaded_text).pretty())
+tree = parser.parse(loaded_text)
 
+class BConditionalTransformer(Transformer):
+    def condition(self, string_list):
+        return 'condition: ' + ' '.join(string_list)
+    
+    def statement(self, string_list):
+        return ' '.join(string_list)
 
-print('\n', parser.parse(text).pretty())
 conditional = BConditionalTransformer().transform(tree)
-print(BConditionalTransformer().transform(tree).pretty())
 
+print('\nafter transformation\n')
+print(BConditionalTransformer().transform(tree).pretty())
 print()

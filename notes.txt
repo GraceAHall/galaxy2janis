@@ -1,4 +1,31 @@
 
+
+
+
+Command parsing
+
+what is the main goal here? 
+
+ - identify the base command word
+ - positional arguments
+ - prefixed arguments
+ - optional arguments?
+ - aliases (through #set directives, #def function directives)
+
+for each argument, want to identify all the params which can set the arg
+take an approach more focused on the command text rather than locating galaxy params
+
+to add: 
+ - sometimes no ' ', '=', ':' between arg and value. ie head -n1. almost always an integer? 
+
+positional arguments
+ - keep track of whether each argument has a prefix or not
+ - keep track of the 'position' of each argument.  is this each word? each argument? (ie key: val arg pair)
+
+
+
+
+
 Datatypes 
 
 UnionType 
@@ -16,6 +43,8 @@ Array
     - data param with multiple="True"
     - collection output
     - output with '*' or '.+' in 'pattern'
+
+
 
 
 

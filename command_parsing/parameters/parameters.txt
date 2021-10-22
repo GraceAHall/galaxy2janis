@@ -6,3 +6,6 @@
 --in '${input}'
 --mode '${busco_mode.mode}'
 --out busco_galaxy
+--mode=conservative
+--inputs:true
+-output_dir:${outdir}
