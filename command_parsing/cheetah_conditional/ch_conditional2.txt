@@ -2,5 +2,4 @@
     ## Using an augustus model from history, we need to unzip it and let augustus find it
     mkdir -p 'augustus_dir/species/' &&
     tar -C 'augustus_dir/species/' -xzf '${busco_mode.use_augustus.aug_prediction.augustus_model}' &&
-    #set $path = '/the/path/to/file'
 #end if

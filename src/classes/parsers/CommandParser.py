@@ -10,22 +10,18 @@ import numpy as np
 
 
 from classes.datastructures.Params import Param
-from classes.datastructures.Command import Command
+from classes.datastructures.Command import Command, CommandLine
 from classes.Logger import Logger
 
-
 """
-Parses the command string
+role of this module is to preprocess the command string into a useable state
 
-cleans empty lines
-removes comments
-splits the command into sections
+aim is to remove constructs like cheetah comments, conditional lines without
+removing other elements like #set directives which will be used later. 
 
-cheetah stuff:
-    splits conditional blocks
-    loads function definitions
+command string is also de-indented and generally cleaned (blank lines removed etc)
 
-rest is handled by Command() class
+returns list of CommandLines
 """
 
 
@@ -33,100 +29,38 @@ class CommandParser:
     def __init__(self, tree: et.ElementTree, logger: Logger):
         self.tree = tree
         self.logger = logger
-        self.command = Command()
+        self.keywords = self.get_keywords()
+
+
+    def get_keywords(self) -> None:
+        conditional_keywords = ['#if ', '#else if ', '#elif ', '#else', '#end if', '#unless ', '#end unless']
+        loop_keywords = ['#for', '#end for', '#while', '#end while']
+        error_keywords = ['#try', '#except', '#end try']
+        return conditional_keywords + loop_keywords + error_keywords
         
 
     def parse(self) -> list[str]:
+        # clean the command string
         command_string = self.get_command_string()
-        command_string = 'some random text \nif asdasdasdasdas  if [ ____ ] \nthen \n    ____ \nfi asdasdasdasdassa fi '
-
-        # swap to masking approach
-        mask: dict[str, np.ndarray] = {
-            'bash_conditional': np.zeros(len(command_string), dtype=np.bool), 
-            'bash_loop': np.zeros(len(command_string), dtype=np.bool),
-            'cheetah_conditional': np.zeros(len(command_string), dtype=np.bool),
-            'cheetah_loop': np.zeros(len(command_string), dtype=np.bool),
-            'cheetah_func': np.zeros(len(command_string), dtype=np.bool)    
-        }
-
-        mask = self.mask_bash_conditionals(command_string, mask)
-        mask = self.mask_bash_loops(command_string, mask)
-        mask = self.mask_cheetah_conditionals(command_string, mask)
-        mask = self.mask_cheetah_loops(command_string, mask)
-        mask = self.mask_cheetah_funcs(command_string, mask)
-
-        commands = self.split_commands(command_string)
-        commands = self.clean_commands(commands)
-        return commands 
+        lines = self.split_command(command_string)
+        lines = self.remove_comments(lines)
+        lines = self.remove_ands(lines)
+        lines = self.remove_bash_constructs(lines)
+        lines = self.remove_cheetah_definitions(lines)
+        lines = self.remove_cheetah_misc(lines)
 
 
-    def mask_bash_conditionals(self, command_str: str, mask: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
-        open_pat = 'if'
-        close_pat = 'fi'
-        hits = self.find_pairs(open_pat, close_pat, command_str)
-        print(command_str[hits[0][0]:hits[0][1]])
-        print()
+        # convert each line into CommandLine and annotate with properties
+        command_dict = self.init_command_lines(lines)
 
-    
-    def find_pairs(self, open_pat: str, close_pat: str, the_string: str) -> list[Tuple[int, int]]:
-        # TODO: allow start and end of string! having issues with regex
-        pattern = f'\s{open_pat}\s.*?(?=(\s{close_pat}\s))'
-        
-        # get all matches of pattern
-        hits = [(m.start(0), m.end(0)) for m in re.finditer(pattern, the_string, flags=re.DOTALL)]
-        return hits
+        # lines variable does not change! the line numbers are meaningful
+        command_dict = self.annotate_conditional_lines(command_dict, lines)
+        command_dict = self.annotate_loop_lines(command_dict, lines)
 
-
-        """
-        # confirm not quoted 
-        for start, end in hits:
-            if not self.is_inside_quote_pairs(end, command_str):
-            
-                # adjust the end point
-                match_end = end + 3
-                while command_str[match_end] not in [' ', '\n'] and match_end < len(command_str):
-                    match_end = match_end + 1
-
-                print(command_str[start: match_end])
-                mask['bash_conditional'][start: match_end] = True
-                print()
-        print()
-        """
-
-
-
-
-    def extract_bash_features(self, the_string: str) -> dict[str, list[str]]:
-        features = { 'conditionals': [], 'loops': [], 'other': [] }
-
-        bash_loop_pattern = '[\n \t(]for .*?(?= done[ \n);&])'
-
-        conditional_hits = [(m.start(0), m.end(0)) for m in re.finditer(bash_conditional_pattern, the_string)]
-        loop_hits = [(m.start(0), m.end(0)) for m in re.finditer(bash_loop_pattern, the_string)]
-
-        for start, end in conditional_hits:
-            if not self.is_inside_quote_pairs(end, the_string):
-                next_char = end + 3
-                while the_string[next_char] not in [' ', '\n']:
-                    next_char = next_char + 1
-
-                segment = the_string[start: next_char]
-                the_string = the_string[:start] + the_string[next_char:]
-                features['conditionals'].append(segment)
-                print(the_string)
-        
-        for start, end in loop_hits:
-            if not self.is_inside_quote_pairs(end, the_string):
-                next_char = end + 5
-                while the_string[next_char] not in [' ', '\n']:
-                    next_char = next_char + 1
-
-                segment = the_string[start: next_char]
-                the_string = the_string[:start] + the_string[next_char:]
-                features['loops'].append(segment)
-                print(the_string)
-        
-        print()
+        # format to return
+        command_lines = list(command_dict.values())
+        command_lines.sort(key=lambda x: x.command_num)
+        return command_lines
  
 
     def get_command_string(self) -> str:
@@ -140,63 +74,220 @@ class CommandParser:
         return command_string  # type: ignore 
 
 
-    def split_commands(self, command_string: str) -> list[str]:
-        # get list of locations of '&&' and ';'
-        # for each location, subset the command str to start at that location
-        # split the subset by ' if an even number of items, it was inside single quotes. if odd, ok
-        # split the subset by " if an even number of items, it was inside single quotes. if odd, ok
+    def split_command(self, command_string: str) -> list[str]:
+        lines = command_string.split('\n')
+        lines = [ln.strip() for ln in lines]
+        lines = [ln for ln in lines if ln != '']
+        return lines
 
-        commands = []
-        prev_slice_loc = 0
+       
+    def remove_comments(self, command_list: list[str]) -> list[str]:
+        """
+        removes cheetah comments from command lines
+        comments can be whole line, or part way through
+        """
+        clean_list = []
 
-        # find instances of '&&' or ';'
-        sep_locations = self.get_sep_locations(command_string)
+        for line in command_list:
+            # find quoted sections in line
+            quotes_mask = self.get_quoted_sections(line)
 
-        # confirm each is not quoted
-        for loc in sep_locations:
-            if not self.is_inside_quote_pairs(loc, command_string):
-                commands.append(command_string[prev_slice_loc: loc])
-                prev_slice_loc = loc
+            # find '##' 
+            matches = re.finditer('##', line)
+            hash_hits = [(m.start(), m.end()) for m in matches]
 
-        commands = [c.strip(';').strip('&') for c in commands]
-        #commands = [c.strip(';').strip('&').strip('\n').strip(' ').strip('\n') for c in commands]
-        return commands
+            # check each '##' to see if its in a quoted section
+            # if not, mark as start of comment
+            if len(hash_hits) > 0:
+                for start, end in hash_hits:
+                    if sum(quotes_mask[start: end]) == 0:
+                        comment_start = start
+                        break
 
+                # override line with comment removed
+                line = line[:comment_start]
+                line = line.strip()
+            
+            # make sure we didnt trim a full line comment 
+            # and now its an empty string
+            if line != '':
+                clean_list.append(line)
 
-    def get_sep_locations(self, the_string: str) -> list[int]:
-        amp_locs = [m.start() for m in re.finditer('&&', the_string)]
-        semicolon_locs = [m.start() for m in re.finditer(';', the_string)]
-        all_locs = amp_locs + semicolon_locs
-        all_locs.sort()
-        return all_locs
+        return clean_list
+    
 
+    def get_quoted_sections(self, the_string: str):
+        # find the areas of the string which are quoted
+        matches = re.finditer(r'"(.*?)"|\'(.*?)\'', the_string)
+        quoted_sections = [(m.start(), m.end()) for m in matches]
+
+        # transform to mask
+        quotes_mask = np.zeros(len(the_string))
+        for start, end in quoted_sections:
+            quotes_mask[start: end] = 1
         
-    def is_inside_quote_pairs(self, loc: int, the_string: str) -> bool:
-        print(the_string[loc - 10: loc + 10])
+        return quotes_mask
+
+
+    def remove_ands(self, command_list: list[str]) -> list[str]:
+        """
+        very basic approach. could use a quotes safe approach like for comments, but likely not needed. either way probably doesn't matter if we delete them. 
+        """    
+        lines = [ln.replace('&&', '') for ln in command_list]
+        lines = [ln.strip(' ') for ln in lines]
+        lines = [ln for ln in lines if ln != '']
+        return lines
+
+
+    def remove_bash_constructs(self, command_lines: list[str]) -> list[str]:
+        """
+        very simple for now! just removing a line if it looks like inline bash conditional. 
+        should add other bash syntax (later though)
+
+        need to eventually handle properly - LARK?
+        """
+        out = []
+        for line in command_lines:
+            if line.startswith('if') and 'fi' in line:
+                pass
+            else:
+                out.append(line)
+        return out
+
+
+    def remove_cheetah_definitions(self, command_lines: list[str]) -> list[str]:
+        """
+        in future this will list the function as a definition before deleting.
+        may help parse commands better.
+        """
+        opening_tag = '#def '
+        closing_tag = '#end def'
         
-        elem_count = the_string.split("'")
-        if len(elem_count) % 2 == 0:
-            return True
+        lines_to_delete = []
+        level = 0
 
-        elem_count = the_string.split('"')
-        if len(elem_count) % 2 == 0:
-            return True
+        for i, line in enumerate(command_lines):
+            # handle def level
+            if line.startswith(opening_tag):
+                level += 1
+            if closing_tag in line:  # safer approach than 'line = closing_tag'
+                lines_to_delete.append(i) # dont forget '#end def' line
+                level -= 1
 
-        return False
+            if level > 0:
+                lines_to_delete.append(i)
 
-
-    def clean_command(self, the_string: str) -> list[str]:
-        command_lines = the_string.split('&&')
-        command_lines = self.split_by_sep(command_lines, ';')
-        command_lines = self.split_by_sep(command_lines, '\n')
-        command_lines = self.remove_comments(command_lines)
+        # delete all lines marked as being in defs
+        for i in reversed(lines_to_delete):
+            del command_lines[i]
+        
         return command_lines
+
+
+    def remove_cheetah_misc(self, command_lines: list[str]) -> list[str]:
+        """
+        yea yea
+        """
+        banned_firstwords = ['#import', '#from', '#break', '#continue', '#pass', '#assert']
+        out = []
+        
+        # delete non-necessary words
+        for line in command_lines:
+            line = line.replace('#slurp', '')
+            line = line.replace('#silent', '')
+        
+            # only keep lines which don't start with keywords
+            if not line.split(' ')[0] in banned_firstwords:
+                out.append(line)
+            else:
+                print()
+
+        return out
+
+
+    def init_command_lines(self, lines: list[str]) -> dict[int, CommandLine]:
+        """
+        inits a CommandLine for every meaningful line of the command string.
+        cheetah constructs are ignored
+        the CommandLines will be annotated later with the constructs they appear in 
+        """
+        out = {}
+        command_count = 0
+
+        for i, line in enumerate(lines):
+            if not any([kw in line for kw in self.keywords]):
+                out[i] = CommandLine(command_count, line)
+                command_count += 1
+
+        return out
+        
+        
+    def annotate_conditional_lines(self, command_dict: dict[int, CommandLine], lines: list[str]) -> dict[int, CommandLine]:
+        """
+        '#unless EXPR' is equivalent to '#if not EXPR'
+        """
+
+        if_level = 0
+        unless_level = 0
+
+        for i, line in enumerate(lines):
+            # incremet conditional depth levels
+            if line.startswith('#if '):
+                if_level += 1
+            if line.startswith('#unless '):
+                unless_level += 1
+
+            # decrement conditional depth levels
+            if '#end if' in line:
+                if_level -= 1
+            if '#end unless' in line:
+                unless_level -= 1
+
+            if not any([kw in line for kw in self.keywords]):
+                if if_level > 0 or unless_level > 0:
+                    command_dict[i].in_conditional = True
+                #print(command_dict[i].in_conditional, command_dict[i].text)
+
+        return command_dict
+
+        
+
+    def annotate_loop_lines(self, command_dict: dict[int, CommandLine], lines: list[str]) -> dict[int, CommandLine]:
+        loop_keywords = ['#for', '#end for', '#while', '#end while']
+
+        for_level = 0
+        while_level = 0
+
+        for i, line in enumerate(lines):
+            # incremet loop depth levels
+            if line.startswith('#for '):
+                for_level += 1
+            if line.startswith('#while '):
+                while_level += 1
+
+            # decrement loop depth levels
+            if '#end for' in line:
+                for_level -= 1
+            if '#end while' in line:
+                while_level -= 1
+
+            if not any([kw in line for kw in self.keywords]):
+                if for_level > 0 or while_level > 0:
+                    command_dict[i].in_loop = True
+                #print(command_dict[i].in_loop, command_dict[i].text)
+
+        return command_dict
+
+
+
         
 
 
 
 
 
+
+    ## unused ------------------------
     def split_by_sep(self, the_input: Union[list[str], str], sep: str) -> list[str]:
         """
         splits a list or string by sep
@@ -226,15 +317,16 @@ class CommandParser:
         the_list = [item for item in the_list if item != '']
         return the_list
 
+    def is_inside_quote_pairs(self, loc: int, the_string: str) -> bool:
+        print(the_string[loc - 10: loc + 10])
+        
+        elem_count = the_string.split("'")
+        if len(elem_count) % 2 == 0:
+            return True
 
-    def remove_comments(self, command_list: list[str]) -> list[str]:
-        """
-        removes cheetah comments from command lines
-        """
-        clean_list = []
-        for item in command_list:
-            item = item.split('##')[0]
-            if item != '':
-                clean_list.append(item)
-        return clean_list
-    
+        elem_count = the_string.split('"')
+        if len(elem_count) % 2 == 0:
+            return True
+
+        return False
+

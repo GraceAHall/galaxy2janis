@@ -30,12 +30,24 @@ templating a string list (abyss)
     '
 #end if
 
+temporary alias in for loop
+#if $input_cond.library_type == "single"
+    #for i, e in enumerate($input_cond.inS)
+        cp '$e'
 
 dynamic setting kwarg (abyss)
 
 #for $i, $v in enumerate($long_seqs)
     long${i}='$v'
 #end for
+
+
+echo to template a string
+#if $col:
+    -c #echo ','.join($col)#
+    -o #echo ','.join($op)#
+#end if
+
 
 More abyss shit:
 
@@ -47,6 +59,36 @@ lib='pea peb' \
 pea='pea_1.fa pea_2.fa' peb='peb_1.fa peb_2.fa' \
 se='se1.fa se2.fa'
 
+
+
+GEMINI
+
+gemini @BINARY@
+-f '$tabixed_file'
+-a $a.a_selector
+#if $a.a_selector == 'extract':
+    #set $types = []
+    #set $elements = []
+    #set $column_names = []
+    #set $operations = []
+    #for $action in $a.actions:
+        $types.append(str($action.column_type))
+        $elements.append(str($action.element_to_extract).strip())
+        $column_names.append(str($action.column_name).strip())
+        $operations.append(str($action.operation))
+    #end for
+
+    -t #echo ",".join($types)
+    -e '#echo ",".join($elements)#'
+    -o #echo ",".join($operations)
+    -c '#echo ",".join($column_names)#'
+#else:
+    -c '${a.column_name}'
+#end if
+#if str($annotate_source.ext) != "bed":
+    $region_only
+#end if
+'$outfile'
 
 
 

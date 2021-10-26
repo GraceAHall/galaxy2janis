@@ -5,23 +5,21 @@
 %ignore WS
 
 
-?plist : parameter*
+text : item*
+
+item : parameter
+     | string
 
 parameter : pname [_PSEP parg]
 
 pname : /-{1,2}(\w+-)*\w+/
 _PSEP : /\s+|:|=/
-parg : integer
-     | number
-     | string
+parg : /(?!-)\S+/
 
 word : ESCAPED_STRING
-string : /\S+(?=\s*)/  // check if contains a single character?
+string : /\S+/ 
 number : SIGNED_NUMBER
 integer : /\d+/
-// parg: /\S+(?=\s*)/
-
-
 
 // FLAG_NAME: /((?<=^)|(?<=\s))-{1,2}(\w+-)*\w+/
 // OPERATOR: /\+|\-|\*|\/|\=\=/
@@ -30,3 +28,4 @@ integer : /\d+/
 
 
 
+// temp: \b(?<!-)[\w\d]+\b

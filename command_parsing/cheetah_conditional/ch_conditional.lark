@@ -1,0 +1,42 @@
+
+
+%import common.WORD
+%import common.WS_INLINE
+%ignore WS_INLINE
+
+conditional : if_block elif_block* else_block? endif
+// conditional : if line+ endif
+
+if_block : if component+
+elif_block : elif component+
+else_block : else component+
+
+?component : conditional
+           | comment
+           | set_direc
+           | statement
+
+if : "#if" CHARSTRING+ _newline
+elif : ELIF CHARSTRING+ _newline
+else : "#else" _newline
+endif : ENDIF _newline
+
+_newline : comment
+        | _NL
+
+statement : CHARSTRING* _newline
+set_direc : "#set" CHARSTRING OPERATOR CHARSTRING _newline
+comment : COMMENT _NL
+
+ENDIF : /#end if/
+ELIF : /#else if|#elif/  
+OPERATOR : /[+-\/*=]?=/
+CHARSTRING : /\S+/ 
+COMMENT : /##.*/
+_NL: /(\r?\n[\t ]*)+/
+
+
+// OPERATOR : /(?<=\s)[+-\/*]*=/
+// CHARSTRING : /[^\s=:;]+/   this is more like arg parsing
+// tree: NAME _NL [_INDENT tree+ _DEDENT]
+

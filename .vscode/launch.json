@@ -44,7 +44,7 @@
             "name": "test",
             "type": "python",
             "request": "launch",
-            "program": "src/gxtool2janis.py",
+            "program": "test.py",
             "console": "integratedTerminal",
 
         },
@@ -291,6 +291,13 @@
             "type": "python",
             "request": "launch",
             "program": "command_parsing/bash_conditional/b_conditional.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "LARK cheetah conditional",
+            "type": "python",
+            "request": "launch",
+            "program": "command_parsing/cheetah_conditional/ch_conditional.py",
             "console": "integratedTerminal"
         },
         {

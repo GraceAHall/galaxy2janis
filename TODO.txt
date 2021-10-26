@@ -6,15 +6,15 @@ TODO v0.1
 
 NOTE check janis-patterns github for tricky situations
 
-currently at:
-    improved command string parsing
-    working on extracting bash conditionals
-    have pattern to find open / closing tags and check if either location is in quotes
+TODO
+    - improved command string parsing
+    - unsupported params
+    - configfiles
+    - tool tests
 
-    command parsing
-        - bash logic uses ';' for syntax
-        - cheetah logic uses line breaks, tabs, and ':' for syntax
-        
+
+Unresolved
+    - command string: multiline bash blocks
 
 
 
@@ -75,6 +75,10 @@ ON HOLD TILL COMMAND PARSER IS UPDATED
     - during tool testing - check whether WilcardSelector can handle the galaxy regex
 
 - duplicate name resolving to LCA in gx_var path?
+
+
+
+Complete Milestones
 
 
 

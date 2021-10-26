@@ -1,0 +1,28 @@
+#if 1
+
+#if 2
+## comment 1
+instruction 1
+instruction 2 ## comment 2
+#end if
+
+instruction 3
+
+#else if 1
+instruction 4
+
+#elif 1
+instruction 5
+
+#else
+
+## Using an augustus model from history, we need to unzip it and let augustus find it
+
+cp -r "\$AUGUSTUS_CONFIG_PATH/" augustus_dir/ &&
+
+mkdir -p 'augustus_dir/species/' &&
+
+tar -C 'augustus_dir/species/' -xzvf '${abinitio_gene_prediction.aug_prediction.augustus_model}' > /dev/null &&
+
+export AUGUSTUS_CONFIG_PATH=`pwd`/augustus_dir/ &&
+#end if

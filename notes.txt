@@ -1,26 +1,75 @@
 
+Current thoughts:
+- optionality for arguments is not possible to identify. can supply defaults in most cases as workaround. 
+
+
+Command parsing
+    - #include not supported
+    - multiline bash blocks not supported (about 12 tools)
+    - currently throwing out bash conditionals
+    - should add bash aliases - 'export AUGUSTUS_CONFIG_PATH=`pwd`/augustus_dir/'
+
+
 
 
 
 Command parsing
 
 what is the main goal here? 
+- identify the base command word
+- options (and their arguments)
+- positional arguments
 
- - identify the base command word
- - positional arguments
- - prefixed arguments
- - optional arguments?
- - aliases (through #set directives, #def function directives)
 
-for each argument, want to identify all the params which can set the arg
-take an approach more focused on the command text rather than locating galaxy params
+1. approach
+- identify bash syntax
+    - parse using LARK
+    - delete these lines
 
-to add: 
- - sometimes no ' ', '=', ':' between arg and value. ie head -n1. almost always an integer? 
+- identify #def directives
+    - store the directive name
+    - delete directive lines
 
-positional arguments
- - keep track of whether each argument has a prefix or not
- - keep track of the 'position' of each argument.  is this each word? each argument? (ie key: val arg pair)
+- identify #set directives
+    - store the alias
+    - delete line 
+
+- split remaining text by line
+    - remove any lines starting with cheetah directives
+    - should result in clean text consisting of statement which are all possible in the shell command
+
+- extract each token and its position
+    
+
+2. MAIN DATASTRUCTURES
+alias dict
+- links variables which are set with #set directive
+- can be galaxy params to a temp param, can be temp param to temp param
+
+galaxy params
+- 
+
+tokens
+- is the token  --option=arg / -option:arg ect?
+    - break into an option. 
+    - next.
+- does the token start with '-'?
+    - label as option
+    - does the next token start with not '-'?
+        - try to resolve it as a galaxy param. 
+        - if possible and the param default value starts with '-'
+            - next (next token is also an option)
+        - else
+            - set the next token as the option argument
+- else
+    - try to resolve it as a galaxy param. 
+    - if possible and the param default value starts with '-'
+        - label as option
+    - else
+        - positional arg
+
+
+
 
 
 

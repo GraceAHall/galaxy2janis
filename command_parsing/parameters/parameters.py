@@ -21,26 +21,28 @@ class ParameterTransformer(Transformer):
         return str(name[0])
 
     def parg(self, arg):
-        return arg[0]
+        return str(arg[0])
 
     def string(self, n):
-        return str(n[0])
+        return None
 
-    def integer(self, n):
-        return int(n[0])
+    def item(self, the_item):
+        if the_item[0] != None:
+            return the_item
 
-    def number(self, n):
-        return float(n[0])
-
-    plist = list
     parameter = list
 
-
-parameters_parser = Lark(ruleset, start='plist')
+parameters_parser = Lark(ruleset, start='text')
 tree = parameters_parser.parse(text)
 parameters = ParameterTransformer().transform(tree)
-print(parameters)
+
+
 print()
+
+for child in parameters.children:
+    if child != None:
+        print(child)
+
 
 
 
