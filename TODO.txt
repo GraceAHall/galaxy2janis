@@ -82,15 +82,36 @@ Complete Milestones
 
 
 
+
+
+
+
+
+
+
+
+
+
 Milestones to v0.1 -------------------------------
 
- - small additions (datatype tweaks, rare params) (hours) 
- - configfiles (1 day)
- - galaxy types integrated into janis (1-2 days)
- - improved command string parsing (1-2 days)
- - tool test platform parsing into janis (2-4 days?)
+ - galaxy type parsing                          (complete)
+ - galaxy types integrated into janis           (richard)
+ - improved command string parsing              (working, almost complete)
+ - small additions (rare params)                (queued) 
+ - configfiles (1 day)                          (queued) 
+ - tool test platform parsing into janis        (queued)
+    - includes ingesting param vals and templating
+      command string
 
-Achieving the above should be possible by next fornight meeting
+
+
+
+
+
+
+
+
+
 
 
 Rollout plan -------------------------------------

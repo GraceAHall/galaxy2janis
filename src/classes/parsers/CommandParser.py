@@ -13,6 +13,8 @@ from classes.datastructures.Params import Param
 from classes.datastructures.Command import Command, CommandLine
 from classes.Logger import Logger
 
+from utils.regex_utils import find_unquoted
+
 """
 role of this module is to preprocess the command string into a useable state
 
@@ -58,9 +60,9 @@ class CommandParser:
         command_dict = self.annotate_loop_lines(command_dict, lines)
 
         # format to return
-        command_lines = list(command_dict.values())
-        command_lines.sort(key=lambda x: x.command_num)
-        return command_lines
+        commands = list(command_dict.values())
+        commands.sort(key=lambda x: x.command_num)
+        return lines, commands
  
 
     def get_command_string(self) -> str:
@@ -89,21 +91,8 @@ class CommandParser:
         clean_list = []
 
         for line in command_list:
-            # find quoted sections in line
-            quotes_mask = self.get_quoted_sections(line)
-
-            # find '##' 
-            matches = re.finditer('##', line)
-            hash_hits = [(m.start(), m.end()) for m in matches]
-
-            # check each '##' to see if its in a quoted section
-            # if not, mark as start of comment
-            if len(hash_hits) > 0:
-                for start, end in hash_hits:
-                    if sum(quotes_mask[start: end]) == 0:
-                        comment_start = start
-                        break
-
+            comment_start, comment_end = find_unquoted(line, '##')
+            if comment_start != -1:
                 # override line with comment removed
                 line = line[:comment_start]
                 line = line.strip()
@@ -134,7 +123,7 @@ class CommandParser:
         very basic approach. could use a quotes safe approach like for comments, but likely not needed. either way probably doesn't matter if we delete them. 
         """    
         lines = [ln.replace('&&', '') for ln in command_list]
-        lines = [ln.strip(' ') for ln in lines]
+        lines = [ln.strip(' ;') for ln in lines]
         lines = [ln for ln in lines if ln != '']
         return lines
 

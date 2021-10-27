@@ -13,6 +13,7 @@ from utils.galaxy_utils import get_common_extension, cast_list, consolidate_type
 from utils.etree_utils import get_attribute_value
 
 
+
 class Param:
     def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
         self.node = node
@@ -22,6 +23,7 @@ class Param:
         # basic info for each Param subclass
         self.name: str = ''
         self.gx_var: str = ''
+        self.gx_var_strings: set[str] = set()
         self.janis_var: str = ''
         self.galaxy_type: str = ''
         self.janis_type: str = ''
@@ -34,7 +36,7 @@ class Param:
         self.is_array: bool = False
         self.validated: bool = False
 
-        # checks
+        # checks REWRITE
         self.has_command_ref: bool = False
         self.has_conditional_ref: bool = False
         # self.needed_user_input: bool = False 

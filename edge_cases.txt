@@ -119,6 +119,15 @@ cheetah functions:
 
 
 
+SQL INSIDE A SET DIRECTIVE INSIDE AN IF STATEMENT
+DISGUSTING
+
+#if str($query.oformat.report.format) == 'maf':
+    #set $q = $q + ' v LEFT JOIN (SELECT DISTINCT gene, is_hgnc, hgnc_id, entrez_id, chrom FROM gene_detailed) g1 ON v.gene = g1.gene AND v.chrom = g1.chrom LEFT JOIN (SELECT DISTINCT gene, is_hgnc, hgnc_id, entrez_id, transcript, chrom, ensembl_gene_id FROM gene_detailed) g2 ON g1.gene = g2.gene AND (v.transcript = g2.transcript OR v.transcript=g2.ensembl_gene_id)'
+#end if
+
+
+
 
 
 

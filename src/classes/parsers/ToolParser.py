@@ -60,10 +60,13 @@ class ToolParser:
         self.parse_macros()
         self.parse_tokens()
         self.parse_configfiles()
-        self.parse_command()
         self.parse_params()
-        self.parse_outputs()
-        self.parse_metadata()
+        #self.parse_configfiles()
+        self.parse_command()
+        
+        #self.link_params_to_command()
+        #self.parse_outputs()
+        #self.parse_metadata()
 
 
     # 1st step: macro expansion (preprocessing)
@@ -101,27 +104,7 @@ class ToolParser:
         self.tool_version = mp.tool_version
 
 
-    # 4th step: command parsing 
-    def parse_command(self):
-        # parse command text into useful representation
-        cp = CommandParser(self.tree, self.logger)
-        command_lines = cp.parse()
-        
-        # create Command() object
-        cmd = Command(command_lines)
-        cmd.process()
-        return cmd
-
-
-
-    # 5th step: configfile parsing
-    def parse_configfiles(self):
-        cp = ConfigfileParser(self.tree, self.tokens, self.logger)
-        cp.parse()
-        self.configfiles = cp.configfiles
-
-
-    # 6th step: param parsing
+    # 4th step: param parsing
     def parse_params(self):
         # parse params
         pp = ParamParser(self.tree, self.command_lines, self.logger)
@@ -130,8 +113,34 @@ class ToolParser:
         print('\n--- Before cleaning ---\n')
         pp.pretty_print()
 
+        self.params = params
+
+
+    # 4th step: configfile parsing
+    def parse_configfiles(self):
+        cp = ConfigfileParser(self.tree, self.tokens, self.logger)
+        cp.parse()
+        self.configfiles = cp.configfiles
+
+
+    # 4th step: command parsing 
+    def parse_command(self):
+        # parse command text into useful representation
+        cp = CommandParser(self.tree, self.logger)
+        lines, commands = cp.parse()
+        
+        # create Command() object
+        cmd = Command(lines, commands, self.params) # type: ignore
+        cmd.process()
+        self.command = cmd
+
+
+    # 6th step: param parsing
+    def link_params_to_command(self):
         # cleanup steps
-        ppp = ParamPostProcessor(params, self.logger)
+        
+        # self.command?
+        ppp = ParamPostProcessor(self.params, self.logger)
         ppp.remove_duplicate_params()
         ppp.set_prefixes()
 
