@@ -10,7 +10,7 @@ import numpy as np
 
 
 from classes.datastructures.Params import Param
-from classes.datastructures.Command import Command, CommandLine
+from classes.datastructures.Command import Command, CommandWord
 from classes.Logger import Logger
 
 from utils.regex_utils import find_unquoted
@@ -23,7 +23,7 @@ removing other elements like #set directives which will be used later.
 
 command string is also de-indented and generally cleaned (blank lines removed etc)
 
-returns list of CommandLines
+returns list of CommandWords
 """
 
 
@@ -36,9 +36,11 @@ class CommandParser:
 
     def get_keywords(self) -> None:
         conditional_keywords = ['#if ', '#else if ', '#elif ', '#else', '#end if', '#unless ', '#end unless']
-        loop_keywords = ['#for', '#end for', '#while', '#end while']
-        error_keywords = ['#try', '#except', '#end try']
-        return conditional_keywords + loop_keywords + error_keywords
+        loop_keywords = ['#for ', '#end for', '#while ', '#end while']
+        error_keywords = ['#try ', '#except', '#end try']
+        cheetah_var_keywords = ['#def ', '#set ']
+        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ']
+        return conditional_keywords + loop_keywords + error_keywords + cheetah_var_keywords + linux_commands
         
 
     def parse(self) -> list[str]:
@@ -51,17 +53,15 @@ class CommandParser:
         lines = self.remove_cheetah_definitions(lines)
         lines = self.remove_cheetah_misc(lines)
 
-
-        # convert each line into CommandLine and annotate with properties
-        command_dict = self.init_command_lines(lines)
+        # convert each line into CommandWord and annotate with properties
+        command_dict = self.init_command_words(lines)
 
         # lines variable does not change! the line numbers are meaningful
-        command_dict = self.annotate_conditional_lines(command_dict, lines)
-        command_dict = self.annotate_loop_lines(command_dict, lines)
+        command_dict = self.annotate_conditional_words(command_dict, lines)
+        command_dict = self.annotate_loop_words(command_dict, lines)
 
         # format to return
         commands = list(command_dict.values())
-        commands.sort(key=lambda x: x.command_num)
         return lines, commands
  
 
@@ -194,24 +194,58 @@ class CommandParser:
         return out
 
 
-    def init_command_lines(self, lines: list[str]) -> dict[int, CommandLine]:
+    def init_command_words(self, lines: list[str]) -> dict[int, list[CommandWord]]:
         """
-        inits a CommandLine for every meaningful line of the command string.
+        inits a CommandWord for every meaningful line of the command string.
+        keys in the dict are line numbers, vals are list of CommandWord
+
         cheetah constructs are ignored
-        the CommandLines will be annotated later with the constructs they appear in 
+
+        the CommandWords will be annotated later with the constructs they appear in 
         """
-        out = {}
-        command_count = 0
+        command_words = {}
+        counter = 0
 
         for i, line in enumerate(lines):
-            if not any([kw in line for kw in self.keywords]):
-                out[i] = CommandLine(command_count, line)
-                command_count += 1
+            if not any([line.startswith(kw) for kw in self.keywords]):
+                command_words[i] = []
+                
+                line = line.split()
+                for word in line:
+                    tokens = self.get_tokens(word)
+                    for t in tokens:
+                        command_words[i].append(CommandWord(counter, t))
+                        counter += 1
 
-        return out
+        return command_words
         
-        
-    def annotate_conditional_lines(self, command_dict: dict[int, CommandLine], lines: list[str]) -> dict[int, CommandLine]:
+
+    def get_tokens(self, word: str) -> list[str]:
+        """
+        handles normal words and the following patterns:
+        --minid=$adv.min_dna_id
+        --protein=off
+        --hintsfile='$hints.hintsfile'
+        -t\${GALAXY_SLOTS:-4}
+        --tumor-lod-to-emit="$optional.tumor_lod_to_emit"
+        --outdir=.
+        gt='${gt}'
+        chrom='${chrom}'
+        ne=$ne
+        """
+        # make extra function to detect this pattern:
+        # -t\${GALAXY_SLOTS:-4} (no sep between flag and arg)
+
+        if '=' in word:
+            operator_start, operator_end = find_unquoted(word, '=')
+            flag, arg = word[:operator_start], word[operator_end:]
+            return [flag, arg]
+        else:
+            return [word]
+
+
+
+    def annotate_conditional_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:
         """
         '#unless EXPR' is equivalent to '#if not EXPR'
         """
@@ -232,16 +266,20 @@ class CommandParser:
             if '#end unless' in line:
                 unless_level -= 1
 
-            if not any([kw in line for kw in self.keywords]):
+            if "--lineage_dataset '${lineage.lineage_dataset}'" in line:
+                print()
+
+            if not any([line.startswith(kw) for kw in self.keywords]):
                 if if_level > 0 or unless_level > 0:
-                    command_dict[i].in_conditional = True
+                    for cmd_word in command_dict[i]:
+                        cmd_word.in_conditional = True
                 #print(command_dict[i].in_conditional, command_dict[i].text)
 
         return command_dict
 
         
 
-    def annotate_loop_lines(self, command_dict: dict[int, CommandLine], lines: list[str]) -> dict[int, CommandLine]:
+    def annotate_loop_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:
         loop_keywords = ['#for', '#end for', '#while', '#end while']
 
         for_level = 0
@@ -260,9 +298,10 @@ class CommandParser:
             if '#end while' in line:
                 while_level -= 1
 
-            if not any([kw in line for kw in self.keywords]):
+            if not any([line.startswith(kw) for kw in self.keywords]):
                 if for_level > 0 or while_level > 0:
-                    command_dict[i].in_loop = True
+                    for cmd_word in command_dict[i]:
+                        cmd_word.in_loop = True
                 #print(command_dict[i].in_loop, command_dict[i].text)
 
         return command_dict

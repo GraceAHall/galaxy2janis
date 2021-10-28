@@ -86,6 +86,16 @@
             ]
         },
         {
+            "name": "sniffles",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "sniffles.xml", "tools/sniffles"
+            ]
+        },
+        {
             "name": "bandage image",
             "type": "python",
             "request": "launch",

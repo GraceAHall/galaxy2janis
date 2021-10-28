@@ -10,8 +10,11 @@ Command parsing
     - should add bash aliases - 'export AUGUSTUS_CONFIG_PATH=`pwd`/augustus_dir/'
 
 
+Non-supported features
+    - for loop statements
 
 
+What the hell is bcftools_cnv.xml doing with mv $outputs? 
 
 Command parsing
 
@@ -41,32 +44,48 @@ what is the main goal here?
 - extract each token and its position
     
 
-2. MAIN DATASTRUCTURES
-alias dict
-- links variables which are set with #set directive
-- can be galaxy params to a temp param, can be temp param to temp param
 
-galaxy params
-- 
+COMMAND DATASTRUCTURES
 
-tokens
-- is the token  --option=arg / -option:arg ect?
-    - break into an option. 
-    - next.
-- does the token start with '-'?
-    - label as option
-    - does the next token start with not '-'?
-        - try to resolve it as a galaxy param. 
-        - if possible and the param default value starts with '-'
-            - next (next token is also an option)
-        - else
-            - set the next token as the option argument
-- else
-    - try to resolve it as a galaxy param. 
-    - if possible and the param default value starts with '-'
-        - label as option
-    - else
-        - positional arg
+aliases
+{
+    source [str]:    alias [Alias]
+                    {
+                        alias.source: str
+                        alias.dest: str
+                        alias.text: str
+                        alias.instruction: str
+                    }
+}
+
+env_vars - list of strings (each string is varname)
+{
+    '$AUGUSTUS_CONFIG_PATH',
+}
+
+params - gx_var is stripped to minimal form: $var
+{
+    param.gx_var [str]: param [Param]
+                        {
+                            param.name: str
+                            param.gx_var: str
+                            param.janis_var: str
+                            param.galaxy_type: str
+                        }
+}
+
+command_words
+[
+    cmdword [CommandWord]
+    {
+        cmdword.text = text
+        cmdword.command_num = command_num
+        cmdword.in_loop = False
+        cmdword.in_conditional = False
+    },
+
+    
+]
 
 
 

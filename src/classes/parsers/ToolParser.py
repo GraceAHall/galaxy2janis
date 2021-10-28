@@ -110,8 +110,8 @@ class ToolParser:
         pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
-        print('\n--- Before cleaning ---\n')
-        pp.pretty_print()
+        #print('\n--- Before cleaning ---\n')
+        #pp.pretty_print()
 
         self.params = params
 

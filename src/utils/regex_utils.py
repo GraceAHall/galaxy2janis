@@ -1,14 +1,7 @@
 
 
-import re
+import regex as re
 import numpy as np
-
-
-
-def get_numbers_and_strings(the_string: str):
-    pattern = r'(".*?(?<!\\)")|(\'.*?(?<!\\)\')|(?<!\w)(-?\d+(\.\d+)?)(?!\d)'
-    matches = re.finditer(pattern, the_string)
-    return [m[0] for m in matches]
 
 
 def extract_cheetah_vars(the_string: str) -> set[str]:
@@ -21,21 +14,58 @@ def extract_cheetah_vars(the_string: str) -> set[str]:
     
     keep_matches = []
     for m in matches:
-        # check if there is a '(' in the string
-        if m.end() < len(the_string) and the_string[m.end()] == '(':
-            # is an object method being called?
-            if '.' in m[0]:
-                # strip back method call
-                adjusted_match = m[0].rsplit('.', 1)[0]
-                keep_matches.append(adjusted_match)
-            else:
-                # is cheetah func call. ignore match. 
-                continue
-        else:
-            keep_matches.append(m[0])
+        match = m[0]
+        match_end = m.end()
+        match = extract_base_var(match)
+        match = strip_method_calls(match, match_end, the_string)
+        
+        if match != '':
+            keep_matches.append(match)
 
     return keep_matches
 
+
+def extract_base_var(the_string: str) -> str:
+    # this would have been nice in the regex pattern 
+    # but was time consuming to develop. faster this way. 
+    
+    # remove quotes if exist
+    the_string = the_string.strip('"\'')
+
+    # remove curly braces if exist
+    if the_string[1] == "{" and the_string[-1] == "}":
+        the_string = the_string[0] + the_string[2:-1]
+    
+    return the_string        
+
+    
+def strip_method_calls(match: str, match_end: int, the_string: str) -> str:
+    """
+    only want cheetah variable references.  
+    sometimes we see python string methods attached to a galaxy param var or cheetah functions (which have similar syntax to other vars of course). Want to remove these.
+    """
+    if match_end < len(the_string) and the_string[match_end] == '(':
+        # object method?
+        if '.' in match:
+            # strip back method call
+            match = match.rsplit('.', 1)[0]
+        else:
+            # is cheetah func call.  
+            match = ''
+
+    return match
+
+
+def get_numbers_and_strings(the_string: str) -> list[str]:
+    pattern = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")|(?<!\w)(-?\d+(\.\d+)?)(?!\d)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+def get_raw_strings(the_string: str) -> str:
+    pattern = r'(?<=\s|^)[^\W][-\w\d.\/]*(?=\s|$)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
 
 
 def find_unquoted(the_string: str, pattern: str) -> int:
