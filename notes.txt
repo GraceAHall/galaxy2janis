@@ -12,6 +12,7 @@ Command parsing
 
 Non-supported features
     - for loop statements
+    - aliases with anything except '#set x = y' structure
 
 
 What the hell is bcftools_cnv.xml doing with mv $outputs? 

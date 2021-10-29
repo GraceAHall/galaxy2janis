@@ -13,7 +13,7 @@ from classes.datastructures.Params import Param
 from classes.datastructures.Command import Command, CommandWord
 from classes.Logger import Logger
 
-from utils.regex_utils import find_unquoted
+from utils.regex_utils import find_unquoted, get_words
 
 """
 role of this module is to preprocess the command string into a useable state
@@ -104,19 +104,6 @@ class CommandParser:
 
         return clean_list
     
-
-    def get_quoted_sections(self, the_string: str):
-        # find the areas of the string which are quoted
-        matches = re.finditer(r'"(.*?)"|\'(.*?)\'', the_string)
-        quoted_sections = [(m.start(), m.end()) for m in matches]
-
-        # transform to mask
-        quotes_mask = np.zeros(len(the_string))
-        for start, end in quoted_sections:
-            quotes_mask[start: end] = 1
-        
-        return quotes_mask
-
 
     def remove_ands(self, command_list: list[str]) -> list[str]:
         """
@@ -209,40 +196,14 @@ class CommandParser:
         for i, line in enumerate(lines):
             if not any([line.startswith(kw) for kw in self.keywords]):
                 command_words[i] = []
-                
-                line = line.split()
-                for word in line:
-                    tokens = self.get_tokens(word)
-                    for t in tokens:
-                        command_words[i].append(CommandWord(counter, t))
-                        counter += 1
+                words = get_words(line)
+
+                for word in words:
+                    new_cmd_word = CommandWord(counter, word)
+                    command_words[i].append(new_cmd_word)
+                    counter += 1
 
         return command_words
-        
-
-    def get_tokens(self, word: str) -> list[str]:
-        """
-        handles normal words and the following patterns:
-        --minid=$adv.min_dna_id
-        --protein=off
-        --hintsfile='$hints.hintsfile'
-        -t\${GALAXY_SLOTS:-4}
-        --tumor-lod-to-emit="$optional.tumor_lod_to_emit"
-        --outdir=.
-        gt='${gt}'
-        chrom='${chrom}'
-        ne=$ne
-        """
-        # make extra function to detect this pattern:
-        # -t\${GALAXY_SLOTS:-4} (no sep between flag and arg)
-
-        if '=' in word:
-            operator_start, operator_end = find_unquoted(word, '=')
-            flag, arg = word[:operator_start], word[operator_end:]
-            return [flag, arg]
-        else:
-            return [word]
-
 
 
     def annotate_conditional_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:

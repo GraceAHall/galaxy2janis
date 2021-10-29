@@ -1,11 +1,25 @@
 
 
-from typing import Tuple, Optional
-import re 
+from typing import DefaultDict, Tuple, Optional
+from collections import defaultdict
+from enum import Enum
+import re
+
+from regex.regex import finditer 
 
 from classes.datastructures.Params import Param
 
-from utils.regex_utils import find_unquoted, extract_cheetah_vars, get_numbers_and_strings, get_raw_strings
+from utils.regex_utils import (
+    find_unquoted,
+    get_cheetah_vars, 
+    get_numbers_and_strings, 
+    get_quoted_numbers,
+    get_raw_numbers,
+    get_quoted_strings,
+    get_raw_strings,
+    get_linux_operators,
+    get_galaxy_keywords
+)
 
 
 class CommandWord:
@@ -14,14 +28,139 @@ class CommandWord:
         self.text = text
         self.in_loop = False
         self.in_conditional = False
+        self.is_keyval = False
+        self.keyval_pos = 0
+        self.expanded_text: list[str] = []
 
 
 class Alias:
-    def __init__(self, text: str, source: str, dest: str, instruction: str):
-        self.text = text
+    def __init__(self, source: str, dest: str, instruction: str, text: str):
         self.source = source
         self.dest = dest
         self.instruction = instruction
+        self.text = text
+
+
+class TokenTypes(Enum):
+    GX_VAR           = 1
+    QUOTED_STRING   = 2
+    RAW_STRING      = 3
+    QUOTED_NUM      = 4
+    RAW_NUM         = 5
+    LINUX_OP        = 6
+    GX_KEYWORD      = 7
+    
+
+class Token:
+    def __init__(self, text: str, token_type: str):
+        self.type = token_type.name
+        self.text = text
+    
+
+
+"""
+AliasRegister stores the aliases we discover while parsing command string
+Facilitates 
+    adding new aliases to the register
+    returing the aliases
+
+This whole class needs to be written cleaner
+Started with simple logic but quickly expanded
+"""
+class AliasRegister:
+    def __init__(self, params: dict[str, Param]):
+        # parsed galaxy params. needed to resolve aliases to a param. 
+        self.gx_params = params
+
+        # stores the aliases using alias.source as key
+        # each source may actually have more than 1 alias if different dests
+        self.alias_dict: dict[str, list[Alias]] = defaultdict(list)
+
+
+    def add(self, source: str, dest: str, instruction: str, text: str) -> None:
+        # check its not referencing itself
+        if source != dest:
+            known_aliases = self.alias_dict[source]
+            if not any([dest == al.dest for al in known_aliases]):
+                # if valid, create new alias and store
+                new_alias = Alias(source, dest, instruction, text)
+                self.alias_dict[new_alias.source].append(new_alias)
+
+
+    def template(self, query_string: str) -> list[str]:
+        """
+        given a query string, templates first var with aliases. 
+        ASSUMES ONLY 1 ALIAS IN STRING. otherwise this would get a little recursive. 
+        returns list of all possible forms of the query string
+        """
+
+        out = []
+
+        for source in self.alias_dict.keys():
+            # in case the var has curly braces in text
+            patterns = [source, '${' + source[1:] + '}']
+
+            for patt in patterns:
+                pattern = re.compile(f'\{patt}(?![\w])')
+                res = re.finditer(pattern, query_string)
+                matches = [m for m in res]
+                if len(matches) > 0:
+                    possible_values = self.resolve(source)
+
+                    # may be multiple resolved values.
+                    for val in possible_values:
+                        for m in matches:
+                            supp_query_string = query_string[:m.start()] + val + query_string[m.end():]
+                            out.append(supp_query_string)
+                    
+                    return out
+
+        return [query_string]
+
+
+
+    def resolve(self, query_var: str) -> list[str]:
+        """
+        returns list of all gx vars, and literals that are linked to the query_var
+        cheetah vars should be fully resolved here 
+        """
+        aliases = self.alias_dict[query_var]
+        out = []
+
+        for alias in aliases:
+            # cheetah or galaxy var
+            if alias.dest.startswith('$'):
+                # add if galaxy param
+                if alias.dest in self.gx_params:
+                    out.append(alias.dest)
+
+                # sometimes its weird.
+                # eg '$single_paired.paired_input.forward'
+                # this is actually an attribute (forward mate pair) of $single_paired.paired_input
+                # temp solution: strip common galaxy attributes and try again
+                stripped_var = self.strip_gx_attributes(alias.dest)
+                if stripped_var in self.gx_params:
+                    out.append(stripped_var)
+
+                # recursive. resolves next link if ch or gx var
+                out += self.resolve(alias.dest)
+                print()
+            
+            # literal
+            else:
+                out.append(alias.dest)
+
+        return out
+
+
+    def strip_gx_attributes(self, the_string: str) -> str:
+        gx_attributes = [
+            '.forward',
+            '.reverse',
+            '.ext',
+            '.value',
+            '',
+        ]
 
 
 class Option:
@@ -38,18 +177,27 @@ class Command:
         Command class receives the CommandLines
         """
         self.params = params
+        self.restructure_params()
         self.lines = lines
         self.command_lines = command_lines
         self.command_words = [item for word in command_lines for item in word]
-        self.aliases: dict[str, str] = {}
+        self.aliases: AliasRegister = AliasRegister(self.params)
         self.env_vars: list[str] = []
         self.options: list[Option] = []
 
 
+    def restructure_params(self) -> None:
+        param_dict = {}
+        for p in self.params:
+            key = '$' + p.gx_var
+            param_dict[key] = p
+        self.params = param_dict
+
+
     def process(self):
-        self.set_param_cheetah_strings()
-        self.set_aliases()
         self.extract_env_vars()
+        self.set_aliases()
+        self.expand_aliases()
         self.print_command_lines()
         # NOTE - preserving the line structure of command is temporary
         # only used for visual checks
@@ -79,17 +227,6 @@ class Command:
         for word in self.command_words:
             print(f'{word.text:60s}{word.command_num:6d}{word.in_conditional:6}{word.in_loop:6}')
         
-    # TODO unnecessary?
-    def set_param_cheetah_strings(self):
-        """
-        sets the 4 possible cheetah formats for each param variable
-        """
-        for param in self.params:
-            param.gx_var_strings.add(f'${param.gx_var}')
-            param.gx_var_strings.add(f'${{{param.gx_var}}}')
-            param.gx_var_strings.add(f'"${{{param.gx_var}}}"')
-            param.gx_var_strings.add(f"'${{{param.gx_var}}}'")
-
 
     def set_aliases(self) -> None:
         """
@@ -103,48 +240,28 @@ class Command:
         }
         can then query the alias dict to better link galaxy params to variables in command string
         """
-       
-        alias_dict: dict[str, str] = {}
-        
+              
         for line in self.lines:
-            aliases = []
-            aliases += self.extract_set_aliases(line)
-            aliases += self.extract_symlink_aliases(line)
-            aliases += self.extract_copy_aliases(line)
+            self.extract_set_aliases(line)
+            self.extract_symlink_aliases(line)
+            self.extract_copy_aliases(line)
             
             # a little confused on mv at the moment. leaving. 
-            #aliases += self.extract_mv_aliases(line)
+            #self.extract_mv_aliases(line)
             
             # #for aliases actually could be supported v0.1
             # would only be the simple case where you're unpacking an array (#for $item in $param:)
             
-            #aliases += self.extract_for_aliases(line)
-            for al in aliases:
-                alias_dict[al.source] = al
+            #self.extract_for_aliases(line)
 
-
-        # remove self-referencing aliases (yes this can happen)
-        to_delete = []
-        for source, alias in alias_dict.items():
-            if source == alias.dest:
-                to_delete.append(source)
-
-        for item in to_delete:
-            del alias_dict[item]
-
-        return alias_dict
-
-            
-
-    def extract_set_aliases(self, line: str) -> list[Alias]:
+          
+    def extract_set_aliases(self, line: str) -> None:
         """
         examples:
         #set var2 = $var1
         #set $ext = '.fastq.gz'
         """
-        
-        aliases = []
-        
+
         if line.startswith('#set '):
             # split the line at the operator and trim
             left, right = self.split_variable_assignment(line)
@@ -158,10 +275,8 @@ class Command:
 
             #print(f'{source} --> {dest}')
             if source is not None and dest is not None:
-                new_alias = Alias(line, source, dest, 'set')
-                aliases.append(new_alias)     
+                self.aliases.add(source, dest, 'set', line)
             
-        return aliases
 
 
     def split_variable_assignment(self, line: str) -> Tuple[str, str]:
@@ -179,7 +294,7 @@ class Command:
             if source_str[0] != '$':
                 source_str = '$' + source_str
         
-        source_vars = extract_cheetah_vars(source_str)
+        source_vars = get_cheetah_vars(source_str)
         assert(len(source_vars) == 1)
         source = source_vars[0]
         return source
@@ -187,7 +302,7 @@ class Command:
 
     def get_dest(self, dest_str: str) -> Optional[str]:
         # any cheetah vars?
-        dest_vars = extract_cheetah_vars(dest_str)
+        dest_vars = get_cheetah_vars(dest_str)
         dest_vars = self.remove_common_modules(dest_vars)
 
         # any literals?
@@ -226,11 +341,10 @@ class Command:
         return out_vars
 
     
-    def extract_symlink_aliases(self, line: str) -> list[Tuple[str, str]]:
+    def extract_symlink_aliases(self, line: str) -> None:
         """
         NOTE - dest and source are swapped for symlinks.
         """
-        aliases = []
         if line.startswith('ln '):
             arg1, arg2 = line.split(' ')[-2:]
 
@@ -247,13 +361,10 @@ class Command:
             #print(line)
             #print(f'{source} --> {dest}')
             if source is not None and dest is not None:
-                new_alias = Alias(line, source, dest, 'ln')
-                aliases.append(new_alias)   
-
-        return aliases
+                self.aliases.add(source, dest, 'ln', line) 
 
 
-    def extract_copy_aliases(self, line: str) -> list[Tuple[str, str]]:
+    def extract_copy_aliases(self, line: str) -> None:
         """
         NOTE - dest and source are swapped for cp commands.
 
@@ -266,9 +377,7 @@ class Command:
             cp '$test_case_conf' circos/conf/galaxy_test_case.json
             #for $hi, $data in enumerate($sec_links.data):
                 cp '${data.data_source}' circos/data/links-${hi}.txt
-        """
-        aliases = []
-        
+        """       
         if line.startswith('cp '):
             arg1, arg2 = line.split(' ')[-2:]
             # set the source
@@ -280,10 +389,8 @@ class Command:
             #print(line)
             #print(f'{source} --> {dest}')
             if source is not None and dest is not None:
-                new_alias = Alias(line, source, dest, 'cp')
-                aliases.append(new_alias)   
+                self.aliases.add(source, dest, 'cp', line)  
         
-        return aliases
 
 
     def extract_mv_aliases(self, line: str) -> list[Tuple[str, str]]:
@@ -296,7 +403,6 @@ class Command:
         mv input_file.tmp output${ ( $i + 1 ) % 2 }.tmp
         
         """
-        aliases = []
         if line.startswith('mv '):
             arg1, arg2 = line.split(' ')[-2:]
 
@@ -313,10 +419,7 @@ class Command:
             #print(line)
             #print(f'{source} --> {dest}')
             if source is not None and dest is not None:
-                new_alias = Alias(line, source, dest, 'ln')
-                aliases.append(new_alias)   
-
-        return aliases
+                self.aliases.add(source, dest, 'mv', line) 
 
 
     # develop later. too complex. 
@@ -331,6 +434,12 @@ class Command:
     #     # use match groups? 
     #     aliases = []
     #     return aliases
+
+
+    def expand_aliases(self) -> None:
+        for cmd_word in self.command_words:
+            cmd_forms = self.aliases.template(cmd_word.text)
+            cmd_word.expanded_text = cmd_forms
 
 
     def extract_env_vars(self) -> None:
@@ -360,15 +469,122 @@ class Command:
         self.env_vars = env_vars
 
 
-    def identify_options():
+    def identify_options(self) -> None:
         """
-        filtlong    
-        --target_bases 
-        '$output_thresholds.target_bases' 
-        --keep_percent  
-        '$output_thresholds.keep_percent'
+        filtlong
+        --target_bases '$output_thresholds.target_bases'
+        minid='$adv.min_dna_id'
+        -t\${GALAXY_SLOTS:-4} (no sep between flag and arg)
+        '$input_file' > output.fastq
         """
-        pass
+        cmd_count = 0
+        print('\n')
+        for i in range(len(self.command_words) - 1):
+            curr_word = self.command_words[i]
+            next_word = self.command_words[i+1]
+
+            # positional literal, option_flag + option_arg, key=val pair
+            cmd_type = self.get_command_type(curr_word, next_word)
+
+            if cmd_type == 'positional':
+                pass
+
+            if cmd_type == 'kv_pair':
+                pass
+
+            if cmd_type == 'flag':
+                pass
+
+            if cmd_type == 'option':
+                pass
+
+        self.handle_last_cmd_word(self.command_words[-1])
+
+
+    def get_command_type(self, curr_word: CommandWord, next_word: CommandWord) -> str:
+
+        #print(curr_word.text, ':')
+        for form in curr_word.expanded_text:
+            curr_tokens = self.get_tokens(form)
+            #curr_token = self.select_highest_priority_token()
+            for t in curr_tokens:
+                print(f'{t.type:20s}{t.text}')
+            
+        for form in next_word.expanded_text:
+            next_tokens = self.get_tokens(form)
+          
+        # positional
+
+        # flag
+
+        # option
+
+        # TODO kv_pair (key=val construct) ???
+        return
+
+
+    def get_tokens(self, text: str) -> list[str]:
+        """
+        detects the type of object being dealt with.
+        first task is to resolve any aliases or env_variables. 
+
+        can be:
+            literal
+                - starts with alphanumeric
+            literal flag 
+                - starts with '-'
+            gx_var
+                - has galaxy var in the word
+        """  
+
+        tokens = []
+
+        quoted_num_lits = get_quoted_numbers(text)
+        tokens += [Token(m, TokenTypes.QUOTED_NUM) for m in quoted_num_lits]
+
+        quoted_str_lits = get_quoted_strings(text)
+        # remove quoted cheetah vars
+        quoted_str_lits = [m for m in quoted_str_lits if m[1] != '$']
+        tokens += [Token(m, TokenTypes.QUOTED_STRING) for m in quoted_str_lits]
+        
+        raw_num_lits = get_raw_numbers(text)
+        tokens += [Token(m, TokenTypes.RAW_NUM) for m in raw_num_lits]
+        
+        raw_str_lits = get_raw_strings(text)
+        tokens += [Token(m, TokenTypes.RAW_STRING) for m in raw_str_lits]
+        
+        # quoted or not doesn't matter. just linking. can resolve its datatype later. 
+        ch_vars = get_cheetah_vars(text)
+        gx_vars = [x for x in ch_vars if x in self.params]
+        tokens += [Token(var, TokenTypes.GX_VAR) for var in gx_vars]
+
+        # TODO this is pretty weak. actually want to search for 
+        # unquoted operator in word. split if necessary. 
+        linux_operators = get_linux_operators(text)
+        tokens += [Token(op, TokenTypes.LINUX_OP) for op in linux_operators]
+
+        gx_keywords = get_galaxy_keywords(text)
+        tokens += [Token(kw, TokenTypes.GX_KEYWORD) for kw in gx_keywords]
+        
+        assert(len(tokens) == 1)
+        return tokens
+
+
+        
+        
+    def split_keyval_cmd(self, cmd_word: str) -> list[str]:
+        """
+        handles normal words and the following patterns:
+        --minid=$adv.min_dna_id
+        --protein='off'
+        ne=$ne
+        """
+        if '=' in cmd_word:
+            operator_start, operator_end = find_unquoted(cmd_word, '=')
+            flag, arg = cmd_word[:operator_start], cmd_word[operator_end:]
+            return [flag, arg]
+        else:
+            return [cmd_word]
 
 
     def set_base_word():

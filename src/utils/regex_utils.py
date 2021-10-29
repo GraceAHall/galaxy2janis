@@ -4,7 +4,7 @@ import regex as re
 import numpy as np
 
 
-def extract_cheetah_vars(the_string: str) -> set[str]:
+def get_cheetah_vars(the_string: str) -> set[str]:
     """
     doesn't keep function calls
     """
@@ -16,7 +16,7 @@ def extract_cheetah_vars(the_string: str) -> set[str]:
     for m in matches:
         match = m[0]
         match_end = m.end()
-        match = extract_base_var(match)
+        match = get_base_var(match)
         match = strip_method_calls(match, match_end, the_string)
         
         if match != '':
@@ -25,7 +25,7 @@ def extract_cheetah_vars(the_string: str) -> set[str]:
     return keep_matches
 
 
-def extract_base_var(the_string: str) -> str:
+def get_base_var(the_string: str) -> str:
     # this would have been nice in the regex pattern 
     # but was time consuming to develop. faster this way. 
     
@@ -56,16 +56,77 @@ def strip_method_calls(match: str, match_end: int, the_string: str) -> str:
     return match
 
 
+def get_words(the_string: str) -> list[str]:
+    pattern = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
 def get_numbers_and_strings(the_string: str) -> list[str]:
     pattern = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")|(?<!\w)(-?\d+(\.\d+)?)(?!\d)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 
 
-def get_raw_strings(the_string: str) -> str:
-    pattern = r'(?<=\s|^)[^\W][-\w\d.\/]*(?=\s|$)'
+def get_quoted_numbers(the_string: str) -> list[str]:
+    pattern = r'[\'"](?<!\w)(-?\d+(\.\d+)?)(?!\d)[\'"]'
+    matches = re.finditer(pattern, the_string)
+    matches = [m[0] for m in matches]
+    return [m.strip('"\'') for m in matches]
+
+
+def get_raw_numbers(the_string: str) -> list[str]:
+    pattern = r'(?<=\s|=)(?<!\w)(-?\d+(\.\d+)?)(?!\d)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
+
+
+def get_quoted_strings(the_string: str) -> list[str]:
+    pattern = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+def get_raw_strings(the_string: str) -> list[str]:
+    pattern = r'(?<=\s|^)([^\W]|-)[-\w\d.\/]*(?=\s|$)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+def get_linux_operators(the_string: str) -> list[str]:
+    pattern = r'^[><|]+$'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+def get_galaxy_keywords(the_string: str) -> list[str]:
+    out = []
+
+    # handle reserved words
+    gx_keywords = [
+        '$__tool_directory__',
+        '$__new_file_path__',
+        '$__tool_data_path__',
+        '$__root_dir__',
+        '$__datatypes_config__',
+        '$__user_id__',
+        '$__user_email__',
+        '$__app__',
+        '$__target_datatype__',
+        '\$GALAXY_MEMORY_MB',
+        '\$GALAXY_MEMORY_MB_PER_SLOT',
+        '\$_GALAXY_JOB_TMP_DIR'
+    ]
+
+    for reserved_word in gx_keywords:
+        if reserved_word in the_string:
+            out.append(reserved_word)
+
+    # handle galaxy slots
+    slots_pattern = r'\\\$\{GALAXY_SLOTS:-\d+}'
+    slots_matches = re.finditer(slots_pattern, the_string)
+    out += [m[0] for m in slots_matches]
+    return out
 
 
 def find_unquoted(the_string: str, pattern: str) -> int:
