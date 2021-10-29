@@ -98,11 +98,14 @@ class AliasRegister:
 
         for source in self.alias_dict.keys():
             # in case the var has curly braces in text
-            patterns = [source, '${' + source[1:] + '}']
+            if source.startswith('$'):
+                patterns = [source, '${' + source[1:] + '}']
+                patterns = [re.compile(f'\{p}(?![\w])') for p in patterns]
+            else:
+                patterns = [re.compile(f'{source}(?![\w])')]
 
             for patt in patterns:
-                pattern = re.compile(f'\{patt}(?![\w])')
-                res = re.finditer(pattern, query_string)
+                res = re.finditer(patt, query_string)
                 matches = [m for m in res]
                 if len(matches) > 0:
                     possible_values = self.resolve(source)
@@ -154,13 +157,27 @@ class AliasRegister:
 
 
     def strip_gx_attributes(self, the_string: str) -> str:
-        gx_attributes = [
+        gx_attributes = set([
             '.forward',
             '.reverse',
             '.ext',
             '.value',
-            '',
-        ]
+            '.name'
+        ])
+        # needs to be recursive so we can iterately peel back 
+        # eg  in1.forward.ext
+        # need to peel .ext then peel .forward.
+
+        for att in gx_attributes:
+            if the_string.endswith(att):
+                # strip from the right - num of chars in the att
+                the_string = the_string[:-len(att)]
+
+                # recurse
+                the_string = self.strip_gx_attributes(the_string)
+        
+        return the_string
+        
 
 
 class Option:
@@ -566,7 +583,6 @@ class Command:
         gx_keywords = get_galaxy_keywords(text)
         tokens += [Token(kw, TokenTypes.GX_KEYWORD) for kw in gx_keywords]
         
-        assert(len(tokens) == 1)
         return tokens
 
 
