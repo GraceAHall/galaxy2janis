@@ -72,7 +72,7 @@ class ParamParser:
         for node in inputs_node:
             self.explore_node(node, tree_path)
 
-        self.check_param_command_refs()
+        #self.check_param_command_refs()
 
         return self.param_list
 
@@ -89,8 +89,6 @@ class ParamParser:
         if node.tag in self.galaxy_depth_elems:
             curr_path.append(node.attrib['name'])
 
-        if get_attribute_value(node, 'name') == 'first_assembly_iter_param':
-            pass
         # Should we parse this node or just continue?
         if node.tag in self.parsable_elems:
             self.parse_elem(node, curr_path)
@@ -233,7 +231,7 @@ class ParamParser:
 
     def pretty_print(self) -> None:
         print('\n--- Params ---\n')
-        print(f'{"name":50}{"datatype":25}{"prefix":20}{"command":>10}')
+        print(f'{"name":50}{"datatype":15}{"prefix":20}{"default_value":20}')
         print('-' * 105)
         for param in self.param_list:
             print(param)

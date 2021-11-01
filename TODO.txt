@@ -6,11 +6,24 @@ TODO v0.1
 
 NOTE check janis-patterns github for tricky situations
 
-TODO
-    - improved command string parsing
-    - unsupported params
+Today:
+    - handle_last_cmd_word()
+    - split_keyval_cmd_words
+    - single token from each command word
+    - -o first${ext}
+    - command compontent class  
+        - base command class
+        - option class
+        - positional class
+
+Tomorrow:
     - configfiles
-    - tool tests
+    - galaxy templating system
+    - local galaxy datatypes
+
+Wednesday:
+    - testing
+
 
 
 Unresolved

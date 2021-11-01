@@ -4,6 +4,11 @@
 # needs to be extensible as will expand in future
 # what if the same variable is used 2 times in a line? annoying
 
+
+"""
+whole class is depicated
+"""
+
 class VariableReference:
     def __init__(self, gx_var: str, pos: int, command_line: list[str]):
         self.gx_var = gx_var

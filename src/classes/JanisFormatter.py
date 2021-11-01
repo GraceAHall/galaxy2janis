@@ -2,7 +2,7 @@
 
 
 from classes.Logger import Logger
-from classes.datastructures.Output import Output
+from classes.datastructures.Outputs import Output
 from classes.datastructures.Params import Param
 from classes.parsers.ToolParser import ToolParser
 

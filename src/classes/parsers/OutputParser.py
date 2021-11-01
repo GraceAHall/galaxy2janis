@@ -5,7 +5,7 @@
 from xml.etree import ElementTree as et
 
 from classes.Logger import Logger
-from classes.datastructures.Output import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
+from classes.datastructures.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
 from classes.datastructures.Params import Param, OutputParam
 from utils.etree_utils import get_attribute_value, create_output_param
 
@@ -26,15 +26,17 @@ class OutputParser:
         # initialize all outputs
         outputs = []
         for node in output_elems:
-            if node.tag in self.parsable_elems:
-                new_output = self.initialize_output(node)
-                outputs.append(new_output)
+            new_output = self.initialize_output(node)
+            outputs.append(new_output)
 
         # parse all outputs
         for output in outputs:
             output.parse()
+            output.galaxy_type = output.get_datatype(self.params)
+            #self.galaxy_type = consolidate_types(self.galaxy_type)
             self.log_pattern_status(output)
             #self.log_datatype_status(output)
+
 
         self.outputs = outputs
         return self.outputs
@@ -96,17 +98,24 @@ class OutputParser:
         """
         initializes a WorkdirOutput. WorkdirOutput has the most simple parse() method. used when from_work_dir is set. 
         """
-        return WorkdirOutput(node, self.params)
+        return WorkdirOutput(node)
     
 
     def initialize_discover_datasets_output(self, node: et.Element) -> Output:
         """
         initializes a DiscoverDatasetsOutput. this subclass has a different parse() method as it must extract info from child nodes. 
         """
-        return DiscoverDatasetsOutput(node, self.params)
+        return DiscoverDatasetsOutput(node)
 
 
     def initialize_templated_output(self, node: et.Element) -> Output:
+        """
+        initializes a TemplatedOutput. 
+        """
+        return TemplatedOutput(node)
+
+
+    def initialize_templated_output_old(self, node: et.Element) -> Output:
         """
         initializes a TemplatedOutput. TemplatedOutputs need to create an input param to reference.
         """
@@ -116,11 +125,12 @@ class OutputParser:
         # initialize new param & parse
         output_param = self.initialize_output_param(temp_out_node)
         
-        # update params with new param
+        # TODO not needed
+        # update params with new output param
         self.params.append(output_param)
 
         # return new output with reference to updated params
-        return TemplatedOutput(node, self.params)
+        return TemplatedOutput(node)
 
 
     def initialize_output_param(self, node: et.Element) -> Param:
@@ -131,7 +141,7 @@ class OutputParser:
 
     def pretty_print(self) -> None:
         print('\n--- Outputs ---\n')
-        print(f'{"name":<30}{"datatype":>25}{"selector":>20}{"selector_contents":>20}{"collection":>15}')
+        print(f'{"name":<30}{"datatype":15}{"subclass":20}{"is_array":5}')
         print('-' * 110)
         for output in self.outputs:
             print(output)

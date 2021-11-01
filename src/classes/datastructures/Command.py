@@ -8,6 +8,7 @@ import re
 from regex.regex import finditer 
 
 from classes.datastructures.Params import Param
+from classes.datastructures.Outputs import Output
 
 from utils.regex_utils import (
     find_unquoted,
@@ -42,7 +43,8 @@ class Alias:
 
 
 class TokenTypes(Enum):
-    GX_VAR           = 1
+    GX_PARAM        = 0
+    GX_OUT          = 1
     QUOTED_STRING   = 2
     RAW_STRING      = 3
     QUOTED_NUM      = 4
@@ -141,9 +143,10 @@ class AliasRegister:
                 # eg '$single_paired.paired_input.forward'
                 # this is actually an attribute (forward mate pair) of $single_paired.paired_input
                 # temp solution: strip common galaxy attributes and try again
-                stripped_var = self.strip_gx_attributes(alias.dest)
-                if stripped_var in self.gx_params:
-                    out.append(stripped_var)
+                else:
+                    stripped_var = self.strip_gx_attributes(alias.dest)
+                    if stripped_var in self.gx_params:
+                        out.append(stripped_var)
 
                 # recursive. resolves next link if ch or gx var
                 out += self.resolve(alias.dest)
@@ -189,12 +192,14 @@ class Option:
 
 
 class Command:
-    def __init__(self, lines: list[str], command_lines: list[list[CommandWord]], params: list[Param]):
+    def __init__(self, lines: list[str], command_lines: list[list[CommandWord]], params: list[Param], outputs: list[Output]):
         """
         Command class receives the CommandLines
         """
         self.params = params
+        self.outputs = outputs
         self.restructure_params()
+        self.restructure_outputs()
         self.lines = lines
         self.command_lines = command_lines
         self.command_words = [item for word in command_lines for item in word]
@@ -209,6 +214,14 @@ class Command:
             key = '$' + p.gx_var
             param_dict[key] = p
         self.params = param_dict
+    
+    
+    def restructure_outputs(self) -> None:
+        output_dict = {}
+        for out in self.outputs:
+            key = '$' + out.gx_var
+            output_dict[key] = out
+        self.outputs = output_dict
 
 
     def process(self):
@@ -520,7 +533,8 @@ class Command:
 
     def get_command_type(self, curr_word: CommandWord, next_word: CommandWord) -> str:
 
-        #print(curr_word.text, ':')
+        print()
+        print(curr_word.text, ':')
         for form in curr_word.expanded_text:
             curr_tokens = self.get_tokens(form)
             #curr_token = self.select_highest_priority_token()
@@ -550,7 +564,7 @@ class Command:
                 - starts with alphanumeric
             literal flag 
                 - starts with '-'
-            gx_var
+            GX_PARAM
                 - has galaxy var in the word
         """  
 
@@ -570,10 +584,16 @@ class Command:
         raw_str_lits = get_raw_strings(text)
         tokens += [Token(m, TokenTypes.RAW_STRING) for m in raw_str_lits]
         
+        # galaxy inputs
         # quoted or not doesn't matter. just linking. can resolve its datatype later. 
         ch_vars = get_cheetah_vars(text)
-        gx_vars = [x for x in ch_vars if x in self.params]
-        tokens += [Token(var, TokenTypes.GX_VAR) for var in gx_vars]
+        gx_params = [x for x in ch_vars if x in self.params]
+        tokens += [Token(param, TokenTypes.GX_PARAM) for param in gx_params]
+        
+        # galaxy outputs
+        ch_vars = get_cheetah_vars(text)
+        gx_out = [x for x in ch_vars if x in self.outputs]
+        tokens += [Token(var, TokenTypes.GX_OUT) for var in gx_out]
 
         # TODO this is pretty weak. actually want to search for 
         # unquoted operator in word. split if necessary. 

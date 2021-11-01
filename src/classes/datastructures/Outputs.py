@@ -8,23 +8,27 @@ import re
 
 from classes.datastructures.Params import Param
 from utils.etree_utils import get_attribute_value
-from utils.galaxy_utils import consolidate_types
+#from utils.galaxy_utils import consolidate_types
 
 
 class Output:
-    def __init__(self, node: et.Element, params: list[Param]) -> None:
+    def __init__(self, node: et.Element) -> None:
         self.node = node
+
+        # parsed info
         self.name: str = ''
-        self.params = params
-        self.janis_var: str = '' 
+        self.gx_var: str = ''
         self.galaxy_type: str = ''
-        self.janis_type: str = ''
+        self.help_text: str = ''  # ?
+        self.is_optional: bool = False 
+        self.is_array: bool = False
+        self.is_hidden: bool = False
         self.selector: str = ''
         self.selector_contents: str = ''
-        self.help_text: str = ''  # ?
-        self.is_hidden: bool = False
-        self.is_array: bool = False
-        self.is_optional: bool = False # const
+        
+        # janis related
+        self.janis_var: str = '' 
+        self.janis_type: str = ''
 
         self.extension_mappings = {
             'fasta': ['fa', 'fna', 'fasta'],
@@ -37,22 +41,20 @@ class Output:
 
 
     def __str__(self) -> str:
-        galaxy_type = self.galaxy_type
-        return f'{self.name[-29:]:<30}{galaxy_type[-24:]:>25}{self.selector[-19:]:>20}{self.selector_contents[-19:]:>20}{self.is_array:>15}'
+        datatype = self.galaxy_type
+        subclass = self.__class__.__name__
+        return f'{self.name[-29:]:30}{datatype[-14:]:15}{subclass[-19:]:20}{self.is_array:5}'
 
 
     def parse(self) -> None:
         self.set_basic_details()
         self.set_help_text()
-        self.galaxy_type = self.get_datatype()
-        self.galaxy_type = consolidate_types(self.galaxy_type)
         self.set_selector_contents()
         self.set_is_array()
-        self.set_janis_var()
-
 
     def set_basic_details(self) -> None:
         self.name = get_attribute_value(self.node, 'name')
+        self.gx_var = self.name
         if get_attribute_value(self.node, 'hidden') == 'true':
             self.is_hidden = True
 
@@ -66,7 +68,7 @@ class Output:
             self.help_text = label
         
 
-    # override
+    # override method
     def set_selector_contents(self) -> None:
         pass
 
@@ -85,12 +87,8 @@ class Output:
         elif self.node.tag == 'collection':
             self.is_array = True        
 
-
-    def set_janis_var(self) -> None:
-        pass
-
     
-    def get_datatype(self) -> str:
+    def get_datatype(self, params: list[Param]) -> str:
         # datatype can be specified in format, format_source, auto_format (ext), or from_work_dir.
         gx_format = get_attribute_value(self.node, 'format')
         format_source = get_attribute_value(self.node, 'format_source')
@@ -103,7 +101,7 @@ class Output:
 
         # get datatype from referenced param
         elif format_source != '':
-            datatype = self.get_datatype_from_param(format_source)
+            datatype = self.get_datatype_from_param(format_source, params)
 
         # get datatype from referenced file extension
         elif from_work_dir != '':
@@ -117,9 +115,9 @@ class Output:
         return datatype
 
 
-    def get_datatype_from_param(self, format_source: str) -> str:
+    def get_datatype_from_param(self, format_source: str, params: list[Param]) -> str:
         # not working
-        for param in self.params:
+        for param in params:
             if format_source == param.name:
                 return param.galaxy_type
         
@@ -156,8 +154,8 @@ class Output:
 
 
 class WorkdirOutput(Output):
-    def __init__(self, node: et.Element, params: list[Param]) -> None:
-        super().__init__(node, params)
+    def __init__(self, node: et.Element) -> None:
+        super().__init__(node)
         self.selector = "WildcardSelector"
 
 
@@ -169,13 +167,13 @@ class WorkdirOutput(Output):
 
 
 class DiscoverDatasetsOutput(Output):
-    def __init__(self, node: et.Element, params: list[Param]) -> None:
-        super().__init__(node, params)
+    def __init__(self, node: et.Element) -> None:
+        super().__init__(node)
         self.selector = "WildcardSelector"
 
 
     # overrides base class
-    def get_datatype(self) -> str:
+    def get_datatype(self, params: list[Param]) -> str:
         """
         in <collection> or <data>(parent):
             - format
@@ -196,7 +194,7 @@ class DiscoverDatasetsOutput(Output):
 
         # get datatype from referenced param
         elif format_source != '':
-            return self.get_datatype_from_param(format_source)
+            return self.get_datatype_from_param(format_source, params)
 
         dd_node = self.node.find('discover_datasets')
         dd_format = get_attribute_value(dd_node, 'format') # type: ignore
@@ -257,33 +255,36 @@ class DiscoverDatasetsOutput(Output):
 
 
 class TemplatedOutput(Output):
-    def __init__(self, node: et.Element, params: list[Param]) -> None:
-        super().__init__(node, params)
+    def __init__(self, node: et.Element) -> None:
+        super().__init__(node)
         self.selector = "InputSelector"
-        self.input_param = self.link_input_param()
-
-
-    def link_input_param(self) -> Param:
-        for param in self.params:
-            if param.name == self.node.attrib['name']:
-                return param
-        raise Exception(f'could not link TemplatedOutput to its input param: {self.node.attrib["name"]}')
 
 
     def set_selector_contents(self) -> None:
         """
         just sets to generated input param name
         """
-        self.selector_contents = f'{self.input_param.name}'
+        self.selector_contents = f'{self.name}'
     
+
+
+    """
+    def link_input_param(self) -> Param:
+        for param in self.params:
+            if param.name == self.node.attrib['name']:
+                return param
+        raise Exception(f'could not link TemplatedOutput to its input param: {self.node.attrib["name"]}')
+    """
+
+
 
 
 
 
 
 # class CollectionOutput(Output):
-#     def __init__(self, node: et.Element, params: list[Param]) -> None:
-#         super().__init__(node, params)
+#     def __init__(self, node: et.Element) -> None:
+#         super().__init__(node)
 #         pass
 
 #     def set_datatype(self) -> None:

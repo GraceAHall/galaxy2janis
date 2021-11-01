@@ -1,4 +1,12 @@
 
+
+
+
+Richard:
+    - how do you want to handle select params encompassing multiple flags?
+
+
+
 Current thoughts:
 - optionality for arguments is not possible to identify. can supply defaults in most cases as workaround. 
 
@@ -20,31 +28,11 @@ What the hell is bcftools_cnv.xml doing with mv $outputs?
 Command parsing
 
 what is the main goal here? 
-- identify the base command word
 - options (and their arguments)
+- identify the base command word
 - positional arguments
 
-
-1. approach
-- identify bash syntax
-    - parse using LARK
-    - delete these lines
-
-- identify #def directives
-    - store the directive name
-    - delete directive lines
-
-- identify #set directives
-    - store the alias
-    - delete line 
-
-- split remaining text by line
-    - remove any lines starting with cheetah directives
-    - should result in clean text consisting of statement which are all possible in the shell command
-
-- extract each token and its position
-    
-
+   
 
 COMMAND DATASTRUCTURES
 

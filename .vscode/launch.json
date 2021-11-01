@@ -146,6 +146,26 @@
             ]
         },
         {
+            "name": "abricate",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abricate.xml", "tools/abricate"
+            ]
+        },
+        {
+            "name": "clusterBed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "clusterBed.xml", "tools/bedtools"
+            ]
+        },
+        {
             "name": "mothur_pca",
             "type": "python",
             "request": "launch",

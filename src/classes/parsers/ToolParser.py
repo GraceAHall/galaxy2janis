@@ -6,7 +6,7 @@ from classes.Logger import Logger
 from typing import Union
 
 from classes.datastructures.Params import Param
-from classes.datastructures.Output import Output
+from classes.datastructures.Outputs import Output
 from classes.datastructures.Command import Command
 from classes.datastructures.Configfile import Configfile
 
@@ -57,16 +57,20 @@ class ToolParser:
 
 
     def parse(self) -> None:
+        # basic setup
         self.parse_macros()
         self.parse_tokens()
-        self.parse_configfiles()
+        self.parse_metadata()
+
+        # gathering UI variables
         self.parse_params()
+        self.parse_outputs()
+        
+        # the business
         #self.parse_configfiles()
         self.parse_command()
         
         #self.link_params_to_command()
-        #self.parse_outputs()
-        #self.parse_metadata()
 
 
     # 1st step: macro expansion (preprocessing)
@@ -110,35 +114,50 @@ class ToolParser:
         pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
-        #print('\n--- Before cleaning ---\n')
-        #pp.pretty_print()
+        pp.pretty_print()
 
         self.params = params
 
 
-    # 4th step: configfile parsing
+    # 5th step: output parsing
+    def parse_outputs(self):
+        op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
+        self.outputs = op.parse()
+
+        op.pretty_print()
+
+
+    # 6th step: configfile parsing
     def parse_configfiles(self):
         cp = ConfigfileParser(self.tree, self.tokens, self.logger)
         cp.parse()
         self.configfiles = cp.configfiles
 
 
-    # 4th step: command parsing 
+    # 7th step: command parsing 
     def parse_command(self):
         # parse command text into useful representation
         cp = CommandParser(self.tree, self.logger)
         lines, commands = cp.parse()
         
         # create Command() object
-        cmd = Command(lines, commands, self.params) # type: ignore
+        cmd = Command(lines, commands, self.params, self.outputs) # type: ignore
         cmd.process()
         self.command = cmd
 
 
-    # 6th step: param parsing
+    # 8th step: input and output postprocessing
+    
     def link_params_to_command(self):
-        # cleanup steps
-        
+        """
+        cleanup steps
+        handles a lot of stuff
+        finalises the set of options (some gx params get split)
+        sets default values
+        sets optionality on params
+        sets datatypes
+        """
+
         # self.command?
         ppp = ParamPostProcessor(self.params, self.logger)
         ppp.remove_duplicate_params()
@@ -151,11 +170,7 @@ class ToolParser:
         self.params = ppp.params
 
 
-    # 7th step: output parsing
-    def parse_outputs(self):
-        op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
-        self.outputs = op.parse()
-        #op.pretty_print()
+
 
 
     
