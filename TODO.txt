@@ -7,14 +7,13 @@ TODO v0.1
 NOTE check janis-patterns github for tricky situations
 
 Today:
-    - handle_last_cmd_word()
-    - split_keyval_cmd_words
     - single token from each command word
     - -o first${ext}
-    - command compontent class  
-        - base command class
-        - option class
-        - positional class
+    - select params which are multiple bool flags?
+    - situations where there is a param and output with same cheetah variable?
+    - resolve GX_PARAMS to actual params
+    - MULTIPLE EXPANDED FORMS (filtlong)
+    - INDICIES (bwa-mem)
 
 Tomorrow:
     - configfiles

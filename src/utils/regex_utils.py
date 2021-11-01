@@ -76,7 +76,7 @@ def get_quoted_numbers(the_string: str) -> list[str]:
 
 
 def get_raw_numbers(the_string: str) -> list[str]:
-    pattern = r'(?<=\s|=)(?<!\w)(-?\d+(\.\d+)?)(?!\d)'
+    pattern = r'(?<=\s|^)-?\.?\d+(\.\d*)?(?=\s|$)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 
@@ -88,7 +88,7 @@ def get_quoted_strings(the_string: str) -> list[str]:
 
 
 def get_raw_strings(the_string: str) -> list[str]:
-    pattern = r'(?<=\s|^)([^\W]|-)[-\w\d.\/]*(?=\s|$)'
+    pattern = r'(?<=\s|^)([^\W]|-|.)[-\w\d.\/]*(?=\s|$)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 
@@ -127,6 +127,17 @@ def get_galaxy_keywords(the_string: str) -> list[str]:
     slots_matches = re.finditer(slots_pattern, the_string)
     out += [m[0] for m in slots_matches]
     return out
+
+
+def get_keyval_pairs(the_string: str) -> list[str]:
+    # TODO IMPROVE
+    # currently just finds key=val. will also find 'key=val' which 
+    # maybe isnt good. 
+    # operator_start, operator_end = find_unquoted(the_string, '=')
+    
+    kv_pattern = r'(?<=\s|^)\S+?=\S+?(?=\s|$)'
+    kv_matches = re.finditer(kv_pattern, the_string)
+    return [m[0] for m in kv_matches]
 
 
 def find_unquoted(the_string: str, pattern: str) -> int:

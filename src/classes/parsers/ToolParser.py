@@ -7,7 +7,7 @@ from typing import Union
 
 from classes.datastructures.Params import Param
 from classes.datastructures.Outputs import Output
-from classes.datastructures.Command import Command
+from classes.datastructures.Command import CommandString
 from classes.datastructures.Configfile import Configfile
 
 from classes.parsers.MacroParser import MacroParser
@@ -141,7 +141,7 @@ class ToolParser:
         lines, commands = cp.parse()
         
         # create Command() object
-        cmd = Command(lines, commands, self.params, self.outputs) # type: ignore
+        cmd = CommandString(lines, commands, self.params, self.outputs) # type: ignore
         cmd.process()
         self.command = cmd
 
