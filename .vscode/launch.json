@@ -86,6 +86,16 @@
             ]
         },
         {
+            "name": "augustus",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "augustus.xml", "tools/augustus"
+            ]
+        },
+        {
             "name": "sniffles",
             "type": "python",
             "request": "launch",

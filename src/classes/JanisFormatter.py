@@ -33,114 +33,6 @@ class JanisFormatter:
             'unix_types': set(),
         }
 
-        self.datatype_categories = {
-            "BAI": 'bioinformatics_types',
-            "BAM": 'bioinformatics_types',
-            "bed": 'bioinformatics_types',
-            "BedGz": 'bioinformatics_types',
-            "BedTABIX": 'bioinformatics_types',
-            "Boolean": 'common_types',
-            "CompressedTarFile": 'unix_types',
-            "CRAI": 'bioinformatics_types',
-            "CRAM": 'bioinformatics_types',
-            "CramPair": 'bioinformatics_types',
-            "csv": 'unix_types',
-            "Directory": 'common_types',
-            "Double": 'common_types',
-            "Fasta": 'bioinformatics_types',
-            "FastaBwa": 'bioinformatics_types',
-            "FastaFai": 'bioinformatics_types',
-            "FastaGz": 'bioinformatics_types',
-            "FastaGzBwa": 'bioinformatics_types',
-            "FastaGzFai": 'bioinformatics_types',
-            "FastaGzWithIndexes": 'bioinformatics_types',
-            "FastaWithIndexes": 'bioinformatics_types',
-            "FastDict": 'bioinformatics_types',
-            "FastGzDict": 'bioinformatics_types',
-            "Fastq": 'bioinformatics_types',
-            "FastqGz": 'bioinformatics_types',
-            "File": 'common_types',
-            "Filename": 'common_types',
-            "Float": 'common_types',
-            "Gzip": 'unix_types',
-            "HtmlFile": 'unix_types',
-            "IndexedBam": 'bioinformatics_types',
-            "Integer": 'common_types',
-            "jsonFile": 'unix_types',
-            "KallistoIdx": 'bioinformatics_types',
-            "SAM": 'bioinformatics_types',
-            "Stdout": 'common_types',
-            "String": 'common_types',
-            "TarFile": 'unix_types',
-            "TextFile": 'unix_types',
-            "tsv": 'unix_types',
-            "VCF": 'bioinformatics_types',
-            "CompressedVCF": 'bioinformatics_types',
-            "IndexedVCF": 'bioinformatics_types',
-            "CompressedIndexedVCF": 'bioinformatics_types',
-            "WhisperIdx": 'bioinformatics_types',
-            "Zip": 'unix_types'
-        }
-
-        self.gx_janis_datatype_mapping = {
-            "bai": "BAI",
-            "bam": "BAM",
-            "bed": "bed",
-            "bed.gz": "BedGz",
-            "tabix": "BedTABIX",
-            "bool": "Boolean",
-            "boolean": "Boolean",
-            "tar.gz": "CompressedTarFile",
-            "brai": "CRAI",
-            "cram": "CRAM",
-            "CramPair": "CramPair",
-            "csv": "csv",
-            "directory": "Directory",
-            "double": "Double",
-            "fa": "Fasta",
-            "fna": "Fasta",
-            "fasta": "Fasta",
-            "FastaBwa": "FastaBwa",  # TODO
-            "fai": "FastaFai",  
-            "fasta.gz": "FastaGz",
-            "FastaGzBwa": "FastaGzBwa",  # TODO
-            "FastaGzFai": "FastaGzFai",  # TODO
-            "FastaGzWithIndexes": "FastaGzWithIndexes",
-            "FastaWithIndexes": "FastaWithIndexes",
-            "FastDict": "FastDict",
-            "FastGzDict": "FastGzDict",
-            "fq": "Fastq",
-            "fastq": "Fastq",
-            "fastqsanger": "Fastq",
-            "fastqillumina": "Fastq",
-            "fastq.gz": "FastqGz",
-            "fastqsanger.gz": "FastqGz",
-            "fastqillumina.gz": "FastqGz",
-            "file": "File",
-            "filename": "Filename",
-            "float": "Float",
-            "gz": "Gzip",
-            "html": "HtmlFile",
-            "IndexedBam": "IndexedBam",  # TODO
-            "integer": "Integer",
-            "json": "jsonFile",
-            "kallisto.idx": "KallistoIdx",
-            "sam": "SAM",
-            "stdout": "Stdout",
-            "color": "String",
-            "string": "String",
-            "text": "String",
-            "tar": "TarFile",
-            "txt": "TextFile",
-            "tsv": "tsv",
-            "vcf": "VCF",
-            "vcf_bgzip": "CompressedVCF",
-            "IndexedVCF": "IndexedVCF",  # TODO
-            "CompressedIndexedVCF": "CompressedIndexedVCF", # TODO?
-            "WhisperIdx": "WhisperIdx", # TODO
-            "zip": "Zip"
-        }
-
 
     def format(self) -> None:
         self.inputs = self.gen_inputs()
@@ -211,27 +103,13 @@ class JanisFormatter:
         return out_str
 
 
-    def convert_type_list(self, param: Param) -> None:
-        out_list = set()
-        galaxy_types = param.galaxy_type.split(',') 
-        for gtype in galaxy_types:
-            if gtype in self.gx_janis_datatype_mapping:
-                ext = self.gx_janis_datatype_mapping[gtype]
-            else:
-                self.logger.log(1, f'datatype conversion failed: {gtype}')
-                ext = 'File'
-            out_list.add(ext)
-
-        param.janis_type = ','.join(out_list)
-
-
     def format_janis_typestr(self, param: Param) -> str:
         """
         String
         String(optional=True)
         Array(String(), optional=True)
         """
-        janis_type = self.get_janis_type(param)
+        janis_type = self.get_janis_type(param) # TODO here
         
         # not array not optional
         if not param.is_optional and not param.is_array:
@@ -250,49 +128,6 @@ class JanisFormatter:
             out_str = f'Array({janis_type}(), optional=True)'
 
         return out_str
-        
-
-    def get_janis_type(self, param: Param) -> str:
-        out_str = ''
-
-        # get janis types (already converted from galaxy)
-        type_list = list(set(param.janis_type.split(',')))
-
-        # reduce to single type 
-        if len(type_list) > 1:
-            type_list = self.reduce_datatype(type_list)
-        
-        return type_list[0]
-
-
-    def reduce_datatype(self, type_list: list[str]) -> list[str]:
-        """
-        selects a single datatype from list of types. 
-        should be either 
-            - the most accessible form of the datatype (raw rather than gz)
-            - the common format (bam rather than sam)
-            - anything except 'File' fallback
-        """
-        # remove 'File' type
-        type_list = [t for t in type_list if t != 'File']
-        
-        # only the 'File' type was present
-        if len(type_list) == 0:
-            return ['File']
-
-        # if had 2 types where 1 was 'File'
-        elif len(type_list) == 1:
-            return type_list
-
-        else:
-            # remove basic types (String, Integer etc) like above 'File'?
-            pass
-
-        # TODO change this laziness. just sorting alphabetically and on length. is this even stable sort? 
-        type_list.sort()
-        type_list.sort(key=lambda x: len(x))
-
-        return [type_list[0]]
 
 
     def gen_outputs(self) -> list[str]:

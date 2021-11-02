@@ -2,14 +2,23 @@
 
 velvetg:
 
-    #if $coverage.cutoff == "auto":
-        -cov_cutoff auto
+    <param name="read_trkg" type="boolean" checked="false" truevalue="-read_trkg yes" falsevalue="-read_trkg no" label="Tracking of short read positions in assembly" help="Generates Graph2 dataset" />
 
 wildcard selector contents:
     <data name="outfile" format="jpg" from_work_dir="out.*" label="${tool.name} on ${on_string}: Assembly Graph Image">
 
 bandage:
 'out.$output_format' what is the out doing? is this just positional? oh yeah its just creating the file format
+
+
+
+bool param which is actually 2 key-vals
+
+<param name="singlestrand" type="boolean" argument="--singlestrand"
+            label="Predict genes independently on each strand"
+            help="This allows overlapping genes on opposite strands."
+            truevalue="--singlestrand=true" falsevalue="--singlestrand=false" checked="false" />
+
 
 assign_primary_output:
 

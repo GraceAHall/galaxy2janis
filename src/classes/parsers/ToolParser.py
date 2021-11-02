@@ -4,10 +4,11 @@
 import xml.etree.ElementTree as et
 from classes.Logger import Logger
 from typing import Union
+import sys
 
 from classes.datastructures.Params import Param
 from classes.datastructures.Outputs import Output
-from classes.datastructures.Command import CommandString
+from classes.datastructures.CommandProcessor import CommandProcessor
 from classes.datastructures.Configfile import Configfile
 
 from classes.parsers.MacroParser import MacroParser
@@ -15,7 +16,7 @@ from classes.parsers.TokenParser import TokenParser
 from classes.parsers.ConfigfileParser import ConfigfileParser
 from classes.parsers.CommandParser import CommandParser
 from classes.parsers.ParamParser import ParamParser
-from classes.ParamPostProcessor import ParamPostProcessor
+from classes.DatatypeAnnotator import DatatypeAnnotator
 from classes.parsers.OutputParser import OutputParser
 from classes.parsers.MetadataParser import MetadataParser
 
@@ -69,8 +70,9 @@ class ToolParser:
         # the business
         #self.parse_configfiles()
         self.parse_command()
-        
-        #self.link_params_to_command()
+        self.annotate_datatypes()
+        sys.exit()
+        #self.postprocess()
 
 
     # 1st step: macro expansion (preprocessing)
@@ -114,7 +116,7 @@ class ToolParser:
         pp = ParamParser(self.tree, self.command_lines, self.logger)
         params = pp.parse()
 
-        pp.pretty_print()
+        #pp.pretty_print()
 
         self.params = params
 
@@ -124,7 +126,7 @@ class ToolParser:
         op = OutputParser(self.tree, self.params, self.command_lines, self.logger)
         self.outputs = op.parse()
 
-        op.pretty_print()
+        #op.pretty_print()
 
 
     # 6th step: configfile parsing
@@ -141,14 +143,14 @@ class ToolParser:
         lines, commands = cp.parse()
         
         # create Command() object
-        cmd = CommandString(lines, commands, self.params, self.outputs) # type: ignore
-        cmd.process()
-        self.command = cmd
+        cs = CommandProcessor(lines, commands, self.params, self.outputs, self.logger) # type: ignore
+        command = cs.process()
+        #command.pretty_print()
+        self.command = command
 
 
     # 8th step: input and output postprocessing
-    
-    def link_params_to_command(self):
+    def annotate_datatypes(self):
         """
         cleanup steps
         handles a lot of stuff
@@ -158,23 +160,13 @@ class ToolParser:
         sets datatypes
         """
 
-        # self.command?
-        ppp = ParamPostProcessor(self.params, self.logger)
-        ppp.remove_duplicate_params()
-        ppp.set_prefixes()
-
-        print('\n--- After cleaning ---\n')
-        ppp.pretty_print()
-
-        # update params to cleaned param list
-        self.params = ppp.params
+        da = DatatypeAnnotator(self.command)
+        da.annotate()
+        self.command.pretty_print()
+        print()
 
 
 
-
-
-    
-    
 
 
     # ============== debugging ============== #

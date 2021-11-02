@@ -4,29 +4,34 @@
 TODO v0.1
 
 
+add known extensions to galaxy parsed types. 
+doesnt' know .fasta = .fa = .fna
+
+
 NOTE check janis-patterns github for tricky situations
 
 Today:
-    - single token from each command word
-    - -o first${ext}
-    - select params which are multiple bool flags?
-    - situations where there is a param and output with same cheetah variable?
-    - resolve GX_PARAMS to actual params
-    - MULTIPLE EXPANDED FORMS (filtlong)
-    - INDICIES (bwa-mem)
+    - split select params which are multiple bool flags
+    - output to Janis format
+
 
 Tomorrow:
-    - configfiles
+    - parse tool xmls
+    - gather parsing stats (how many worked etc)
     - galaxy templating system
-    - local galaxy datatypes
+    - test parsing
+    - configfiles
 
 Wednesday:
     - testing
 
-
-
 Unresolved
+    - for loops
     - command string: multiline bash blocks
+    - builtin datasets
+    - MULTIPLE EXPANDED FORMS (filtlong)
+    - INDICIES (bwa-mem)
+    - -o first${ext}
 
 
 

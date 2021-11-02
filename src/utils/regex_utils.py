@@ -88,7 +88,7 @@ def get_quoted_strings(the_string: str) -> list[str]:
 
 
 def get_raw_strings(the_string: str) -> list[str]:
-    pattern = r'(?<=\s|^)([^\W]|-|.)[-\w\d.\/]*(?=\s|$)'
+    pattern = r'(?<=\s|^)([\/\\\w\d-.])[-\w\d\{\}\$.\/\\_:]*(?=\s|$)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 

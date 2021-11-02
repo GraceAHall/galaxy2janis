@@ -10,7 +10,8 @@ import numpy as np
 
 
 from classes.datastructures.Params import Param
-from classes.datastructures.Command import Command, CommandWord
+from classes.datastructures.Command import Command
+from classes.datastructures.CommandProcessor import CommandWord
 from classes.Logger import Logger
 
 from utils.regex_utils import find_unquoted, get_words
@@ -24,6 +25,8 @@ removing other elements like #set directives which will be used later.
 command string is also de-indented and generally cleaned (blank lines removed etc)
 
 returns list of CommandWords
+after this module, the list of CommandWord() gets parsed to CommandProcessor() which processes the words into an actual Command()
+
 """
 
 
@@ -249,8 +252,10 @@ class CommandParser:
         for i, line in enumerate(lines):
             # incremet loop depth levels
             if line.startswith('#for '):
+                self.logger.log(2, 'for loop encountered')
                 for_level += 1
             if line.startswith('#while '):
+                self.logger.log(2, 'for loop encountered')
                 while_level += 1
 
             # decrement loop depth levels

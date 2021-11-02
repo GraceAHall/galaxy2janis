@@ -1,9 +1,51 @@
 
 
 
+abricate shows off program well
+
+
+the galaxy params are more like suggestions than rules
+
+helps link something in the command string to known values etc 
+
+
+galaxy params should be parsed as-is
+at postprocessing stage should be remapped into final understanding of underlying tool
+
+
+
+non-flag bool params:
+    - two string
+        - at postprocessing stage treat as 2 value select with string type
+        - usually 'yes'/'no' or 'TRUE'/'FALSE' etc
+        - may be two modes / option values
+    - two flags
+        - may be individual flags 
+        - may be kv pairs
+        - may be same kv pair but with different values
+
+
+
+
+flag-list select params:
+
+
 
 Richard:
     - how do you want to handle select params encompassing multiple flags?
+
+
+Tools with unsupported features
+
+For loops
+    - genetrack
+    - annotateBed
+
+
+cutadapt generally super fucked
+
+Macro parsing not working as expected! Fastp
+
 
 
 
