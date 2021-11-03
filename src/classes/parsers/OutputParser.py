@@ -6,8 +6,8 @@ from xml.etree import ElementTree as et
 
 from classes.Logger import Logger
 from classes.datastructures.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
-from classes.datastructures.Params import Param, OutputParam
-from utils.etree_utils import get_attribute_value, create_output_param
+from classes.datastructures.Params import Param
+from utils.etree_utils import get_attribute_value
 
 
 class OutputParser:
@@ -115,10 +115,31 @@ class OutputParser:
         return TemplatedOutput(node)
 
 
+    def pretty_print(self) -> None:
+        print('\n--- Outputs ---\n')
+        print(f'{"name":<30}{"datatype":15}{"subclass":20}{"is_array":5}')
+        print('-' * 110)
+        for output in self.outputs:
+            print(output)
+
+
+    # def initialize_collection_output(self, node: et.Element) -> Output:
+    #     """
+    #     initializes a CollectionOutput. 
+    #     """
+    #     pass
+
+
+
+
+    """
+    CORNER OF SHAME
+
     def initialize_templated_output_old(self, node: et.Element) -> Output:
-        """
-        initializes a TemplatedOutput. TemplatedOutputs need to create an input param to reference.
-        """
+        
+        # initializes a TemplatedOutput. 
+        # TemplatedOutputs need to create an input param to reference.
+        
         # create dummy param for the output to refer to
         temp_out_node = create_output_param(node)
 
@@ -137,18 +158,4 @@ class OutputParser:
         new_param = OutputParam(node, [], self.command_lines)
         new_param.parse()
         return new_param
-
-
-    def pretty_print(self) -> None:
-        print('\n--- Outputs ---\n')
-        print(f'{"name":<30}{"datatype":15}{"subclass":20}{"is_array":5}')
-        print('-' * 110)
-        for output in self.outputs:
-            print(output)
-
-
-    # def initialize_collection_output(self, node: et.Element) -> Output:
-    #     """
-    #     initializes a CollectionOutput. 
-    #     """
-    #     pass
+    """

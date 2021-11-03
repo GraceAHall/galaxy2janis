@@ -13,9 +13,10 @@ from utils.etree_utils import get_attribute_value
 
 class Output:
     def __init__(self, node: et.Element) -> None:
+        # tree things
         self.node = node
 
-        # parsed info
+        # details to parse
         self.name: str = ''
         self.gx_var: str = ''
         self.galaxy_type: str = ''
@@ -25,16 +26,11 @@ class Output:
         self.is_hidden: bool = False
         self.selector: str = ''
         self.selector_contents: str = ''
-        
-        # janis related
-        self.janis_var: str = '' 
-        self.janis_type: str = ''
 
         self.extension_mappings = {
             'fasta': ['fa', 'fna', 'fasta'],
             'fastq': ['fq', 'fastq']
         }
-
 
         # i dont understand "metadata_source"
         # discover_datasets should be janis WildcardSelector with datatype = j.Array(j.File)

@@ -15,37 +15,27 @@ from utils.etree_utils import get_attribute_value
 
 
 class Param:
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        # tree things
         self.node = node
         self.tree_path = tree_path
 
-        # parsed info
+        # details to parse
         self.name: str = ''
         self.gx_var: str = ''
         self.galaxy_type: str = ''
-        self.default_value: str = ''
         self.help_text: str = ''
         self.marked_optional: bool = False
         self.is_array: bool = False
-
-        # postprocessing
-        self.is_optional: bool = False
-        self.datatype: str = ''
-
-        # janis
-        self.janis_var: str = ''
-        self.janis_type: str = ''
-      
-        # checks REWRITE
-        # self.has_command_ref: bool = False
-        # self.has_conditional_ref: bool = False
-        # self.needed_user_input: bool = False 
-
-        # linking to command string
-        self.prefix: Optional[str] = None
+        self.argument: Optional[str] = None
 
         # galaxy stuff
         self.truths = ['true', 'True']
+
+
+    # override method
+    def get_default(self) -> str:
+        pass
 
 
     def parse_common_features(self) -> None:
@@ -54,19 +44,14 @@ class Param:
         self.set_help_text()
         self.set_marked_optional() # TODO potentially override func
         self.set_is_array() # TODO potentially override func
-        self.set_defaults()
 
-        # deprecated:
-        #self.set_references()
-        #self.remove_conditional_occurances()
-        
 
     def set_name(self) -> None:
         # name & prefix if argument 
         argument = get_attribute_value(self.node, 'argument')
         name = get_attribute_value(self.node, 'name')
         if argument != '':
-            self.prefix = argument
+            self.argument = argument
             if name == '':
                 self.name = argument.lstrip('-').replace('-', '_') 
             else:
@@ -101,7 +86,6 @@ class Param:
     def set_marked_optional(self) -> None:
         if get_attribute_value(self.node, 'optional') in self.truths:
             self.marked_optional = True
-            self.is_optional = True
         
 
     def set_is_array(self) -> None:
@@ -112,12 +96,7 @@ class Param:
             self.is_array = True
         elif multiple in self.truths:
             if param_type == 'data':
-                self.is_array = True
-    
-
-    # the default class method. overridden in some subclasses
-    def set_defaults(self) -> None:
-        self.default_value = get_attribute_value(self.node, 'value')
+                self.is_array = True      
     
 
     def print_details(self):
@@ -125,7 +104,7 @@ class Param:
         out_str += '\nparam --------------\n'
 
         out_str += f'gx_var: {self.gx_var}\n'
-        out_str += f'prefix: {self.prefix}\n'
+        out_str += f'prefix: {self.argument}\n'
         out_str += f'datatype: {self.galaxy_type}\n'
         out_str += f'default_value: {self.default_value}\n'
         out_str += f'help_text: {self.help_text}\n'
@@ -135,187 +114,118 @@ class Param:
 
 
     def __str__(self):
-        temp_prefix = self.prefix or ''
+        temp_prefix = self.argument or ''
         datatype = self.galaxy_type
         if type(self).__name__ == "BoolParam":
             datatype += f'({self.subtype})'
         return f'{self.gx_var[-49:]:50}{datatype[-14:]:15}{temp_prefix[-19:]:20}{self.default_value:20}'
 
 
-"""
-def set_references(self) -> None:
-    self.cmd_references = vf.find() # type: ignore
-    self.set_cmd_ref_details()
 
 
-def set_cmd_ref_details(self) -> None:
-    for ref in self.cmd_references:
-        if ref.in_conditional:
-            self.has_conditional_ref = True
-        else:
-            self.has_command_ref = True
-    
 
-def remove_conditional_occurances(self) -> None:
-    non_conditional_refs: list[VariableReference] = []
-    for ref in self.cmd_references:
-        if not ref.in_conditional:
-            non_conditional_refs.append(ref)
-    self.cmd_references = non_conditional_refs
-
-    # occurs during postprocessing. called from ParamPostProcessor
-    # deprecated?
-    def user_select_prefix(self) -> str:
-        # print basics
-        print(f'\n--- prefix selection ---')
-        print(f'var: {self.gx_var}')
-
-        # print each candidate prefix
-        for i, ref in enumerate(self.cmd_references):
-            print(i, end=' ')
-            print(ref.command_line)
-        
-        selected_elem = int(input('Selected command line reference [int]: '))
-        prefix = self.cmd_references[selected_elem].prefix
-        return prefix
-"""
-
-
+###### CHILD CLASSES START ######
 
 
 class TextParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
         # type="color" is also TextParam
         self.galaxy_type: str = 'string' 
-
-
-    def parse(self) -> None:
+        self.value = get_attribute_value(node, 'value')
         self.parse_common_features()
-        self.set_defaults()
+
+
+    def get_default(self) -> str:
+        return self.value
 
 
 
 class IntParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
         self.galaxy_type: str = 'integer'
-
-
-    def parse(self) -> None:
+        self.value = get_attribute_value(node, 'value')
         self.parse_common_features()
-        self.set_defaults()
+
+    
+    def get_default(self) -> str:
+        return self.value
 
 
 
 class FloatParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
         self.galaxy_type: str = 'float'
-
-
-    def parse(self) -> None:
+        self.value = get_attribute_value(node, 'value')
         self.parse_common_features()
-        self.set_defaults()
+
+
+    def get_default(self) -> str:
+        return self.value
 
 
 
 class DataParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
-
-
-    def parse(self) -> None:
-        self.parse_common_features()
-        self.set_datatype()
-        self.set_defaults()
-
-
-    def set_datatype(self) -> None:
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
         self.galaxy_type = get_attribute_value(self.node, 'format')
-        #self.galaxy_type = consolidate_types(self.galaxy_type)
+        self.parse_common_features()
+
+
+    def get_default(self) -> None:
+        return None
+
 
 
 class BoolParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
         self.galaxy_type: str = 'boolean'
-        self.subtype: str = ''
-
-
-    def parse(self) -> None:
-        #self.validate_value_order()
+        self.truevalue: str = get_attribute_value(node, 'truevalue')
+        self.falsevalue: str = get_attribute_value(node, 'falsevalue')
         self.parse_common_features()
-        #self.set_bool_subtype()
-        #self.assert_structure()
-        #self.set_prefix()
 
 
-    def set_defaults(self) -> None:
-        self.default_value = get_attribute_value(self.node, 'truevalue')
-        if self.default_value == '':
-            self.default_value = get_attribute_value(self.node, 'value')
-    
-        
-    """
-    def validate_value_order(self) -> None:
-        tv = get_attribute_value(self.node, 'truevalue')
-        fv = get_attribute_value(self.node, 'falsevalue')
-        if tv == '' and fv != '':
-            self.node.attrib['truevalue'] = fv
-            self.node.attrib['falsevalue'] = tv
-
-
-    def set_bool_subtype(self) -> None:
-        tv = get_attribute_value(self.node, 'truevalue')
-        fv = get_attribute_value(self.node, 'falsevalue')
-        if tv == '' and fv == '':
-            self.subtype = 'true_bool'
-        elif tv != '' and fv == '':
-            self.subtype = 'flag_bool'
-
-
-    def assert_structure(self) -> None:
-        tv = get_attribute_value(self.node, 'truevalue')
-        fv = get_attribute_value(self.node, 'falsevalue')
-        if self.subtype == 'true_bool':
-            assert(tv == '' and fv == '')
-        elif self.subtype == 'flag_bool':
-            assert(tv != '' and fv == '')
-
-
-    def set_prefix(self):
-        self.prefix = get_attribute_value(self.node, 'truevalue')
-    """
+    def get_default(self) -> str:
+        if self.truevalue != '':
+            return self.truevalue
+        return self.falsevalue
 
 
 
 class SelectParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
-        self.options: list[str] = []
-        self.select_type: str = ''  # the flavour of select param
-    
-
-    def parse(self) -> None:
-        self.set_param_options()
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
+        self.options: list[str] = self.get_param_options()
+        self.galaxy_type: str = self.get_datatype()
         self.parse_common_features()
-        self.set_datatype()
         self.add_options_to_helptext()
 
 
-    def set_param_options(self) -> None:
+    def get_default(self) -> str:
+        return self.options[0]
+
+
+    def get_param_options(self) -> list[str]:
         option_values = []
 
         for child in self.node:
             if child.tag == 'option':
                 optval = get_attribute_value(child, 'value')
-                option_values.append(optval)  # type: ignore
 
-        self.options = option_values
+                # if 'selected=True' put at top of list
+                if get_attribute_value(child, 'selected') in self.truths:
+                    option_values = [optval] + option_values
+                else:
+                    option_values.append(optval)  # type: ignore
 
+        # option list is same order as in galaxy except 'selected' option is 1st
+        return option_values
+    
 
-    def set_datatype(self) -> None:
+    def get_datatype(self) -> str:
         """
         infers select param type. 
         Uses the different values in the option elems.
@@ -323,11 +233,11 @@ class SelectParam(Param):
         """
         param_type = "string"  # fallback
 
-        # are the option values all a particular type?
-        castable_type = cast_list(self.options)
-
         # do the option values all have a common extension? 
         common_extension = get_common_extension(self.options)
+        
+        # are the option values all a particular type?
+        castable_type = cast_list(self.options)
         
         # deciding what the type should be from our results
         if common_extension != '':
@@ -335,8 +245,7 @@ class SelectParam(Param):
         elif castable_type != '':
             param_type = castable_type
 
-        self.galaxy_type = param_type
-        #self.galaxy_type = consolidate_types(self.galaxy_type)
+        return param_type      
 
 
     def add_options_to_helptext(self) -> None:
@@ -349,69 +258,25 @@ class SelectParam(Param):
         self.help_text += f'  example values: {options}'
 
 
-    def set_defaults(self) -> None:
-        for child in self.node:
-            if child.tag == 'option':
-                if get_attribute_value(child, 'selected') in self.truths:
-                    self.default_value = get_attribute_value(child, 'value')
-                    break
-        
-        if self.default_value == '':
-            self.default_value = self.options[0]
-
 
 class DataCollectionParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
-        self.collection_type: str = ''
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
+        self.collection_type = get_attribute_value(self.node, 'collection_type')
+        self.galaxy_type = get_attribute_value(self.node, 'format')
+        self.parse_common_features()
         self.is_array: bool = True
 
 
-    def parse(self) -> None:
-        self.parse_common_features()
-        self.parse_collection_type()
-        self.set_defaults()
-        self.set_datatype()
+    def get_default(self) -> None:
+        return None
 
-
-    def parse_collection_type(self) -> None:
-        self.collection_type = get_attribute_value(self.node, 'collection_type')
-
-
-    def set_datatype(self) -> None:
-        self.galaxy_type = get_attribute_value(self.node, 'format')
-        #self.galaxy_type = consolidate_types(self.galaxy_type)
 
 
 class HiddenParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
+    def __init__(self, node: et.Element, tree_path: list[str]):
+        super().__init__(node, tree_path)
+        self.parse_common_features()
+        self.value = get_attribute_value(node, 'value')
 
     
-    def parse(self) -> None:
-        pass
-
-
-"""
-This class is only to create a dummy param for outputs which instantiate
-a cheetah variable for referencing. 
-This is not an Output().
-DEPRECATED
-"""
-class OutputParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str], cmd_lines: list[str]):
-        super().__init__(node, tree_path, cmd_lines)
-
-
-    def parse(self) -> None:
-        self.parse_common_features()
-
-
-    # override
-    def set_help_text(self) -> None:
-        label = get_attribute_value(self.node, 'label')
-        if "${on_string}" in label:
-            label = label.rsplit("${on_string}", 1)[1]
-            label = label.strip(':')
-            label = label.strip(' ')
-            self.help_text = label

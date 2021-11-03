@@ -6,7 +6,7 @@ from typing import Tuple, Optional
 
 from classes.datastructures.Command import Command, Token, TokenTypes
 from classes.datastructures.Alias import AliasRegister
-from classes.datastructures.Params import Param
+from classes.datastructures.Params import Param, SelectParam, BoolParam
 from classes.datastructures.Outputs import Output
 from classes.Logger import Logger
 
@@ -26,8 +26,7 @@ from utils.regex_utils import (
 
 
 class CommandWord:
-    def __init__(self, command_num: str, text: str):
-        self.command_num = command_num
+    def __init__(self, text: str):
         self.text = text
         self.in_loop = False
         self.in_conditional = False
@@ -46,8 +45,8 @@ class CommandProcessor:
         self.logger = logger
         self.lines = lines
         self.command_lines = command_lines
-        self.command_words = [item for word in command_lines for item in word]
-        self.command_words.append(CommandWord(-1, '__END_COMMAND__')) # sentinel for end of command
+        self.cmd_words = [item for word in command_lines for item in word]
+        self.cmd_words.append(CommandWord('__END_COMMAND__')) # sentinel for end of command
         self.aliases: AliasRegister = AliasRegister(self.params)
         self.env_vars: list[str] = []
 
@@ -72,8 +71,8 @@ class CommandProcessor:
         self.extract_env_vars()
         self.set_aliases()
         self.expand_aliases()
-        #self.print_command_lines()
-        #self.print_command_words()
+        self.tokenify_command()
+        self.expand_galaxy_tokens()
         command = self.gen_command()
         return command
 
@@ -82,7 +81,7 @@ class CommandProcessor:
         print()
         for line in self.command_lines:
             for cmd_word in line:
-                temp_str = f'[{cmd_word.command_num}]'
+                temp_str = ''
                 if cmd_word.in_conditional:
                     temp_str += '[C]'
                 if cmd_word.in_loop:
@@ -94,9 +93,9 @@ class CommandProcessor:
 
     def print_command_words(self) -> None:
         print()
-        print(f'{"word":60s}{"pos":>6}{"cond":>6}{"loop":>6}')
-        for word in self.command_words:
-            print(f'{word.text:60s}{word.command_num:6d}{word.in_conditional:6}{word.in_loop:6}')
+        print(f'{"word":60s}{"cond":>6}{"loop":>6}')
+        for word in self.cmd_words:
+            print(f'{word.text:60s}{word.in_conditional:6}{word.in_loop:6}')
         
 
     def set_aliases(self) -> None:
@@ -308,7 +307,7 @@ class CommandProcessor:
 
 
     def expand_aliases(self) -> None:
-        for cmd_word in self.command_words:
+        for cmd_word in self.cmd_words:
             cmd_forms = self.aliases.template(cmd_word.text)
             cmd_word.expanded_text = cmd_forms
 
@@ -340,9 +339,104 @@ class CommandProcessor:
         self.env_vars = env_vars
 
 
+    def tokenify_command(self) -> None:
+        cmd_tokens: list[Token] = []
+
+        for word in self.cmd_words:
+            token = self.get_best_token(word)
+            cmd_tokens.append(token)
+
+        self.cmd_tokens = cmd_tokens
+
+
+    def expand_galaxy_tokens(self) -> None:
+        """
+        expands each individual token into a list of tokens
+        most commonly will just be list with single item (the original token)
+        sometimes will be multiple tokens
+
+        reason is that some galaxy select or bool params hide flags or options as their possible values
+
+        """
+        out_tokens: list[Token] = []
+
+        for token in self.cmd_tokens:
+            expanded_tokens = []
+
+            # attempt to expand if select or bool params
+            if token.type == TokenTypes.GX_PARAM:
+                param = token.value
+                if type(param) == SelectParam:
+                    expanded_tokens = self.expand_select_tokens(param, token.in_conditional)
+                    print()
+                elif type(param) == BoolParam:
+                    expanded_tokens = self.expand_bool_tokens(param, token.in_conditional)
+                    print()
+            
+            if len(expanded_tokens) > 0:
+                out_tokens.append(expanded_tokens)
+            else:
+                out_tokens.append([token])
+                        
+        self.cmd_tokens = out_tokens
+
+
+    def expand_select_tokens(self, param: SelectParam, in_conditional: bool) -> list[Token]:
+        """
+        NOTE does this work with key=$val where $val is gx param? 
+        """
+        expanded_tokens = []
+        if self.should_expand_select(param):
+            # expand into all possible tokens
+            
+            for opt in param.options:
+                # EDGE CASE: <option value="-strand +"> into a kv_pair 
+                str_list = opt.split(' ')
+                if len(str_list) == 2 and str_list[0].startswith('-'):
+                    new_token = Token(opt, TokenTypes.KV_PAIR)
+                
+                # normal scenarios. create temp cmd word and parse to token
+                else:
+                    temp_cmd_word = CommandWord(opt)
+                    temp_cmd_word.in_conditional = in_conditional 
+                    temp_cmd_word.expanded_text = [opt]
+                    new_token = self.get_best_token(temp_cmd_word)
+                
+                expanded_tokens.append(new_token)
+
+        return expanded_tokens
+
+
+    def expand_bool_tokens(self, param: BoolParam, in_conditional: bool) -> list[Token]:
+        expanded_tokens = []
+        if self.should_expand_bool(param):
+            # expand into all possible tokens
+            pass
+        return expanded_tokens
+
+
+    def should_expand_select(self, param: SelectParam) -> bool:
+        """
+        check that each option is "" or starts with "-"
+        """
+        for opt in param.options:
+            if not opt == "" and not opt.startswith('-'):
+                return False
+        return True
+
+
+    def should_expand_bool(self, param: SelectParam) -> bool:
+        """
+        TODO HERE
+        we expect a proper flag bool to have either 
+        truevalue or falsevalue starting with '-' and the other == "" (None)
+        should expand if both have value of any form
+        """
+        pass
+
+
     def gen_command(self) -> None:
         """
-        Too big! 
         lots of logic here
             - the command string words are handled one at a time
             - for each command word, lookahead to next word for some context
@@ -356,41 +450,18 @@ class CommandProcessor:
         i = 0
 
         # iterate through command words (with next word for context)
-        while i < len(self.command_words) - 1:
-            curr_word = self.command_words[i]
-            next_word = self.command_words[i+1]
-
-            # TODO situations with more than 1!
-            if len(curr_word.expanded_text) > 1:
-                self.logger.log(2, 'multiple expanded forms of cmd word')
-                sys.exit()
-
-            # get best token representation of curr_word
-            curr_tokens = self.get_tokens(curr_word.expanded_text[0])
-            if len(curr_tokens) == 0:
-                self.logger.log(2, 'could not resolve token')
-                sys.exit()
-            curr_token = self.select_highest_priority_token(curr_tokens)
-            
-            # get best token representation of next_word
-            next_tokens = self.get_tokens(next_word.expanded_text[0])
-            if len(next_tokens) == 0:
-                self.logger.log(2, 'could not resolve token')
-                sys.exit()
-            next_token = self.select_highest_priority_token(next_tokens)
-            
-            # transfer in_conditional status to token
-            curr_token.in_conditional = curr_word.in_conditional
-            next_token.in_conditional = next_word.in_conditional
+        while i < len(self.cmd_words) - 1:
+            curr_word = self.cmd_words[i]
+            next_word = self.cmd_words[i+1]
+            curr_token = self.get_best_token(curr_word)
+            next_token = self.get_best_token(next_word)
 
             # if kv pair, break and reassign curr/next tokens
-            kv_pair = False
+            is_kv_pair = False
+            delim = ' '
             if self.is_kv_pair(curr_token): 
-                kv_pair = True
-                key, val = self.split_keyval_cmd(curr_token.value)
-                curr_token = self.get_tokens(key)[0]
-                next_token = self.get_tokens(val)[0]
-                next_token.in_conditional = curr_word.in_conditional
+                is_kv_pair = True
+                curr_token, next_token, delim = self.split_keyval_to_best_tokens(curr_word)
 
             if self.is_linux_op(curr_token, next_token):
                 command.update_positionals(positional_count, curr_token, is_after_options)                
@@ -402,8 +473,8 @@ class CommandProcessor:
 
             elif self.is_option(curr_token, next_token):
                 is_after_options = True
-                command.update_options(curr_token, next_token)
-                if not kv_pair:
+                command.update_options(curr_token, next_token, delim)
+                if not is_kv_pair:
                     i += 1
 
             else:
@@ -417,7 +488,86 @@ class CommandProcessor:
         return command
 
 
-    def get_tokens(self, text: str) -> list[Token]:
+
+    def split_keyval_to_best_tokens(self, curr_word: CommandWord) -> Tuple[Token, Token, str]:
+        """
+        keyval options need to be split into two tokens
+        """
+        curr_word, next_word, delim = self.split_keyval_cmd(curr_word)
+
+        curr_token = self.get_best_token(curr_word)
+        next_token = self.get_best_token(next_word)
+
+        return curr_token, next_token, delim
+
+
+    def split_keyval_cmd(self, kv_cmd: str) -> list[str]:
+        """
+        handles the following patterns:
+        --minid=$adv.min_dna_id
+        --protein='off'
+        ne=$ne
+        etc
+        """
+        text = kv_cmd.expanded_text[0]
+        possible_delims = ['=', ':', ' ']
+
+        delim, delim_start, delim_end = self.get_first_unquoted(text, possible_delims)
+        left_text, right_text = text[:delim_start], text[delim_end:]
+
+        curr_word = CommandWord(left_text)
+        curr_word.in_loop = kv_cmd.in_loop
+        curr_word.in_conditional = kv_cmd.in_conditional
+        curr_word.expanded_text = [left_text]
+        
+        next_word = CommandWord(right_text)
+        next_word.in_loop = kv_cmd.in_loop
+        next_word.in_conditional = kv_cmd.in_conditional
+        next_word.expanded_text = [right_text]
+
+        return curr_word, next_word, delim
+
+
+    def get_first_unquoted(self, the_string: str, the_list: list[str]) -> Tuple[str, int]:
+        """
+        returns the first item in the_list found unquoted in the_string
+        """
+        hits = []
+
+        # get locations of each item in the_list in the_string
+        for item in the_list:
+            item_start, item_end = find_unquoted(the_string, item)
+            if item_start != -1:
+                hits.append((item, item_start, item_end))
+
+        # sort by pos ascending and return
+        hits.sort(key=lambda x: x[1])
+        return hits[0]
+
+
+    def get_best_token(self, word: CommandWord) -> Token:
+        # TODO situations with more than 1!
+        if len(word.expanded_text) > 1:
+            print('multiple expanded forms of cmd word')
+            self.logger.log(2, 'multiple expanded forms of cmd word')
+            sys.exit()
+
+        # get best token representation of curr_word
+        tokens = self.get_all_tokens(word.expanded_text[0])
+        if len(tokens) == 0:
+            print('could not resolve token')
+            self.logger.log(2, 'could not resolve token')
+            sys.exit()
+
+        best_token = self.select_highest_priority_token(tokens)
+        
+        # transfer in_conditional status to token
+        best_token.in_conditional = word.in_conditional
+
+        return best_token
+
+
+    def get_all_tokens(self, text: str) -> list[Token]:
         """
         detects the type of object being dealt with.
         first task is to resolve any aliases or env_variables. 
@@ -486,7 +636,12 @@ class CommandProcessor:
         linux_ops = [t for t in tokens if t.type == TokenTypes.LINUX_OP]
 
         if len(kv_pairs) > 0:
-            return kv_pairs[0]
+            # just check if there is a gx_kw of same length 
+            # gx_kws show up as kv_pairs too because of the ':'
+            if len(gx_kws) > 0:
+                return self.resolve_kvpair_and_gxkw_priority(kv_pairs + gx_kws)
+            else:
+                return kv_pairs[0]
         elif len(gx_params) > 0:
             return gx_params[0]
         elif len(gx_outs) > 0:
@@ -497,6 +652,28 @@ class CommandProcessor:
             return linux_ops[0]
                 
         return tokens[0]
+
+
+    def resolve_kvpair_and_gxkw_priority(self, token_list: list[Token]) -> Token:
+        longest_tokens = self.get_longest_token(token_list)
+        
+        # prioritise GX_KEYWORDs if they're in longest_tokens
+        for token in longest_tokens:
+            if token.type == TokenTypes.GX_KEYWORD:
+                return token
+
+        # otherwise just return first (will be KV_PAIR)
+        return longest_tokens[0]
+
+
+    def get_longest_token(self, token_list: list[Token]) -> list[Token]:
+        """
+        gets longest token in list
+        returns multiple tokens if both have max len
+        """   
+        longest_text_len = max([len(t.value) for t in token_list])
+        longest_tokens = [t for t in token_list if len(t.value) == longest_text_len]
+        return longest_tokens
 
 
     def is_linux_op(self, curr_token: Token, next_token: Token) -> bool:
@@ -549,15 +726,18 @@ class CommandProcessor:
     def get_gx_flag_status(self, token: Token) -> bool:
         if token.type == TokenTypes.GX_PARAM:
             param = token.value
-            # check if numbers first
-            if len(get_quoted_numbers(param.default_value)) > 0:
-                return False
-            elif len(get_raw_numbers(param.default_value)) > 0:
-                return False
+            default_val = param.get_default()
+            
+            if default_val is not None:
+                # check if numbers first
+                if len(get_quoted_numbers(default_val)) > 0:
+                    return False
+                elif len(get_raw_numbers(default_val)) > 0:
+                    return False
 
-            # then interpret as string
-            elif param.default_value.startswith('-'):
-                return True
+                # then interpret as string
+                elif default_val.startswith('-'):
+                    return True
         
         return False
 
@@ -577,18 +757,6 @@ class CommandProcessor:
         return False
 
 
-    def split_keyval_cmd(self, cmd_word: str) -> list[str]:
-        """
-        handles normal words and the following patterns:
-        --minid=$adv.min_dna_id
-        --protein='off'
-        ne=$ne
-        """
-        if '=' in cmd_word:
-            operator_start, operator_end = find_unquoted(cmd_word, '=')
-            flag, arg = cmd_word[:operator_start], cmd_word[operator_end:]
-            return [flag, arg]
-        else:
-            return [cmd_word]
+
 
 

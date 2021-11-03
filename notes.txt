@@ -1,28 +1,131 @@
 
 
-
-abricate shows off program well
-
-
-the galaxy params are more like suggestions than rules
-
-helps link something in the command string to known values etc 
+Params
+    the galaxy params are more like suggestions than rules
+    galaxy params should be parsed as-is
+    at postprocessing stage should be remapped into final understanding of underlying tool
 
 
-galaxy params should be parsed as-is
-at postprocessing stage should be remapped into final understanding of underlying tool
+AT postprocess stage
+    bool params:
+        - truevalue and falsevalue are 
+
+
+from non-galaxy command string
+--augustus=true
+
+have a registry
+know that
+    --augustus=true is key-val pair
+    --augustus= can be set from $use_augustus boolean gx param
+    can simply look at $use_augustus and confirm that either truevalue or falsevalue == '--augustus=true'
+    can then set that attribute when translating external -> galaxy 
+
+
+SELECT PARAMS
+
+list of flags (one may be blank)
+
+    (bedtools bamtobed)
+    <option value="">Create a 6-column BED file</option>
+    <option value="-bed12">Create a full, 12-column "blocked" BED  file</option>
+    <option value="-bedpe">Create a paired-end, BEDPE format</option>
+
+list of options
+
+    (bedtools genomecoveragebed)
+    <option value="">both strands combined</option>
+    <option value="-strand +">positive strand only</option>
+    <option value="-strand -">negative strand only</option>
+
+list of kv pairs
+
+    (lastz)
+    <option value="--strand=both" selected="True">Both</option>
+    <option value="--strand=plus">Plus</option>
+    <option value="--strand=minus">Minus</option>
+
+a blend
+
+    (lastz)
+    <option value="--transition" selected="true">One</option>
+    <option value="--transition=2">Two</option>
+    <option value="--notransition">None</option>
+
+
+if the param is select
+    check that each option is "" or starts with "-"
+    if true:
+        inject all the options directly into the list of command words
 
 
 
-non-flag bool params:
-    - two string
-        - at postprocessing stage treat as 2 value select with string type
-        - usually 'yes'/'no' or 'TRUE'/'FALSE' etc
-        - may be two modes / option values
-    - two flags
-        - may be individual flags 
-        - may be kv pairs
-        - may be same kv pair but with different values
+
+BOOLEAN PARAMS
+
+SINGLE VALUE
+
+single value but its assigned to falsevalue
+
+    (mothur pairwise.seqs)
+    truevalue="" falsevalue="countends=false," 
+
+single value and its spaced kv pair
+
+    (circos macros)
+    truevalue="flow = continue"
+    falsevalue=""
+
+
+TWO DIFFERENT VALUES
+
+    (allegro)
+    truevalue="on"
+    falsevalue="off"
+
+    (bcftools_query)
+    truevalue="True"
+    falsevalue="False"
+
+    (art/macros)
+    truevalue="centimorgan"
+    falsevalue="recombination"
+
+    (augustus)
+    truevalue="1"
+    falsevalue="0" 
+
+involving flags
+
+    (kofamscan)
+    truevalue="--report-unannotated"
+    falsevalue="--no-report-unannotated" 
+
+kv_pairs yes/no
+
+    (minimap2)
+    truevalue="--splice-flank=yes" 
+    falsevalue="--splice-flank=no" 
+
+single option, two values
+
+    (velvetg)
+    truevalue="-read_trkg yes" 
+    falsevalue="-read_trkg no"
+
+
+
+
+skip conditions
+at least 1 of [truevalue, falsevalue] == ""
+
+else
+expand every option (select param), truevalue/falsevalue and try to interpret as 
+
+
+
+
+
 
 
 

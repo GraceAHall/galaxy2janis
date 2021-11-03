@@ -15,14 +15,6 @@ from classes.datastructures.Params import (
     DataCollectionParam, 
     HiddenParam
 ) 
-from utils.galaxy_utils import is_flag_list, is_string_list
-from utils.etree_utils import ( 
-    get_attribute_value, 
-    get_select_options,
-    create_bool_elem, 
-    convert_bool_to_select_elem, 
-    convert_select_to_bool_elems, 
-)
 
 
 class ParamParser:
@@ -107,71 +99,68 @@ class ParamParser:
 
     def parse_elem(self, node: et.Element, tree_path: list[str]) -> None:
         if node.tag == 'param':
-            new_params = self.parse_param_elem(node, tree_path)
-            self.param_list += new_params
+            new_param = self.parse_param_elem(node, tree_path)
+            self.param_list.append(new_param)
 
         #elif node.tag == 'repeat':  TODO!
         #    self.parse_repeat_elem(node, tree_path)
-
+ 
 
     def parse_param_elem(self, node: et.Element, tree_path: list[str]) -> Param:
         """
-        parses a param elem. 
-        
-        accepts a tree node, returns one or more fully parsed Params (select and boolean params may be split into multiple Params depending on contents). 
-
-         - the number of params needed and their types are determined
-         - Param subclass objects are initialized
-         - control is passed to the Param which dictates its own methods of parsing the elem and looking up information in the command string
-        """
-
-        params = self.initialize_params(node, tree_path)
-        for param in params:
-            param.parse()
-
-        return params
- 
-
-    def initialize_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
-        """
-        switch function to initialize params depending on type
+        switch function to initialize and parse params depending on type
+        params auto automatically parsed in the __init__ method
         """
         # get param type
         param_type = node.attrib['type']
 
         # params we can initalize immediately
         if param_type in ['text', 'color']:
-            return [TextParam(node, tree_path, self.command_lines)]
+            return TextParam(node, tree_path)
 
         elif param_type == 'integer':
-            return [IntParam(node, tree_path, self.command_lines)]
+            return IntParam(node, tree_path)
         
         elif param_type == 'float':
-            return [FloatParam(node, tree_path, self.command_lines)]
+            return FloatParam(node, tree_path)
 
         elif param_type == 'data':
-            return [DataParam(node, tree_path, self.command_lines)]
+            return DataParam(node, tree_path)
 
         elif param_type == 'data_collection':
-            return [DataCollectionParam(node, tree_path, self.command_lines)]
+            return DataCollectionParam(node, tree_path)
 
         elif param_type == 'data_column':
-            return [TextParam(node, tree_path, self.command_lines)]
+            return TextParam(node, tree_path)
 
         elif param_type == 'hidden':
-            self.logger.log(2, 'unsupported param type: hidden')
-            return []
-            return [HiddenParam(node, tree_path, self.command_lines)]
+            return HiddenParam(node, tree_path)
 
         # params which need more processing and potential splitting
         elif param_type == 'boolean':
-            new_params = self.initialize_bool_params(node, tree_path)
-            return new_params
+            return BoolParam(node, tree_path)
 
         elif param_type == 'select':
-            new_params = self.initialize_select_params(node, tree_path)
-            return new_params
-    
+            return SelectParam(node, tree_path)
+
+
+    def parse_repeat_elem(self, node, tree_path):
+        pass
+
+
+    def pretty_print(self) -> None:
+        print('\n--- Params ---\n')
+        print(f'{"name":50}{"datatype":15}{"prefix":20}{"default_value":20}')
+        print('-' * 105)
+        for param in self.param_list:
+            print(param)
+
+
+
+
+
+    """
+    CORNER OF DEPRECATED SHAME
 
     def initialize_bool_params(self, node: et.Element, tree_path: list[str]) -> list[Param]:
         out_params = []
@@ -225,16 +214,4 @@ class ParamParser:
         return out_params
 
 
-    def parse_repeat_elem(self, node, tree_path):
-        pass
-
-
-    def pretty_print(self) -> None:
-        print('\n--- Params ---\n')
-        print(f'{"name":50}{"datatype":15}{"prefix":20}{"default_value":20}')
-        print('-' * 105)
-        for param in self.param_list:
-            print(param)
-
-
-        
+    """

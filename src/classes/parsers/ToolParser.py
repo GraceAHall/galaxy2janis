@@ -145,7 +145,7 @@ class ToolParser:
         # create Command() object
         cs = CommandProcessor(lines, commands, self.params, self.outputs, self.logger) # type: ignore
         command = cs.process()
-        #command.pretty_print()
+        command.pretty_print()
         self.command = command
 
 

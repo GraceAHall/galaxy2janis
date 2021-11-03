@@ -86,6 +86,16 @@
             ]
         },
         {
+            "name": "spades",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "spades.xml", "tools/spades"
+            ]
+        },
+        {
             "name": "augustus",
             "type": "python",
             "request": "launch",

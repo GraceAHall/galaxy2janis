@@ -3,14 +3,9 @@
 # pyright: basic
 
 
-from typing import Union, Tuple
-import re
+from typing import Union
 import xml.etree.ElementTree as et
-import numpy as np
 
-
-from classes.datastructures.Params import Param
-from classes.datastructures.Command import Command
 from classes.datastructures.CommandProcessor import CommandWord
 from classes.Logger import Logger
 
@@ -194,7 +189,6 @@ class CommandParser:
         the CommandWords will be annotated later with the constructs they appear in 
         """
         command_words = {}
-        counter = 0
 
         for i, line in enumerate(lines):
             if not any([line.startswith(kw) for kw in self.keywords]):
@@ -202,9 +196,8 @@ class CommandParser:
                 words = get_words(line)
 
                 for word in words:
-                    new_cmd_word = CommandWord(counter, word)
+                    new_cmd_word = CommandWord(word)
                     command_words[i].append(new_cmd_word)
-                    counter += 1
 
         return command_words
 

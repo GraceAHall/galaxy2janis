@@ -24,7 +24,6 @@ class TokenTypes(Enum):
     END_COMMAND     = 9
 
 
-
 class Token:
     def __init__(self, value: Union[str, Param, Output], token_type: str):
         self.value = value
@@ -36,7 +35,7 @@ class Token:
         """
         """
         if self.type == TokenTypes.GX_PARAM:
-            res_value = self.value.default_value
+            res_value = self.value.get_default() or ''
             cmd_value = '$' + self.value.gx_var
         elif self.type == TokenTypes.GX_OUT:
             res_value = ''
@@ -48,7 +47,8 @@ class Token:
         representation = {
             'res_value': res_value,
             'cmd_value': cmd_value,
-            'type': self.type.name
+            'type': self.type.name,
+            'in_cond': self.in_conditional 
         }
 
         return representation
@@ -113,12 +113,12 @@ class Flag:
         the_str = ''
 
         props = self.sources[0].get_repr()
-        the_str += f'{self.prefix[:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):>20}'
+        the_str += f'{self.prefix[:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):20}{props["in_cond"]:>5}'
 
         if len(self.sources) > 1:
             for source in self.sources[1:]:
                 props = source.get_repr()
-                the_str += f'\n{"":30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):>20}'
+                the_str += f'\n{"":30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):20}{props["in_cond"]:>5}'
 
         return the_str
 
@@ -132,8 +132,9 @@ sources has a little bit different meaning to as seen in Flags.
 
 """
 class Option:
-    def __init__(self, prefix: str):
+    def __init__(self, prefix: str, delim: str):
         self.prefix: str = prefix
+        self.delim: str = delim
         self.sources: list[Token] = []
         self.is_optional: bool = False
         self.datatypes: list[str] = []
@@ -154,12 +155,12 @@ class Option:
         the_str = ''
 
         props = self.sources[0].get_repr()
-        the_str += f'{self.prefix[:29]:30}{props["res_value"][:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):>20}'
+        the_str += f'{self.prefix[:29]:30}{props["res_value"][:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):20}{props["in_cond"]:>5}'
 
         if len(self.sources) > 1:
             for source in self.sources[1:]:
                 props = source.get_repr()
-                the_str += f'\n{"":30}{props["res_value"][:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):>20}'
+                the_str += f'\n{"":30}{props["res_value"][:29]:30}{props["cmd_value"][:29]:30}{props["type"]:20}{",".join(self.datatypes):20}{props["in_cond"]:>5}'
 
         return the_str
 
@@ -188,29 +189,32 @@ class Command:
         self.flags[key].sources.append(token)       
 
 
-    def update_options(self, flag_token: Token, arg_token: Token) -> None:
+    def update_options(self, flag_token: Token, arg_token: Token, delim: str) -> None:
         props = flag_token.get_repr()
         key = props['res_value']
 
         if key not in self.options:
-            new_option = Option(key)
+            new_option = Option(key, delim)
             self.options[key] = new_option
         self.options[key].sources.append(arg_token)
 
 
+    
+
+
     def pretty_print(self) -> None:
         print('\npositionals ---------\n')
-        #print(f'{"pos":<10}{"text":20}{"token type":20}')
+        print(f'{"pos":<10}{"resolved value":20}{"command value":20}{"token":20}{"datatype":20}{"after opts":>5}')
         for p in self.positionals.values():
             print(p)
 
         print('\nflags ---------------\n')
-        #print(f'{"prefix":30}{"token type":>20}')
+        print(f'{"prefix":30}{"command value":30}{"token":20}{"datatype":20}{"cond":>5}')
         for f in self.flags.values():
             print(f)
 
         print('\noptions -------------\n')
-        #print(f'{"prefix":30}{"token text":30}{"token gx_var":30}{"token type":>10}')
+        print(f'{"prefix":30}{"resolved value":30}{"command value":30}{"token":20}{"datatype":20}{"cond":>5}')
         for opt in self.options.values():
             print(opt)
 

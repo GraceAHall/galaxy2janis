@@ -1,5 +1,6 @@
 
 
+NOTE check janis-patterns github for tricky situations
 
 TODO v0.1
 
@@ -8,21 +9,17 @@ add known extensions to galaxy parsed types.
 doesnt' know .fasta = .fa = .fna
 
 
-NOTE check janis-patterns github for tricky situations
-
 Today:
-    - split select params which are multiple bool flags
+    - command component postprocessing
+        - occurs before datatype annotation
     - output to Janis format
-
-
-Tomorrow:
     - parse tool xmls
     - gather parsing stats (how many worked etc)
-    - galaxy templating system
-    - test parsing
-    - configfiles
 
-Wednesday:
+Tomorrow:
+    - galaxy templating system
+    - configfiles
+    - test parsing
     - testing
 
 Unresolved
@@ -32,6 +29,17 @@ Unresolved
     - MULTIPLE EXPANDED FORMS (filtlong)
     - INDICIES (bwa-mem)
     - -o first${ext}
+
+
+from non-galaxy command string
+--augustus=true
+
+have a registry
+know that
+    --augustus=true is key-val pair
+    --augustus= can be set from $use_augustus boolean gx param
+    can simply look at $use_augustus and confirm that either truevalue or falsevalue == '--augustus=true'
+    can then set that attribute when translating external -> galaxy 
 
 
 
