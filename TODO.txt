@@ -22,13 +22,7 @@ Tomorrow:
     - test parsing
     - testing
 
-Unresolved
-    - for loops
-    - command string: multiline bash blocks
-    - builtin datasets
-    - MULTIPLE EXPANDED FORMS (filtlong)
-    - INDICIES (bwa-mem)
-    - -o first${ext}
+
 
 
 from non-galaxy command string

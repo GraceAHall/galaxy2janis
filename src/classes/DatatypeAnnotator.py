@@ -7,7 +7,7 @@ import json
 from typing import Union, Optional
 
 
-from classes.datastructures.Command import Positional, Flag, Option, Command, TokenTypes, Token
+from classes.datastructures.Command import Positional, Flag, Option, Command, TokenType, Token
 
 
 class DatatypeAnnotator:
@@ -93,11 +93,11 @@ class DatatypeAnnotator:
         TODO note here pls
         """
         # galaxy variables
-        if the_token.type in [TokenTypes.GX_PARAM, TokenTypes.GX_OUT]:
+        if the_token.type in [TokenType.GX_PARAM, TokenType.GX_OUT]:
             return self.infer_types_from_gx(the_token)
 
         # strings
-        elif the_token.type in [TokenTypes.RAW_STRING, TokenTypes.QUOTED_STRING]:
+        elif the_token.type in [TokenType.RAW_STRING, TokenType.QUOTED_STRING]:
             # return string or file type inferred from .extension
             ext_types = self.infer_types_from_ext(the_token)
             if len(ext_types) > 0:
@@ -105,16 +105,16 @@ class DatatypeAnnotator:
             return ['String']
         
         # numeric
-        elif the_token.type == [TokenTypes.RAW_NUM, TokenTypes.QUOTED_NUM]:
+        elif the_token.type == [TokenType.RAW_NUM, TokenType.QUOTED_NUM]:
             # return int or float
             return self.infer_types_from_numeric(the_token)
         
         # linux
-        elif the_token.type == TokenTypes.LINUX_OP:
+        elif the_token.type == TokenType.LINUX_OP:
             return ['LinuxOp']
         
         # linux
-        elif the_token.type == TokenTypes.GX_KEYWORD:
+        elif the_token.type == TokenType.GX_KEYWORD:
             return ['GalaxyKW']
 
 
@@ -123,11 +123,11 @@ class DatatypeAnnotator:
         # gx params and outputs already have type annotation
         # extracted from the xml
 
-        if the_token.type == TokenTypes.GX_PARAM:
+        if the_token.type == TokenType.GX_PARAM:
             gx_var = the_token.value  
             gx_types = gx_var.galaxy_type.split(',')
 
-        elif the_token.type == TokenTypes.GX_OUT:
+        elif the_token.type == TokenType.GX_OUT:
             gx_out = the_token.value
             gx_types = the_token.value.galaxy_type.split(',')
 
@@ -217,11 +217,11 @@ class DatatypeAnnotator:
         from_galaxy = []
 
         for token_type, datatypes in source_datatypes:
-            if token_type in [TokenTypes.GX_PARAM, TokenTypes.GX_OUT] and len(datatypes) > 0:
+            if token_type in [TokenType.GX_PARAM, TokenType.GX_OUT] and len(datatypes) > 0:
                 from_galaxy.append(datatypes)
         
-        from_numeric = [dt for tt, dt in source_datatypes if tt in [TokenTypes.RAW_NUM, TokenTypes.QUOTED_NUM]]    
-        from_string = [dt for tt, dt in source_datatypes if tt in [TokenTypes.RAW_STRING, TokenTypes.QUOTED_STRING]]    
+        from_numeric = [dt for tt, dt in source_datatypes if tt in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]]    
+        from_string = [dt for tt, dt in source_datatypes if tt in [TokenType.RAW_STRING, TokenType.QUOTED_STRING]]    
 
         # galaxy is best 
         if len(from_galaxy) > 0:

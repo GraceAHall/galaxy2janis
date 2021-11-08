@@ -11,7 +11,7 @@ from classes.datastructures.Outputs import Output
 
 
 
-class TokenTypes(Enum):
+class TokenType(Enum):
     GX_PARAM        = 0
     GX_OUT          = 1
     QUOTED_STRING   = 2
@@ -24,9 +24,14 @@ class TokenTypes(Enum):
     END_COMMAND     = 9
 
 
+# TODO HERE IM HERE
+# restructure so that gx params get split when tokenizing the command words
+# no reason to do it later, and allows the new Token datastructure (below)
+
 class Token:
-    def __init__(self, value: Union[str, Param, Output], token_type: str):
-        self.value = value
+    def __init__(self, cmd_value: str, token_type: TokenType):
+        self.cmd_value = cmd_value
+        self.realised_value = cmd_value
         self.type = token_type
         self.in_conditional = False
 
@@ -34,10 +39,10 @@ class Token:
     def get_repr(self) -> dict[str, str]:
         """
         """
-        if self.type == TokenTypes.GX_PARAM:
+        if self.type == TokenType.GX_PARAM:
             res_value = self.value.get_default() or ''
             cmd_value = '$' + self.value.gx_var
-        elif self.type == TokenTypes.GX_OUT:
+        elif self.type == TokenType.GX_OUT:
             res_value = ''
             cmd_value = '$' + self.value.gx_var
         else:

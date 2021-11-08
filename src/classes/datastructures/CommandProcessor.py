@@ -4,7 +4,7 @@ import sys
 from typing import Tuple, Optional
 
 
-from classes.datastructures.Command import Command, Token, TokenTypes
+from classes.datastructures.Command import Command, Token, TokenType
 from classes.datastructures.Alias import AliasRegister
 from classes.datastructures.Params import Param, SelectParam, BoolParam
 from classes.datastructures.Outputs import Output
@@ -72,7 +72,7 @@ class CommandProcessor:
         self.set_aliases()
         self.expand_aliases()
         self.tokenify_command()
-        self.expand_galaxy_tokens()
+        
         command = self.gen_command()
         return command
 
@@ -343,13 +343,21 @@ class CommandProcessor:
         cmd_tokens: list[Token] = []
 
         for word in self.cmd_words:
+            # get initial token
             token = self.get_best_token(word)
-            cmd_tokens.append(token)
+
+            # possibly split token if GX_PARAM is hiding flags or options
+            if token.type == TokenType.GX_PARAM:
+                tokens = self.expand_galaxy_tokens(token)
+            else:
+                tokens = [token]
+
+            cmd_tokens.append(tokens)
 
         self.cmd_tokens = cmd_tokens
 
 
-    def expand_galaxy_tokens(self) -> None:
+    def expand_galaxy_tokens(self, token: Token) -> list[Token]:
         """
         expands each individual token into a list of tokens
         most commonly will just be list with single item (the original token)
@@ -364,15 +372,13 @@ class CommandProcessor:
             expanded_tokens = []
 
             # attempt to expand if select or bool params
-            if token.type == TokenTypes.GX_PARAM:
+            if token.type == TokenType.GX_PARAM:
                 param = token.value
                 if type(param) == SelectParam:
                     expanded_tokens = self.expand_select_tokens(param, token.in_conditional)
-                    print()
                 elif type(param) == BoolParam:
                     expanded_tokens = self.expand_bool_tokens(param, token.in_conditional)
-                    print()
-            
+
             if len(expanded_tokens) > 0:
                 out_tokens.append(expanded_tokens)
             else:
@@ -383,17 +389,17 @@ class CommandProcessor:
 
     def expand_select_tokens(self, param: SelectParam, in_conditional: bool) -> list[Token]:
         """
-        NOTE does this work with key=$val where $val is gx param? 
+        NOTE CHECK does this work with key=$val where $val is gx param? 
         """
         expanded_tokens = []
         if self.should_expand_select(param):
             # expand into all possible tokens
             
             for opt in param.options:
-                # EDGE CASE: <option value="-strand +"> into a kv_pair 
+                # satisfying EDGE CASE: <option value="-strand +"> into a kv_pair 
                 str_list = opt.split(' ')
                 if len(str_list) == 2 and str_list[0].startswith('-'):
-                    new_token = Token(opt, TokenTypes.KV_PAIR)
+                    new_token = Token(opt, TokenType.KV_PAIR)
                 
                 # normal scenarios. create temp cmd word and parse to token
                 else:
@@ -407,14 +413,6 @@ class CommandProcessor:
         return expanded_tokens
 
 
-    def expand_bool_tokens(self, param: BoolParam, in_conditional: bool) -> list[Token]:
-        expanded_tokens = []
-        if self.should_expand_bool(param):
-            # expand into all possible tokens
-            pass
-        return expanded_tokens
-
-
     def should_expand_select(self, param: SelectParam) -> bool:
         """
         check that each option is "" or starts with "-"
@@ -423,16 +421,34 @@ class CommandProcessor:
             if not opt == "" and not opt.startswith('-'):
                 return False
         return True
+    
 
+    def expand_bool_tokens(self, param: BoolParam, in_conditional: bool) -> list[Token]:
+        """
+        anything really can be contained in the boolparams. 
+        often its used as a simple flag, of form 'truevalue="--flag" falsevalue=""'
+        in some situations its another use.
+        either way, want to expand both possible values and see what type of tokens they are
+        
+        this way, can catch the following witnessed patterns:
+            truevalue="centimorgan" falsevalue="recombination"
+            truevalue="--report-unannotated" falsevalue="--no-report-unannotated"
+            truevalue="-read_trkg yes" falsevalue="-read_trkg no"
+            truevalue="--splice-flank=yes" falsevalue="--splice-flank=no"
 
-    def should_expand_bool(self, param: SelectParam) -> bool:
         """
-        TODO HERE
-        we expect a proper flag bool to have either 
-        truevalue or falsevalue starting with '-' and the other == "" (None)
-        should expand if both have value of any form
-        """
-        pass
+        boolvalues = [param.truevalue, param.falsevalue]
+        boolvalues = [v for v in boolvalues if v != '']
+        
+        expanded_tokens = []
+        for val in boolvalues:
+            new_word = CommandWord(val)
+            new_word.in_conditional = in_conditional 
+            new_word.expanded_text = [val]
+            new_token = self.get_best_token(new_word)
+            expanded_tokens.append(new_token)
+        
+        return expanded_tokens
 
 
     def gen_command(self) -> None:
@@ -584,43 +600,43 @@ class CommandProcessor:
         tokens = []
 
         if text == '__END_COMMAND__':
-            return [Token('', TokenTypes.END_COMMAND)]
+            return [Token('', TokenType.END_COMMAND)]
 
         quoted_num_lits = get_quoted_numbers(text)
-        tokens += [Token(m, TokenTypes.QUOTED_NUM) for m in quoted_num_lits]
+        tokens += [Token(m, TokenType.QUOTED_NUM) for m in quoted_num_lits]
 
         quoted_str_lits = get_quoted_strings(text)
-        tokens += [Token(m, TokenTypes.QUOTED_STRING) for m in quoted_str_lits]
+        tokens += [Token(m, TokenType.QUOTED_STRING) for m in quoted_str_lits]
         
         raw_num_lits = get_raw_numbers(text)
-        tokens += [Token(m, TokenTypes.RAW_NUM) for m in raw_num_lits]
+        tokens += [Token(m, TokenType.RAW_NUM) for m in raw_num_lits]
         
         raw_str_lits = get_raw_strings(text)
-        tokens += [Token(m, TokenTypes.RAW_STRING) for m in raw_str_lits]
+        tokens += [Token(m, TokenType.RAW_STRING) for m in raw_str_lits]
         
         # galaxy inputs
         # quoted or not doesn't matter. just linking. can resolve its datatype later. 
         ch_vars = get_cheetah_vars(text)
         gx_params = [x for x in ch_vars if x in self.params]
         gx_params = [self.params[p] for p in gx_params]
-        tokens += [Token(param, TokenTypes.GX_PARAM) for param in gx_params]
+        tokens += [Token(param, TokenType.GX_PARAM) for param in gx_params]
         
         # galaxy 
         ch_vars = get_cheetah_vars(text) # get cheetah vars
         gx_out = [x for x in ch_vars if x in self.outputs]  # subsets to galaxy out vars
         gx_out = [self.outputs[out] for out in gx_out] # get Output from galaxy out var
-        tokens += [Token(out, TokenTypes.GX_OUT) for out in gx_out]  # transform to tokens
+        tokens += [Token(out, TokenType.GX_OUT) for out in gx_out]  # transform to tokens
 
         # TODO this is pretty weak. actually want to search for 
         # unquoted operator in word. split if necessary. 
         linux_operators = get_linux_operators(text)
-        tokens += [Token(op, TokenTypes.LINUX_OP) for op in linux_operators]
+        tokens += [Token(op, TokenType.LINUX_OP) for op in linux_operators]
 
         gx_keywords = get_galaxy_keywords(text)
-        tokens += [Token(kw, TokenTypes.GX_KEYWORD) for kw in gx_keywords]
+        tokens += [Token(kw, TokenType.GX_KEYWORD) for kw in gx_keywords]
 
         kv_pairs = get_keyval_pairs(text)
-        tokens += [Token(kv, TokenTypes.KV_PAIR) for kv in kv_pairs]
+        tokens += [Token(kv, TokenType.KV_PAIR) for kv in kv_pairs]
         
         return tokens
 
@@ -629,11 +645,11 @@ class CommandProcessor:
         # extremely simple. just the token with longest text match.
         # solves issues of galaxy param being embedded in string. 
        
-        kv_pairs = [t for t in tokens if t.type == TokenTypes.KV_PAIR]
-        gx_params = [t for t in tokens if t.type == TokenTypes.GX_PARAM]
-        gx_outs = [t for t in tokens if t.type == TokenTypes.GX_OUT]
-        gx_kws = [t for t in tokens if t.type == TokenTypes.GX_KEYWORD]
-        linux_ops = [t for t in tokens if t.type == TokenTypes.LINUX_OP]
+        kv_pairs = [t for t in tokens if t.type == TokenType.KV_PAIR]
+        gx_params = [t for t in tokens if t.type == TokenType.GX_PARAM]
+        gx_outs = [t for t in tokens if t.type == TokenType.GX_OUT]
+        gx_kws = [t for t in tokens if t.type == TokenType.GX_KEYWORD]
+        linux_ops = [t for t in tokens if t.type == TokenType.LINUX_OP]
 
         if len(kv_pairs) > 0:
             # just check if there is a gx_kw of same length 
@@ -659,7 +675,7 @@ class CommandProcessor:
         
         # prioritise GX_KEYWORDs if they're in longest_tokens
         for token in longest_tokens:
-            if token.type == TokenTypes.GX_KEYWORD:
+            if token.type == TokenType.GX_KEYWORD:
                 return token
 
         # otherwise just return first (will be KV_PAIR)
@@ -679,7 +695,7 @@ class CommandProcessor:
     def is_linux_op(self, curr_token: Token, next_token: Token) -> bool:
         """
         """
-        if curr_token.type == TokenTypes.LINUX_OP:
+        if curr_token.type == TokenType.LINUX_OP:
             return True
         return False
 
@@ -688,7 +704,7 @@ class CommandProcessor:
         """
         https://youtu.be/hqVJpfFkJ9k
         """
-        if curr_token.type == TokenTypes.KV_PAIR:
+        if curr_token.type == TokenType.KV_PAIR:
             return True
         return False
 
@@ -697,34 +713,34 @@ class CommandProcessor:
         # is this a raw flag or option?
         # could be a raw string or galaxy param with flag as default value 
         curr_is_gx_flag = self.get_gx_flag_status(curr_token)
-        curr_is_raw_flag = curr_token.type == TokenTypes.RAW_STRING and curr_token.value.startswith('-')
+        curr_is_raw_flag = curr_token.type == TokenType.RAW_STRING and curr_token.value.startswith('-')
 
         # the current token has to be a flag 
         if curr_is_raw_flag or curr_is_gx_flag:
             next_is_gx_flag = self.get_gx_flag_status(next_token)
-            next_is_raw_flag = next_token.type == TokenTypes.RAW_STRING and next_token.value.startswith('-')
+            next_is_raw_flag = next_token.type == TokenType.RAW_STRING and next_token.value.startswith('-')
 
             # next token is a flag
             if next_is_raw_flag or next_is_gx_flag:
                 return True
 
             # next token is linux operation
-            elif next_token.type == TokenTypes.LINUX_OP:
+            elif next_token.type == TokenType.LINUX_OP:
                 return True
             
             # next token is key-val pair
-            elif next_token.type == TokenTypes.KV_PAIR:
+            elif next_token.type == TokenType.KV_PAIR:
                 return True
             
             # this is the last command token
-            elif next_token.type == TokenTypes.END_COMMAND:
+            elif next_token.type == TokenType.END_COMMAND:
                 return True
                 
         return False
 
 
     def get_gx_flag_status(self, token: Token) -> bool:
-        if token.type == TokenTypes.GX_PARAM:
+        if token.type == TokenType.GX_PARAM:
             param = token.value
             default_val = param.get_default()
             
@@ -748,7 +764,7 @@ class CommandProcessor:
         # looks like a flag/option, it has to be an option. 
 
         curr_is_gx_flag = self.get_gx_flag_status(curr_token)
-        curr_is_raw_flag = curr_token.type == TokenTypes.RAW_STRING and curr_token.value.startswith('-')
+        curr_is_raw_flag = curr_token.type == TokenType.RAW_STRING and curr_token.value.startswith('-')
 
         # the current token has to be a flag 
         if curr_is_raw_flag or curr_is_gx_flag:
