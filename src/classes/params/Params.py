@@ -7,7 +7,7 @@ from xml.etree import ElementTree as et
 from typing import Optional
 
 from classes.Logger import Logger
-# from classes.VariableFinder import VariableFinder, VariableReference # type: ignore
+
 
 from utils.galaxy_utils import get_common_extension, cast_list, consolidate_types
 from utils.etree_utils import get_attribute_value

@@ -10,9 +10,9 @@ doesnt' know .fasta = .fa = .fna
 
 
 Today:
-    - command component postprocessing
-        - occurs before datatype annotation
     - output to Janis format
+        - galaxy keywords 
+    - get specific container
     - parse tool xmls
     - gather parsing stats (how many worked etc)
 

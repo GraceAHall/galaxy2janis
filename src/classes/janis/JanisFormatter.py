@@ -2,20 +2,22 @@
 
 
 from classes.Logger import Logger
-from classes.datastructures.Outputs import Output
-from classes.datastructures.Params import Param
-from classes.parsers.ToolParser import ToolParser
+from classes.command.Command import TokenType
+from classes.outputs.Outputs import Output
+from classes.params.Params import Param
 
 from typing import Union
 
 class JanisFormatter:
-    def __init__(self, tool: ToolParser, out_def: str) -> None:
+    def __init__(self, tool, janis_out_path: str, logger: Logger) -> None:
         self.tool = tool
-        self.out_def = out_def
-        self.logger = tool.logger # bad awful yuck
+        self.janis_out_path = janis_out_path
+        self.logger = logger
+
+        # janis attributes to create
+        self.commandtool: str = ''
         self.inputs: list[str] = []
         self.outputs: list[str] = []
-        self.command: list[str] = []
         self.metadata: list[str] = []
         
         self.janis_import_dict: dict[str, set[str]] = {
@@ -35,19 +37,72 @@ class JanisFormatter:
 
 
     def format(self) -> None:
+        self.commandtool = self.gen_commandtool()
         self.inputs = self.gen_inputs()
         self.outputs = self.gen_outputs()
         self.imports = self.gen_imports()
-        self.command = self.gen_command()
-        self.commandtool = self.gen_commandtool()
         self.main_call = self.gen_main_call()
         
 
+    def gen_commandtool(self) -> list[str]:
+        """
+        each str elem in out list is tool output
+        """
+
+        base_command = self.infer_base_command()
+
+        toolname = self.tool.id.replace('-', '_')
+        container = self.tool.container
+        version = self.tool.version
+
+        out_str = f'\n{toolname} = CommandToolBuilder(\n'
+        out_str += f'\ttool="{toolname}",\n'
+        out_str += f'\tbase_command={base_command},\n'
+        out_str += f'\tinputs=inputs,\n'
+        out_str += f'\toutputs=outputs,\n'
+        out_str += f'\tcontainer="{container}",\n'
+        out_str += f'\tversion="{version}",\n'
+        # TODO here add requirements (biocontainer for conda pkg or container + version)
+        out_str += ')\n'
+
+        return out_str
+
+
+    def infer_base_command(self) -> str:
+        """
+        base command is all RAW_STRING tokens before options begin
+        can be accessed going through positionals by pos.        
+        """
+        # get base command positionals
+        positionals = self.tool.command.get_positionals()
+        positionals = [p for p in positionals if not p.after_options]
+        positionals = [p for p in positionals if p.token.type == TokenType.RAW_STRING]
+
+        # remove these positionals 
+        for p in positionals:
+            self.tool.command.remove_positional(p.pos)
+
+        # format to string
+        base_command = [p.token.text for p in positionals]
+        base_command = ['"' + cmd + '"' for cmd in base_command]
+        base_command = ', '.join(base_command)
+        base_command = '[' + base_command + ']'
+        return base_command
+
+
     def gen_inputs(self) -> list[str]:
         """
-        each str elem in out list is a tool input        
+        inputs are any positional, flag or option except the following:
+            - positional is part of the base_command (will have been removed)
+            - positional with TokenType = GX_OUT
+            - option with only 1 source token and the TokenType is GX_OUT
+            - 
         """
         inputs = []
+
+        
+
+
 
         for param in self.tool.params:
             if param.validated:  # TODO this will rule out complex param syntax at this stage
@@ -77,12 +132,13 @@ class JanisFormatter:
             doc="First fastq input. If paired end, input2 is used for the other PE fastq"
         )
         """
-        # TODO: move this to ParamPostProcessing?
-        param.janis_type = self.convert_types_to_janis(param)
+
+        self.update_datatype_imports(param)
+        jtype = self.format_janis_typestr(param)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{param.name}",\n'
-        out_str += f'\t\t{param.janis_type},\n'
+        out_str += f'\t\t{jtype},\n'
         out_str += f'\t\tprefix="{param.prefix or ""}",\n'
         out_str += f'\t\tdefault="{param.default_value}",\n'
         out_str += f'\t\tdoc="{param.help_text}"\n'
@@ -90,18 +146,6 @@ class JanisFormatter:
 
         return out_str
         
-
-    def convert_types_to_janis(self, param: Param) -> str:
-        """
-        converts galaxy extensions to janis. 
-        also standardises exts: fastqsanger -> Fastq, fastq -> Fastq. 
-        """
-        self.convert_type_list(param)
-        self.update_datatype_imports(param)
-        out_str = self.format_janis_typestr(param)
-
-        return out_str
-
 
     def format_janis_typestr(self, param: Param) -> str:
         """
@@ -206,34 +250,6 @@ class JanisFormatter:
 
         return out_str
 
-
-    def gen_command(self) -> list[str]:
-        """
-        each str elem in out list is tool output
-        """
-        return self.tool.base_command
-        
-
-    def gen_commandtool(self) -> list[str]:
-        """
-        each str elem in out list is tool output
-        """
-        toolname = self.tool.tool_id.replace('-', '_')
-        container = self.tool.container
-        version = self.tool.tool_version
-
-        out_str = f'\n{toolname} = CommandToolBuilder(\n'
-        out_str += f'\ttool="{toolname}",\n'
-        out_str += f'\tbase_command=["{self.command}"],\n'
-        out_str += f'\tinputs=inputs,\n'
-        out_str += f'\toutputs=outputs,\n'
-        out_str += f'\tcontainer="{container}",\n'
-        out_str += f'\tversion="{version}",\n'
-        # TODO here add requirements (biocontainer for conda pkg or container + version)
-        out_str += ')\n'
-
-        return out_str
-
     
     def gen_main_call(self) -> str:
         """
@@ -255,7 +271,7 @@ class JanisFormatter:
 
         """
 
-        with open(self.out_def, 'w') as fp:
+        with open(self.janis_out_path, 'w') as fp:
             fp.write(self.imports + '\n\n')
 
             fp.write('inputs = [\n')

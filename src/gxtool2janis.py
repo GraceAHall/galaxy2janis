@@ -6,7 +6,7 @@
 import sys
 import os
 from typing import Tuple
-from classes.JanisFormatter import JanisFormatter
+
 
 from classes.parsers.ToolParser import ToolParser
 import xml.etree.ElementTree as et
@@ -23,13 +23,10 @@ def main(argv: list[str]):
         out_log, out_def = init_out_files(tool_xml, tool_workdir)
 
         # parse tool 
-        tp = ToolParser(tool_xml, tool_workdir, out_log)
+        tp = ToolParser(tool_xml, tool_workdir, out_log, out_def)
         tp.parse()
 
-        # generate janis py
-        jf = JanisFormatter(tp, out_def)
-        jf.format()
-        jf.write()
+
 
 
 def init_out_files(filename: str, workdir: str) -> Tuple[str, str]:

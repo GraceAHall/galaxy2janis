@@ -3,7 +3,7 @@
 from xml.etree import ElementTree as et
 
 from classes.Logger import Logger
-from classes.datastructures.Configfile import Configfile
+from classes.command.Configfile import Configfile
 
 
 class ConfigfileParser:

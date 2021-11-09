@@ -4,7 +4,7 @@ from copy import deepcopy
 from xml.etree import ElementTree as et
 
 from classes.Logger import Logger
-from classes.datastructures.Params import (
+from classes.params.Params import (
     Param, 
     TextParam, 
     IntParam, 
@@ -24,10 +24,9 @@ class ParamParser:
     actual parsing of the param is delegated to the Param class. 
     """
     
-    def __init__(self, tree: et.ElementTree, command_lines: list[str], logger: Logger):
+    def __init__(self, tree: et.ElementTree, logger: Logger):
         # other helper classes
         self.tree: et.ElementTree = tree
-        self.command_lines = command_lines
         self.logger = logger
         self.param_list: list[Param] = []
         self.params: dict[str, Param] = {}

@@ -6,13 +6,21 @@
 import json
 from typing import Union, Optional
 
-
-from classes.datastructures.Command import Positional, Flag, Option, Command, TokenType, Token
-
+from classes.params.ParamRegister import ParamRegister
+from classes.outputs.OutputRegister import OutputRegister
+from classes.command.Command import Positional, Flag, Option, Command, TokenType, Token
+from classes.Logger import Logger
 
 class DatatypeAnnotator:
-    def __init__(self, command: Command):
+    def __init__(self, command: Command, param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         self.command = command
+        self.param_register = param_register
+        self.out_register = out_register
+        self.logger = logger
+        self.init_datastructures()
+
+
+    def init_datastructures(self) -> None:
         self.gx_parsed = self.load_gx_parsed_types()
         self.gx_capitalisation_map = self.create_capitalisation_map()
         self.ext_to_gx = self.invert_dict(self.gx_parsed)
@@ -90,7 +98,8 @@ class DatatypeAnnotator:
 
     def get_token_datatypes(self, the_token: Token) -> list[str]:
         """
-        TODO note here pls
+        TODO note here pls 
+        DONT TELL ME WHAT TO DO?
         """
         # galaxy variables
         if the_token.type in [TokenType.GX_PARAM, TokenType.GX_OUT]:
@@ -119,17 +128,19 @@ class DatatypeAnnotator:
 
 
     def infer_types_from_gx(self, the_token: Token) -> list[str]:
-        # for gx params or gx outputs
-        # gx params and outputs already have type annotation
-        # extracted from the xml
+        """
+        for gx params or gx outputs
+        gx params and outputs already have type annotation
+        extracted from the xml
+        """
 
         if the_token.type == TokenType.GX_PARAM:
-            gx_var = the_token.value  
-            gx_types = gx_var.galaxy_type.split(',')
+            param = self.param_register.get(the_token.gx_ref)
+            gx_types = param.galaxy_type.split(',')
 
         elif the_token.type == TokenType.GX_OUT:
-            gx_out = the_token.value
-            gx_types = the_token.value.galaxy_type.split(',')
+            output = self.out_register.get(the_token.gx_ref)
+            gx_types = output.galaxy_type.split(',')
 
         janis_types = self.cast_to_janis(gx_types)
         #final_type = self.get_simplest_type(janis_types)
@@ -151,11 +162,9 @@ class DatatypeAnnotator:
         return out
 
 
-
     def get_simplest_type(self, types: list[str]) -> str:
         """
-        NOTE this is where some safety features are implemented
-        if the list of janis types is empty, just set as 'File'
+        
         """
         if len(types) == 0:
             return 'File'
@@ -169,7 +178,7 @@ class DatatypeAnnotator:
 
 
     def infer_types_from_ext(self, the_token: Token) -> list[str]:
-        the_string = the_token.value
+        the_string = the_token.text
         hits = []
 
         components = the_string.split('.')
@@ -184,7 +193,7 @@ class DatatypeAnnotator:
 
     def infer_types_from_numeric(self, the_token: Token) -> list[str]:
         # check string against 
-        the_string = the_token.value
+        the_string = the_token.text
         if '.' in the_string:
             return ['Float']
         return ['Integer']
@@ -193,7 +202,6 @@ class DatatypeAnnotator:
     def annotate_flag(self, the_flag) -> None:
         # priority list
         # gx param / gx out
-        # 
 
         source_datatypes = []
 
@@ -215,7 +223,6 @@ class DatatypeAnnotator:
         """
 
         from_galaxy = []
-
         for token_type, datatypes in source_datatypes:
             if token_type in [TokenType.GX_PARAM, TokenType.GX_OUT] and len(datatypes) > 0:
                 from_galaxy.append(datatypes)

@@ -4,11 +4,12 @@ import sys
 from typing import Tuple, Optional
 
 
-from classes.datastructures.Command import Command, Token, TokenType
-from classes.datastructures.Alias import AliasRegister
-from classes.datastructures.Params import Param, SelectParam, BoolParam
-from classes.datastructures.Outputs import Output
+from classes.command.Command import Command, Token, TokenType
+from classes.command.Alias import AliasRegister
+from classes.params.ParamRegister import ParamRegister
+from classes.outputs.OutputRegister import OutputRegister
 from classes.Logger import Logger
+
 
 from utils.regex_utils import (
     find_unquoted,
@@ -34,37 +35,20 @@ class CommandWord:
 
 
 class CommandProcessor:
-    def __init__(self, lines: list[str], command_lines: list[list[CommandWord]], params: list[Param], outputs: list[Output], logger: Logger):
+    def __init__(self, lines: list[str], command_lines: list[list[CommandWord]], param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         """
         Command class receives the CommandLines
         """
-        self.params = params
-        self.outputs = outputs
-        self.restructure_params()
-        self.restructure_outputs()
+        self.param_register = param_register
+        self.out_register = out_register
         self.logger = logger
         self.lines = lines
         self.command_lines = command_lines
         self.cmd_words = [item for word in command_lines for item in word]
         self.cmd_words.append(CommandWord('__END_COMMAND__')) # sentinel for end of command
-        self.aliases: AliasRegister = AliasRegister(self.params)
+        self.aliases: AliasRegister = AliasRegister(self.param_register)
         self.env_vars: list[str] = []
-
-
-    def restructure_params(self) -> None:
-        param_dict = {}
-        for p in self.params:
-            key = '$' + p.gx_var
-            param_dict[key] = p
-        self.params = param_dict
-    
-    
-    def restructure_outputs(self) -> None:
-        output_dict = {}
-        for out in self.outputs:
-            key = '$' + out.gx_var
-            output_dict[key] = out
-        self.outputs = output_dict
+        self.cmd_tokens: list[Token] = []
 
 
     def process(self) -> Command:
@@ -72,8 +56,9 @@ class CommandProcessor:
         self.set_aliases()
         self.expand_aliases()
         self.tokenify_command()
-        
+        self.pretty_print_tokens()
         command = self.gen_command()
+        command.pretty_print()
         return command
 
 
@@ -97,6 +82,16 @@ class CommandProcessor:
         for word in self.cmd_words:
             print(f'{word.text:60s}{word.in_conditional:6}{word.in_loop:6}')
         
+
+    def pretty_print_tokens(self) -> None:
+        print('tokens --------------')
+        print(f'{"text":<20}{"gx_ref":20}{"type":25}{"in_cond":>10}')
+        counter = 0
+        for token_list in self.cmd_tokens:
+            counter += 1
+            for token in token_list:
+                print(f'{counter:<3}{token}')
+
 
     def set_aliases(self) -> None:
         """
@@ -365,159 +360,172 @@ class CommandProcessor:
 
         reason is that some galaxy select or bool params hide flags or options as their possible values
 
+        every BoolParam will have 1+ 'realised_values'
+        each SelectParam which is a list of flags / opts will have 1+ realised values
+
         """
         out_tokens: list[Token] = []
 
-        for token in self.cmd_tokens:
-            expanded_tokens = []
+        values = self.param_register.get_realised_values(token.gx_ref)
 
-            # attempt to expand if select or bool params
-            if token.type == TokenType.GX_PARAM:
-                param = token.value
-                if type(param) == SelectParam:
-                    expanded_tokens = self.expand_select_tokens(param, token.in_conditional)
-                elif type(param) == BoolParam:
-                    expanded_tokens = self.expand_bool_tokens(param, token.in_conditional)
+        if self.should_expand(values):
+            for val in values:
+                # in case its something like '-read_trkg yes'
+                if val.startswith('-') and len(val.split(' ')) == 2:
+                    new_token = Token(val, TokenType.KV_PAIR)
 
-            if len(expanded_tokens) > 0:
-                out_tokens.append(expanded_tokens)
-            else:
-                out_tokens.append([token])
-                        
-        self.cmd_tokens = out_tokens
-
-
-    def expand_select_tokens(self, param: SelectParam, in_conditional: bool) -> list[Token]:
-        """
-        NOTE CHECK does this work with key=$val where $val is gx param? 
-        """
-        expanded_tokens = []
-        if self.should_expand_select(param):
-            # expand into all possible tokens
-            
-            for opt in param.options:
-                # satisfying EDGE CASE: <option value="-strand +"> into a kv_pair 
-                str_list = opt.split(' ')
-                if len(str_list) == 2 and str_list[0].startswith('-'):
-                    new_token = Token(opt, TokenType.KV_PAIR)
-                
-                # normal scenarios. create temp cmd word and parse to token
+                # else its a single word or a quoted phrase TODO CHECK THIS
                 else:
-                    temp_cmd_word = CommandWord(opt)
-                    temp_cmd_word.in_conditional = in_conditional 
-                    temp_cmd_word.expanded_text = [opt]
-                    new_token = self.get_best_token(temp_cmd_word)
+                    new_word = self.init_cmd_word(val, in_conditional=token.in_conditional, in_loop=token.in_loop)
+                    new_token = self.get_best_token(new_word)
                 
-                expanded_tokens.append(new_token)
+                # transfer properties
+                new_token.in_conditional = token.in_conditional
+                new_token.in_loop = token.in_loop
+                new_token.gx_ref = token.gx_ref
+                out_tokens.append(new_token)
+        else:
+            out_tokens.append(token)
+                        
+        return out_tokens
 
-        return expanded_tokens
 
+    def should_expand(self, values: list[str]) -> bool:
+        if len(values) == 0:
+            return False
 
-    def should_expand_select(self, param: SelectParam) -> bool:
-        """
-        check that each option is "" or starts with "-"
-        """
-        for opt in param.options:
-            if not opt == "" and not opt.startswith('-'):
+        elif all([v == '' for v in values]):
+            return False
+    
+        for val in values:
+            if not val == "" and not val.startswith('-'):
                 return False
+
         return True
+
+
+    # def expand_select_tokens(self, param: SelectParam, in_conditional: bool) -> list[Token]:
+    #     """
+    #     NOTE CHECK does this work with key=$val where $val is gx param? 
+    #     """
+    #     expanded_tokens = []
+    #     if self.should_expand_select(param):
+    #         # expand into all possible tokens
+            
+    #         for opt in param.options:
+    #             # satisfying EDGE CASE: <option value="-strand +"> into a kv_pair 
+    #             str_list = opt.split(' ')
+    #             if len(str_list) == 2 and str_list[0].startswith('-'):
+    #                 new_token = Token(opt, TokenType.KV_PAIR)
+                
+    #             # normal scenarios. create temp cmd word and parse to token
+    #             else:
+    #                 cmd_word = self.init_cmd_word(opt, in_conditional=in_conditional)
+    #                 new_token = self.get_best_token(cmd_word)
+                
+    #             expanded_tokens.append(new_token)
+
+    #     return expanded_tokens
+
+
+    def init_cmd_word(self, text: str, in_conditional=False, in_loop=False) -> CommandWord:
+        new_word = CommandWord(text)
+        new_word.in_conditional = in_conditional
+        new_word.in_loop = in_loop
+        new_word.expanded_text = [text]
+        return new_word
+
+
+    # def should_expand_select(self, param: SelectParam) -> bool:
+    #     """
+    #     check that each option is "" or starts with "-"
+    #     """
+    #     for opt in param.options:
+    #         if not opt == "" and not opt.startswith('-'):
+    #             return False
+    #     return True
     
 
-    def expand_bool_tokens(self, param: BoolParam, in_conditional: bool) -> list[Token]:
-        """
-        anything really can be contained in the boolparams. 
-        often its used as a simple flag, of form 'truevalue="--flag" falsevalue=""'
-        in some situations its another use.
-        either way, want to expand both possible values and see what type of tokens they are
+    # def expand_bool_tokens(self, param: BoolParam, in_conditional: bool) -> list[Token]:
+    #     """
+    #     anything really can be contained in the boolparams. 
+    #     often its used as a simple flag, of form 'truevalue="--flag" falsevalue=""'
+    #     in some situations its another use.
+    #     either way, want to expand both possible values and see what type of tokens they are
         
-        this way, can catch the following witnessed patterns:
-            truevalue="centimorgan" falsevalue="recombination"
-            truevalue="--report-unannotated" falsevalue="--no-report-unannotated"
-            truevalue="-read_trkg yes" falsevalue="-read_trkg no"
-            truevalue="--splice-flank=yes" falsevalue="--splice-flank=no"
+    #     this way, can catch the following witnessed patterns:
+    #         truevalue="centimorgan" falsevalue="recombination"
+    #         truevalue="--report-unannotated" falsevalue="--no-report-unannotated"
+    #         truevalue="-read_trkg yes" falsevalue="-read_trkg no"
+    #         truevalue="--splice-flank=yes" falsevalue="--splice-flank=no"
 
-        """
-        boolvalues = [param.truevalue, param.falsevalue]
-        boolvalues = [v for v in boolvalues if v != '']
+    #     """
+    #     boolvalues = [param.truevalue, param.falsevalue]
+    #     boolvalues = [v for v in boolvalues if v != '']
         
-        expanded_tokens = []
-        for val in boolvalues:
-            new_word = CommandWord(val)
-            new_word.in_conditional = in_conditional 
-            new_word.expanded_text = [val]
-            new_token = self.get_best_token(new_word)
-            expanded_tokens.append(new_token)
+    #     expanded_tokens = []
+    #     for val in boolvalues:
+    #         cmd_word = self.init_cmd_word(val, in_conditional=in_conditional)
+    #         new_token = self.get_best_token(cmd_word)
+    #         expanded_tokens.append(new_token)
         
-        return expanded_tokens
+    #     return expanded_tokens
 
 
     def gen_command(self) -> None:
         """
-        lots of logic here
-            - the command string words are handled one at a time
-            - for each command word, lookahead to next word for some context
-            - decide whether the current word is positional, flag, option, linux op etc
-            - init appropriate object and store
-        """
 
+        """
         command = Command()
-        positional_count = 0
-        is_after_options = False
         i = 0
 
         # iterate through command words (with next word for context)
-        while i < len(self.cmd_words) - 1:
-            curr_word = self.cmd_words[i]
-            next_word = self.cmd_words[i+1]
-            curr_token = self.get_best_token(curr_word)
-            next_token = self.get_best_token(next_word)
+        while i < len(self.cmd_tokens) - 1:
+            curr_tokens = self.cmd_tokens[i]
+            next_tokens = self.cmd_tokens[i+1]
 
-            # if kv pair, break and reassign curr/next tokens
-            is_kv_pair = False
-            delim = ' '
-            if self.is_kv_pair(curr_token): 
-                is_kv_pair = True
-                curr_token, next_token, delim = self.split_keyval_to_best_tokens(curr_word)
+            should_skip_next = False
+            for ctoken in curr_tokens:
 
-            if self.is_linux_op(curr_token, next_token):
-                command.update_positionals(positional_count, curr_token, is_after_options)                
-                positional_count += 1
+                # kv pair handling (edge case)
+                if ctoken.type == TokenType.KV_PAIR: 
+                    ctoken, ntoken, delim = self.split_keyval_to_best_tokens(ctoken)
+                    command.update_options(ctoken, ntoken, delim=delim)
+                    continue
 
-            elif self.is_flag(curr_token, next_token):
-                is_after_options = True
-                command.update_flags(curr_token)
-
-            elif self.is_option(curr_token, next_token):
-                is_after_options = True
-                command.update_options(curr_token, next_token, delim)
-                if not is_kv_pair:
-                    i += 1
-
+                # everything else
+                for ntoken in next_tokens:
+                    option_encountered = command.update(ctoken, ntoken)
+                    if option_encountered:
+                        should_skip_next = True
+            
+            if should_skip_next:
+                i += 2
             else:
-                # text positional
-                # this has to happen last, as last resort
-                # some examples of options which don't start with '-' exist. 
-                command.update_positionals(positional_count, curr_token, is_after_options)                
-                positional_count += 1
+                i += 1
 
-            i += 1
         return command
 
 
-
-    def split_keyval_to_best_tokens(self, curr_word: CommandWord) -> Tuple[Token, Token, str]:
+    def split_keyval_to_best_tokens(self, kv_token: Token) -> Tuple[Token, Token, str]:
         """
         keyval options need to be split into two tokens
         """
-        curr_word, next_word, delim = self.split_keyval_cmd(curr_word)
+        curr_word, next_word, delim = self.split_keyval_to_cmd_words(kv_token)
 
         curr_token = self.get_best_token(curr_word)
         next_token = self.get_best_token(next_word)
 
+        if curr_token.gx_ref == '':
+            curr_token.gx_ref = kv_token.gx_ref
+        
+        if next_token.gx_ref == '':
+            next_token.gx_ref = kv_token.gx_ref
+
         return curr_token, next_token, delim
 
 
-    def split_keyval_cmd(self, kv_cmd: str) -> list[str]:
+    def split_keyval_to_cmd_words(self, kv_token: Token) -> list[CommandWord]:
         """
         handles the following patterns:
         --minid=$adv.min_dna_id
@@ -525,21 +533,14 @@ class CommandProcessor:
         ne=$ne
         etc
         """
-        text = kv_cmd.expanded_text[0]
+        text = kv_token.text
         possible_delims = ['=', ':', ' ']
 
         delim, delim_start, delim_end = self.get_first_unquoted(text, possible_delims)
         left_text, right_text = text[:delim_start], text[delim_end:]
-
-        curr_word = CommandWord(left_text)
-        curr_word.in_loop = kv_cmd.in_loop
-        curr_word.in_conditional = kv_cmd.in_conditional
-        curr_word.expanded_text = [left_text]
-        
-        next_word = CommandWord(right_text)
-        next_word.in_loop = kv_cmd.in_loop
-        next_word.in_conditional = kv_cmd.in_conditional
-        next_word.expanded_text = [right_text]
+       
+        curr_word = self.init_cmd_word(left_text, in_conditional=kv_token.in_conditional, in_loop=kv_token.in_loop)
+        next_word = self.init_cmd_word(right_text, in_conditional=kv_token.in_conditional, in_loop=kv_token.in_loop)
 
         return curr_word, next_word, delim
 
@@ -617,14 +618,12 @@ class CommandProcessor:
         # galaxy inputs
         # quoted or not doesn't matter. just linking. can resolve its datatype later. 
         ch_vars = get_cheetah_vars(text)
-        gx_params = [x for x in ch_vars if x in self.params]
-        gx_params = [self.params[p] for p in gx_params]
-        tokens += [Token(param, TokenType.GX_PARAM) for param in gx_params]
-        
+        gx_params = [x for x in ch_vars if self.param_register.get(x) is not None]
+        tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
+       
         # galaxy 
         ch_vars = get_cheetah_vars(text) # get cheetah vars
-        gx_out = [x for x in ch_vars if x in self.outputs]  # subsets to galaxy out vars
-        gx_out = [self.outputs[out] for out in gx_out] # get Output from galaxy out var
+        gx_out = [x for x in ch_vars if self.out_register.get(x) is not None]  # subsets to galaxy out vars
         tokens += [Token(out, TokenType.GX_OUT) for out in gx_out]  # transform to tokens
 
         # TODO this is pretty weak. actually want to search for 
@@ -687,90 +686,12 @@ class CommandProcessor:
         gets longest token in list
         returns multiple tokens if both have max len
         """   
-        longest_text_len = max([len(t.value) for t in token_list])
-        longest_tokens = [t for t in token_list if len(t.value) == longest_text_len]
+        longest_text_len = max([len(t.text) for t in token_list])
+        longest_tokens = [t for t in token_list if len(t.text) == longest_text_len]
         return longest_tokens
 
 
-    def is_linux_op(self, curr_token: Token, next_token: Token) -> bool:
-        """
-        """
-        if curr_token.type == TokenType.LINUX_OP:
-            return True
-        return False
-
-
-    def is_kv_pair(self, curr_token: Token) -> bool:
-        """
-        https://youtu.be/hqVJpfFkJ9k
-        """
-        if curr_token.type == TokenType.KV_PAIR:
-            return True
-        return False
-
-
-    def is_flag(self, curr_token: Token, next_token: Token) -> bool:
-        # is this a raw flag or option?
-        # could be a raw string or galaxy param with flag as default value 
-        curr_is_gx_flag = self.get_gx_flag_status(curr_token)
-        curr_is_raw_flag = curr_token.type == TokenType.RAW_STRING and curr_token.value.startswith('-')
-
-        # the current token has to be a flag 
-        if curr_is_raw_flag or curr_is_gx_flag:
-            next_is_gx_flag = self.get_gx_flag_status(next_token)
-            next_is_raw_flag = next_token.type == TokenType.RAW_STRING and next_token.value.startswith('-')
-
-            # next token is a flag
-            if next_is_raw_flag or next_is_gx_flag:
-                return True
-
-            # next token is linux operation
-            elif next_token.type == TokenType.LINUX_OP:
-                return True
-            
-            # next token is key-val pair
-            elif next_token.type == TokenType.KV_PAIR:
-                return True
-            
-            # this is the last command token
-            elif next_token.type == TokenType.END_COMMAND:
-                return True
-                
-        return False
-
-
-    def get_gx_flag_status(self, token: Token) -> bool:
-        if token.type == TokenType.GX_PARAM:
-            param = token.value
-            default_val = param.get_default()
-            
-            if default_val is not None:
-                # check if numbers first
-                if len(get_quoted_numbers(default_val)) > 0:
-                    return False
-                elif len(get_raw_numbers(default_val)) > 0:
-                    return False
-
-                # then interpret as string
-                elif default_val.startswith('-'):
-                    return True
-        
-        return False
-
-
-    def is_option(self, curr_token: Token, next_token: Token) -> bool:
-        # happens 2nd after 'is_flag()'
-        # already know that its not a flag, so if the current token
-        # looks like a flag/option, it has to be an option. 
-
-        curr_is_gx_flag = self.get_gx_flag_status(curr_token)
-        curr_is_raw_flag = curr_token.type == TokenType.RAW_STRING and curr_token.value.startswith('-')
-
-        # the current token has to be a flag 
-        if curr_is_raw_flag or curr_is_gx_flag:
-            return True
-                
-        return False
+    
 
 
 

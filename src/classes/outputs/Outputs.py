@@ -1,12 +1,12 @@
 
 
-# pyright: strict
+# pyright: basic
 
 
 from xml.etree import ElementTree as et
 import re
 
-from classes.datastructures.Params import Param
+from classes.params.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 #from utils.galaxy_utils import consolidate_types
 
@@ -84,7 +84,7 @@ class Output:
             self.is_array = True        
 
     
-    def get_datatype(self, params: list[Param]) -> str:
+    def get_datatype(self, param_register: ParamRegister) -> str:
         # datatype can be specified in format, format_source, auto_format (ext), or from_work_dir.
         gx_format = get_attribute_value(self.node, 'format')
         format_source = get_attribute_value(self.node, 'format_source')
@@ -97,7 +97,8 @@ class Output:
 
         # get datatype from referenced param
         elif format_source != '':
-            datatype = self.get_datatype_from_param(format_source, params)
+            param = param_register.get(format_source, ignore_path=True)
+            return param.galaxy_type
 
         # get datatype from referenced file extension
         elif from_work_dir != '':
@@ -109,16 +110,6 @@ class Output:
             datatype = 'File'
 
         return datatype
-
-
-    def get_datatype_from_param(self, format_source: str, params: list[Param]) -> str:
-        # not working
-        for param in params:
-            if format_source == param.name:
-                return param.galaxy_type
-        
-        return '' # failed
-        #raise Exception(f'could not find param: {format_source}')
 
 
     def format_pattern_extension(self, pattern: str) -> str:
@@ -169,7 +160,7 @@ class DiscoverDatasetsOutput(Output):
 
 
     # overrides base class
-    def get_datatype(self, params: list[Param]) -> str:
+    def get_datatype(self, param_register: ParamRegister) -> str:
         """
         in <collection> or <data>(parent):
             - format
@@ -190,7 +181,8 @@ class DiscoverDatasetsOutput(Output):
 
         # get datatype from referenced param
         elif format_source != '':
-            return self.get_datatype_from_param(format_source, params)
+            param = param_register.get(format_source)
+            return param.galaxy_type or ''
 
         dd_node = self.node.find('discover_datasets')
         dd_format = get_attribute_value(dd_node, 'format') # type: ignore
@@ -262,19 +254,6 @@ class TemplatedOutput(Output):
         """
         self.selector_contents = f'{self.name}'
     
-
-
-    """
-    def link_input_param(self) -> Param:
-        for param in self.params:
-            if param.name == self.node.attrib['name']:
-                return param
-        raise Exception(f'could not link TemplatedOutput to its input param: {self.node.attrib["name"]}')
-    """
-
-
-
-
 
 
 

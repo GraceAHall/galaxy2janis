@@ -5,16 +5,15 @@
 from xml.etree import ElementTree as et
 
 from classes.Logger import Logger
-from classes.datastructures.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
-from classes.datastructures.Params import Param
+from classes.outputs.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
+from classes.params.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 
 
 class OutputParser:
-    def __init__(self, tree: et.ElementTree, params: list[Param], command_lines: list[str], logger: Logger) -> None:
+    def __init__(self, tree: et.ElementTree, param_register: ParamRegister, logger: Logger) -> None:
         self.tree = tree
-        self.params = params
-        self.command_lines = command_lines
+        self.param_register = param_register
         self.logger = logger
         self.parsable_elems: list[str] = ['data', 'collection']
         self.outputs: list[Output] = [] 
@@ -32,7 +31,7 @@ class OutputParser:
         # parse all outputs
         for output in outputs:
             output.parse()
-            output.galaxy_type = output.get_datatype(self.params)
+            output.galaxy_type = output.get_datatype(self.param_register)
             #self.galaxy_type = consolidate_types(self.galaxy_type)
             self.log_pattern_status(output)
             #self.log_datatype_status(output)
@@ -129,33 +128,3 @@ class OutputParser:
     #     """
     #     pass
 
-
-
-
-    """
-    CORNER OF SHAME
-
-    def initialize_templated_output_old(self, node: et.Element) -> Output:
-        
-        # initializes a TemplatedOutput. 
-        # TemplatedOutputs need to create an input param to reference.
-        
-        # create dummy param for the output to refer to
-        temp_out_node = create_output_param(node)
-
-        # initialize new param & parse
-        output_param = self.initialize_output_param(temp_out_node)
-        
-        # TODO not needed
-        # update params with new output param
-        self.params.append(output_param)
-
-        # return new output with reference to updated params
-        return TemplatedOutput(node)
-
-
-    def initialize_output_param(self, node: et.Element) -> Param:
-        new_param = OutputParam(node, [], self.command_lines)
-        new_param.parse()
-        return new_param
-    """

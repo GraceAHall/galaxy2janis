@@ -4,7 +4,8 @@
 from collections import defaultdict
 import re
 
-from classes.datastructures.Params import Param
+from classes.params.ParamRegister import ParamRegister
+
 
 
 class Alias:
@@ -25,9 +26,9 @@ This whole class needs to be written cleaner
 Started with simple logic but quickly expanded
 """
 class AliasRegister:
-    def __init__(self, params: dict[str, Param]):
+    def __init__(self, param_register: ParamRegister):
         # parsed galaxy params. needed to resolve aliases to a param. 
-        self.gx_params = params
+        self.param_register = param_register
 
         # stores the aliases using alias.source as key
         # each source may actually have more than 1 alias if different dests
@@ -91,7 +92,7 @@ class AliasRegister:
             # cheetah or galaxy var
             if alias.dest.startswith('$'):
                 # add if galaxy param
-                if alias.dest in self.gx_params:
+                if self.param_register.get(alias.dest) is not None:
                     out.append(alias.dest)
 
                 # sometimes its weird.
@@ -100,7 +101,7 @@ class AliasRegister:
                 # temp solution: strip common galaxy attributes and try again
                 else:
                     stripped_var = self.strip_gx_attributes(alias.dest)
-                    if stripped_var in self.gx_params:
+                    if self.param_register.get(stripped_var) is not None:
                         out.append(stripped_var)
 
                 # recursive. resolves next link if ch or gx var

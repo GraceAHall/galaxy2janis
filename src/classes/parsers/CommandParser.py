@@ -6,7 +6,7 @@
 from typing import Union
 import xml.etree.ElementTree as et
 
-from classes.datastructures.CommandProcessor import CommandWord
+from classes.command.CommandProcessor import CommandWord
 from classes.Logger import Logger
 
 from utils.regex_utils import find_unquoted, get_words
