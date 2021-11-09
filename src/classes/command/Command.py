@@ -53,11 +53,10 @@ class Positional:
         self.pos = pos
         self.token = token
         self.after_options = after_options
-        self.is_optional: bool = False
         self.datatypes: list[str] = []
 
 
-    def set_is_conditional(self) -> bool:
+    def is_optional(self) -> bool:
         return self.token.in_conditional
 
 
@@ -75,15 +74,13 @@ class Flag:
     def __init__(self, prefix: str):
         self.prefix: str = prefix
         self.sources: list[Token] = [] 
-        self.is_optional: bool = False
         self.datatypes: list[str] = []
 
 
-    def set_is_conditional(self) -> bool:
+    def is_optional(self) -> bool:
         for source in self.sources:
-            if not source.is_conditional:
+            if not source.in_conditional:
                 return False
-                
         return True
 
 
@@ -117,15 +114,13 @@ class Option:
         self.prefix: str = prefix
         self.delim: str = delim
         self.sources: list[Token] = []
-        self.is_optional: bool = False
         self.datatypes: list[str] = []
 
 
-    def set_is_conditional(self) -> bool:
+    def is_optional(self) -> bool:
         for source in self.sources:
-            if not source.is_conditional:
+            if not source.in_conditional:
                 return False
-
         return True
 
 
@@ -169,7 +164,23 @@ class Command:
         return positionals
 
     def remove_positional(self, pos: int) -> None:
-        del self.positionals[pos]
+        """
+        removes positional and renumbers remaining positionals
+        does this by just creating a new dict and moving items across
+        """
+        new_positionals = {}
+
+        for key, val in self.positionals.items():
+            if key == pos:
+                continue
+            elif key > pos:
+                val.pos = val.pos - 1
+                new_positionals[key - 1] = val
+            else:
+                new_positionals[key] = val
+        
+        self.positionals = new_positionals
+
 
 
     def update(self, ctoken: Token, ntoken: Token) -> None:

@@ -81,7 +81,7 @@ class Output:
 
         # root is <collection>
         elif self.node.tag == 'collection':
-            self.is_array = True        
+            self.is_array = True      
 
     
     def get_datatype(self, param_register: ParamRegister) -> str:
@@ -137,6 +137,10 @@ class Output:
         pattern = pattern + '.' + datatype_list[0]
         
         return pattern
+
+
+    def get_default(self):
+        return None
 
 
 

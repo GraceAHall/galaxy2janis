@@ -20,17 +20,17 @@ class ParamRegister:
 
 
     def get(self, query_key: str, ignore_path=False) -> Optional[Param]:
+        # when we want to match full path
+        if query_key in self.params:
+            return self.params[query_key]
+
         # incase we dont care about path and just want final dot.
+        # note that this is a backup, and still prioritises trying to find full path first
         if ignore_path == True:
             for key in list(self.params.keys()):
                 nopath_key = key.rsplit('.')[-1]
                 if nopath_key.endswith(query_key.lstrip('$')):
                     return self.params[key]
-
-        # when we want to match full path
-        else:
-            if query_key in self.params:
-                return self.params[query_key]
 
         return None
 
