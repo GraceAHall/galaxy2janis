@@ -19,6 +19,26 @@ class JanisFormatter:
         self.inputs: list[str] = []
         self.outputs: list[str] = []
         self.metadata: list[str] = []
+        self.datatype_categories = {
+            "Boolean": 'common_types',
+            "CompressedTarFile": 'unix_types',
+            "csv": 'unix_types',
+            "Directory": 'common_types',
+            "Double": 'common_types',
+            "File": 'common_types',
+            "Filename": 'common_types',
+            "Float": 'common_types',
+            "Gzip": 'unix_types',
+            "HtmlFile": 'unix_types',
+            "Integer": 'common_types',
+            "jsonFile": 'unix_types',
+            "Stdout": 'common_types',
+            "String": 'common_types',
+            "TarFile": 'unix_types',
+            "TextFile": 'unix_types',
+            "tsv": 'unix_types',
+            "Zip": 'unix_types'
+        }
         
         self.janis_import_dict: dict[str, set[str]] = {
             'janis_core': {
@@ -28,7 +48,9 @@ class JanisFormatter:
                 'InputSelector',
                 'WildcardSelector',
                 'Array',
-                'Optional'
+                'Optional',
+                'UnionType',
+                'Stdout'
             },
             'bioinformatics_types': set(),
             'common_types': set(),
@@ -141,7 +163,6 @@ class JanisFormatter:
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
-        print(out_str)
         return out_str
 
 
@@ -186,7 +207,6 @@ class JanisFormatter:
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
-        print(out_str)
         return out_str
         
 
@@ -223,7 +243,12 @@ class JanisFormatter:
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
         out_str += f'\t\t{datatype},\n'
-        out_str += f'\t\tprefix="{prefix}",\n'
+
+        if opt.delim != ' ':
+            out_str += f'\t\tprefix="{prefix + opt.delim}",\n'
+            out_str += f'\t\tseparate_value_from_prefix=False,\n'
+        else:
+            out_str += f'\t\tprefix="{prefix}",\n'
 
         if default is not None:
             if len(opt.datatypes) == 1 and opt.datatypes[0] in ['Float', 'Integer']:
@@ -234,7 +259,6 @@ class JanisFormatter:
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
-        print(out_str)
         return out_str
 
 
@@ -262,10 +286,10 @@ class JanisFormatter:
         String
         String(optional=True)
         Array(String(), optional=True)
+        etc
         """
 
-        # TODO HERE
-        #self.update_datatype_imports(datatypes)
+        self.update_datatype_imports(datatypes)
         
         # handle union type
         if len(datatypes) > 1:
@@ -299,11 +323,12 @@ class JanisFormatter:
         either way have to update the import list for the datatypes it needs.
         """
         for dtype in datatypes:
-            category = self.datatype_categories[dtype]
+            if dtype in self.datatype_categories:
+                category = self.datatype_categories[dtype]
+            else:
+                category = 'bioinformatics_types'
             self.janis_import_dict[category].add(dtype)
 
-
-    # TODO then here
 
     def gen_outputs(self) -> list[str]:
         """
@@ -318,30 +343,12 @@ class JanisFormatter:
         """
         outputs = []
 
-        for output in self.tool.outputs:
-            output_string = self.format_output_to_string(output) 
+        for output in self.tool.out_register.get_outputs():
             self.update_component_imports(output)
+            output_string = self.format_output_to_string(output) 
             outputs.append(output_string)
 
         return outputs
-        
-
-    def format_output_to_string(self, output: Output) -> str:
-        """
-        formats outputs into janis tooldef string
-        """
-        output.janis_type = self.convert_types_to_janis(output)
-
-        out_str = '\tToolOutput(\n'
-        out_str += f'\t\t"{output.name}",\n'
-        out_str += f'\t\t{output.janis_type},\n'
-
-        # TODO this isnt strictly correct
-        out_str += f'\t\tselector={output.selector}("{output.selector_contents}"),\n'
-        out_str += f'\t\tdoc="{output.help_text}"\n'
-        out_str += '\t),\n'
-
-        return out_str
 
 
     def update_component_imports(self, output: Output) -> None:
@@ -349,9 +356,33 @@ class JanisFormatter:
         need to add the selector type to imports too!
         """
         self.janis_import_dict['janis_core'].add(output.selector)
+        
+
+    def format_output_to_string(self, output: Output) -> str:
+        """
+        formats outputs into janis tooldef string
+        """
+        datatype = self.format_janis_typestr(output.datatypes)
+
+        out_str = '\tToolOutput(\n'
+        out_str += f'\t\t"{output.name}",\n'
+
+        if output.is_stdout:
+            out_str += f'\t\tStdout({datatype}),\n'
+        else:
+            out_str += f'\t\t{datatype},\n'
+            out_str += f'\t\tselector={output.selector}("{output.selector_contents}"),\n'
+        
+        out_str += f'\t\tdoc="{output.help_text}"\n'
+        out_str += '\t),\n'
+
+        return out_str
 
 
     def gen_imports(self) -> list[str]:
+        if len(self.tool.out_register.get_outputs()) > 0:
+            self.janis_import_dict['common_types'].add('Boolean')
+
         out_str = ''
         jid = self.janis_import_dict
         
@@ -386,7 +417,7 @@ class JanisFormatter:
         """
         generates the __main__ call to translate to wdl on program exec
         """
-        toolname = self.tool.tool_id.replace('-', '_')
+        toolname = self.tool.id.replace('-', '_')
 
         out_str = '\n'
         out_str += 'if __name__ == "__main__":\n'

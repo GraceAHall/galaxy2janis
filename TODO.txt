@@ -8,22 +8,17 @@ add known extensions to galaxy parsed types.
 doesnt' know .fasta = .fa = .fna
 
 Today:
-    - stdout handling
-    - set_datatype() for params and outputs
-        - Outputs.py
-        - doesnt really work
-        - for each galaxy type, need type name and list of valid extensions
-        - then if select options or filepath is needed to infer type, 
-          the extensions can be pulled, searched, then the actual galaxy type returned. 
+    - DatatypeAnnotator() for cmd components and outputs needs to be upgraded
+        - need to collect parsed galaxy types and janis types
+        - need map of all possible extensions per type
+        - need to prioritise janis types, then fallback to galaxy parsed 
     - output to Janis format
-        - separate_value_from_prefix=False for key=val options. append '=' to prefix
         - interpret galaxy keywords (and flesh out galaxy kws better, make sure they all work)
-        - in general, be careful to make sure quotes are correct in cmd parsing
-    - get specific container
     - parse tool xmls
     - gather parsing stats (how many worked etc)
         - call tool.py (should have tool().translate("wdl", to_console) set up)
           to check whether its valid janis 
+    - get specific container
     - test parsing
     - galaxy templating system
     

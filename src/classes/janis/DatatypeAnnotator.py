@@ -5,6 +5,7 @@
 
 import json
 from typing import Union, Optional
+from classes.outputs.Outputs import Output
 
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
@@ -89,6 +90,9 @@ class DatatypeAnnotator:
 
         for item in self.command.options.values():
             self.annotate_option(item)
+        
+        for item in self.out_register.get_outputs():
+            self.annotate_output(item)
 
 
     def annotate_positional(self, the_positional) -> None:
@@ -108,7 +112,7 @@ class DatatypeAnnotator:
         # strings
         elif the_token.type in [TokenType.RAW_STRING, TokenType.QUOTED_STRING]:
             # return string or file type inferred from .extension
-            ext_types = self.infer_types_from_ext(the_token)
+            ext_types = self.infer_types_from_ext(the_token.text)
             if len(ext_types) > 0:
                 return ext_types
             return ['String']
@@ -177,8 +181,7 @@ class DatatypeAnnotator:
         return types[0]
 
 
-    def infer_types_from_ext(self, the_token: Token) -> list[str]:
-        the_string = the_token.text
+    def infer_types_from_ext(self, the_string: str) -> list[str]:
         hits = []
 
         components = the_string.split('.')
@@ -258,67 +261,25 @@ class DatatypeAnnotator:
 
         the_option.datatypes = self.select_datatypes_source(source_datatypes)
 
-        print()
 
-    
-    """
-    def convert_type_list(self, type_list) -> None:
-        out_list = set()
-
-        galaxy_types = param.galaxy_type.split(',') 
-        for gtype in galaxy_types:
-            if gtype in self.gx_janis_datatype_mapping:
-                ext = self.gx_janis_datatype_mapping[gtype]
-            else:
-                self.logger.log(1, f'datatype conversion failed: {gtype}')
-                ext = 'File'
-            out_list.add(ext)
-
-        param.janis_type = ','.join(out_list)
+    def annotate_output(self, the_output: Output) -> None:
+        """
+        a little different to the others. runs on a galaxy output obj not tokens
+        """
+        the_output.datatypes = self.get_output_datatype(the_output)
 
 
-    def get_janis_type(self) -> str:
-        out_str = ''
+    def get_output_datatype(self, the_output: Output) -> list[str]:
+        # try from galaxy_type first
+        if the_output.galaxy_type != '':
+            gx_types = the_output.galaxy_type.split(',')
+            return self.cast_to_janis(gx_types)
 
-        # get janis types (already converted from galaxy)
-        type_list = list(set(param.janis_type.split(',')))
+        # then from the extension on the selector contents
+        ext_types = self.infer_types_from_ext(the_output.selector_contents)
+        if len(ext_types) > 0:
+            # ext_types returns parsed galaxy types
+            return ext_types
 
-        # reduce to single type 
-        if len(type_list) > 1:
-            type_list = self.reduce_datatype(type_list)
-        
-        return type_list[0]
-
-
-    def reduce_datatype(self, type_list: list[str]) -> list[str]:
-        " ""
-        selects a single datatype from list of types. 
-        should be either 
-            - the most accessible form of the datatype (raw rather than gz)
-            - the common format (bam rather than sam)
-            - anything except 'File' fallback
-        " ""
-        # remove 'File' type
-        type_list = [t for t in type_list if t != 'File']
-        
-        # only the 'File' type was present
-        if len(type_list) == 0:
-            return ['File']
-
-        # if had 2 types where 1 was 'File'
-        elif len(type_list) == 1:
-            return type_list
-
-        else:
-            # remove basic types (String, Integer etc) like above 'File'?
-            pass
-
-        # TODO change this laziness. just sorting alphabetically and on length. is this even stable sort? 
-        type_list.sort()
-        type_list.sort(key=lambda x: len(x))
-
-        return [type_list[0]]
-
-
-    """
-
+        # fallback        
+        return ['File']

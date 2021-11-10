@@ -15,6 +15,7 @@ v0.1 unsupported
     - -o first${ext}
     - proper reconstruction of command order using cheetah command logic
     - tools with multiple commands (only first is interpreted at the moment) (bwa.xml is good example)
+        - do I need to consider '&&' after the first '>' / '|' ? 
 
 
 sources of outputs

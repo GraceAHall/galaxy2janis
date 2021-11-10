@@ -25,6 +25,10 @@ class OutputRegister:
         return None
 
 
+    def get_outputs(self) -> list[Output]:
+        return list(self.outputs.values())
+
+
     def get_output_by_filepath(self, filepath: str) -> Optional[Output]:
         # try to match the whole path
         for out in self.outputs.values():

@@ -225,7 +225,7 @@ class SelectParam(Param):
         return option_values
     
 
-    def set_datatype(self) -> str:
+    def set_datatype(self) -> None:
         """
         infers select param type. 
         Uses the different values in the option elems.
@@ -245,7 +245,7 @@ class SelectParam(Param):
         elif castable_type != '':
             param_type = castable_type
 
-        return param_type      
+        self.galaxy_type = param_type      
 
 
     def add_options_to_helptext(self) -> None:
