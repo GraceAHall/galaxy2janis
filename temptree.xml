@@ -57,7 +57,7 @@ runDisco.sh
     -d .
     -o disco
     #if $input_cond.library_type == "single"
-        -inS \$(find . -name "*fastq*" -print | tr '\n' ',' | sed 's/,$//')
+        -inS \$(find . -name "*fastq*" -print |'\n' ',' | sed 's/,$//')
     #else
         #if $input_cond.paired_input.type == "separated"
             #if $input_cond.paired_input.in1.ext.endswith(".gz") 

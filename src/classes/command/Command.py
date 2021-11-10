@@ -3,6 +3,7 @@
 
 from typing import Tuple, Optional, Union
 from enum import Enum
+from classes.outputs.OutputRegister import OutputRegister
 
 from utils.regex_utils import (
     find_unquoted,
@@ -182,12 +183,13 @@ class Command:
         self.positionals = new_positionals
 
 
-
-    def update(self, ctoken: Token, ntoken: Token) -> None:
-        option_encountered = False
-        # linux
-        if self.is_linux_op(ctoken):
-            self.update_positionals(ctoken)                
+    def update(self, ctoken: Token, ntoken: Token, out_register: OutputRegister) -> None:
+        skip_next = False
+        
+        # first linux '>' to stdout
+        if self.is_stdout(ctoken, ntoken):
+            self.update_outputs(ntoken, out_register)
+            skip_next = True
 
         # flag
         elif self.is_flag(ctoken, ntoken):
@@ -196,7 +198,7 @@ class Command:
         # option
         elif self.is_option(ctoken, ntoken):
             self.update_options(ctoken, ntoken, ' ')
-            option_encountered = True
+            skip_next = True
 
         else:
             # text positional
@@ -204,7 +206,29 @@ class Command:
             # some examples of options which don't start with '-' exist. 
             self.update_positionals(ctoken)  
 
-        return option_encountered              
+        return skip_next 
+
+
+    def is_stdout(self, ctoken: Token, ntoken: Token) -> bool:
+        """
+        """
+        if ctoken.type == TokenType.LINUX_OP:
+            if ntoken.type in [TokenType.RAW_STRING, TokenType.GX_OUT]:
+                return True
+        return False             
+
+
+    def update_outputs(self, token: Token, out_register: OutputRegister) -> None:
+        if token.type == TokenType.GX_OUT:
+            gx_out = out_register.get(token.text)
+
+        elif token.type == TokenType.RAW_STRING:
+            gx_out = out_register.get_output_by_filepath(token.text)
+        
+        if gx_out is None:
+            raise Exception(f"could not find gx output: {token.text}")
+
+        gx_out.is_stdout = True
 
 
     def update_positionals(self, token: Token) -> None:
@@ -240,14 +264,6 @@ class Command:
             self.options[key] = new_option
             
         self.options[key].sources.append(ntoken)
-
-
-    def is_linux_op(self, ctoken: Token) -> bool:
-        """
-        """
-        if ctoken.type == TokenType.LINUX_OP:
-            return True
-        return False
 
 
     def is_kv_pair(self, ctoken: Token) -> bool:

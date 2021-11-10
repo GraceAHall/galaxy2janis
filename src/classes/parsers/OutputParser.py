@@ -31,7 +31,7 @@ class OutputParser:
         # parse all outputs
         for output in outputs:
             output.parse()
-            output.galaxy_type = output.get_datatype(self.param_register)
+            output.set_datatype(self.param_register)
             #self.galaxy_type = consolidate_types(self.galaxy_type)
             self.log_pattern_status(output)
             #self.log_datatype_status(output)

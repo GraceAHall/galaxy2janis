@@ -5,6 +5,7 @@
 
 from typing import Union
 import xml.etree.ElementTree as et
+from classes.command.Command import Command
 
 from classes.command.CommandProcessor import CommandWord
 from classes.Logger import Logger
@@ -16,6 +17,8 @@ role of this module is to preprocess the command string into a useable state
 
 aim is to remove constructs like cheetah comments, conditional lines without
 removing other elements like #set directives which will be used later. 
+
+some stdio stuff is managed here. '| tee ', '|& tee ', 2>&1 etc are found and replaced or just removed for better understanding. 
 
 command string is also de-indented and generally cleaned (blank lines removed etc)
 
@@ -37,30 +40,34 @@ class CommandParser:
         loop_keywords = ['#for ', '#end for', '#while ', '#end while']
         error_keywords = ['#try ', '#except', '#end try']
         cheetah_var_keywords = ['#def ', '#set ']
-        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ']
+        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ']
         return conditional_keywords + loop_keywords + error_keywords + cheetah_var_keywords + linux_commands
         
 
     def parse(self) -> list[str]:
         # clean the command string
         command_string = self.get_command_string()
+        command_string = self.simplify_stdio(command_string)
         lines = self.split_command(command_string)
         lines = self.remove_comments(lines)
         lines = self.remove_ands(lines)
         lines = self.remove_bash_constructs(lines)
         lines = self.remove_cheetah_definitions(lines)
         lines = self.remove_cheetah_misc(lines)
+        # lines variable does not change from here! the line numbers are meaningful
 
         # convert each line into CommandWord and annotate with properties
         command_dict = self.init_command_words(lines)
-
-        # lines variable does not change! the line numbers are meaningful
         command_dict = self.annotate_conditional_words(command_dict, lines)
         command_dict = self.annotate_loop_words(command_dict, lines)
 
-        # format to return
-        commands = list(command_dict.values())
-        return lines, commands
+        # remove everything 
+        command_words = self.convert_to_words(command_dict)
+        command_words = self.truncate_extra_commands(command_words)
+
+        # post sentinel & return
+        command_words.append(CommandWord('__END_COMMAND__'))
+        return lines, command_words
  
 
     def get_command_string(self) -> str:
@@ -72,6 +79,25 @@ class CommandParser:
                 command_string = child.text
         
         return command_string  # type: ignore 
+
+
+    def simplify_stdio(self, command_string: str) -> str:
+        """
+        this function aims to remove some of the more complex constructs in the tool xml command
+        
+        """
+        command_string = command_string.replace("&amp;", "&")
+        command_string = command_string.replace(">>", ">")
+
+        command_string = command_string.replace("| tee ", "> ")
+        command_string = command_string.replace("| tee\n", "> ")
+        command_string = command_string.replace("|& tee ", "> ")
+        command_string = command_string.replace("|& tee\n", "> ")
+        command_string = command_string.replace("2>&1", "")
+        command_string = command_string.replace("1>&2", "")
+        command_string = command_string.replace(">&2", "")
+
+        return command_string
 
 
     def split_command(self, command_string: str) -> list[str]:
@@ -167,8 +193,8 @@ class CommandParser:
         
         # delete non-necessary words
         for line in command_lines:
-            line = line.replace('#slurp', '')
-            line = line.replace('#silent', '')
+            line = line.replace('#slurp ', '')
+            line = line.replace('#silent ', '')
         
             # only keep lines which don't start with keywords
             if not line.split(' ')[0] in banned_firstwords:
@@ -223,9 +249,6 @@ class CommandParser:
             if '#end unless' in line:
                 unless_level -= 1
 
-            if "--lineage_dataset '${lineage.lineage_dataset}'" in line:
-                print()
-
             if not any([line.startswith(kw) for kw in self.keywords]):
                 if if_level > 0 or unless_level > 0:
                     for cmd_word in command_dict[i]:
@@ -235,7 +258,6 @@ class CommandParser:
         return command_dict
 
         
-
     def annotate_loop_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:
         loop_keywords = ['#for', '#end for', '#while', '#end while']
 
@@ -266,8 +288,43 @@ class CommandParser:
         return command_dict
 
 
+    def convert_to_words(self, command_dict: dict[int, CommandWord]) -> list[CommandWord]:
+        command_lines = list(command_dict.items())
+        command_lines.sort(key = lambda x: x[0])
+        command_lines = [line for num, line in command_lines]
+        command_words = [item for word in command_lines for item in word]
+        return command_words
 
+
+    def truncate_extra_commands(self, command_words: list[CommandWord]) -> list[CommandWord]:
+        first_command_complete = False
+        cutoff = -1
+
+        for i, word in enumerate(command_words):
+            if word.text == '>':
+                if first_command_complete:
+                    cutoff = i
+                    break
+                else:
+                    first_command_complete = True
+
+            elif word.text == '|':
+                if first_command_complete:
+                    cutoff = i
+                    break
+                else:
+                    self.logger.log(2, "pipe encountered as end of 1st command")
+                    print()
         
+        # truncate or keep all cmd words 
+        if cutoff != -1:
+            out_words = command_words[:cutoff]
+            self.logger.log(1, "multiple commands encountered")
+        else:
+            out_words = command_words
+
+        return out_words
+
 
 
 

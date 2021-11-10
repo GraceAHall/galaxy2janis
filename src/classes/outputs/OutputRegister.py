@@ -25,6 +25,29 @@ class OutputRegister:
         return None
 
 
+    def get_output_by_filepath(self, filepath: str) -> Optional[Output]:
+        # try to match the whole path
+        for out in self.outputs.values():
+            if out.selector_contents == filepath:
+                return out
+        
+        # no success, try to match the end of the path
+        for out in self.outputs.values():
+            if out.selector_contents.endswith(filepath):
+                return out
+
+        # again no success, try to match the filepath anywhere in the selector contents
+        for out in self.outputs.values():
+            if filepath in out.selector_contents:
+                return out
+
+        return None
+
+
+            
+
+
+
     def restructure_outputs(self, outputs: list[Output]) -> None:
         output_dict = {}
         for out in self.outputs:

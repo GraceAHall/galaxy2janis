@@ -14,8 +14,21 @@ v0.1 unsupported
     - INDICIES (bwa-mem)
     - -o first${ext}
     - proper reconstruction of command order using cheetah command logic
+    - tools with multiple commands (only first is interpreted at the moment) (bwa.xml is good example)
+
+
+sources of outputs
+    - STDOUT written to GX_OUT
+        - annotate output.is_stdout
+    - STDOUT written to file, file path is referenced by a GX_OUT
+        - 
+    - other GX_OUTs
+        - point to file(s) not encountered in the command string 
+
+
 
 - param features 
+
     - non-unique param / output names 
         - ie param1.name = param2.name but param1.gx_var !=
           param2.gx_var
@@ -26,6 +39,84 @@ v0.1 unsupported
         - data->actions
         - data->default_identifier_source
         - discover_datasets->recurse
+    - tools with multiple commands
+        - each '|' or '&&' or ';' could represent a different command that could be run as a step
+        - in these cases, the single tool xml can be split into multiple janis tool definitions
+        - first, split the command string into each individual command
+        - identify the particular command which seems to be main one (ie bwa in bwa.xml, even though it has a number of samtools commands)
+        - when executing workflows, it could be known that the tool xml was split into (4) janis tools
+        - the step could then run as sort-of a sub-workflow
+        - when splitting a tool xml into multiple tool definitions: 
+            - first check if a tool def exists 
+            - if so, add any newly discovered params / outputs / command components
+            - else, just create a new one from scratch
+            - this approach is already employed by the main workflow specs incl janis. 
+            - sometimes even something simple like 'tr a-z A-Z < file.txt' is run as an individual step in a vanilla ubuntu container
+
+
+
+
+
+
+
+SUPPORTED REDIRECTION
+0 is stdin, 1 is stdout, and 2 is stderr
+'&amp;' is also accepted as '&'
+'>>' is also accepted as '>'
+
+STDOUT to file (often used for outputs) (337 tools)
+    construct           > file
+    galaxy occurance    > '$report'   (report has format="tabular")
+    janis solution      ToolOutput("report", Tabular, Stdout(optional=False))
+
+STDERR to file (4 tools)
+    construct           2>&1 > file
+    galaxy occurance    2>&1 > $file_stderr
+    janis solution      ToolOutput("file_stderr", Textfile, Stdout(optional=False))
+
+branch/split STDOUT to a file (usually for logs) (142 tools)
+    construct           | tee file
+    galaxy occurance    '$out_result' | tee '$out_log'  (out_log has format="txt")
+    janis solution      ToolOutput("report", Textfile, Stdout(optional=False))
+    
+    does janis support this? 
+        - should be fine in situations where '| tee' effectively replaces '>'
+        - ie when whatever gets passed to '| tee' is the final stdout of the tool step
+        - what if the tool continues and performs other actions? then goes on to collect stdout at a later time point? 
+
+branch/split STDERR & STDOUT to a file (usually for logs) (3 tools)
+    construct           |& tee file (short for `2>&1 | tee file`)
+    galaxy occurance    --verbose 3 |& tee '$out_log'
+    janis solution      ToolOutput("out_log", Datatype, Stdout(optional=False))
+
+STDIN
+    construct           < infile
+    galaxy occurance    datamash reverse < $in_file > $out_file
+    janis solution      ToolInput("in_file", Datatype, prefix="<" etc)
+
+STDOUT to STDERR (4 tools)
+    construct           1>&2 
+    galaxy occurance    echo "Reporting ... single input sample" 1>&2; exit 1 
+    janis solution      ignore. handled by workflow manager 
+
+STDERR to STDOUT (50 tools)
+    construct           2>&1
+    galaxy occurance    '$inputfile' '$output' 2>&1
+    janis solution      ignore. handled by workflow manager 
+
+something to STDERR (usually a quoted string or logfile) (19 tools)
+    construct           >&2
+    galaxy occurance    >&2 "unknown extension $in.input.ext"
+    janis solution      ignore. handled by workflow manager 
+
+
+Note
+If |& is used, the standard error of command is connected to command2’s standard input through the pipe; it is shorthand for 2>&1 |
+    |& tee -a '$out_log'
+    2>&1 | tee -a '$out_log'
+
+Bin something
+    /dev/null
 
 
 Params

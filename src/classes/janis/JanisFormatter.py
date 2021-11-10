@@ -265,7 +265,7 @@ class JanisFormatter:
         """
 
         # TODO HERE
-        self.update_datatype_imports(datatypes)
+        #self.update_datatype_imports(datatypes)
         
         # handle union type
         if len(datatypes) > 1:

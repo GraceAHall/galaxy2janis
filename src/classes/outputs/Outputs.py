@@ -24,6 +24,7 @@ class Output:
         self.is_optional: bool = False 
         self.is_array: bool = False
         self.is_hidden: bool = False
+        self.is_stdout: bool = False
         self.selector: str = ''
         self.selector_contents: str = ''
 
@@ -47,6 +48,7 @@ class Output:
         self.set_help_text()
         self.set_selector_contents()
         self.set_is_array()
+
 
     def set_basic_details(self) -> None:
         self.name = get_attribute_value(self.node, 'name')
@@ -84,7 +86,7 @@ class Output:
             self.is_array = True      
 
     
-    def get_datatype(self, param_register: ParamRegister) -> str:
+    def set_datatype(self, param_register: ParamRegister) -> str:
         # datatype can be specified in format, format_source, auto_format (ext), or from_work_dir.
         gx_format = get_attribute_value(self.node, 'format')
         format_source = get_attribute_value(self.node, 'format_source')
@@ -102,8 +104,11 @@ class Output:
 
         # get datatype from referenced file extension
         elif from_work_dir != '':
-            assert('.' in from_work_dir)
-            datatype = from_work_dir.rsplit('.', 1)[1]
+            # TODO HERE needs a much more complex process to get datatype from extension. 
+            # needs a map of extensions -> galaxy types
+            # this isn't even a datatype - its an ext being returned? so bad yuck 
+            datatype = 'File'
+            # datatype = from_work_dir.rsplit('.', 1)[-1]
 
         # fallback
         else:
@@ -112,11 +117,18 @@ class Output:
         return datatype
 
 
-    def format_pattern_extension(self, pattern: str) -> str:
+    def format_pattern_extension(self, filepath: str) -> str:
         # get datatypes
         datatype_list = self.galaxy_type.split(',')
+        datatype_list = [d for d in datatype_list if d != '']
+
+        # early exits
+        if len(datatype_list) == 1 and datatype_list[0] == 'File':
+            return filepath
+        elif len(datatype_list) == 0:
+            return filepath
         
-        # check if the pattern already ends with any of these datatypes
+        # check if the filepath already ends with any of these datatypes
         for datatype in datatype_list:
             
             # get all possible extensions for the datatype
@@ -127,16 +139,13 @@ class Output:
 
             # check if any are present
             for ext in extensions:
-                if pattern.endswith('.' + ext):
-                    return pattern
+                if filepath.endswith('.' + ext):
+                    return filepath
 
-        # if not, add the first to the pattern end (if not file)
-        pattern = pattern.rstrip('.')
-        if len(datatype_list) == 1 and datatype_list[0] == 'file':
-            return pattern
-        pattern = pattern + '.' + datatype_list[0]
-        
-        return pattern
+        # if not, add the first to the filepath end (if not file)
+        filepath = filepath.rsplit('.', 1)[0]
+        filepath = filepath + '.' + datatype_list[0]
+        return filepath
 
 
     def get_default(self):
@@ -164,7 +173,7 @@ class DiscoverDatasetsOutput(Output):
 
 
     # overrides base class
-    def get_datatype(self, param_register: ParamRegister) -> str:
+    def set_datatype(self, param_register: ParamRegister) -> str:
         """
         in <collection> or <data>(parent):
             - format
@@ -198,7 +207,7 @@ class DiscoverDatasetsOutput(Output):
         elif dd_ext != '':
             return dd_ext
         
-        return 'file'
+        return 'File'
 
 
     def set_selector_contents(self) -> None:

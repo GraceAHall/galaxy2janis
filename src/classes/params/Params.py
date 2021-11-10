@@ -199,7 +199,7 @@ class SelectParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str]):
         super().__init__(node, tree_path)
         self.options: list[str] = self.get_param_options()
-        self.galaxy_type: str = self.get_datatype()
+        self.set_datatype()
         self.parse_common_features()
         self.add_options_to_helptext()
 
@@ -225,7 +225,7 @@ class SelectParam(Param):
         return option_values
     
 
-    def get_datatype(self) -> str:
+    def set_datatype(self) -> str:
         """
         infers select param type. 
         Uses the different values in the option elems.

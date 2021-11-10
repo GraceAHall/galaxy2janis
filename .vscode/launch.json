@@ -126,6 +126,16 @@
             ]
         },
         {
+            "name": "bandage info",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "bandage_info.xml", "tools/bandage"
+            ]
+        },
+        {
             "name": "velvetg",
             "type": "python",
             "request": "launch",

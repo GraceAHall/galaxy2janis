@@ -35,7 +35,7 @@ class CommandWord:
 
 
 class CommandProcessor:
-    def __init__(self, lines: list[str], command_lines: list[list[CommandWord]], param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
+    def __init__(self, lines: list[str], cmd_words: list[CommandWord], param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         """
         Command class receives the CommandLines
         """
@@ -43,9 +43,7 @@ class CommandProcessor:
         self.out_register = out_register
         self.logger = logger
         self.lines = lines
-        self.command_lines = command_lines
-        self.cmd_words = [item for word in command_lines for item in word]
-        self.cmd_words.append(CommandWord('__END_COMMAND__')) # sentinel for end of command
+        self.cmd_words = cmd_words
         self.aliases: AliasRegister = AliasRegister(self.param_register)
         self.env_vars: list[str] = []
         self.cmd_tokens: list[Token] = []
@@ -60,20 +58,6 @@ class CommandProcessor:
         command = self.gen_command()
         command.pretty_print()
         return command
-
-
-    def print_command_lines(self) -> None:
-        print()
-        for line in self.command_lines:
-            for cmd_word in line:
-                temp_str = ''
-                if cmd_word.in_conditional:
-                    temp_str += '[C]'
-                if cmd_word.in_loop:
-                    temp_str += '[L]'
-                temp_str += cmd_word.text
-                print(temp_str, end=' ')
-            print()
 
 
     def print_command_words(self) -> None:
@@ -495,8 +479,8 @@ class CommandProcessor:
 
                 # everything else
                 for ntoken in next_tokens:
-                    option_encountered = command.update(ctoken, ntoken)
-                    if option_encountered:
+                    skip_next = command.update(ctoken, ntoken, self.out_register)
+                    if skip_next:
                         should_skip_next = True
             
             if should_skip_next:

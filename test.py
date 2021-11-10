@@ -1,50 +1,52 @@
 
 
-import re 
-import numpy as np
+
+import regex as re
+
+def get_stdout_constructs(the_string):
+    pattern = r'(?<=\s|^)(2>\&1 )?>(?=\s)|(\|&?)\stee(?=\s|$)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+print(get_stdout_constructs("> '$report'"))
+print(get_stdout_constructs("2>&1 > $file_stderr"))
+print(get_stdout_constructs("'$out_result' | tee '$out_log'"))
+print(get_stdout_constructs("--verbose 3 |& tee '$out_log'"))
+print(get_stdout_constructs("|& tee '$out_log'"))
+print(get_stdout_constructs("| tee"))
+print(get_stdout_constructs("| tee1"))
+print(get_stdout_constructs(" |& tee 1daasd"))
+print(get_stdout_constructs(" | & tee"))
 
 
 
-the_string1 = 'hello ## there "yeah"'
+
+def simplify_stdio(command_string):
+    command_string = command_string.replace("&amp;", "&")
+    command_string = command_string.replace(">>", ">")
+
+    command_string = command_string.replace("| tee ", "> ")
+    command_string = command_string.replace("| tee\n", "> ")
+    command_string = command_string.replace("|& tee ", "> ")
+    command_string = command_string.replace("|& tee\n", "> ")
+    command_string = command_string.replace("2>&1", "")
+    command_string = command_string.replace("1>&2", "")
+    command_string = command_string.replace(">&2", "")
+
+    return command_string
 
 
-the_string2 = """
-hello \'##\' there "yeah"
+cmd_string = """
+  > '$report'
+2>&1 > $file_stderr
+'$out_result' | tee '$out_log'
+--verbose 3 |& tee '$out_log'
+|& tee '$out_log'
+| tee
+| tee1
+ | & tee 1daasd
 """
 
+print(simplify_stdio(cmd_string))
 
-the_string3 = """
-hello '##' there "yeah"
-"""
-
-the_string4 = """
-## hello there "yeah"
-"""
-
-
-
-# find the areas of the string which are quoted
-matches = re.finditer(r'"(.*?)"|\'(.*?)\'', the_string4)
-quoted_sections = [(m.start(), m.end()) for m in matches]
-
-# transform to mask
-quotes_mask = np.zeros(len(the_string4))
-for start, end in quoted_sections:
-    quotes_mask[start: end] = 1
-
-print(quotes_mask)
-
-# find '##' 
-matches = re.finditer('##', the_string4)
-hash_hits = [(m.start(), m.end()) for m in matches]
-
-# check each '##' to see if its quoted. if not, mark as start of comment
-comment_start = -1
-for start, end in hash_hits:
-    if sum(quotes_mask[start: end]) == 0:
-        comment_start = start
-        break
-
-# override line
-line = the_string4[:comment_start]
-print(line)

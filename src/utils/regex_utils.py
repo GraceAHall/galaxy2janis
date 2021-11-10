@@ -56,6 +56,12 @@ def strip_method_calls(match: str, match_end: int, the_string: str) -> str:
     return match
 
 
+def get_stdout_constructs(the_string: str) -> list[str]:
+    pattern = r'(?<=\s|^)(2>\&1 )?>(?=\s)|(\|&?)\stee(?=\s|$)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
 def get_words(the_string: str) -> list[str]:
     pattern = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
     matches = re.finditer(pattern, the_string)
