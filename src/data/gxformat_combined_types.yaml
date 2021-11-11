@@ -21,12 +21,12 @@ types:
     import_path: janis_core.types.common_data_types
   - format: bai
     source: janis
-    classname: BAI
+    classname: Bai
     extensions: .bai
     import_path: janis_bioinformatics.data_types.bai
   - format: bam
     source: janis
-    classname: BAM
+    classname: Bam
     extensions: .bam
     import_path: janis_bioinformatics.data_types.bam
   - format: bed

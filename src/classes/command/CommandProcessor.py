@@ -614,8 +614,8 @@ class CommandProcessor:
         linux_operators = get_linux_operators(text)
         tokens += [Token(op, TokenType.LINUX_OP) for op in linux_operators]
 
-        gx_keywords = get_galaxy_keywords(text)
-        tokens += [Token(kw, TokenType.GX_KEYWORD) for kw in gx_keywords]
+        #gx_keywords = get_galaxy_keywords(text) TODO REMOVE
+        #tokens += [Token(kw, TokenType.GX_KEYWORD) for kw in gx_keywords] TODO REMOVE
 
         kv_pairs = get_keyval_pairs(text)
         tokens += [Token(kv, TokenType.KV_PAIR) for kv in kv_pairs]
@@ -630,28 +630,29 @@ class CommandProcessor:
         kv_pairs = [t for t in tokens if t.type == TokenType.KV_PAIR]
         gx_params = [t for t in tokens if t.type == TokenType.GX_PARAM]
         gx_outs = [t for t in tokens if t.type == TokenType.GX_OUT]
-        gx_kws = [t for t in tokens if t.type == TokenType.GX_KEYWORD]
+        #gx_kws = [t for t in tokens if t.type == TokenType.GX_KEYWORD] TODO REMOVE
         linux_ops = [t for t in tokens if t.type == TokenType.LINUX_OP]
 
         if len(kv_pairs) > 0:
             # just check if there is a gx_kw of same length 
             # gx_kws show up as kv_pairs too because of the ':'
-            if len(gx_kws) > 0:
-                return self.resolve_kvpair_and_gxkw_priority(kv_pairs + gx_kws)
-            else:
-                return kv_pairs[0]
+            # if len(gx_kws) > 0: TODO REMOVE
+            #     return self.resolve_kvpair_and_gxkw_priority(kv_pairs + gx_kws) TODO REMOVE
+            return kv_pairs[0]
         elif len(gx_params) > 0:
             return gx_params[0]
         elif len(gx_outs) > 0:
             return gx_outs[0]
-        elif len(gx_kws) > 0:
-            return gx_kws[0]
+        # elif len(gx_kws) > 0:  TODO REMOVE
+        #     return gx_kws[0] TODO REMOVE
         elif len(linux_ops) > 0:
             return linux_ops[0]
                 
         return tokens[0]
 
 
+    # maybe not needed in current version as GX_KEYWORDS are removed in command parsing
+    # TODO REMOVE function
     def resolve_kvpair_and_gxkw_priority(self, token_list: list[Token]) -> Token:
         longest_tokens = self.get_longest_token(token_list)
         
@@ -672,6 +673,9 @@ class CommandProcessor:
         longest_text_len = max([len(t.text) for t in token_list])
         longest_tokens = [t for t in token_list if len(t.text) == longest_text_len]
         return longest_tokens
+
+
+    
 
 
     

@@ -10,7 +10,7 @@ from classes.command.Command import Command
 from classes.command.CommandProcessor import CommandWord
 from classes.Logger import Logger
 
-from utils.regex_utils import find_unquoted, get_words
+from utils.regex_utils import find_unquoted, get_words, get_galaxy_keyword_value
 
 """
 role of this module is to preprocess the command string into a useable state
@@ -63,6 +63,7 @@ class CommandParser:
 
         # remove everything 
         command_words = self.convert_to_words(command_dict)
+        command_words = self.translate_gx_keywords(command_words)
         command_words = self.truncate_extra_commands(command_words)
 
         # post sentinel & return
@@ -293,6 +294,15 @@ class CommandParser:
         command_lines.sort(key = lambda x: x[0])
         command_lines = [line for num, line in command_lines]
         command_words = [item for word in command_lines for item in word]
+        return command_words
+
+
+    def translate_gx_keywords(self, command_words: list[CommandWord]) -> list[CommandWord]:
+        for word in command_words:
+            gx_keyword_value = get_galaxy_keyword_value(word.text)
+            if gx_keyword_value != None:
+                word.text = gx_keyword_value
+
         return command_words
 
 

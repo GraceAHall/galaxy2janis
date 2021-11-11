@@ -2,6 +2,7 @@
 
 import regex as re
 import numpy as np
+from typing import Optional
 
 
 def get_cheetah_vars(the_string: str) -> set[str]:
@@ -103,6 +104,15 @@ def get_linux_operators(the_string: str) -> list[str]:
     pattern = r'^[><|]+$'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
+
+
+def get_galaxy_keyword_value(the_string: str) -> Optional[str]:
+    pattern = r'\\\$\{?GALAXY_.*?[\s:]-(\w+?)\}'
+    matches = re.finditer(pattern, the_string)
+    for m in matches:
+        return m.group(1)
+    return None
+
 
 
 def get_galaxy_keywords(the_string: str) -> list[str]:

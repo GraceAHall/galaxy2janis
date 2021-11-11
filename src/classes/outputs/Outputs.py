@@ -108,14 +108,14 @@ class Output:
             # TODO HERE needs a much more complex process to get datatype from extension. 
             # needs a map of extensions -> galaxy types
             # this isn't even a datatype - its an ext being returned? so bad yuck 
-            datatype = 'File'
+            datatype = 'file'
             # datatype = from_work_dir.rsplit('.', 1)[-1]
 
         # fallback
         else:
-            datatype = 'File'
+            datatype = 'file'
 
-        return datatype
+        self.galaxy_type = datatype
 
 
     def format_pattern_extension(self, filepath: str) -> str:

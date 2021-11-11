@@ -8,12 +8,7 @@ add known extensions to galaxy parsed types.
 doesnt' know .fasta = .fa = .fna
 
 Today:
-    - DatatypeAnnotator() for cmd components and outputs needs to be upgraded
-        - need to collect parsed galaxy types and janis types
-        - need map of all possible extensions per type
-        - need to prioritise janis types, then fallback to galaxy parsed 
-    - output to Janis format
-        - interpret galaxy keywords (and flesh out galaxy kws better, make sure they all work)
+    - when option is GX_OUT, create an input for it (-v '$output')
     - parse tool xmls
     - gather parsing stats (how many worked etc)
         - call tool.py (should have tool().translate("wdl", to_console) set up)

@@ -33,6 +33,15 @@ class JanisFormatter:
                 'Stdout'
             }
         }
+        self.tag_counter = {
+            "identifier": 0,
+            "tool": 0,
+            "scatter": 0,
+            "ignore_missing": 0,
+            "output": 0,
+            "input": 0,
+            "inputs": 0
+        }
 
 
     def format(self) -> None:
@@ -126,6 +135,8 @@ class JanisFormatter:
             - doc
         """
         tag, datatype, default, docstring = self.extract_positional_details(positional)
+        tag = self.validate_tag(tag)
+
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
         out_str += f'\t\t{datatype},\n'
@@ -157,8 +168,25 @@ class JanisFormatter:
 
         docstring = self.get_docstring([token])
         datatype = self.format_janis_typestr(posit.datatypes)        
+        if len(tag) == 1:
+            tag += '_'
 
         return tag, datatype, default, docstring
+
+
+    def validate_tag(self, tag: str) -> str:
+        """
+        to avoid janis reserved keywords
+        if the tag is a keyword, appends an int (count of times that keyword has appeared)
+        """
+        if tag in self.tag_counter:
+            self.tag_counter[tag] += 1
+            tag = tag + str(self.tag_counter[tag])
+
+        if len(tag) == 1:
+            tag += '_'
+
+        return tag
 
 
     def get_gx_obj(self, query_ref: str):
@@ -177,6 +205,7 @@ class JanisFormatter:
             doc=""
         """
         tag, datatype, prefix, docstring = self.extract_flag_details(flag)
+        tag = self.validate_tag(tag)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -197,6 +226,9 @@ class JanisFormatter:
 
         prefix = flag.prefix
         docstring = self.get_docstring(flag.sources) # get from galaxy param otherwise blank
+
+        if len(tag) == 1:
+            tag += '_'
         
         return tag, datatype, prefix, docstring
         
@@ -218,6 +250,8 @@ class JanisFormatter:
             doc="[Optional] Max read length",
         """
         tag, datatype, prefix, default, docstring = self.extract_option_details(opt)
+        tag = self.validate_tag(tag)
+
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
         out_str += f'\t\t{datatype},\n'
@@ -247,6 +281,9 @@ class JanisFormatter:
 
         default = self.get_default(opt.sources)
         docstring = self.get_docstring(opt.sources)
+
+        if len(tag) == 1:
+            tag += '_'
 
         return tag, datatype, prefix, default, docstring
     
@@ -340,9 +377,10 @@ class JanisFormatter:
         formats outputs into janis tooldef string
         """
         datatype = self.format_janis_typestr(output.datatypes)
+        tag = self.validate_tag(output.name)
 
         out_str = '\tToolOutput(\n'
-        out_str += f'\t\t"{output.name}",\n'
+        out_str += f'\t\t"{tag}",\n'
 
         if output.is_stdout:
             out_str += f'\t\tStdout({datatype}),\n'

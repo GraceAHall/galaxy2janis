@@ -85,6 +85,7 @@ build 3 datastructures containing the above, indexed by:
 v0.1 unsupported
 
 - command string
+    - \$_GALAXY_JOB_TMP_DIR (no idea what to do)
     - for loops
     - multiline bash blocks
     - MULTIPLE EXPANDED FORMS (filtlong)

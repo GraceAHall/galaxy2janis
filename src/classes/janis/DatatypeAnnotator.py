@@ -185,7 +185,7 @@ class DatatypeAnnotator:
             }]
         
         # numeric
-        elif the_token.type == [TokenType.RAW_NUM, TokenType.QUOTED_NUM]:
+        elif the_token.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]:
             # return int or float
             return self.infer_types_from_numeric(the_token)
         
@@ -193,9 +193,9 @@ class DatatypeAnnotator:
         elif the_token.type == TokenType.LINUX_OP:
             return [None]
         
-        # linux
-        elif the_token.type == TokenType.GX_KEYWORD:
-            return [None]
+        #gx kw TODO REMOVE
+        #elif the_token.type == TokenType.GX_KEYWORD: TODO REMOVE
+        #    return [None] TODO REMOVE
 
 
     def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
