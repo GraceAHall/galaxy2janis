@@ -7,13 +7,16 @@
 
 Datatypes
 
-single read-only json file (persistable)
+single read-only yaml file (persistable)
+
 
 janis types, galaxy types
+
+format_attrib:
+    - source
     - classname
     - exts
     - import path
-
 
 
 

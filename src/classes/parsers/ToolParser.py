@@ -176,11 +176,12 @@ class ToolParser:
         # parse command text into useful representation
         cp = CommandParser(self.tree, self.logger)
         lines, commands = cp.parse()
+        #command.pretty_print()
         
         # create Command() object
         cs = CommandProcessor(lines, commands, self.param_register, self.out_register, self.logger) # type: ignore
         command = cs.process()
-        command.pretty_print()
+        #command.pretty_print()
         self.command = command
 
 
@@ -188,7 +189,7 @@ class ToolParser:
     def annotate_datatypes(self):
         da = DatatypeAnnotator(self.command, self.param_register, self.out_register, self.logger)
         da.annotate()
-        self.command.pretty_print()
+        #self.command.pretty_print()
 
 
     def init_tool(self):

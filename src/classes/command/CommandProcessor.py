@@ -54,9 +54,8 @@ class CommandProcessor:
         self.set_aliases()
         self.expand_aliases()
         self.tokenify_command()
-        self.pretty_print_tokens()
+        #self.pretty_print_tokens()
         command = self.gen_command()
-        command.pretty_print()
         return command
 
 

@@ -1,5 +1,5 @@
 
-from janis_core import File, Array, Logger
+from janis_core import File
 
 
 class Ab1(File):
@@ -21,7 +21,7 @@ class Ab1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AccNos(File):
@@ -43,7 +43,7 @@ class AccNos(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Acedb(File):
@@ -65,7 +65,7 @@ class Acedb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Affybatch(File):
@@ -87,7 +87,7 @@ class Affybatch(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AlignCheck(File):
@@ -109,7 +109,7 @@ class AlignCheck(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AlignReport(File):
@@ -131,7 +131,7 @@ class AlignReport(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AllegroLOD(File):
@@ -153,7 +153,7 @@ class AllegroLOD(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Alohomora_maf(File):
@@ -175,7 +175,7 @@ class Alohomora_maf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Alohomora_map(File):
@@ -197,7 +197,7 @@ class Alohomora_map(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Alohomora_ped(File):
@@ -219,7 +219,7 @@ class Alohomora_ped(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Amos(File):
@@ -241,7 +241,7 @@ class Amos(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Analyze75(File):
@@ -263,7 +263,7 @@ class Analyze75(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anndata(File):
@@ -285,7 +285,7 @@ class Anndata(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioComposite(File):
@@ -307,7 +307,7 @@ class AnvioComposite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioContigsDB(File):
@@ -329,7 +329,7 @@ class AnvioContigsDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioDB(File):
@@ -351,7 +351,7 @@ class AnvioDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioGenomesDB(File):
@@ -373,7 +373,7 @@ class AnvioGenomesDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioPanDB(File):
@@ -395,7 +395,7 @@ class AnvioPanDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioProfileDB(File):
@@ -417,7 +417,7 @@ class AnvioProfileDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioSamplesDB(File):
@@ -439,7 +439,7 @@ class AnvioSamplesDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class AnvioStructureDB(File):
@@ -461,7 +461,7 @@ class AnvioStructureDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anvio_classifier(File):
@@ -483,7 +483,7 @@ class Anvio_classifier(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anvio_cog_profile(File):
@@ -505,7 +505,7 @@ class Anvio_cog_profile(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anvio_pfam_profile(File):
@@ -527,7 +527,7 @@ class Anvio_pfam_profile(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anvio_state(File):
@@ -549,7 +549,7 @@ class Anvio_state(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Anvio_variability(File):
@@ -571,7 +571,7 @@ class Anvio_variability(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Arff(File):
@@ -593,7 +593,7 @@ class Arff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Augustus(File):
@@ -615,7 +615,7 @@ class Augustus(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Axes(File):
@@ -637,7 +637,7 @@ class Axes(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Axt(File):
@@ -659,7 +659,7 @@ class Axt(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BPF(File):
@@ -681,7 +681,7 @@ class BPF(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BafTar(File):
@@ -703,7 +703,7 @@ class BafTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bai(File):
@@ -725,7 +725,7 @@ class Bai(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bam(File):
@@ -747,7 +747,7 @@ class Bam(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BamInputSorted(File):
@@ -769,7 +769,7 @@ class BamInputSorted(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BamNative(File):
@@ -791,7 +791,7 @@ class BamNative(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BamQuerynameSorted(File):
@@ -813,7 +813,7 @@ class BamQuerynameSorted(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bcf(File):
@@ -835,7 +835,7 @@ class Bcf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BcfUncompressed(File):
@@ -857,7 +857,7 @@ class BcfUncompressed(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bcf_bgzip(File):
@@ -879,7 +879,7 @@ class Bcf_bgzip(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bed(File):
@@ -901,7 +901,7 @@ class Bed(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bed12(File):
@@ -923,7 +923,7 @@ class Bed12(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bed6(File):
@@ -945,7 +945,7 @@ class Bed6(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BedGraph(File):
@@ -967,7 +967,7 @@ class BedGraph(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BedStrict(File):
@@ -989,7 +989,7 @@ class BedStrict(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bgzip(File):
@@ -1011,7 +1011,7 @@ class Bgzip(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bif(File):
@@ -1033,7 +1033,7 @@ class Bif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BigBed(File):
@@ -1055,7 +1055,7 @@ class BigBed(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BigWig(File):
@@ -1077,7 +1077,7 @@ class BigWig(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Binary(File):
@@ -1099,7 +1099,7 @@ class Binary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Biom1(File):
@@ -1121,7 +1121,7 @@ class Biom1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Biom2(File):
@@ -1143,7 +1143,7 @@ class Biom2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastDomainDb(File):
@@ -1165,7 +1165,7 @@ class BlastDomainDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastDomainDb5(File):
@@ -1187,7 +1187,7 @@ class BlastDomainDb5(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastNucDb(File):
@@ -1209,7 +1209,7 @@ class BlastNucDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastNucDb5(File):
@@ -1231,7 +1231,7 @@ class BlastNucDb5(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastProtDb(File):
@@ -1253,7 +1253,7 @@ class BlastProtDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastProtDb5(File):
@@ -1275,7 +1275,7 @@ class BlastProtDb5(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlastXml(File):
@@ -1297,7 +1297,7 @@ class BlastXml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BlibSQlite(File):
@@ -1319,7 +1319,7 @@ class BlibSQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bmp(File):
@@ -1341,7 +1341,7 @@ class Bmp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BowtieBaseIndex(File):
@@ -1363,7 +1363,7 @@ class BowtieBaseIndex(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class BowtieColorIndex(File):
@@ -1385,7 +1385,7 @@ class BowtieColorIndex(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bref3(File):
@@ -1407,7 +1407,7 @@ class Bref3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Btf(File):
@@ -1429,7 +1429,7 @@ class Btf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Btwisted(File):
@@ -1451,7 +1451,7 @@ class Btwisted(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Bus(File):
@@ -1473,7 +1473,7 @@ class Bus(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CMAP(File):
@@ -1495,7 +1495,7 @@ class CMAP(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CML(File):
@@ -1517,7 +1517,7 @@ class CML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CRAM(File):
@@ -1539,7 +1539,7 @@ class CRAM(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CSV(File):
@@ -1561,7 +1561,7 @@ class CSV(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cai(File):
@@ -1583,7 +1583,7 @@ class Cai(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cat_db(File):
@@ -1605,7 +1605,7 @@ class Cat_db(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cel(File):
@@ -1627,7 +1627,7 @@ class Cel(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Charge(File):
@@ -1649,7 +1649,7 @@ class Charge(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Checktrans(File):
@@ -1671,7 +1671,7 @@ class Checktrans(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Chips(File):
@@ -1693,7 +1693,7 @@ class Chips(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ChiraSQLite(File):
@@ -1715,7 +1715,7 @@ class ChiraSQLite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ChromInfo(File):
@@ -1737,7 +1737,7 @@ class ChromInfo(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ChromatinInteractions(File):
@@ -1759,7 +1759,7 @@ class ChromatinInteractions(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CisML(File):
@@ -1781,7 +1781,7 @@ class CisML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ckpt(File):
@@ -1803,7 +1803,7 @@ class Ckpt(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Clustal(File):
@@ -1825,7 +1825,7 @@ class Clustal(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Codata(File):
@@ -1847,7 +1847,7 @@ class Codata(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Codcmp(File):
@@ -1869,7 +1869,7 @@ class Codcmp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Coderet(File):
@@ -1891,7 +1891,7 @@ class Coderet(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CompressedZipArchive(File):
@@ -1913,7 +1913,7 @@ class CompressedZipArchive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Compseq(File):
@@ -1935,7 +1935,7 @@ class Compseq(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ConnectivityTable(File):
@@ -1957,7 +1957,7 @@ class ConnectivityTable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ConsensusTaxonomy(File):
@@ -1979,7 +1979,7 @@ class ConsensusTaxonomy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ConsensusXML(File):
@@ -2001,7 +2001,7 @@ class ConsensusXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cool(File):
@@ -2023,7 +2023,7 @@ class Cool(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CountTable(File):
@@ -2045,7 +2045,7 @@ class CountTable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cpgplot(File):
@@ -2067,7 +2067,7 @@ class Cpgplot(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cpgreport(File):
@@ -2089,7 +2089,7 @@ class Cpgreport(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cps(File):
@@ -2111,7 +2111,7 @@ class Cps(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cpt(File):
@@ -2133,7 +2133,7 @@ class Cpt(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CuffDiffSQlite(File):
@@ -2155,7 +2155,7 @@ class CuffDiffSQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cusp(File):
@@ -2177,7 +2177,7 @@ class Cusp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class CustomTrack(File):
@@ -2199,7 +2199,7 @@ class CustomTrack(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cut(File):
@@ -2221,7 +2221,7 @@ class Cut(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Cxb(File):
@@ -2243,7 +2243,7 @@ class Cxb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class D3_hierarchy(File):
@@ -2265,7 +2265,7 @@ class D3_hierarchy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DAA(File):
@@ -2287,7 +2287,7 @@ class DAA(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DMND(File):
@@ -2309,7 +2309,7 @@ class DMND(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DRF(File):
@@ -2331,7 +2331,7 @@ class DRF(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dada2_dada(File):
@@ -2353,7 +2353,7 @@ class Dada2_dada(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dada2_errorrates(File):
@@ -2375,7 +2375,7 @@ class Dada2_errorrates(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dada2_mergepairs(File):
@@ -2397,7 +2397,7 @@ class Dada2_mergepairs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dada2_sequencetable(File):
@@ -2419,7 +2419,7 @@ class Dada2_sequencetable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dada2_uniques(File):
@@ -2441,7 +2441,7 @@ class Dada2_uniques(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dan(File):
@@ -2463,7 +2463,7 @@ class Dan(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Data(File):
@@ -2485,7 +2485,7 @@ class Data(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DataIn(File):
@@ -2507,7 +2507,7 @@ class DataIn(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Data_manager_json(File):
@@ -2529,7 +2529,7 @@ class Data_manager_json(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dbmotif(File):
@@ -2551,7 +2551,7 @@ class Dbmotif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dbnsfp_tabular(File):
@@ -2573,7 +2573,7 @@ class Dbnsfp_tabular(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dcd(File):
@@ -2595,7 +2595,7 @@ class Dcd(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Deeptools_compute_matrix_archive(File):
@@ -2617,7 +2617,7 @@ class Deeptools_compute_matrix_archive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Deeptools_coverage_matrix(File):
@@ -2639,7 +2639,7 @@ class Deeptools_coverage_matrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Diffseq(File):
@@ -2661,7 +2661,7 @@ class Diffseq(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Digest(File):
@@ -2683,7 +2683,7 @@ class Digest(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Directory(File):
@@ -2705,7 +2705,7 @@ class Directory(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DistanceMatrix(File):
@@ -2727,7 +2727,7 @@ class DistanceMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DlibSQlite(File):
@@ -2749,7 +2749,7 @@ class DlibSQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class DotBracket(File):
@@ -2771,7 +2771,7 @@ class DotBracket(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dreg(File):
@@ -2793,7 +2793,7 @@ class Dreg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dta(File):
@@ -2815,7 +2815,7 @@ class Dta(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dta2d(File):
@@ -2837,7 +2837,7 @@ class Dta2d(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Dzi(File):
@@ -2859,7 +2859,7 @@ class Dzi(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ENCODEPeak(File):
@@ -2881,7 +2881,7 @@ class ENCODEPeak(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Edr(File):
@@ -2903,7 +2903,7 @@ class Edr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Edta(File):
@@ -2925,7 +2925,7 @@ class Edta(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Eigenstratgeno(File):
@@ -2947,7 +2947,7 @@ class Eigenstratgeno(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Eigenstratpca(File):
@@ -2969,7 +2969,7 @@ class Eigenstratpca(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Einverted(File):
@@ -2991,7 +2991,7 @@ class Einverted(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Eland(File):
@@ -3013,7 +3013,7 @@ class Eland(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ElandMulti(File):
@@ -3035,7 +3035,7 @@ class ElandMulti(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ElibSQlite(File):
@@ -3057,7 +3057,7 @@ class ElibSQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Embl(File):
@@ -3079,7 +3079,7 @@ class Embl(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Epestfind(File):
@@ -3101,7 +3101,7 @@ class Epestfind(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Eps(File):
@@ -3123,7 +3123,7 @@ class Eps(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Equicktandem(File):
@@ -3145,7 +3145,7 @@ class Equicktandem(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Eset(File):
@@ -3167,7 +3167,7 @@ class Eset(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Est2genome(File):
@@ -3189,7 +3189,7 @@ class Est2genome(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Etandem(File):
@@ -3211,7 +3211,7 @@ class Etandem(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Excel(File):
@@ -3233,7 +3233,7 @@ class Excel(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ExcelXls(File):
@@ -3255,7 +3255,7 @@ class ExcelXls(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ExpressionJson(File):
@@ -3277,7 +3277,7 @@ class ExpressionJson(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FCS(File):
@@ -3299,7 +3299,7 @@ class FCS(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FPS(File):
@@ -3321,7 +3321,7 @@ class FPS(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fai(File):
@@ -3343,7 +3343,7 @@ class Fai(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fast5Archive(File):
@@ -3365,7 +3365,7 @@ class Fast5Archive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fast5ArchiveBz2(File):
@@ -3387,7 +3387,7 @@ class Fast5ArchiveBz2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fast5ArchiveGz(File):
@@ -3409,7 +3409,7 @@ class Fast5ArchiveGz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fasta(File):
@@ -3431,7 +3431,7 @@ class Fasta(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fastg(File):
@@ -3453,7 +3453,7 @@ class Fastg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fastq(File):
@@ -3475,7 +3475,7 @@ class Fastq(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FastqCSSanger(File):
@@ -3497,7 +3497,7 @@ class FastqCSSanger(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FastqIllumina(File):
@@ -3519,7 +3519,7 @@ class FastqIllumina(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FastqSanger(File):
@@ -3541,7 +3541,7 @@ class FastqSanger(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FastqSolexa(File):
@@ -3563,7 +3563,7 @@ class FastqSolexa(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Feattable(File):
@@ -3585,7 +3585,7 @@ class Feattable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FeatureLocationIndex(File):
@@ -3607,7 +3607,7 @@ class FeatureLocationIndex(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class FeatureXML(File):
@@ -3629,7 +3629,7 @@ class FeatureXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ffdata(File):
@@ -3651,7 +3651,7 @@ class Ffdata(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ffindex(File):
@@ -3673,7 +3673,7 @@ class Ffindex(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fitch(File):
@@ -3695,7 +3695,7 @@ class Fitch(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowclr(File):
@@ -3717,7 +3717,7 @@ class Flowclr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowframe(File):
@@ -3739,7 +3739,7 @@ class Flowframe(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowmfi(File):
@@ -3761,7 +3761,7 @@ class Flowmfi(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowscore(File):
@@ -3783,7 +3783,7 @@ class Flowscore(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowset(File):
@@ -3805,7 +3805,7 @@ class Flowset(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowstat1(File):
@@ -3827,7 +3827,7 @@ class Flowstat1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowstat2(File):
@@ -3849,7 +3849,7 @@ class Flowstat2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowstat3(File):
@@ -3871,7 +3871,7 @@ class Flowstat3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flowtext(File):
@@ -3893,7 +3893,7 @@ class Flowtext(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Flv(File):
@@ -3915,7 +3915,7 @@ class Flv(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fped(File):
@@ -3937,7 +3937,7 @@ class Fped(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fphe(File):
@@ -3959,7 +3959,7 @@ class Fphe(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Freak(File):
@@ -3981,7 +3981,7 @@ class Freak(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Frequency(File):
@@ -4003,7 +4003,7 @@ class Frequency(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fsom(File):
@@ -4025,7 +4025,7 @@ class Fsom(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fuzznuc(File):
@@ -4047,7 +4047,7 @@ class Fuzznuc(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fuzzpro(File):
@@ -4069,7 +4069,7 @@ class Fuzzpro(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Fuzztran(File):
@@ -4091,7 +4091,7 @@ class Fuzztran(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GAFASQLite(File):
@@ -4113,7 +4113,7 @@ class GAFASQLite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gal(File):
@@ -4135,7 +4135,7 @@ class Gal(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Garnier(File):
@@ -4157,7 +4157,7 @@ class Garnier(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gatk_dbsnp(File):
@@ -4179,7 +4179,7 @@ class Gatk_dbsnp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gatk_interval(File):
@@ -4201,7 +4201,7 @@ class Gatk_interval(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gatk_recal(File):
@@ -4223,7 +4223,7 @@ class Gatk_recal(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gatk_report(File):
@@ -4245,7 +4245,7 @@ class Gatk_report(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gatk_tranche(File):
@@ -4267,7 +4267,7 @@ class Gatk_tranche(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gcg(File):
@@ -4289,7 +4289,7 @@ class Gcg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Geecee(File):
@@ -4311,7 +4311,7 @@ class Geecee(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GeminiSQLite(File):
@@ -4333,7 +4333,7 @@ class GeminiSQLite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Genbank(File):
@@ -4355,7 +4355,7 @@ class Genbank(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GeneTrack(File):
@@ -4377,7 +4377,7 @@ class GeneTrack(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GenericAsn1(File):
@@ -4399,7 +4399,7 @@ class GenericAsn1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GenericAsn1Binary(File):
@@ -4421,7 +4421,7 @@ class GenericAsn1Binary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GenericXml(File):
@@ -4443,7 +4443,7 @@ class GenericXml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GenomeGraphs(File):
@@ -4465,7 +4465,7 @@ class GenomeGraphs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GenotypeMatrix(File):
@@ -4487,7 +4487,7 @@ class GenotypeMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GeoJson(File):
@@ -4509,7 +4509,7 @@ class GeoJson(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gfa1(File):
@@ -4531,7 +4531,7 @@ class Gfa1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gfa2(File):
@@ -4553,7 +4553,7 @@ class Gfa2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gff(File):
@@ -4575,7 +4575,7 @@ class Gff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gff3(File):
@@ -4597,7 +4597,7 @@ class Gff3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gif(File):
@@ -4619,7 +4619,7 @@ class Gif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gifti(File):
@@ -4641,7 +4641,7 @@ class Gifti(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gmaj(File):
@@ -4663,7 +4663,7 @@ class Gmaj(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gpr(File):
@@ -4685,7 +4685,7 @@ class Gpr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Graph_dot(File):
@@ -4707,7 +4707,7 @@ class Graph_dot(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gro(File):
@@ -4729,7 +4729,7 @@ class Gro(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Group(File):
@@ -4751,7 +4751,7 @@ class Group(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class GroupAbund(File):
@@ -4773,7 +4773,7 @@ class GroupAbund(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Gtf(File):
@@ -4795,7 +4795,7 @@ class Gtf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class H5(File):
@@ -4817,7 +4817,7 @@ class H5(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class H5MLM(File):
@@ -4839,7 +4839,7 @@ class H5MLM(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class HDT(File):
@@ -4861,7 +4861,7 @@ class HDT(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hamamatsu(File):
@@ -4883,7 +4883,7 @@ class Hamamatsu(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hardklor(File):
@@ -4905,7 +4905,7 @@ class Hardklor(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Helixturnhelix(File):
@@ -4927,7 +4927,7 @@ class Helixturnhelix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hennig86(File):
@@ -4949,7 +4949,7 @@ class Hennig86(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hep_root(File):
@@ -4971,7 +4971,7 @@ class Hep_root(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class HexrdEtaOmeNpz(File):
@@ -4993,7 +4993,7 @@ class HexrdEtaOmeNpz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class HexrdImagesNpz(File):
@@ -5015,7 +5015,7 @@ class HexrdImagesNpz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class HexrdMaterials(File):
@@ -5037,7 +5037,7 @@ class HexrdMaterials(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hhr(File):
@@ -5059,7 +5059,7 @@ class Hhr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hivtrace(File):
@@ -5081,7 +5081,7 @@ class Hivtrace(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hmmer2(File):
@@ -5103,7 +5103,7 @@ class Hmmer2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hmmer3(File):
@@ -5125,7 +5125,7 @@ class Hmmer3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hmoment(File):
@@ -5147,7 +5147,7 @@ class Hmoment(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Html(File):
@@ -5169,7 +5169,7 @@ class Html(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Hyphy_results_json(File):
@@ -5191,7 +5191,7 @@ class Hyphy_results_json(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ICM(File):
@@ -5213,7 +5213,7 @@ class ICM(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IQTree(File):
@@ -5235,7 +5235,7 @@ class IQTree(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IdXML(File):
@@ -5257,7 +5257,7 @@ class IdXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Idat(File):
@@ -5279,7 +5279,7 @@ class Idat(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IdeasPre(File):
@@ -5301,7 +5301,7 @@ class IdeasPre(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IdpDB(File):
@@ -5323,7 +5323,7 @@ class IdpDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ig(File):
@@ -5345,7 +5345,7 @@ class Ig(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Im(File):
@@ -5367,7 +5367,7 @@ class Im(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ImgtJson(File):
@@ -5389,7 +5389,7 @@ class ImgtJson(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ImzML(File):
@@ -5411,7 +5411,7 @@ class ImzML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class InChI(File):
@@ -5433,7 +5433,7 @@ class InChI(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class InfernalCM(File):
@@ -5455,7 +5455,7 @@ class InfernalCM(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Intermine_tabular(File):
@@ -5477,7 +5477,7 @@ class Intermine_tabular(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Interprophet_pepxml(File):
@@ -5499,7 +5499,7 @@ class Interprophet_pepxml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Interval(File):
@@ -5521,7 +5521,7 @@ class Interval(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Interval_index(File):
@@ -5543,7 +5543,7 @@ class Interval_index(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ipynb(File):
@@ -5565,7 +5565,7 @@ class Ipynb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IsaJson(File):
@@ -5587,7 +5587,7 @@ class IsaJson(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class IsaTab(File):
@@ -5609,7 +5609,7 @@ class IsaTab(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Isochore(File):
@@ -5631,7 +5631,7 @@ class Isochore(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Itp(File):
@@ -5653,7 +5653,7 @@ class Itp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class JP2(File):
@@ -5675,7 +5675,7 @@ class JP2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Jackknifer(File):
@@ -5697,7 +5697,7 @@ class Jackknifer(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Jackknifernon(File):
@@ -5719,7 +5719,7 @@ class Jackknifernon(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Jellyfish(File):
@@ -5741,7 +5741,7 @@ class Jellyfish(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Jpg(File):
@@ -5763,7 +5763,7 @@ class Jpg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Json(File):
@@ -5785,7 +5785,7 @@ class Json(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Jsonld(File):
@@ -5807,7 +5807,7 @@ class Jsonld(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Kallisto_idx(File):
@@ -5829,7 +5829,7 @@ class Kallisto_idx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Kroenik(File):
@@ -5851,7 +5851,7 @@ class Kroenik(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Kronik(File):
@@ -5873,7 +5873,7 @@ class Kronik(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Laj(File):
@@ -5895,7 +5895,7 @@ class Laj(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class LaneMask(File):
@@ -5917,7 +5917,7 @@ class LaneMask(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class LastDb(File):
@@ -5939,7 +5939,7 @@ class LastDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Lav(File):
@@ -5961,7 +5961,7 @@ class Lav(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class LineCount(File):
@@ -5983,7 +5983,7 @@ class LineCount(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Linkage_pedin(File):
@@ -6005,7 +6005,7 @@ class Linkage_pedin(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Loom(File):
@@ -6027,7 +6027,7 @@ class Loom(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class LowerTriangleDistanceMatrix(File):
@@ -6049,7 +6049,7 @@ class LowerTriangleDistanceMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Lped(File):
@@ -6071,7 +6071,7 @@ class Lped(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MAlist(File):
@@ -6093,7 +6093,7 @@ class MAlist(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MCool(File):
@@ -6115,7 +6115,7 @@ class MCool(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MEMEXml(File):
@@ -6137,7 +6137,7 @@ class MEMEXml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MOL(File):
@@ -6159,7 +6159,7 @@ class MOL(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MOL2(File):
@@ -6181,7 +6181,7 @@ class MOL2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Maf(File):
@@ -6203,7 +6203,7 @@ class Maf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MafCustomTrack(File):
@@ -6225,7 +6225,7 @@ class MafCustomTrack(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MarkerMap(File):
@@ -6247,7 +6247,7 @@ class MarkerMap(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Markx0(File):
@@ -6269,7 +6269,7 @@ class Markx0(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Markx1(File):
@@ -6291,7 +6291,7 @@ class Markx1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Markx10(File):
@@ -6313,7 +6313,7 @@ class Markx10(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Markx2(File):
@@ -6335,7 +6335,7 @@ class Markx2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Markx3(File):
@@ -6357,7 +6357,7 @@ class Markx3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MascotDat(File):
@@ -6379,7 +6379,7 @@ class MascotDat(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MascotXML(File):
@@ -6401,7 +6401,7 @@ class MascotXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MashSketch(File):
@@ -6423,7 +6423,7 @@ class MashSketch(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Maskinfo_asn1(File):
@@ -6445,7 +6445,7 @@ class Maskinfo_asn1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Maskinfo_asn1_binary(File):
@@ -6467,7 +6467,7 @@ class Maskinfo_asn1_binary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MassHunterTar(File):
@@ -6489,7 +6489,7 @@ class MassHunterTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MassLynxTar(File):
@@ -6511,7 +6511,7 @@ class MassLynxTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Match(File):
@@ -6533,7 +6533,7 @@ class Match(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MatrixMarket(File):
@@ -6555,7 +6555,7 @@ class MatrixMarket(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MauveXmfa(File):
@@ -6577,7 +6577,7 @@ class MauveXmfa(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mdp(File):
@@ -6599,7 +6599,7 @@ class Mdp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mega(File):
@@ -6621,7 +6621,7 @@ class Mega(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Meganon(File):
@@ -6643,7 +6643,7 @@ class Meganon(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MemePsp(File):
@@ -6665,7 +6665,7 @@ class MemePsp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Meryldb(File):
@@ -6687,7 +6687,7 @@ class Meryldb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Metacyto_clr_txt(File):
@@ -6709,7 +6709,7 @@ class Metacyto_clr_txt(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mgf(File):
@@ -6731,7 +6731,7 @@ class Mgf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mirax(File):
@@ -6753,7 +6753,7 @@ class Mirax(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mkv(File):
@@ -6775,7 +6775,7 @@ class Mkv(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_align(File):
@@ -6797,7 +6797,7 @@ class Mothur_align(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_design(File):
@@ -6819,7 +6819,7 @@ class Mothur_design(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_filtered_masked_quan(File):
@@ -6841,7 +6841,7 @@ class Mothur_filtered_masked_quan(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_filtered_quan(File):
@@ -6863,7 +6863,7 @@ class Mothur_filtered_quan(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_list(File):
@@ -6885,7 +6885,7 @@ class Mothur_list(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_masked_quan(File):
@@ -6907,7 +6907,7 @@ class Mothur_masked_quan(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_otu_corr(File):
@@ -6929,7 +6929,7 @@ class Mothur_otu_corr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_rabund(File):
@@ -6951,7 +6951,7 @@ class Mothur_rabund(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_rdp_taxonomy(File):
@@ -6973,7 +6973,7 @@ class Mothur_rdp_taxonomy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_relabund(File):
@@ -6995,7 +6995,7 @@ class Mothur_relabund(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_seq_taxonomy(File):
@@ -7017,7 +7017,7 @@ class Mothur_seq_taxonomy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mothur_tre(File):
@@ -7039,7 +7039,7 @@ class Mothur_tre(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Motif(File):
@@ -7061,7 +7061,7 @@ class Motif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mp3(File):
@@ -7083,7 +7083,7 @@ class Mp3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mp4(File):
@@ -7105,7 +7105,7 @@ class Mp4(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mpg(File):
@@ -7127,7 +7127,7 @@ class Mpg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mrc2014(File):
@@ -7149,7 +7149,7 @@ class Mrc2014(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mrm(File):
@@ -7171,7 +7171,7 @@ class Mrm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ms2(File):
@@ -7193,7 +7193,7 @@ class Ms2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Msf(File):
@@ -7215,7 +7215,7 @@ class Msf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Msp(File):
@@ -7237,7 +7237,7 @@ class Msp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Mz5(File):
@@ -7259,7 +7259,7 @@ class Mz5(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzData(File):
@@ -7281,7 +7281,7 @@ class MzData(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzIdentML(File):
@@ -7303,7 +7303,7 @@ class MzIdentML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzML(File):
@@ -7325,7 +7325,7 @@ class MzML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzQuantML(File):
@@ -7347,7 +7347,7 @@ class MzQuantML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzSQlite(File):
@@ -7369,7 +7369,7 @@ class MzSQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzTab(File):
@@ -7391,7 +7391,7 @@ class MzTab(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzTab2(File):
@@ -7413,7 +7413,7 @@ class MzTab2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class MzXML(File):
@@ -7435,7 +7435,7 @@ class MzXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class N3(File):
@@ -7457,7 +7457,7 @@ class N3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class NTriples(File):
@@ -7479,7 +7479,7 @@ class NTriples(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Names(File):
@@ -7501,7 +7501,7 @@ class Names(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nametable(File):
@@ -7523,7 +7523,7 @@ class Nametable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ncbi(File):
@@ -7545,7 +7545,7 @@ class Ncbi(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class NcbiTaxonomySQlite(File):
@@ -7567,7 +7567,7 @@ class NcbiTaxonomySQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ndpi(File):
@@ -7589,7 +7589,7 @@ class Ndpi(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ndx(File):
@@ -7611,7 +7611,7 @@ class Ndx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Needle(File):
@@ -7633,7 +7633,7 @@ class Needle(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Neo4jDB(File):
@@ -7655,7 +7655,7 @@ class Neo4jDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Neo4jDBzip(File):
@@ -7677,7 +7677,7 @@ class Neo4jDBzip(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class NetCDF(File):
@@ -7699,7 +7699,7 @@ class NetCDF(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Newcpgreport(File):
@@ -7721,7 +7721,7 @@ class Newcpgreport(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Newcpgseek(File):
@@ -7743,7 +7743,7 @@ class Newcpgseek(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Newick(File):
@@ -7765,7 +7765,7 @@ class Newick(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nexus(File):
@@ -7787,7 +7787,7 @@ class Nexus(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nexusnon(File):
@@ -7809,7 +7809,7 @@ class Nexusnon(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nhdr(File):
@@ -7831,7 +7831,7 @@ class Nhdr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nhx(File):
@@ -7853,7 +7853,7 @@ class Nhx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nifti1(File):
@@ -7875,7 +7875,7 @@ class Nifti1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nifti2(File):
@@ -7897,7 +7897,7 @@ class Nifti2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class NmrML(File):
@@ -7919,7 +7919,7 @@ class NmrML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Noreturn(File):
@@ -7941,7 +7941,7 @@ class Noreturn(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Npz(File):
@@ -7963,7 +7963,7 @@ class Npz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Nrrd(File):
@@ -7985,7 +7985,7 @@ class Nrrd(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OBFS(File):
@@ -8007,7 +8007,7 @@ class OBFS(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OMETiff(File):
@@ -8029,7 +8029,7 @@ class OMETiff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OSW(File):
@@ -8051,7 +8051,7 @@ class OSW(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Obo(File):
@@ -8073,7 +8073,7 @@ class Obo(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Odgi(File):
@@ -8095,7 +8095,7 @@ class Odgi(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Oligos(File):
@@ -8117,7 +8117,7 @@ class Oligos(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Onnx(File):
@@ -8139,7 +8139,7 @@ class Onnx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Otu(File):
@@ -8161,7 +8161,7 @@ class Otu(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Owl(File):
@@ -8183,7 +8183,7 @@ class Owl(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliCountGraph(File):
@@ -8205,7 +8205,7 @@ class OxliCountGraph(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliGraphLabels(File):
@@ -8227,7 +8227,7 @@ class OxliGraphLabels(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliNodeGraph(File):
@@ -8249,7 +8249,7 @@ class OxliNodeGraph(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliStopTags(File):
@@ -8271,7 +8271,7 @@ class OxliStopTags(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliSubset(File):
@@ -8293,7 +8293,7 @@ class OxliSubset(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class OxliTagSet(File):
@@ -8315,7 +8315,7 @@ class OxliTagSet(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PDB(File):
@@ -8337,7 +8337,7 @@ class PDB(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PDBQT(File):
@@ -8359,7 +8359,7 @@ class PDBQT(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PEFF(File):
@@ -8381,7 +8381,7 @@ class PEFF(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PHAR(File):
@@ -8403,7 +8403,7 @@ class PHAR(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PQP(File):
@@ -8425,7 +8425,7 @@ class PQP(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PQR(File):
@@ -8447,7 +8447,7 @@ class PQR(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PSMS(File):
@@ -8469,7 +8469,7 @@ class PSMS(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Paf(File):
@@ -8491,7 +8491,7 @@ class Paf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pair(File):
@@ -8513,7 +8513,7 @@ class Pair(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PairwiseDistanceMatrix(File):
@@ -8535,7 +8535,7 @@ class PairwiseDistanceMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Palindrome(File):
@@ -8557,7 +8557,7 @@ class Palindrome(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Paramxml(File):
@@ -8579,7 +8579,7 @@ class Paramxml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Parquet(File):
@@ -8601,7 +8601,7 @@ class Parquet(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pbed(File):
@@ -8623,7 +8623,7 @@ class Pbed(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pbm(File):
@@ -8645,7 +8645,7 @@ class Pbm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pcd(File):
@@ -8667,7 +8667,7 @@ class Pcd(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pcx(File):
@@ -8689,7 +8689,7 @@ class Pcx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pdf(File):
@@ -8711,7 +8711,7 @@ class Pdf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PepList(File):
@@ -8733,7 +8733,7 @@ class PepList(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PepXml(File):
@@ -8755,7 +8755,7 @@ class PepXml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PepXmlReport(File):
@@ -8777,7 +8777,7 @@ class PepXmlReport(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pepcoil(File):
@@ -8799,7 +8799,7 @@ class Pepcoil(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pepinfo(File):
@@ -8821,7 +8821,7 @@ class Pepinfo(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pepstats(File):
@@ -8843,7 +8843,7 @@ class Pepstats(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Peptideprophet_pepxml(File):
@@ -8865,7 +8865,7 @@ class Peptideprophet_pepxml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Peptideshaker_archive(File):
@@ -8887,7 +8887,7 @@ class Peptideshaker_archive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Percin(File):
@@ -8909,7 +8909,7 @@ class Percin(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Percout(File):
@@ -8931,7 +8931,7 @@ class Percout(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pgm(File):
@@ -8953,7 +8953,7 @@ class Pgm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pheno(File):
@@ -8975,7 +8975,7 @@ class Pheno(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Phylip(File):
@@ -8997,7 +8997,7 @@ class Phylip(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Phylipnon(File):
@@ -9019,7 +9019,7 @@ class Phylipnon(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Phyloxml(File):
@@ -9041,7 +9041,7 @@ class Phyloxml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Picard_interval_list(File):
@@ -9063,7 +9063,7 @@ class Picard_interval_list(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pileup(File):
@@ -9085,7 +9085,7 @@ class Pileup(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pir(File):
@@ -9107,7 +9107,7 @@ class Pir(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PlantTribesKsComponents(File):
@@ -9129,7 +9129,7 @@ class PlantTribesKsComponents(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PlyAscii(File):
@@ -9151,7 +9151,7 @@ class PlyAscii(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PlyBinary(File):
@@ -9173,7 +9173,7 @@ class PlyBinary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Png(File):
@@ -9195,7 +9195,7 @@ class Png(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Polydot(File):
@@ -9217,7 +9217,7 @@ class Polydot(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class PostgresqlArchive(File):
@@ -9239,7 +9239,7 @@ class PostgresqlArchive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pphe(File):
@@ -9261,7 +9261,7 @@ class Pphe(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Ppm(File):
@@ -9283,7 +9283,7 @@ class Ppm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Preg(File):
@@ -9305,7 +9305,7 @@ class Preg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pretext(File):
@@ -9327,7 +9327,7 @@ class Pretext(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Prettyseq(File):
@@ -9349,7 +9349,7 @@ class Prettyseq(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Primersearch(File):
@@ -9371,7 +9371,7 @@ class Primersearch(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ProBam(File):
@@ -9393,7 +9393,7 @@ class ProBam(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ProBed(File):
@@ -9415,7 +9415,7 @@ class ProBed(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ProtXML(File):
@@ -9437,7 +9437,7 @@ class ProtXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ProtXmlReport(File):
@@ -9459,7 +9459,7 @@ class ProtXmlReport(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Protobuf2(File):
@@ -9481,7 +9481,7 @@ class Protobuf2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Protobuf3(File):
@@ -9503,7 +9503,7 @@ class Protobuf3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Psd(File):
@@ -9525,7 +9525,7 @@ class Psd(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Pssm_asn1(File):
@@ -9547,7 +9547,7 @@ class Pssm_asn1(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QCML(File):
@@ -9569,7 +9569,7 @@ class QCML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QualityScore(File):
@@ -9591,7 +9591,7 @@ class QualityScore(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QualityScore454(File):
@@ -9613,7 +9613,7 @@ class QualityScore454(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QualityScoreIllumina(File):
@@ -9635,7 +9635,7 @@ class QualityScoreIllumina(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QualityScoreSOLiD(File):
@@ -9657,7 +9657,7 @@ class QualityScoreSOLiD(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class QualityScoreSolexa(File):
@@ -9679,7 +9679,7 @@ class QualityScoreSolexa(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Quantile(File):
@@ -9701,7 +9701,7 @@ class Quantile(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class RData(File):
@@ -9723,7 +9723,7 @@ class RData(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class RMA6(File):
@@ -9745,7 +9745,7 @@ class RMA6(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class RNADotPlotMatrix(File):
@@ -9767,7 +9767,7 @@ class RNADotPlotMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rast(File):
@@ -9789,7 +9789,7 @@ class Rast(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Raw_pepxml(File):
@@ -9811,7 +9811,7 @@ class Raw_pepxml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_camera_negative(File):
@@ -9833,7 +9833,7 @@ class Rdata_camera_negative(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_camera_positive(File):
@@ -9855,7 +9855,7 @@ class Rdata_camera_positive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_camera_quick(File):
@@ -9877,7 +9877,7 @@ class Rdata_camera_quick(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_eset(File):
@@ -9899,7 +9899,7 @@ class Rdata_eset(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_msnbase_raw(File):
@@ -9921,7 +9921,7 @@ class Rdata_msnbase_raw(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_sce(File):
@@ -9943,7 +9943,7 @@ class Rdata_sce(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_xcms_fillpeaks(File):
@@ -9965,7 +9965,7 @@ class Rdata_xcms_fillpeaks(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_xcms_findchrompeaks(File):
@@ -9987,7 +9987,7 @@ class Rdata_xcms_findchrompeaks(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_xcms_group(File):
@@ -10009,7 +10009,7 @@ class Rdata_xcms_group(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_xcms_raw(File):
@@ -10031,7 +10031,7 @@ class Rdata_xcms_raw(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdata_xcms_retcor(File):
@@ -10053,7 +10053,7 @@ class Rdata_xcms_retcor(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdf(File):
@@ -10075,7 +10075,7 @@ class Rdf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rdock_as(File):
@@ -10097,7 +10097,7 @@ class Rdock_as(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class RefTaxonomy(File):
@@ -10119,7 +10119,7 @@ class RefTaxonomy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Regions(File):
@@ -10141,7 +10141,7 @@ class Regions(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class RexpBase(File):
@@ -10163,7 +10163,7 @@ class RexpBase(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rgb(File):
@@ -10185,7 +10185,7 @@ class Rgb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Rgenetics(File):
@@ -10207,7 +10207,7 @@ class Rgenetics(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Roadmaps(File):
@@ -10229,7 +10229,7 @@ class Roadmaps(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SDF(File):
@@ -10251,7 +10251,7 @@ class SDF(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SMILES(File):
@@ -10273,7 +10273,7 @@ class SMILES(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SNPMatrix(File):
@@ -10295,7 +10295,7 @@ class SNPMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SPLib(File):
@@ -10317,7 +10317,7 @@ class SPLib(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SPLibNoIndex(File):
@@ -10339,7 +10339,7 @@ class SPLibNoIndex(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SQlite(File):
@@ -10361,7 +10361,7 @@ class SQlite(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SQmass(File):
@@ -10383,7 +10383,7 @@ class SQmass(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class STL(File):
@@ -10405,7 +10405,7 @@ class STL(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sabund(File):
@@ -10427,7 +10427,7 @@ class Sabund(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sakura(File):
@@ -10449,7 +10449,7 @@ class Sakura(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sam(File):
@@ -10471,7 +10471,7 @@ class Sam(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sbml(File):
@@ -10493,7 +10493,7 @@ class Sbml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ScIdx(File):
@@ -10515,7 +10515,7 @@ class ScIdx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Scf(File):
@@ -10537,7 +10537,7 @@ class Scf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Scn(File):
@@ -10559,7 +10559,7 @@ class Scn(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Score(File):
@@ -10581,7 +10581,7 @@ class Score(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SearchGuiArchive(File):
@@ -10603,7 +10603,7 @@ class SearchGuiArchive(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SecondaryStructureMap(File):
@@ -10625,7 +10625,7 @@ class SecondaryStructureMap(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Seqtable(File):
@@ -10647,7 +10647,7 @@ class Seqtable(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SequenceSplitLocations(File):
@@ -10669,7 +10669,7 @@ class SequenceSplitLocations(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sequences(File):
@@ -10691,7 +10691,7 @@ class Sequences(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sf3(File):
@@ -10713,7 +10713,7 @@ class Sf3(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sff(File):
@@ -10735,7 +10735,7 @@ class Sff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SffFlow(File):
@@ -10757,7 +10757,7 @@ class SffFlow(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Shapefile(File):
@@ -10779,7 +10779,7 @@ class Shapefile(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Showfeat(File):
@@ -10801,7 +10801,7 @@ class Showfeat(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Showorf(File):
@@ -10823,7 +10823,7 @@ class Showorf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sif(File):
@@ -10845,7 +10845,7 @@ class Sif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Simple(File):
@@ -10867,7 +10867,7 @@ class Simple(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sirius_ms(File):
@@ -10889,7 +10889,7 @@ class Sirius_ms(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sixpack(File):
@@ -10911,7 +10911,7 @@ class Sixpack(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Smat(File):
@@ -10933,7 +10933,7 @@ class Smat(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SnapHmm(File):
@@ -10955,7 +10955,7 @@ class SnapHmm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SnpEffDb(File):
@@ -10977,7 +10977,7 @@ class SnpEffDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SnpSiftDbNSFP(File):
@@ -10999,7 +10999,7 @@ class SnpSiftDbNSFP(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Snptest(File):
@@ -11021,7 +11021,7 @@ class Snptest(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_c(File):
@@ -11043,7 +11043,7 @@ class Source_c(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_cpp(File):
@@ -11065,7 +11065,7 @@ class Source_cpp(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_cs(File):
@@ -11087,7 +11087,7 @@ class Source_cs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_go(File):
@@ -11109,7 +11109,7 @@ class Source_go(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_h(File):
@@ -11131,7 +11131,7 @@ class Source_h(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_py(File):
@@ -11153,7 +11153,7 @@ class Source_py(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Source_rs(File):
@@ -11175,7 +11175,7 @@ class Source_rs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SpalnNuclDb(File):
@@ -11197,7 +11197,7 @@ class SpalnNuclDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SpalnProtDb(File):
@@ -11219,7 +11219,7 @@ class SpalnProtDb(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SquareDistanceMatrix(File):
@@ -11241,7 +11241,7 @@ class SquareDistanceMatrix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Sra(File):
@@ -11263,7 +11263,7 @@ class Sra(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class SraManifest(File):
@@ -11285,7 +11285,7 @@ class SraManifest(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Srs(File):
@@ -11307,7 +11307,7 @@ class Srs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Srspair(File):
@@ -11329,7 +11329,7 @@ class Srspair(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Staden(File):
@@ -11351,7 +11351,7 @@ class Staden(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Star(File):
@@ -11373,7 +11373,7 @@ class Star(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Stockholm_1_0(File):
@@ -11395,7 +11395,7 @@ class Stockholm_1_0(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Strider(File):
@@ -11417,7 +11417,7 @@ class Strider(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Summary(File):
@@ -11439,7 +11439,7 @@ class Summary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Supermatcher(File):
@@ -11461,7 +11461,7 @@ class Supermatcher(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Svg(File):
@@ -11483,7 +11483,7 @@ class Svg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Svs(File):
@@ -11505,7 +11505,7 @@ class Svs(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Swiss(File):
@@ -11527,7 +11527,7 @@ class Swiss(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Syco(File):
@@ -11549,7 +11549,7 @@ class Syco(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TSV(File):
@@ -11571,7 +11571,7 @@ class TSV(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tabix(File):
@@ -11593,7 +11593,7 @@ class Tabix(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Table(File):
@@ -11615,7 +11615,7 @@ class Table(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tabular(File):
@@ -11637,7 +11637,7 @@ class Tabular(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tagseq(File):
@@ -11659,7 +11659,7 @@ class Tagseq(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TandemXML(File):
@@ -11681,7 +11681,7 @@ class TandemXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tar(File):
@@ -11703,7 +11703,7 @@ class Tar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Taxonomy(File):
@@ -11725,7 +11725,7 @@ class Taxonomy(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TaxonomySummary(File):
@@ -11747,7 +11747,7 @@ class TaxonomySummary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tck(File):
@@ -11769,7 +11769,7 @@ class Tck(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TdfTar(File):
@@ -11791,7 +11791,7 @@ class TdfTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Text(File):
@@ -11813,7 +11813,7 @@ class Text(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TextGrid(File):
@@ -11835,7 +11835,7 @@ class TextGrid(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Textsearch(File):
@@ -11857,7 +11857,7 @@ class Textsearch(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tf2(File):
@@ -11879,7 +11879,7 @@ class Tf2(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tf8(File):
@@ -11901,7 +11901,7 @@ class Tf8(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tgz(File):
@@ -11923,7 +11923,7 @@ class Tgz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ThermoRAW(File):
@@ -11945,7 +11945,7 @@ class ThermoRAW(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tif(File):
@@ -11967,7 +11967,7 @@ class Tif(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Tiff(File):
@@ -11989,7 +11989,7 @@ class Tiff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Toml(File):
@@ -12011,7 +12011,7 @@ class Toml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Toolshed_gz(File):
@@ -12033,7 +12033,7 @@ class Toolshed_gz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Top(File):
@@ -12055,7 +12055,7 @@ class Top(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TraML(File):
@@ -12077,7 +12077,7 @@ class TraML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TrafoXML(File):
@@ -12099,7 +12099,7 @@ class TrafoXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Triples(File):
@@ -12121,7 +12121,7 @@ class Triples(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Trk(File):
@@ -12143,7 +12143,7 @@ class Trk(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Trr(File):
@@ -12165,7 +12165,7 @@ class Trr(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Turtle(File):
@@ -12187,7 +12187,7 @@ class Turtle(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class TwoBit(File):
@@ -12209,7 +12209,7 @@ class TwoBit(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class UCSCTrackHub(File):
@@ -12231,7 +12231,7 @@ class UCSCTrackHub(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class UniProtXML(File):
@@ -12253,7 +12253,7 @@ class UniProtXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Vcf(File):
@@ -12275,7 +12275,7 @@ class Vcf(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class VcfGz(File):
@@ -12297,7 +12297,7 @@ class VcfGz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Vectorstrip(File):
@@ -12319,7 +12319,7 @@ class Vectorstrip(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Vel(File):
@@ -12341,7 +12341,7 @@ class Vel(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Velvet(File):
@@ -12363,7 +12363,7 @@ class Velvet(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Vg(File):
@@ -12385,7 +12385,7 @@ class Vg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Vmu(File):
@@ -12407,7 +12407,7 @@ class Vmu(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class VtkAscii(File):
@@ -12429,7 +12429,7 @@ class VtkAscii(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class VtkBinary(File):
@@ -12451,7 +12451,7 @@ class VtkBinary(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Wav(File):
@@ -12473,7 +12473,7 @@ class Wav(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Wiff(File):
@@ -12495,7 +12495,7 @@ class Wiff(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class WiffTar(File):
@@ -12517,7 +12517,7 @@ class WiffTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Wiggle(File):
@@ -12539,7 +12539,7 @@ class Wiggle(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Wobble(File):
@@ -12561,7 +12561,7 @@ class Wobble(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Wordcount(File):
@@ -12583,7 +12583,7 @@ class Wordcount(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class XHunterAslFormat(File):
@@ -12605,7 +12605,7 @@ class XHunterAslFormat(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xbm(File):
@@ -12627,7 +12627,7 @@ class Xbm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xg(File):
@@ -12649,7 +12649,7 @@ class Xg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xgmml(File):
@@ -12671,7 +12671,7 @@ class Xgmml(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xlsx(File):
@@ -12693,7 +12693,7 @@ class Xlsx(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xpm(File):
@@ -12715,7 +12715,7 @@ class Xpm(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class XquestSpecXML(File):
@@ -12737,7 +12737,7 @@ class XquestSpecXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class XquestXML(File):
@@ -12759,7 +12759,7 @@ class XquestXML(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xtc(File):
@@ -12781,7 +12781,7 @@ class Xtc(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class Xvg(File):
@@ -12803,7 +12803,7 @@ class Xvg(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class YepTar(File):
@@ -12825,7 +12825,7 @@ class YepTar(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class csFasta(File):
@@ -12847,7 +12847,7 @@ class csFasta(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class grd(File):
@@ -12869,7 +12869,7 @@ class grd(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class grdtgz(File):
@@ -12891,7 +12891,7 @@ class grdtgz(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class ldIndep(File):
@@ -12913,7 +12913,7 @@ class ldIndep(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class mStats(File):
@@ -12935,7 +12935,7 @@ class mStats(File):
 
 
 
-from janis_core import File, Array, Logger
+
 
 
 class mSummary(File):

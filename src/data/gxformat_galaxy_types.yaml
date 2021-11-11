@@ -1,0 +1,2945 @@
+source_h:
+  source: galaxy
+  classname: Source_h
+  extensions: .source.h
+  import_path: local_types.galaxy
+source_c:
+  source: galaxy
+  classname: Source_c
+  extensions: .source.c
+  import_path: local_types.galaxy
+source_cpp:
+  source: galaxy
+  classname: Source_cpp
+  extensions: .source.cpp
+  import_path: local_types.galaxy
+source_py:
+  source: galaxy
+  classname: Source_py
+  extensions: .source.py
+  import_path: local_types.galaxy
+source_go:
+  source: galaxy
+  classname: Source_go
+  extensions: .source.go
+  import_path: local_types.galaxy
+source_rs:
+  source: galaxy
+  classname: Source_rs
+  extensions: .source.rs
+  import_path: local_types.galaxy
+source_cs:
+  source: galaxy
+  classname: Source_cs
+  extensions: .source.cs
+  import_path: local_types.galaxy
+hep_root:
+  source: galaxy
+  classname: Hep_root
+  extensions: .hep.root
+  import_path: local_types.galaxy
+jp2:
+  source: galaxy
+  classname: JP2
+  extensions: .jp2
+  import_path: local_types.galaxy
+ab1:
+  source: galaxy
+  classname: Ab1
+  extensions: .ab1
+  import_path: local_types.galaxy
+amos:
+  source: galaxy
+  classname: Amos
+  extensions: .afg
+  import_path: local_types.galaxy
+anvio_cog_profile:
+  source: galaxy
+  classname: Anvio_cog_profile
+  extensions: .anvio_cog_profile
+  import_path: local_types.galaxy
+anviocomposite:
+  source: galaxy
+  classname: AnvioComposite
+  extensions: .anvio_composite
+  import_path: local_types.galaxy
+anvio_classifier:
+  source: galaxy
+  classname: Anvio_classifier
+  extensions: .anvio_classifier
+  import_path: local_types.galaxy
+anviocontigsdb:
+  source: galaxy
+  classname: AnvioContigsDB
+  extensions: .anvio_contigs_db
+  import_path: local_types.galaxy
+anviodb:
+  source: galaxy
+  classname: AnvioDB
+  extensions: .anvio_db
+  import_path: local_types.galaxy
+anviogenomesdb:
+  source: galaxy
+  classname: AnvioGenomesDB
+  extensions: .anvio_genomes_db
+  import_path: local_types.galaxy
+anviopandb:
+  source: galaxy
+  classname: AnvioPanDB
+  extensions: .anvio_pan_db
+  import_path: local_types.galaxy
+anvio_pfam_profile:
+  source: galaxy
+  classname: Anvio_pfam_profile
+  extensions: .anvio_pfam_profile
+  import_path: local_types.galaxy
+anvioprofiledb:
+  source: galaxy
+  classname: AnvioProfileDB
+  extensions: .anvio_profile_db
+  import_path: local_types.galaxy
+anviosamplesdb:
+  source: galaxy
+  classname: AnvioSamplesDB
+  extensions: .anvio_samples_db
+  import_path: local_types.galaxy
+anvio_state:
+  source: galaxy
+  classname: Anvio_state
+  extensions: .anvio_state
+  import_path: local_types.galaxy
+anviostructuredb:
+  source: galaxy
+  classname: AnvioStructureDB
+  extensions: .anvio_structure_db
+  import_path: local_types.galaxy
+anvio_variability:
+  source: galaxy
+  classname: Anvio_variability
+  extensions: .anvio_variability
+  import_path: local_types.galaxy
+arff:
+  source: galaxy
+  classname: Arff
+  extensions: .arff
+  import_path: local_types.galaxy
+paf:
+  source: galaxy
+  classname: Paf
+  extensions: .paf,.paf.gz
+  import_path: local_types.galaxy
+gfa1:
+  source: galaxy
+  classname: Gfa1
+  extensions: .gfa1
+  import_path: local_types.galaxy
+gfa2:
+  source: galaxy
+  classname: Gfa2
+  extensions: .gfa2
+  import_path: local_types.galaxy
+genericasn1:
+  source: galaxy
+  classname: GenericAsn1
+  extensions: .asn1
+  import_path: local_types.galaxy
+genericasn1binary:
+  source: galaxy
+  classname: GenericAsn1Binary
+  extensions: .asn1-binary
+  import_path: local_types.galaxy
+axt:
+  source: galaxy
+  classname: Axt
+  extensions: .axt
+  import_path: local_types.galaxy
+featurelocationindex:
+  source: galaxy
+  classname: FeatureLocationIndex
+  extensions: .fli
+  import_path: local_types.galaxy
+bam:
+  source: galaxy
+  classname: Bam
+  extensions: .bam
+  import_path: local_types.galaxy
+bai:
+  source: galaxy
+  classname: Bai
+  extensions: .bai
+  import_path: local_types.galaxy
+baminputsorted:
+  source: galaxy
+  classname: BamInputSorted
+  extensions: .qname_input_sorted.bam
+  import_path: local_types.galaxy
+bamquerynamesorted:
+  source: galaxy
+  classname: BamQuerynameSorted
+  extensions: .qname_sorted.bam
+  import_path: local_types.galaxy
+bamnative:
+  source: galaxy
+  classname: BamNative
+  extensions: .unsorted.bam
+  import_path: local_types.galaxy
+probam:
+  source: galaxy
+  classname: ProBam
+  extensions: .probam
+  import_path: local_types.galaxy
+cram:
+  source: galaxy
+  classname: CRAM
+  extensions: .cram
+  import_path: local_types.galaxy
+bed:
+  source: galaxy
+  classname: Bed
+  extensions: .bed
+  import_path: local_types.galaxy
+bedgraph:
+  source: galaxy
+  classname: BedGraph
+  extensions: .bedgraph
+  import_path: local_types.galaxy
+bedstrict:
+  source: galaxy
+  classname: BedStrict
+  extensions: .bedstrict
+  import_path: local_types.galaxy
+bed6:
+  source: galaxy
+  classname: Bed6
+  extensions: .bed6
+  import_path: local_types.galaxy
+bed12:
+  source: galaxy
+  classname: Bed12
+  extensions: .bed12
+  import_path: local_types.galaxy
+probed:
+  source: galaxy
+  classname: ProBed
+  extensions: .probed
+  import_path: local_types.galaxy
+chrominfo:
+  source: galaxy
+  classname: ChromInfo
+  extensions: .len
+  import_path: local_types.galaxy
+daa:
+  source: galaxy
+  classname: DAA
+  extensions: .daa
+  import_path: local_types.galaxy
+rma6:
+  source: galaxy
+  classname: RMA6
+  extensions: .rma6
+  import_path: local_types.galaxy
+dmnd:
+  source: galaxy
+  classname: DMND
+  extensions: .dmnd
+  import_path: local_types.galaxy
+parquet:
+  source: galaxy
+  classname: Parquet
+  extensions: .parquet
+  import_path: local_types.galaxy
+idat:
+  source: galaxy
+  classname: Idat
+  extensions: .idat
+  import_path: local_types.galaxy
+bigbed:
+  source: galaxy
+  classname: BigBed
+  extensions: .bigbed
+  import_path: local_types.galaxy
+bigwig:
+  source: galaxy
+  classname: BigWig
+  extensions: .bigwig
+  import_path: local_types.galaxy
+cxb:
+  source: galaxy
+  classname: Cxb
+  extensions: .cxb
+  import_path: local_types.galaxy
+chromatininteractions:
+  source: galaxy
+  classname: ChromatinInteractions
+  extensions: .chrint
+  import_path: local_types.galaxy
+csv:
+  source: galaxy
+  classname: CSV
+  extensions: .csv
+  import_path: local_types.galaxy
+tsv:
+  source: galaxy
+  classname: TSV
+  extensions: .tsv
+  import_path: local_types.galaxy
+intermine_tabular:
+  source: galaxy
+  classname: Intermine_tabular
+  extensions: .intermine_tabular
+  import_path: local_types.galaxy
+customtrack:
+  source: galaxy
+  classname: CustomTrack
+  extensions: .customtrack
+  import_path: local_types.galaxy
+bowtiecolorindex:
+  source: galaxy
+  classname: BowtieColorIndex
+  extensions: .bowtie_color_index
+  import_path: local_types.galaxy
+bowtiebaseindex:
+  source: galaxy
+  classname: BowtieBaseIndex
+  extensions: .bowtie_base_index
+  import_path: local_types.galaxy
+csfasta:
+  source: galaxy
+  classname: csFasta
+  extensions: .csfasta
+  import_path: local_types.galaxy
+data:
+  source: galaxy
+  classname: Data
+  extensions: .data
+  import_path: local_types.galaxy
+binary:
+  source: galaxy
+  classname: Binary
+  extensions: .tpr,.binary
+  import_path: local_types.galaxy
+d3_hierarchy:
+  source: galaxy
+  classname: D3_hierarchy
+  extensions: .d3_hierarchy
+  import_path: local_types.galaxy
+imgtjson:
+  source: galaxy
+  classname: ImgtJson
+  extensions: .imgt.json
+  import_path: local_types.galaxy
+geojson:
+  source: galaxy
+  classname: GeoJson
+  extensions: .geojson
+  import_path: local_types.galaxy
+data_manager_json:
+  source: galaxy
+  classname: Data_manager_json
+  extensions: .data_manager_json
+  import_path: local_types.galaxy
+dotbracket:
+  source: galaxy
+  classname: DotBracket
+  extensions: .dbn
+  import_path: local_types.galaxy
+fai:
+  source: galaxy
+  classname: Fai
+  extensions: .fai
+  import_path: local_types.galaxy
+fasta:
+  source: galaxy
+  classname: Fasta
+  extensions: .fasta,.fasta.gz
+  import_path: local_types.galaxy
+fastg:
+  source: galaxy
+  classname: Fastg
+  extensions: .fastg
+  import_path: local_types.galaxy
+fastq:
+  source: galaxy
+  classname: Fastq
+  extensions: .fastq,.fastq.gz.bz2,.fastq.gz,.fastq.bz2
+  import_path: local_types.galaxy
+fastqsanger:
+  source: galaxy
+  classname: FastqSanger
+  extensions: .fastqsanger,.fastqsanger.bz2,.fastqsanger.gz,.fastqsanger.gz.bz2
+  import_path: local_types.galaxy
+fastqsolexa:
+  source: galaxy
+  classname: FastqSolexa
+  extensions: .fastqsolexa,.fastqsolexa.gz,.fastqsolexa.gz.bz2,.fastqsolexa.bz2
+  import_path: local_types.galaxy
+fastqcssanger:
+  source: galaxy
+  classname: FastqCSSanger
+  extensions: .fastqcssanger,.fastqcssanger.bz2,.fastqcssanger.gz,.fastqcssanger.gz.bz2
+  import_path: local_types.galaxy
+fastqillumina:
+  source: galaxy
+  classname: FastqIllumina
+  extensions: .fastqillumina,.fastqillumina.gz,.fastqillumina.gz.bz2,.fastqillumina.bz2
+  import_path: local_types.galaxy
+sequencesplitlocations:
+  source: galaxy
+  classname: SequenceSplitLocations
+  extensions: .fqtoc
+  import_path: local_types.galaxy
+eland:
+  source: galaxy
+  classname: Eland
+  extensions: .eland
+  import_path: local_types.galaxy
+elandmulti:
+  source: galaxy
+  classname: ElandMulti
+  extensions: .elandmulti
+  import_path: local_types.galaxy
+genetrack:
+  source: galaxy
+  classname: GeneTrack
+  extensions: .genetrack
+  import_path: local_types.galaxy
+gff:
+  source: galaxy
+  classname: Gff
+  extensions: .gff
+  import_path: local_types.galaxy
+gff3:
+  source: galaxy
+  classname: Gff3
+  extensions: .gff3,.gff3.gz,.gff3.gz.bz2,.gff3.bz2
+  import_path: local_types.galaxy
+gif:
+  source: galaxy
+  classname: Gif
+  extensions: .gif
+  import_path: local_types.galaxy
+gmaj:
+  source: galaxy
+  classname: Gmaj
+  extensions: .gmaj.zip
+  import_path: local_types.galaxy
+graph_dot:
+  source: galaxy
+  classname: Graph_dot
+  extensions: .graph_dot
+  import_path: local_types.galaxy
+gtf:
+  source: galaxy
+  classname: Gtf
+  extensions: .gtf
+  import_path: local_types.galaxy
+toolshed_gz:
+  source: galaxy
+  classname: Toolshed_gz
+  extensions: .toolshed.gz
+  import_path: local_types.galaxy
+h5:
+  source: galaxy
+  classname: H5
+  extensions: .h5
+  import_path: local_types.galaxy
+loom:
+  source: galaxy
+  classname: Loom
+  extensions: .loom
+  import_path: local_types.galaxy
+anndata:
+  source: galaxy
+  classname: Anndata
+  extensions: .h5ad
+  import_path: local_types.galaxy
+mz5:
+  source: galaxy
+  classname: Mz5
+  extensions: .mz5
+  import_path: local_types.galaxy
+hyphy_results_json:
+  source: galaxy
+  classname: Hyphy_results_json
+  extensions: .hyphy_results.json
+  import_path: local_types.galaxy
+hivtrace:
+  source: galaxy
+  classname: Hivtrace
+  extensions: .hivtrace
+  import_path: local_types.galaxy
+cool:
+  source: galaxy
+  classname: Cool
+  extensions: .cool
+  import_path: local_types.galaxy
+mcool:
+  source: galaxy
+  classname: MCool
+  extensions: .mcool
+  import_path: local_types.galaxy
+h5mlm:
+  source: galaxy
+  classname: H5MLM
+  extensions: .h5mlm
+  import_path: local_types.galaxy
+html:
+  source: galaxy
+  classname: Html
+  extensions: .html
+  import_path: local_types.galaxy
+interval:
+  source: galaxy
+  classname: Interval
+  extensions: .interval
+  import_path: local_types.galaxy
+jellyfish:
+  source: galaxy
+  classname: Jellyfish
+  extensions: .jellyfish
+  import_path: local_types.galaxy
+isatab:
+  source: galaxy
+  classname: IsaTab
+  extensions: .isa-tab
+  import_path: local_types.galaxy
+isajson:
+  source: galaxy
+  classname: IsaJson
+  extensions: .isa-json
+  import_path: local_types.galaxy
+picard_interval_list:
+  source: galaxy
+  classname: Picard_interval_list
+  extensions: .picard_interval_list
+  import_path: local_types.galaxy
+gatk_interval:
+  source: galaxy
+  classname: Gatk_interval
+  extensions: .gatk_interval
+  import_path: local_types.galaxy
+gatk_report:
+  source: galaxy
+  classname: Gatk_report
+  extensions: .gatk_report
+  import_path: local_types.galaxy
+gatk_dbsnp:
+  source: galaxy
+  classname: Gatk_dbsnp
+  extensions: .gatk_dbsnp
+  import_path: local_types.galaxy
+gatk_tranche:
+  source: galaxy
+  classname: Gatk_tranche
+  extensions: .gatk_tranche
+  import_path: local_types.galaxy
+gatk_recal:
+  source: galaxy
+  classname: Gatk_recal
+  extensions: .gatk_recal
+  import_path: local_types.galaxy
+hhr:
+  source: galaxy
+  classname: Hhr
+  extensions: .hhr
+  import_path: local_types.galaxy
+jpg:
+  source: galaxy
+  classname: Jpg
+  extensions: .jpg
+  import_path: local_types.galaxy
+tiff:
+  source: galaxy
+  classname: Tiff
+  extensions: .tiff
+  import_path: local_types.galaxy
+tf2:
+  source: galaxy
+  classname: Tf2
+  extensions: .tf2
+  import_path: local_types.galaxy
+tf8:
+  source: galaxy
+  classname: Tf8
+  extensions: .tf8
+  import_path: local_types.galaxy
+btf:
+  source: galaxy
+  classname: Btf
+  extensions: .btf
+  import_path: local_types.galaxy
+tif:
+  source: galaxy
+  classname: Tif
+  extensions: .tif
+  import_path: local_types.galaxy
+svs:
+  source: galaxy
+  classname: Svs
+  extensions: .svs
+  import_path: local_types.galaxy
+scn:
+  source: galaxy
+  classname: Scn
+  extensions: .scn
+  import_path: local_types.galaxy
+bif:
+  source: galaxy
+  classname: Bif
+  extensions: .bif
+  import_path: local_types.galaxy
+ometiff:
+  source: galaxy
+  classname: OMETiff
+  extensions: .ome.tiff
+  import_path: local_types.galaxy
+hamamatsu:
+  source: galaxy
+  classname: Hamamatsu
+  extensions: .vms
+  import_path: local_types.galaxy
+vmu:
+  source: galaxy
+  classname: Vmu
+  extensions: .vmu
+  import_path: local_types.galaxy
+ndpi:
+  source: galaxy
+  classname: Ndpi
+  extensions: .ndpi
+  import_path: local_types.galaxy
+mirax:
+  source: galaxy
+  classname: Mirax
+  extensions: .mrxs
+  import_path: local_types.galaxy
+sakura:
+  source: galaxy
+  classname: Sakura
+  extensions: .svslide
+  import_path: local_types.galaxy
+bmp:
+  source: galaxy
+  classname: Bmp
+  extensions: .bmp
+  import_path: local_types.galaxy
+im:
+  source: galaxy
+  classname: Im
+  extensions: .im
+  import_path: local_types.galaxy
+pcd:
+  source: galaxy
+  classname: Pcd
+  extensions: .pcd
+  import_path: local_types.galaxy
+pcx:
+  source: galaxy
+  classname: Pcx
+  extensions: .pcx
+  import_path: local_types.galaxy
+ppm:
+  source: galaxy
+  classname: Ppm
+  extensions: .ppm
+  import_path: local_types.galaxy
+psd:
+  source: galaxy
+  classname: Psd
+  extensions: .psd
+  import_path: local_types.galaxy
+xbm:
+  source: galaxy
+  classname: Xbm
+  extensions: .xbm
+  import_path: local_types.galaxy
+xpm:
+  source: galaxy
+  classname: Xpm
+  extensions: .xpm
+  import_path: local_types.galaxy
+rgb:
+  source: galaxy
+  classname: Rgb
+  extensions: .rgb
+  import_path: local_types.galaxy
+pbm:
+  source: galaxy
+  classname: Pbm
+  extensions: .pbm
+  import_path: local_types.galaxy
+pgm:
+  source: galaxy
+  classname: Pgm
+  extensions: .pgm
+  import_path: local_types.galaxy
+nrrd:
+  source: galaxy
+  classname: Nrrd
+  extensions: .nrrd
+  import_path: local_types.galaxy
+nhdr:
+  source: galaxy
+  classname: Nhdr
+  extensions: .nhdr
+  import_path: local_types.galaxy
+rnadotplotmatrix:
+  source: galaxy
+  classname: RNADotPlotMatrix
+  extensions: .rna_eps
+  import_path: local_types.galaxy
+compressedziparchive:
+  source: galaxy
+  classname: CompressedZipArchive
+  extensions: .zip
+  import_path: local_types.galaxy
+tar:
+  source: galaxy
+  classname: Tar
+  extensions: .tar
+  import_path: local_types.galaxy
+directory:
+  source: galaxy
+  classname: Directory
+  extensions: .directory
+  import_path: local_types.galaxy
+mrm:
+  source: galaxy
+  classname: Mrm
+  extensions: .mrm
+  import_path: local_types.galaxy
+dta:
+  source: galaxy
+  classname: Dta
+  extensions: .dta
+  import_path: local_types.galaxy
+dta2d:
+  source: galaxy
+  classname: Dta2d
+  extensions: .dta2d
+  import_path: local_types.galaxy
+edta:
+  source: galaxy
+  classname: Edta
+  extensions: .edta
+  import_path: local_types.galaxy
+pepxml:
+  source: galaxy
+  classname: PepXml
+  extensions: .pepxml
+  import_path: local_types.galaxy
+raw_pepxml:
+  source: galaxy
+  classname: Raw_pepxml
+  extensions: .raw_pepxml
+  import_path: local_types.galaxy
+peptideprophet_pepxml:
+  source: galaxy
+  classname: Peptideprophet_pepxml
+  extensions: .peptideprophet_pepxml
+  import_path: local_types.galaxy
+interprophet_pepxml:
+  source: galaxy
+  classname: Interprophet_pepxml
+  extensions: .interprophet_pepxml
+  import_path: local_types.galaxy
+protxml:
+  source: galaxy
+  classname: ProtXML
+  extensions: .protxml
+  import_path: local_types.galaxy
+paramxml:
+  source: galaxy
+  classname: Paramxml
+  extensions: .paramxml
+  import_path: local_types.galaxy
+kroenik:
+  source: galaxy
+  classname: Kroenik
+  extensions: .kroenik
+  import_path: local_types.galaxy
+peplist:
+  source: galaxy
+  classname: PepList
+  extensions: .peplist
+  import_path: local_types.galaxy
+psms:
+  source: galaxy
+  classname: PSMS
+  extensions: .psms
+  import_path: local_types.galaxy
+pepxmlreport:
+  source: galaxy
+  classname: PepXmlReport
+  extensions: .pepxml.tsv
+  import_path: local_types.galaxy
+protxmlreport:
+  source: galaxy
+  classname: ProtXmlReport
+  extensions: .protxml.tsv
+  import_path: local_types.galaxy
+mascotdat:
+  source: galaxy
+  classname: MascotDat
+  extensions: .mascotdat
+  import_path: local_types.galaxy
+mzidentml:
+  source: galaxy
+  classname: MzIdentML
+  extensions: .mzid
+  import_path: local_types.galaxy
+idxml:
+  source: galaxy
+  classname: IdXML
+  extensions: .idxml
+  import_path: local_types.galaxy
+tandemxml:
+  source: galaxy
+  classname: TandemXML
+  extensions: .tandem
+  import_path: local_types.galaxy
+sirius_ms:
+  source: galaxy
+  classname: Sirius_ms
+  extensions: .sirius.ms
+  import_path: local_types.galaxy
+thermoraw:
+  source: galaxy
+  classname: ThermoRAW
+  extensions: .thermo.raw
+  import_path: local_types.galaxy
+baftar:
+  source: galaxy
+  classname: BafTar
+  extensions: .brukerbaf.d.tar
+  import_path: local_types.galaxy
+yeptar:
+  source: galaxy
+  classname: YepTar
+  extensions: .agilentbrukeryep.d.tar
+  import_path: local_types.galaxy
+tdftar:
+  source: galaxy
+  classname: TdfTar
+  extensions: .brukertdf.d.tar
+  import_path: local_types.galaxy
+masshuntertar:
+  source: galaxy
+  classname: MassHunterTar
+  extensions: .agilentmasshunter.d.tar
+  import_path: local_types.galaxy
+masslynxtar:
+  source: galaxy
+  classname: MassLynxTar
+  extensions: .watersmasslynx.raw.tar
+  import_path: local_types.galaxy
+wifftar:
+  source: galaxy
+  classname: WiffTar
+  extensions: .wiff.tar
+  import_path: local_types.galaxy
+mascotxml:
+  source: galaxy
+  classname: MascotXML
+  extensions: .mascotxml
+  import_path: local_types.galaxy
+mztab:
+  source: galaxy
+  classname: MzTab
+  extensions: .mztab
+  import_path: local_types.galaxy
+mztab2:
+  source: galaxy
+  classname: MzTab2
+  extensions: .mztab2
+  import_path: local_types.galaxy
+mzml:
+  source: galaxy
+  classname: MzML
+  extensions: .mzml
+  import_path: local_types.galaxy
+nmrml:
+  source: galaxy
+  classname: NmrML
+  extensions: .nmrml
+  import_path: local_types.galaxy
+meryldb:
+  source: galaxy
+  classname: Meryldb
+  extensions: .meryldb
+  import_path: local_types.galaxy
+bref3:
+  source: galaxy
+  classname: Bref3
+  extensions: .bref3
+  import_path: local_types.galaxy
+mgf:
+  source: galaxy
+  classname: Mgf
+  extensions: .mgf
+  import_path: local_types.galaxy
+wiff:
+  source: galaxy
+  classname: Wiff
+  extensions: .wiff
+  import_path: local_types.galaxy
+mzxml:
+  source: galaxy
+  classname: MzXML
+  extensions: .mzxml
+  import_path: local_types.galaxy
+mzdata:
+  source: galaxy
+  classname: MzData
+  extensions: .mzdata
+  import_path: local_types.galaxy
+ms2:
+  source: galaxy
+  classname: Ms2
+  extensions: .ms2
+  import_path: local_types.galaxy
+mzquantml:
+  source: galaxy
+  classname: MzQuantML
+  extensions: .mzq
+  import_path: local_types.galaxy
+sqlite:
+  source: galaxy
+  classname: SQlite
+  extensions: .sqlite
+  import_path: local_types.galaxy
+mzsqlite:
+  source: galaxy
+  classname: MzSQlite
+  extensions: .mz.sqlite
+  import_path: local_types.galaxy
+osw:
+  source: galaxy
+  classname: OSW
+  extensions: .osw
+  import_path: local_types.galaxy
+pqp:
+  source: galaxy
+  classname: PQP
+  extensions: .pqp
+  import_path: local_types.galaxy
+traml:
+  source: galaxy
+  classname: TraML
+  extensions: .traml
+  import_path: local_types.galaxy
+trafoxml:
+  source: galaxy
+  classname: TrafoXML
+  extensions: .trafoxml
+  import_path: local_types.galaxy
+featurexml:
+  source: galaxy
+  classname: FeatureXML
+  extensions: .featurexml
+  import_path: local_types.galaxy
+consensusxml:
+  source: galaxy
+  classname: ConsensusXML
+  extensions: .consensusxml
+  import_path: local_types.galaxy
+uniprotxml:
+  source: galaxy
+  classname: UniProtXML
+  extensions: .uniprotxml
+  import_path: local_types.galaxy
+xquestxml:
+  source: galaxy
+  classname: XquestXML
+  extensions: .xquest.xml
+  import_path: local_types.galaxy
+xquestspecxml:
+  source: galaxy
+  classname: XquestSpecXML
+  extensions: .spec.xml
+  import_path: local_types.galaxy
+qcml:
+  source: galaxy
+  classname: QCML
+  extensions: .qcml
+  import_path: local_types.galaxy
+msp:
+  source: galaxy
+  classname: Msp
+  extensions: .msp
+  import_path: local_types.galaxy
+splibnoindex:
+  source: galaxy
+  classname: SPLibNoIndex
+  extensions: .splib_noindex
+  import_path: local_types.galaxy
+splib:
+  source: galaxy
+  classname: SPLib
+  extensions: .splib
+  import_path: local_types.galaxy
+blibsqlite:
+  source: galaxy
+  classname: BlibSQlite
+  extensions: .blib
+  import_path: local_types.galaxy
+dlibsqlite:
+  source: galaxy
+  classname: DlibSQlite
+  extensions: .dlib
+  import_path: local_types.galaxy
+elibsqlite:
+  source: galaxy
+  classname: ElibSQlite
+  extensions: .elib
+  import_path: local_types.galaxy
+xhunteraslformat:
+  source: galaxy
+  classname: XHunterAslFormat
+  extensions: .hlf
+  import_path: local_types.galaxy
+idpdb:
+  source: galaxy
+  classname: IdpDB
+  extensions: .idpdb
+  import_path: local_types.galaxy
+sf3:
+  source: galaxy
+  classname: Sf3
+  extensions: .sf3
+  import_path: local_types.galaxy
+cps:
+  source: galaxy
+  classname: Cps
+  extensions: .cps
+  import_path: local_types.galaxy
+connectivitytable:
+  source: galaxy
+  classname: ConnectivityTable
+  extensions: .ct
+  import_path: local_types.galaxy
+postgresqlarchive:
+  source: galaxy
+  classname: PostgresqlArchive
+  extensions: .postgresql
+  import_path: local_types.galaxy
+searchguiarchive:
+  source: galaxy
+  classname: SearchGuiArchive
+  extensions: .searchgui_archive
+  import_path: local_types.galaxy
+fast5archive:
+  source: galaxy
+  classname: Fast5Archive
+  extensions: .fast5.tar
+  import_path: local_types.galaxy
+fast5archivegz:
+  source: galaxy
+  classname: Fast5ArchiveGz
+  extensions: .fast5.tar.gz
+  import_path: local_types.galaxy
+fast5archivebz2:
+  source: galaxy
+  classname: Fast5ArchiveBz2
+  extensions: .fast5.tar.bz2
+  import_path: local_types.galaxy
+peptideshaker_archive:
+  source: galaxy
+  classname: Peptideshaker_archive
+  extensions: .peptideshaker_archive
+  import_path: local_types.galaxy
+percin:
+  source: galaxy
+  classname: Percin
+  extensions: .percin
+  import_path: local_types.galaxy
+percout:
+  source: galaxy
+  classname: Percout
+  extensions: .percout
+  import_path: local_types.galaxy
+hardklor:
+  source: galaxy
+  classname: Hardklor
+  extensions: .hardklor
+  import_path: local_types.galaxy
+kronik:
+  source: galaxy
+  classname: Kronik
+  extensions: .kronik
+  import_path: local_types.galaxy
+imzml:
+  source: galaxy
+  classname: ImzML
+  extensions: .imzml
+  import_path: local_types.galaxy
+analyze75:
+  source: galaxy
+  classname: Analyze75
+  extensions: .analyze75
+  import_path: local_types.galaxy
+nifti1:
+  source: galaxy
+  classname: Nifti1
+  extensions: .nii1,.nii1.gz
+  import_path: local_types.galaxy
+nifti2:
+  source: galaxy
+  classname: Nifti2
+  extensions: .nii2,.nii2.gz
+  import_path: local_types.galaxy
+gifti:
+  source: galaxy
+  classname: Gifti
+  extensions: .gii,.gii.gz
+  import_path: local_types.galaxy
+tck:
+  source: galaxy
+  classname: Tck
+  extensions: .tck
+  import_path: local_types.galaxy
+trk:
+  source: galaxy
+  classname: Trk
+  extensions: .trk
+  import_path: local_types.galaxy
+mrc2014:
+  source: galaxy
+  classname: Mrc2014
+  extensions: .mrc
+  import_path: local_types.galaxy
+star:
+  source: galaxy
+  classname: Star
+  extensions: .star
+  import_path: local_types.galaxy
+peff:
+  source: galaxy
+  classname: PEFF
+  extensions: .peff
+  import_path: local_types.galaxy
+toml:
+  source: galaxy
+  classname: Toml
+  extensions: .toml
+  import_path: local_types.galaxy
+fcs:
+  source: galaxy
+  classname: FCS
+  extensions: .fcs
+  import_path: local_types.galaxy
+flowtext:
+  source: galaxy
+  classname: Flowtext
+  extensions: .flowtext
+  import_path: local_types.galaxy
+flowclr:
+  source: galaxy
+  classname: Flowclr
+  extensions: .flowclr
+  import_path: local_types.galaxy
+flowmfi:
+  source: galaxy
+  classname: Flowmfi
+  extensions: .flowmfi
+  import_path: local_types.galaxy
+flowstat1:
+  source: galaxy
+  classname: Flowstat1
+  extensions: .flowstat1
+  import_path: local_types.galaxy
+flowstat2:
+  source: galaxy
+  classname: Flowstat2
+  extensions: .flowstat2
+  import_path: local_types.galaxy
+flowstat3:
+  source: galaxy
+  classname: Flowstat3
+  extensions: .flowstat3
+  import_path: local_types.galaxy
+flowscore:
+  source: galaxy
+  classname: Flowscore
+  extensions: .flowscore
+  import_path: local_types.galaxy
+flowframe:
+  source: galaxy
+  classname: Flowframe
+  extensions: .flowframe
+  import_path: local_types.galaxy
+fsom:
+  source: galaxy
+  classname: Fsom
+  extensions: .fsom
+  import_path: local_types.galaxy
+flowset:
+  source: galaxy
+  classname: Flowset
+  extensions: .flowset
+  import_path: local_types.galaxy
+metacyto_clr_txt:
+  source: galaxy
+  classname: Metacyto_clr_txt
+  extensions: .metacyto_clr.txt
+  import_path: local_types.galaxy
+msummary:
+  source: galaxy
+  classname: mSummary
+  extensions: .metacyto_summary.txt
+  import_path: local_types.galaxy
+mstats:
+  source: galaxy
+  classname: mStats
+  extensions: .metacyto_stats.txt
+  import_path: local_types.galaxy
+deeptools_compute_matrix_archive:
+  source: galaxy
+  classname: Deeptools_compute_matrix_archive
+  extensions: .deeptools_compute_matrix_archive
+  import_path: local_types.galaxy
+deeptools_coverage_matrix:
+  source: galaxy
+  classname: Deeptools_coverage_matrix
+  extensions: .deeptools_coverage_matrix
+  import_path: local_types.galaxy
+netcdf:
+  source: galaxy
+  classname: NetCDF
+  extensions: .netcdf
+  import_path: local_types.galaxy
+eps:
+  source: galaxy
+  classname: Eps
+  extensions: .eps
+  import_path: local_types.galaxy
+rast:
+  source: galaxy
+  classname: Rast
+  extensions: .rast
+  import_path: local_types.galaxy
+laj:
+  source: galaxy
+  classname: Laj
+  extensions: .laj
+  import_path: local_types.galaxy
+lav:
+  source: galaxy
+  classname: Lav
+  extensions: .lav
+  import_path: local_types.galaxy
+maf:
+  source: galaxy
+  classname: Maf
+  extensions: .maf
+  import_path: local_types.galaxy
+mafcustomtrack:
+  source: galaxy
+  classname: MafCustomTrack
+  extensions: .mafcustomtrack
+  import_path: local_types.galaxy
+matrixmarket:
+  source: galaxy
+  classname: MatrixMarket
+  extensions: .mtx
+  import_path: local_types.galaxy
+cmap:
+  source: galaxy
+  classname: CMAP
+  extensions: .cmap
+  import_path: local_types.galaxy
+encodepeak:
+  source: galaxy
+  classname: ENCODEPeak
+  extensions: .encodepeak
+  import_path: local_types.galaxy
+pdf:
+  source: galaxy
+  classname: Pdf
+  extensions: .pdf
+  import_path: local_types.galaxy
+pileup:
+  source: galaxy
+  classname: Pileup
+  extensions: .pileup
+  import_path: local_types.galaxy
+obo:
+  source: galaxy
+  classname: Obo
+  extensions: .obo
+  import_path: local_types.galaxy
+owl:
+  source: galaxy
+  classname: Owl
+  extensions: .owl
+  import_path: local_types.galaxy
+png:
+  source: galaxy
+  classname: Png
+  extensions: .png
+  import_path: local_types.galaxy
+qualityscore:
+  source: galaxy
+  classname: QualityScore
+  extensions: .qual
+  import_path: local_types.galaxy
+qualityscoresolexa:
+  source: galaxy
+  classname: QualityScoreSolexa
+  extensions: .qualsolexa
+  import_path: local_types.galaxy
+qualityscoreillumina:
+  source: galaxy
+  classname: QualityScoreIllumina
+  extensions: .qualillumina
+  import_path: local_types.galaxy
+qualityscoresolid:
+  source: galaxy
+  classname: QualityScoreSOLiD
+  extensions: .qualsolid
+  import_path: local_types.galaxy
+qualityscore454:
+  source: galaxy
+  classname: QualityScore454
+  extensions: .qual454
+  import_path: local_types.galaxy
+roadmaps:
+  source: galaxy
+  classname: Roadmaps
+  extensions: .roadmaps
+  import_path: local_types.galaxy
+sam:
+  source: galaxy
+  classname: Sam
+  extensions: .sam
+  import_path: local_types.galaxy
+scf:
+  source: galaxy
+  classname: Scf
+  extensions: .scf
+  import_path: local_types.galaxy
+sequences:
+  source: galaxy
+  classname: Sequences
+  extensions: .sequences
+  import_path: local_types.galaxy
+shapefile:
+  source: galaxy
+  classname: Shapefile
+  extensions: .shp
+  import_path: local_types.galaxy
+snpeffdb:
+  source: galaxy
+  classname: SnpEffDb
+  extensions: .snpeffdb
+  import_path: local_types.galaxy
+snpsiftdbnsfp:
+  source: galaxy
+  classname: SnpSiftDbNSFP
+  extensions: .snpsiftdbnsfp
+  import_path: local_types.galaxy
+dbnsfp_tabular:
+  source: galaxy
+  classname: Dbnsfp_tabular
+  extensions: .dbnsfp.tabular
+  import_path: local_types.galaxy
+sff:
+  source: galaxy
+  classname: Sff
+  extensions: .sff
+  import_path: local_types.galaxy
+sra:
+  source: galaxy
+  classname: Sra
+  extensions: .sra
+  import_path: local_types.galaxy
+sramanifest:
+  source: galaxy
+  classname: SraManifest
+  extensions: .sra_manifest.tabular
+  import_path: local_types.galaxy
+svg:
+  source: galaxy
+  classname: Svg
+  extensions: .svg
+  import_path: local_types.galaxy
+taxonomy:
+  source: galaxy
+  classname: Taxonomy
+  extensions: .taxonomy
+  import_path: local_types.galaxy
+tabular:
+  source: galaxy
+  classname: Tabular
+  extensions: .tabular,.allegro_ihaplo,.allegro_descent.gz,.tabular.gz,.allegro_descent,.allegro_ihaplo.gz
+  import_path: local_types.galaxy
+twobit:
+  source: galaxy
+  classname: TwoBit
+  extensions: .twobit
+  import_path: local_types.galaxy
+sqmass:
+  source: galaxy
+  classname: SQmass
+  extensions: .sqmass
+  import_path: local_types.galaxy
+geminisqlite:
+  source: galaxy
+  classname: GeminiSQLite
+  extensions: .gemini.sqlite
+  import_path: local_types.galaxy
+chirasqlite:
+  source: galaxy
+  classname: ChiraSQLite
+  extensions: .chira.sqlite
+  import_path: local_types.galaxy
+cuffdiffsqlite:
+  source: galaxy
+  classname: CuffDiffSQlite
+  extensions: .cuffdiff.sqlite
+  import_path: local_types.galaxy
+gafasqlite:
+  source: galaxy
+  classname: GAFASQLite
+  extensions: .gafa.sqlite
+  import_path: local_types.galaxy
+ncbitaxonomysqlite:
+  source: galaxy
+  classname: NcbiTaxonomySQlite
+  extensions: .ncbitaxonomy.sqlite
+  import_path: local_types.galaxy
+text:
+  source: galaxy
+  classname: Text
+  extensions: .txt
+  import_path: local_types.galaxy
+linecount:
+  source: galaxy
+  classname: LineCount
+  extensions: .linecount
+  import_path: local_types.galaxy
+memepsp:
+  source: galaxy
+  classname: MemePsp
+  extensions: .memepsp
+  import_path: local_types.galaxy
+memexml:
+  source: galaxy
+  classname: MEMEXml
+  extensions: .memexml
+  import_path: local_types.galaxy
+cisml:
+  source: galaxy
+  classname: CisML
+  extensions: .cisml
+  import_path: local_types.galaxy
+genericxml:
+  source: galaxy
+  classname: GenericXml
+  extensions: .xml
+  import_path: local_types.galaxy
+dzi:
+  source: galaxy
+  classname: Dzi
+  extensions: .dzi
+  import_path: local_types.galaxy
+vcf:
+  source: galaxy
+  classname: Vcf
+  extensions: .vcf
+  import_path: local_types.galaxy
+bcf:
+  source: galaxy
+  classname: Bcf
+  extensions: .bcf
+  import_path: local_types.galaxy
+bcf_bgzip:
+  source: galaxy
+  classname: Bcf_bgzip
+  extensions: .bcf_bgzip
+  import_path: local_types.galaxy
+bcfuncompressed:
+  source: galaxy
+  classname: BcfUncompressed
+  extensions: .bcf_uncompressed
+  import_path: local_types.galaxy
+velvet:
+  source: galaxy
+  classname: Velvet
+  extensions: .velvet
+  import_path: local_types.galaxy
+wiggle:
+  source: galaxy
+  classname: Wiggle
+  extensions: .wig
+  import_path: local_types.galaxy
+interval_index:
+  source: galaxy
+  classname: Interval_index
+  extensions: .interval_index
+  import_path: local_types.galaxy
+odgi:
+  source: galaxy
+  classname: Odgi
+  extensions: .odgi
+  import_path: local_types.galaxy
+vg:
+  source: galaxy
+  classname: Vg
+  extensions: .vg
+  import_path: local_types.galaxy
+xg:
+  source: galaxy
+  classname: Xg
+  extensions: .xg
+  import_path: local_types.galaxy
+protobuf2:
+  source: galaxy
+  classname: Protobuf2
+  extensions: .protobuf2
+  import_path: local_types.galaxy
+protobuf3:
+  source: galaxy
+  classname: Protobuf3
+  extensions: .protobuf3
+  import_path: local_types.galaxy
+onnx:
+  source: galaxy
+  classname: Onnx
+  extensions: .onnx
+  import_path: local_types.galaxy
+tabix:
+  source: galaxy
+  classname: Tabix
+  extensions: .tabix
+  import_path: local_types.galaxy
+bgzip:
+  source: galaxy
+  classname: Bgzip
+  extensions: .bgzip
+  import_path: local_types.galaxy
+vcfgz:
+  source: galaxy
+  classname: VcfGz
+  extensions: .vcf_bgzip
+  import_path: local_types.galaxy
+bus:
+  source: galaxy
+  classname: Bus
+  extensions: .bus
+  import_path: local_types.galaxy
+kallisto_idx:
+  source: galaxy
+  classname: Kallisto_idx
+  extensions: .kallisto.idx
+  import_path: local_types.galaxy
+phyloxml:
+  source: galaxy
+  classname: Phyloxml
+  extensions: .phyloxml
+  import_path: local_types.galaxy
+newick:
+  source: galaxy
+  classname: Newick
+  extensions: .newick
+  import_path: local_types.galaxy
+nhx:
+  source: galaxy
+  classname: Nhx
+  extensions: .nhx
+  import_path: local_types.galaxy
+nexus:
+  source: galaxy
+  classname: Nexus
+  extensions: .nex,.nexus
+  import_path: local_types.galaxy
+iqtree:
+  source: galaxy
+  classname: IQTree
+  extensions: .iqtree
+  import_path: local_types.galaxy
+squaredistancematrix:
+  source: galaxy
+  classname: SquareDistanceMatrix
+  extensions: .mldist,.mothur.square.dist
+  import_path: local_types.galaxy
+affybatch:
+  source: galaxy
+  classname: Affybatch
+  extensions: .affybatch
+  import_path: local_types.galaxy
+eigenstratgeno:
+  source: galaxy
+  classname: Eigenstratgeno
+  extensions: .eigenstratgeno
+  import_path: local_types.galaxy
+eigenstratpca:
+  source: galaxy
+  classname: Eigenstratpca
+  extensions: .eigenstratpca
+  import_path: local_types.galaxy
+eset:
+  source: galaxy
+  classname: Eset
+  extensions: .eset
+  import_path: local_types.galaxy
+fped:
+  source: galaxy
+  classname: Fped
+  extensions: .fped
+  import_path: local_types.galaxy
+fphe:
+  source: galaxy
+  classname: Fphe
+  extensions: .fphe
+  import_path: local_types.galaxy
+genomegraphs:
+  source: galaxy
+  classname: GenomeGraphs
+  extensions: .gg
+  import_path: local_types.galaxy
+ldindep:
+  source: galaxy
+  classname: ldIndep
+  extensions: .ldindep
+  import_path: local_types.galaxy
+malist:
+  source: galaxy
+  classname: MAlist
+  extensions: .malist
+  import_path: local_types.galaxy
+lped:
+  source: galaxy
+  classname: Lped
+  extensions: .lped
+  import_path: local_types.galaxy
+pbed:
+  source: galaxy
+  classname: Pbed
+  extensions: .pbed
+  import_path: local_types.galaxy
+pheno:
+  source: galaxy
+  classname: Pheno
+  extensions: .pheno
+  import_path: local_types.galaxy
+pphe:
+  source: galaxy
+  classname: Pphe
+  extensions: .pphe
+  import_path: local_types.galaxy
+rexpbase:
+  source: galaxy
+  classname: RexpBase
+  extensions: .rexpbase
+  import_path: local_types.galaxy
+rgenetics:
+  source: galaxy
+  classname: Rgenetics
+  extensions: .rgenetics
+  import_path: local_types.galaxy
+snptest:
+  source: galaxy
+  classname: Snptest
+  extensions: .snptest
+  import_path: local_types.galaxy
+snpmatrix:
+  source: galaxy
+  classname: SNPMatrix
+  extensions: .snpmatrix
+  import_path: local_types.galaxy
+excelxls:
+  source: galaxy
+  classname: ExcelXls
+  extensions: .xls,.excel.xls
+  import_path: local_types.galaxy
+ipynb:
+  source: galaxy
+  classname: Ipynb
+  extensions: .ipynb
+  import_path: local_types.galaxy
+json:
+  source: galaxy
+  classname: Json
+  extensions: .json
+  import_path: local_types.galaxy
+expressionjson:
+  source: galaxy
+  classname: ExpressionJson
+  extensions: .expression.json
+  import_path: local_types.galaxy
+xgmml:
+  source: galaxy
+  classname: Xgmml
+  extensions: .xgmml
+  import_path: local_types.galaxy
+sif:
+  source: galaxy
+  classname: Sif
+  extensions: .sif
+  import_path: local_types.galaxy
+triples:
+  source: galaxy
+  classname: Triples
+  extensions: .triples
+  import_path: local_types.galaxy
+hdt:
+  source: galaxy
+  classname: HDT
+  extensions: .hdt
+  import_path: local_types.galaxy
+ntriples:
+  source: galaxy
+  classname: NTriples
+  extensions: .nt
+  import_path: local_types.galaxy
+n3:
+  source: galaxy
+  classname: N3
+  extensions: .n3
+  import_path: local_types.galaxy
+turtle:
+  source: galaxy
+  classname: Turtle
+  extensions: .ttl
+  import_path: local_types.galaxy
+rdf:
+  source: galaxy
+  classname: Rdf
+  extensions: .rdf
+  import_path: local_types.galaxy
+jsonld:
+  source: galaxy
+  classname: Jsonld
+  extensions: .jsonld
+  import_path: local_types.galaxy
+xlsx:
+  source: galaxy
+  classname: Xlsx
+  extensions: .xlsx
+  import_path: local_types.galaxy
+btwisted:
+  source: galaxy
+  classname: Btwisted
+  extensions: .btwisted
+  import_path: local_types.galaxy
+cai:
+  source: galaxy
+  classname: Cai
+  extensions: .cai
+  import_path: local_types.galaxy
+cat_db:
+  source: galaxy
+  classname: Cat_db
+  extensions: .cat_db
+  import_path: local_types.galaxy
+charge:
+  source: galaxy
+  classname: Charge
+  extensions: .charge
+  import_path: local_types.galaxy
+checktrans:
+  source: galaxy
+  classname: Checktrans
+  extensions: .checktrans
+  import_path: local_types.galaxy
+chips:
+  source: galaxy
+  classname: Chips
+  extensions: .chips
+  import_path: local_types.galaxy
+codcmp:
+  source: galaxy
+  classname: Codcmp
+  extensions: .codcmp
+  import_path: local_types.galaxy
+coderet:
+  source: galaxy
+  classname: Coderet
+  extensions: .coderet
+  import_path: local_types.galaxy
+compseq:
+  source: galaxy
+  classname: Compseq
+  extensions: .compseq
+  import_path: local_types.galaxy
+cpgplot:
+  source: galaxy
+  classname: Cpgplot
+  extensions: .cpgplot
+  import_path: local_types.galaxy
+cpgreport:
+  source: galaxy
+  classname: Cpgreport
+  extensions: .cpgreport
+  import_path: local_types.galaxy
+cusp:
+  source: galaxy
+  classname: Cusp
+  extensions: .cusp
+  import_path: local_types.galaxy
+cut:
+  source: galaxy
+  classname: Cut
+  extensions: .cut
+  import_path: local_types.galaxy
+dan:
+  source: galaxy
+  classname: Dan
+  extensions: .dan
+  import_path: local_types.galaxy
+digest:
+  source: galaxy
+  classname: Digest
+  extensions: .digest
+  import_path: local_types.galaxy
+dreg:
+  source: galaxy
+  classname: Dreg
+  extensions: .dreg
+  import_path: local_types.galaxy
+einverted:
+  source: galaxy
+  classname: Einverted
+  extensions: .einverted
+  import_path: local_types.galaxy
+epestfind:
+  source: galaxy
+  classname: Epestfind
+  extensions: .epestfind
+  import_path: local_types.galaxy
+equicktandem:
+  source: galaxy
+  classname: Equicktandem
+  extensions: .equicktandem
+  import_path: local_types.galaxy
+est2genome:
+  source: galaxy
+  classname: Est2genome
+  extensions: .est2genome
+  import_path: local_types.galaxy
+etandem:
+  source: galaxy
+  classname: Etandem
+  extensions: .etandem
+  import_path: local_types.galaxy
+freak:
+  source: galaxy
+  classname: Freak
+  extensions: .freak
+  import_path: local_types.galaxy
+fuzznuc:
+  source: galaxy
+  classname: Fuzznuc
+  extensions: .fuzznuc
+  import_path: local_types.galaxy
+fuzzpro:
+  source: galaxy
+  classname: Fuzzpro
+  extensions: .fuzzpro
+  import_path: local_types.galaxy
+fuzztran:
+  source: galaxy
+  classname: Fuzztran
+  extensions: .fuzztran
+  import_path: local_types.galaxy
+garnier:
+  source: galaxy
+  classname: Garnier
+  extensions: .garnier
+  import_path: local_types.galaxy
+geecee:
+  source: galaxy
+  classname: Geecee
+  extensions: .geecee
+  import_path: local_types.galaxy
+helixturnhelix:
+  source: galaxy
+  classname: Helixturnhelix
+  extensions: .helixturnhelix
+  import_path: local_types.galaxy
+hmoment:
+  source: galaxy
+  classname: Hmoment
+  extensions: .hmoment
+  import_path: local_types.galaxy
+isochore:
+  source: galaxy
+  classname: Isochore
+  extensions: .isochore
+  import_path: local_types.galaxy
+match:
+  source: galaxy
+  classname: Match
+  extensions: .match
+  import_path: local_types.galaxy
+nametable:
+  source: galaxy
+  classname: Nametable
+  extensions: .nametable
+  import_path: local_types.galaxy
+needle:
+  source: galaxy
+  classname: Needle
+  extensions: .needle
+  import_path: local_types.galaxy
+newcpgreport:
+  source: galaxy
+  classname: Newcpgreport
+  extensions: .newcpgreport
+  import_path: local_types.galaxy
+newcpgseek:
+  source: galaxy
+  classname: Newcpgseek
+  extensions: .newcpgseek
+  import_path: local_types.galaxy
+noreturn:
+  source: galaxy
+  classname: Noreturn
+  extensions: .noreturn
+  import_path: local_types.galaxy
+palindrome:
+  source: galaxy
+  classname: Palindrome
+  extensions: .palindrome
+  import_path: local_types.galaxy
+pepcoil:
+  source: galaxy
+  classname: Pepcoil
+  extensions: .pepcoil
+  import_path: local_types.galaxy
+pepinfo:
+  source: galaxy
+  classname: Pepinfo
+  extensions: .pepinfo
+  import_path: local_types.galaxy
+pepstats:
+  source: galaxy
+  classname: Pepstats
+  extensions: .pepstats
+  import_path: local_types.galaxy
+polydot:
+  source: galaxy
+  classname: Polydot
+  extensions: .polydot
+  import_path: local_types.galaxy
+preg:
+  source: galaxy
+  classname: Preg
+  extensions: .preg
+  import_path: local_types.galaxy
+prettyseq:
+  source: galaxy
+  classname: Prettyseq
+  extensions: .prettyseq
+  import_path: local_types.galaxy
+primersearch:
+  source: galaxy
+  classname: Primersearch
+  extensions: .primersearch
+  import_path: local_types.galaxy
+showfeat:
+  source: galaxy
+  classname: Showfeat
+  extensions: .showfeat
+  import_path: local_types.galaxy
+showorf:
+  source: galaxy
+  classname: Showorf
+  extensions: .showorf
+  import_path: local_types.galaxy
+sixpack:
+  source: galaxy
+  classname: Sixpack
+  extensions: .sixpack
+  import_path: local_types.galaxy
+strider:
+  source: galaxy
+  classname: Strider
+  extensions: .strider
+  import_path: local_types.galaxy
+supermatcher:
+  source: galaxy
+  classname: Supermatcher
+  extensions: .supermatcher
+  import_path: local_types.galaxy
+syco:
+  source: galaxy
+  classname: Syco
+  extensions: .syco
+  import_path: local_types.galaxy
+textsearch:
+  source: galaxy
+  classname: Textsearch
+  extensions: .textsearch
+  import_path: local_types.galaxy
+vectorstrip:
+  source: galaxy
+  classname: Vectorstrip
+  extensions: .vectorstrip
+  import_path: local_types.galaxy
+wobble:
+  source: galaxy
+  classname: Wobble
+  extensions: .wobble
+  import_path: local_types.galaxy
+wordcount:
+  source: galaxy
+  classname: Wordcount
+  extensions: .wordcount
+  import_path: local_types.galaxy
+dbmotif:
+  source: galaxy
+  classname: Dbmotif
+  extensions: .dbmotif
+  import_path: local_types.galaxy
+diffseq:
+  source: galaxy
+  classname: Diffseq
+  extensions: .diffseq
+  import_path: local_types.galaxy
+excel:
+  source: galaxy
+  classname: Excel
+  extensions: .excel
+  import_path: local_types.galaxy
+feattable:
+  source: galaxy
+  classname: Feattable
+  extensions: .feattable
+  import_path: local_types.galaxy
+motif:
+  source: galaxy
+  classname: Motif
+  extensions: .motif
+  import_path: local_types.galaxy
+regions:
+  source: galaxy
+  classname: Regions
+  extensions: .regions
+  import_path: local_types.galaxy
+seqtable:
+  source: galaxy
+  classname: Seqtable
+  extensions: .seqtable
+  import_path: local_types.galaxy
+simple:
+  source: galaxy
+  classname: Simple
+  extensions: .simple
+  import_path: local_types.galaxy
+table:
+  source: galaxy
+  classname: Table
+  extensions: .table
+  import_path: local_types.galaxy
+tagseq:
+  source: galaxy
+  classname: Tagseq
+  extensions: .tagseq
+  import_path: local_types.galaxy
+acedb:
+  source: galaxy
+  classname: Acedb
+  extensions: .acedb
+  import_path: local_types.galaxy
+clustal:
+  source: galaxy
+  classname: Clustal
+  extensions: .clustal
+  import_path: local_types.galaxy
+codata:
+  source: galaxy
+  classname: Codata
+  extensions: .codata
+  import_path: local_types.galaxy
+embl:
+  source: galaxy
+  classname: Embl
+  extensions: .embl
+  import_path: local_types.galaxy
+fitch:
+  source: galaxy
+  classname: Fitch
+  extensions: .fitch
+  import_path: local_types.galaxy
+gcg:
+  source: galaxy
+  classname: Gcg
+  extensions: .gcg
+  import_path: local_types.galaxy
+genbank:
+  source: galaxy
+  classname: Genbank
+  extensions: .genbank,.genbank.gz
+  import_path: local_types.galaxy
+hennig86:
+  source: galaxy
+  classname: Hennig86
+  extensions: .hennig86
+  import_path: local_types.galaxy
+ig:
+  source: galaxy
+  classname: Ig
+  extensions: .ig
+  import_path: local_types.galaxy
+jackknifer:
+  source: galaxy
+  classname: Jackknifer
+  extensions: .jackknifer
+  import_path: local_types.galaxy
+jackknifernon:
+  source: galaxy
+  classname: Jackknifernon
+  extensions: .jackknifernon
+  import_path: local_types.galaxy
+mega:
+  source: galaxy
+  classname: Mega
+  extensions: .mega
+  import_path: local_types.galaxy
+meganon:
+  source: galaxy
+  classname: Meganon
+  extensions: .meganon
+  import_path: local_types.galaxy
+ncbi:
+  source: galaxy
+  classname: Ncbi
+  extensions: .ncbi
+  import_path: local_types.galaxy
+nexusnon:
+  source: galaxy
+  classname: Nexusnon
+  extensions: .nexusnon
+  import_path: local_types.galaxy
+phylip:
+  source: galaxy
+  classname: Phylip
+  extensions: .phylip
+  import_path: local_types.galaxy
+phylipnon:
+  source: galaxy
+  classname: Phylipnon
+  extensions: .phylipnon
+  import_path: local_types.galaxy
+pir:
+  source: galaxy
+  classname: Pir
+  extensions: .pir
+  import_path: local_types.galaxy
+staden:
+  source: galaxy
+  classname: Staden
+  extensions: .staden
+  import_path: local_types.galaxy
+swiss:
+  source: galaxy
+  classname: Swiss
+  extensions: .swiss
+  import_path: local_types.galaxy
+msf:
+  source: galaxy
+  classname: Msf
+  extensions: .msf
+  import_path: local_types.galaxy
+markx0:
+  source: galaxy
+  classname: Markx0
+  extensions: .markx0
+  import_path: local_types.galaxy
+markx1:
+  source: galaxy
+  classname: Markx1
+  extensions: .markx1
+  import_path: local_types.galaxy
+markx10:
+  source: galaxy
+  classname: Markx10
+  extensions: .markx10
+  import_path: local_types.galaxy
+markx2:
+  source: galaxy
+  classname: Markx2
+  extensions: .markx2
+  import_path: local_types.galaxy
+markx3:
+  source: galaxy
+  classname: Markx3
+  extensions: .markx3
+  import_path: local_types.galaxy
+pair:
+  source: galaxy
+  classname: Pair
+  extensions: .pair
+  import_path: local_types.galaxy
+score:
+  source: galaxy
+  classname: Score
+  extensions: .score
+  import_path: local_types.galaxy
+srs:
+  source: galaxy
+  classname: Srs
+  extensions: .srs
+  import_path: local_types.galaxy
+srspair:
+  source: galaxy
+  classname: Srspair
+  extensions: .srspair
+  import_path: local_types.galaxy
+snaphmm:
+  source: galaxy
+  classname: SnapHmm
+  extensions: .snaphmm
+  import_path: local_types.galaxy
+augustus:
+  source: galaxy
+  classname: Augustus
+  extensions: .augustus
+  import_path: local_types.galaxy
+icm:
+  source: galaxy
+  classname: ICM
+  extensions: .icm
+  import_path: local_types.galaxy
+infernalcm:
+  source: galaxy
+  classname: InfernalCM
+  extensions: .cm
+  import_path: local_types.galaxy
+hmmer2:
+  source: galaxy
+  classname: Hmmer2
+  extensions: .hmm2
+  import_path: local_types.galaxy
+hmmer3:
+  source: galaxy
+  classname: Hmmer3
+  extensions: .hmm3
+  import_path: local_types.galaxy
+stockholm_1_0:
+  source: galaxy
+  classname: Stockholm_1_0
+  extensions: .stockholm
+  import_path: local_types.galaxy
+mauvexmfa:
+  source: galaxy
+  classname: MauveXmfa
+  extensions: .xmfa
+  import_path: local_types.galaxy
+cel:
+  source: galaxy
+  classname: Cel
+  extensions: .cel
+  import_path: local_types.galaxy
+gpr:
+  source: galaxy
+  classname: Gpr
+  extensions: .gpr
+  import_path: local_types.galaxy
+gal:
+  source: galaxy
+  classname: Gal
+  extensions: .gal
+  import_path: local_types.galaxy
+rdata:
+  source: galaxy
+  classname: RData
+  extensions: .rdata
+  import_path: local_types.galaxy
+rdata_sce:
+  source: galaxy
+  classname: Rdata_sce
+  extensions: .rdata.sce
+  import_path: local_types.galaxy
+rdata_eset:
+  source: galaxy
+  classname: Rdata_eset
+  extensions: .rdata.eset
+  import_path: local_types.galaxy
+rdata_xcms_raw:
+  source: galaxy
+  classname: Rdata_xcms_raw
+  extensions: .rdata.xcms.raw
+  import_path: local_types.galaxy
+rdata_msnbase_raw:
+  source: galaxy
+  classname: Rdata_msnbase_raw
+  extensions: .rdata.msnbase.raw
+  import_path: local_types.galaxy
+rdata_xcms_findchrompeaks:
+  source: galaxy
+  classname: Rdata_xcms_findchrompeaks
+  extensions: .rdata.xcms.findchrompeaks
+  import_path: local_types.galaxy
+rdata_xcms_group:
+  source: galaxy
+  classname: Rdata_xcms_group
+  extensions: .rdata.xcms.group
+  import_path: local_types.galaxy
+rdata_xcms_retcor:
+  source: galaxy
+  classname: Rdata_xcms_retcor
+  extensions: .rdata.xcms.retcor
+  import_path: local_types.galaxy
+rdata_xcms_fillpeaks:
+  source: galaxy
+  classname: Rdata_xcms_fillpeaks
+  extensions: .rdata.xcms.fillpeaks
+  import_path: local_types.galaxy
+rdata_camera_positive:
+  source: galaxy
+  classname: Rdata_camera_positive
+  extensions: .rdata.camera.positive
+  import_path: local_types.galaxy
+rdata_camera_negative:
+  source: galaxy
+  classname: Rdata_camera_negative
+  extensions: .rdata.camera.negative
+  import_path: local_types.galaxy
+rdata_camera_quick:
+  source: galaxy
+  classname: Rdata_camera_quick
+  extensions: .rdata.camera.quick
+  import_path: local_types.galaxy
+rdock_as:
+  source: galaxy
+  classname: Rdock_as
+  extensions: .rdock_as
+  import_path: local_types.galaxy
+oxlicountgraph:
+  source: galaxy
+  classname: OxliCountGraph
+  extensions: .oxlicg
+  import_path: local_types.galaxy
+oxlinodegraph:
+  source: galaxy
+  classname: OxliNodeGraph
+  extensions: .oxling
+  import_path: local_types.galaxy
+oxlitagset:
+  source: galaxy
+  classname: OxliTagSet
+  extensions: .oxlits
+  import_path: local_types.galaxy
+oxlistoptags:
+  source: galaxy
+  classname: OxliStopTags
+  extensions: .oxlist
+  import_path: local_types.galaxy
+oxlisubset:
+  source: galaxy
+  classname: OxliSubset
+  extensions: .oxliss
+  import_path: local_types.galaxy
+oxligraphlabels:
+  source: galaxy
+  classname: OxliGraphLabels
+  extensions: .oxligl
+  import_path: local_types.galaxy
+stl:
+  source: galaxy
+  classname: STL
+  extensions: .stl
+  import_path: local_types.galaxy
+plyascii:
+  source: galaxy
+  classname: PlyAscii
+  extensions: .plyascii
+  import_path: local_types.galaxy
+plybinary:
+  source: galaxy
+  classname: PlyBinary
+  extensions: .plybinary
+  import_path: local_types.galaxy
+vtkascii:
+  source: galaxy
+  classname: VtkAscii
+  extensions: .vtkascii
+  import_path: local_types.galaxy
+vtkbinary:
+  source: galaxy
+  classname: VtkBinary
+  extensions: .vtkbinary
+  import_path: local_types.galaxy
+biom1:
+  source: galaxy
+  classname: Biom1
+  extensions: .biom1
+  import_path: local_types.galaxy
+biom2:
+  source: galaxy
+  classname: Biom2
+  extensions: .biom2
+  import_path: local_types.galaxy
+mashsketch:
+  source: galaxy
+  classname: MashSketch
+  extensions: .msh
+  import_path: local_types.galaxy
+scidx:
+  source: galaxy
+  classname: ScIdx
+  extensions: .scidx
+  import_path: local_types.galaxy
+smiles:
+  source: galaxy
+  classname: SMILES
+  extensions: .smi
+  import_path: local_types.galaxy
+sdf:
+  source: galaxy
+  classname: SDF
+  extensions: .sdf
+  import_path: local_types.galaxy
+inchi:
+  source: galaxy
+  classname: InChI
+  extensions: .inchi
+  import_path: local_types.galaxy
+mol:
+  source: galaxy
+  classname: MOL
+  extensions: .mol
+  import_path: local_types.galaxy
+mol2:
+  source: galaxy
+  classname: MOL2
+  extensions: .mol2
+  import_path: local_types.galaxy
+cml:
+  source: galaxy
+  classname: CML
+  extensions: .cml
+  import_path: local_types.galaxy
+fps:
+  source: galaxy
+  classname: FPS
+  extensions: .fps
+  import_path: local_types.galaxy
+obfs:
+  source: galaxy
+  classname: OBFS
+  extensions: .obfs
+  import_path: local_types.galaxy
+drf:
+  source: galaxy
+  classname: DRF
+  extensions: .drf
+  import_path: local_types.galaxy
+phar:
+  source: galaxy
+  classname: PHAR
+  extensions: .phar
+  import_path: local_types.galaxy
+pdb:
+  source: galaxy
+  classname: PDB
+  extensions: .pdb
+  import_path: local_types.galaxy
+pdbqt:
+  source: galaxy
+  classname: PDBQT
+  extensions: .pdbqt
+  import_path: local_types.galaxy
+pqr:
+  source: galaxy
+  classname: PQR
+  extensions: .pqr
+  import_path: local_types.galaxy
+trr:
+  source: galaxy
+  classname: Trr
+  extensions: .trr
+  import_path: local_types.galaxy
+dcd:
+  source: galaxy
+  classname: Dcd
+  extensions: .dcd
+  import_path: local_types.galaxy
+top:
+  source: galaxy
+  classname: Top
+  extensions: .top
+  import_path: local_types.galaxy
+itp:
+  source: galaxy
+  classname: Itp
+  extensions: .itp
+  import_path: local_types.galaxy
+mdp:
+  source: galaxy
+  classname: Mdp
+  extensions: .mdp
+  import_path: local_types.galaxy
+ndx:
+  source: galaxy
+  classname: Ndx
+  extensions: .ndx
+  import_path: local_types.galaxy
+xvg:
+  source: galaxy
+  classname: Xvg
+  extensions: .xvg
+  import_path: local_types.galaxy
+xtc:
+  source: galaxy
+  classname: Xtc
+  extensions: .xtc
+  import_path: local_types.galaxy
+cpt:
+  source: galaxy
+  classname: Cpt
+  extensions: .cpt
+  import_path: local_types.galaxy
+edr:
+  source: galaxy
+  classname: Edr
+  extensions: .edr
+  import_path: local_types.galaxy
+gro:
+  source: galaxy
+  classname: Gro
+  extensions: .gro
+  import_path: local_types.galaxy
+vel:
+  source: galaxy
+  classname: Vel
+  extensions: .vel
+  import_path: local_types.galaxy
+grd:
+  source: galaxy
+  classname: grd
+  extensions: .grd
+  import_path: local_types.galaxy
+grdtgz:
+  source: galaxy
+  classname: grdtgz
+  extensions: .grd.tgz
+  import_path: local_types.galaxy
+otu:
+  source: galaxy
+  classname: Otu
+  extensions: .mothur.otu
+  import_path: local_types.galaxy
+mothur_list:
+  source: galaxy
+  classname: Mothur_list
+  extensions: .mothur.list
+  import_path: local_types.galaxy
+sabund:
+  source: galaxy
+  classname: Sabund
+  extensions: .mothur.sabund
+  import_path: local_types.galaxy
+mothur_rabund:
+  source: galaxy
+  classname: Mothur_rabund
+  extensions: .mothur.rabund
+  import_path: local_types.galaxy
+groupabund:
+  source: galaxy
+  classname: GroupAbund
+  extensions: .mothur.shared
+  import_path: local_types.galaxy
+mothur_relabund:
+  source: galaxy
+  classname: Mothur_relabund
+  extensions: .mothur.relabund
+  import_path: local_types.galaxy
+names:
+  source: galaxy
+  classname: Names
+  extensions: .mothur.names
+  import_path: local_types.galaxy
+mothur_design:
+  source: galaxy
+  classname: Mothur_design
+  extensions: .mothur.design
+  import_path: local_types.galaxy
+summary:
+  source: galaxy
+  classname: Summary
+  extensions: .mothur.summary
+  import_path: local_types.galaxy
+group:
+  source: galaxy
+  classname: Group
+  extensions: .mothur.groups
+  import_path: local_types.galaxy
+oligos:
+  source: galaxy
+  classname: Oligos
+  extensions: .mothur.oligos
+  import_path: local_types.galaxy
+mothur_align:
+  source: galaxy
+  classname: Mothur_align
+  extensions: .mothur.align
+  import_path: local_types.galaxy
+accnos:
+  source: galaxy
+  classname: AccNos
+  extensions: .mothur.accnos,.mothur.otulabels
+  import_path: local_types.galaxy
+mothur_otu_corr:
+  source: galaxy
+  classname: Mothur_otu_corr
+  extensions: .mothur.otu.corr
+  import_path: local_types.galaxy
+secondarystructuremap:
+  source: galaxy
+  classname: SecondaryStructureMap
+  extensions: .mothur.map
+  import_path: local_types.galaxy
+aligncheck:
+  source: galaxy
+  classname: AlignCheck
+  extensions: .mothur.align.check
+  import_path: local_types.galaxy
+alignreport:
+  source: galaxy
+  classname: AlignReport
+  extensions: .mothur.align.report
+  import_path: local_types.galaxy
+lanemask:
+  source: galaxy
+  classname: LaneMask
+  extensions: .mothur.filter
+  import_path: local_types.galaxy
+distancematrix:
+  source: galaxy
+  classname: DistanceMatrix
+  extensions: .mothur.dist
+  import_path: local_types.galaxy
+mothur_tre:
+  source: galaxy
+  classname: Mothur_tre
+  extensions: .mothur.tre
+  import_path: local_types.galaxy
+pairwisedistancematrix:
+  source: galaxy
+  classname: PairwiseDistanceMatrix
+  extensions: .mothur.pair.dist
+  import_path: local_types.galaxy
+lowertriangledistancematrix:
+  source: galaxy
+  classname: LowerTriangleDistanceMatrix
+  extensions: .mothur.lower.dist
+  import_path: local_types.galaxy
+reftaxonomy:
+  source: galaxy
+  classname: RefTaxonomy
+  extensions: .mothur.ref.taxonomy
+  import_path: local_types.galaxy
+mothur_seq_taxonomy:
+  source: galaxy
+  classname: Mothur_seq_taxonomy
+  extensions: .mothur.seq.taxonomy
+  import_path: local_types.galaxy
+mothur_rdp_taxonomy:
+  source: galaxy
+  classname: Mothur_rdp_taxonomy
+  extensions: .mothur.rdp.taxonomy
+  import_path: local_types.galaxy
+consensustaxonomy:
+  source: galaxy
+  classname: ConsensusTaxonomy
+  extensions: .mothur.cons.taxonomy
+  import_path: local_types.galaxy
+taxonomysummary:
+  source: galaxy
+  classname: TaxonomySummary
+  extensions: .mothur.tax.summary
+  import_path: local_types.galaxy
+frequency:
+  source: galaxy
+  classname: Frequency
+  extensions: .mothur.freq
+  import_path: local_types.galaxy
+quantile:
+  source: galaxy
+  classname: Quantile
+  extensions: .mothur.quan
+  import_path: local_types.galaxy
+mothur_filtered_quan:
+  source: galaxy
+  classname: Mothur_filtered_quan
+  extensions: .mothur.filtered.quan
+  import_path: local_types.galaxy
+mothur_masked_quan:
+  source: galaxy
+  classname: Mothur_masked_quan
+  extensions: .mothur.masked.quan
+  import_path: local_types.galaxy
+mothur_filtered_masked_quan:
+  source: galaxy
+  classname: Mothur_filtered_masked_quan
+  extensions: .mothur.filtered.masked.quan
+  import_path: local_types.galaxy
+axes:
+  source: galaxy
+  classname: Axes
+  extensions: .mothur.axes
+  import_path: local_types.galaxy
+sffflow:
+  source: galaxy
+  classname: SffFlow
+  extensions: .mothur.sff.flow
+  import_path: local_types.galaxy
+counttable:
+  source: galaxy
+  classname: CountTable
+  extensions: .mothur.count_table
+  import_path: local_types.galaxy
+neo4jdb:
+  source: galaxy
+  classname: Neo4jDB
+  extensions: .neostore
+  import_path: local_types.galaxy
+neo4jdbzip:
+  source: galaxy
+  classname: Neo4jDBzip
+  extensions: .neostore.zip
+  import_path: local_types.galaxy
+ucsctrackhub:
+  source: galaxy
+  classname: UCSCTrackHub
+  extensions: .trackhub
+  import_path: local_types.galaxy
+blastxml:
+  source: galaxy
+  classname: BlastXml
+  extensions: .blastxml
+  import_path: local_types.galaxy
+blastnucdb:
+  source: galaxy
+  classname: BlastNucDb
+  extensions: .blastdbn
+  import_path: local_types.galaxy
+blastprotdb:
+  source: galaxy
+  classname: BlastProtDb
+  extensions: .blastdbp
+  import_path: local_types.galaxy
+blastdomaindb:
+  source: galaxy
+  classname: BlastDomainDb
+  extensions: .blastdbd
+  import_path: local_types.galaxy
+lastdb:
+  source: galaxy
+  classname: LastDb
+  extensions: .lastdb
+  import_path: local_types.galaxy
+blastnucdb5:
+  source: galaxy
+  classname: BlastNucDb5
+  extensions: .blastdbn5
+  import_path: local_types.galaxy
+blastprotdb5:
+  source: galaxy
+  classname: BlastProtDb5
+  extensions: .blastdbp5
+  import_path: local_types.galaxy
+blastdomaindb5:
+  source: galaxy
+  classname: BlastDomainDb5
+  extensions: .blastdbd5
+  import_path: local_types.galaxy
+maskinfo_asn1:
+  source: galaxy
+  classname: Maskinfo_asn1
+  extensions: .maskinfo-asn1
+  import_path: local_types.galaxy
+maskinfo_asn1_binary:
+  source: galaxy
+  classname: Maskinfo_asn1_binary
+  extensions: .maskinfo-asn1-binary
+  import_path: local_types.galaxy
+pssm_asn1:
+  source: galaxy
+  classname: Pssm_asn1
+  extensions: .pssm-asn1
+  import_path: local_types.galaxy
+planttribeskscomponents:
+  source: galaxy
+  classname: PlantTribesKsComponents
+  extensions: .ptkscmp
+  import_path: local_types.galaxy
+smat:
+  source: galaxy
+  classname: Smat
+  extensions: .smat
+  import_path: local_types.galaxy
+genotypematrix:
+  source: galaxy
+  classname: GenotypeMatrix
+  extensions: .alohomora_gts
+  import_path: local_types.galaxy
+alohomora_map:
+  source: galaxy
+  classname: Alohomora_map
+  extensions: .alohomora_map
+  import_path: local_types.galaxy
+alohomora_maf:
+  source: galaxy
+  classname: Alohomora_maf
+  extensions: .alohomora_maf
+  import_path: local_types.galaxy
+alohomora_ped:
+  source: galaxy
+  classname: Alohomora_ped
+  extensions: .alohomora_ped
+  import_path: local_types.galaxy
+linkage_pedin:
+  source: galaxy
+  classname: Linkage_pedin
+  extensions: .linkage_pedin
+  import_path: local_types.galaxy
+datain:
+  source: galaxy
+  classname: DataIn
+  extensions: .linkage_datain
+  import_path: local_types.galaxy
+markermap:
+  source: galaxy
+  classname: MarkerMap
+  extensions: .linkage_map
+  import_path: local_types.galaxy
+allegrolod:
+  source: galaxy
+  classname: AllegroLOD
+  extensions: .allegro_fparam
+  import_path: local_types.galaxy
+ideaspre:
+  source: galaxy
+  classname: IdeasPre
+  extensions: .ideaspre
+  import_path: local_types.galaxy
+sbml:
+  source: galaxy
+  classname: Sbml
+  extensions: .sbml
+  import_path: local_types.galaxy
+spalnnucldb:
+  source: galaxy
+  classname: SpalnNuclDb
+  extensions: .spalndbnp
+  import_path: local_types.galaxy
+spalnprotdb:
+  source: galaxy
+  classname: SpalnProtDb
+  extensions: .spalndba
+  import_path: local_types.galaxy
+dada2_dada:
+  source: galaxy
+  classname: Dada2_dada
+  extensions: .dada2_dada
+  import_path: local_types.galaxy
+dada2_errorrates:
+  source: galaxy
+  classname: Dada2_errorrates
+  extensions: .dada2_errorrates
+  import_path: local_types.galaxy
+dada2_mergepairs:
+  source: galaxy
+  classname: Dada2_mergepairs
+  extensions: .dada2_mergepairs
+  import_path: local_types.galaxy
+dada2_sequencetable:
+  source: galaxy
+  classname: Dada2_sequencetable
+  extensions: .dada2_sequencetable
+  import_path: local_types.galaxy
+dada2_uniques:
+  source: galaxy
+  classname: Dada2_uniques
+  extensions: .dada2_uniques
+  import_path: local_types.galaxy
+ckpt:
+  source: galaxy
+  classname: Ckpt
+  extensions: .ckpt
+  import_path: local_types.galaxy
+tgz:
+  source: galaxy
+  classname: Tgz
+  extensions: .tgz
+  import_path: local_types.galaxy
+wav:
+  source: galaxy
+  classname: Wav
+  extensions: .wav
+  import_path: local_types.galaxy
+mp3:
+  source: galaxy
+  classname: Mp3
+  extensions: .mp3
+  import_path: local_types.galaxy
+mkv:
+  source: galaxy
+  classname: Mkv
+  extensions: .mkv
+  import_path: local_types.galaxy
+mp4:
+  source: galaxy
+  classname: Mp4
+  extensions: .mp4
+  import_path: local_types.galaxy
+flv:
+  source: galaxy
+  classname: Flv
+  extensions: .flv
+  import_path: local_types.galaxy
+mpg:
+  source: galaxy
+  classname: Mpg
+  extensions: .mpg
+  import_path: local_types.galaxy
+textgrid:
+  source: galaxy
+  classname: TextGrid
+  extensions: .textgrid
+  import_path: local_types.galaxy
+bpf:
+  source: galaxy
+  classname: BPF
+  extensions: .par
+  import_path: local_types.galaxy
+ffindex:
+  source: galaxy
+  classname: Ffindex
+  extensions: .ffindex
+  import_path: local_types.galaxy
+ffdata:
+  source: galaxy
+  classname: Ffdata
+  extensions: .ffdata
+  import_path: local_types.galaxy
+pretext:
+  source: galaxy
+  classname: Pretext
+  extensions: .pretext
+  import_path: local_types.galaxy
+hexrdmaterials:
+  source: galaxy
+  classname: HexrdMaterials
+  extensions: .hexrd.materials.h5
+  import_path: local_types.galaxy
+npz:
+  source: galaxy
+  classname: Npz
+  extensions: .npz
+  import_path: local_types.galaxy
+hexrdimagesnpz:
+  source: galaxy
+  classname: HexrdImagesNpz
+  extensions: .hexrd.images.npz
+  import_path: local_types.galaxy
+hexrdetaomenpz:
+  source: galaxy
+  classname: HexrdEtaOmeNpz
+  extensions: .hexrd.eta_ome.npz
+  import_path: local_types.galaxy

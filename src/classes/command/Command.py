@@ -54,7 +54,7 @@ class Positional:
         self.pos = pos
         self.token = token
         self.after_options = after_options
-        self.datatypes: list[str] = []
+        self.datatypes: list[dict[str, str]] = []
 
 
     def is_optional(self) -> bool:
@@ -63,7 +63,7 @@ class Positional:
 
     def __str__(self) -> str:
         t = self.token
-        return f'{self.pos:<10}{t.text[:19]:20}{t.gx_ref[:19]:20}{t.type.name:20}{",".join(self.datatypes):20}{self.after_options:>5}'
+        return f'{self.pos:<10}{t.text[:19]:20}{t.gx_ref[:19]:20}{t.type.name:20}{",".join([d["classname"] for d in self.datatypes]):20}{self.after_options:>5}'
 
 
 """
@@ -75,7 +75,7 @@ class Flag:
     def __init__(self, prefix: str):
         self.prefix: str = prefix
         self.sources: list[Token] = [] 
-        self.datatypes: list[str] = []
+        self.datatypes: list[dict[str, str]] = []
 
 
     def is_optional(self) -> bool:
@@ -93,11 +93,11 @@ class Flag:
         the_str = ''
 
         t = self.sources[0]
-        the_str += f'{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join(self.datatypes):20}{t.in_conditional:>5}'
+        the_str += f'{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join([d["classname"] for d in self.datatypes]):20}{t.in_conditional:>5}'
 
         if len(self.sources) > 1:
             for t in self.sources[1:]:
-                the_str += f'\n{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join(self.datatypes):20}{t.in_conditional:>5}'
+                the_str += f'\n{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join([d["classname"] for d in self.datatypes]):20}{t.in_conditional:>5}'
 
         return the_str
 
@@ -115,7 +115,7 @@ class Option:
         self.prefix: str = prefix
         self.delim: str = delim
         self.sources: list[Token] = []
-        self.datatypes: list[str] = []
+        self.datatypes: list[dict[str, str]] = []
 
 
     def is_optional(self) -> bool:
@@ -129,11 +129,11 @@ class Option:
         the_str = ''
 
         t = self.sources[0]
-        the_str += f'{self.prefix[:29]:30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join(self.datatypes):20}{t.in_conditional:>5}'
+        the_str += f'{self.prefix[:29]:30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join([d["classname"] for d in self.datatypes]):20}{t.in_conditional:>5}'
 
         if len(self.sources) > 1:
             for t in self.sources[1:]:
-                the_str += f'\n{"":30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join(self.datatypes):20}{t.in_conditional:>5}'
+                the_str += f'\n{"":30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{",".join([d["classname"] for d in self.datatypes]):20}{t.in_conditional:>5}'
 
         return the_str
 

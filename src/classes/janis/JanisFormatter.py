@@ -19,28 +19,8 @@ class JanisFormatter:
         self.inputs: list[str] = []
         self.outputs: list[str] = []
         self.metadata: list[str] = []
-        self.datatype_categories = {
-            "Boolean": 'common_types',
-            "CompressedTarFile": 'unix_types',
-            "csv": 'unix_types',
-            "Directory": 'common_types',
-            "Double": 'common_types',
-            "File": 'common_types',
-            "Filename": 'common_types',
-            "Float": 'common_types',
-            "Gzip": 'unix_types',
-            "HtmlFile": 'unix_types',
-            "Integer": 'common_types',
-            "jsonFile": 'unix_types',
-            "Stdout": 'common_types',
-            "String": 'common_types',
-            "TarFile": 'unix_types',
-            "TextFile": 'unix_types',
-            "tsv": 'unix_types',
-            "Zip": 'unix_types'
-        }
-        
-        self.janis_import_dict: dict[str, set[str]] = {
+        self.datatype_imports: set[str] = set()      
+        self.default_imports: dict[str, set[str]] = {
             'janis_core': {
                 'CommandToolBuilder', 
                 'ToolInput', 
@@ -51,10 +31,7 @@ class JanisFormatter:
                 'Optional',
                 'UnionType',
                 'Stdout'
-            },
-            'bioinformatics_types': set(),
-            'common_types': set(),
-            'unix_types': set(),
+            }
         }
 
 
@@ -155,10 +132,11 @@ class JanisFormatter:
         out_str += f'\t\tposition={positional.pos},\n'
 
         if default is not None:
-            if len(positional.datatypes) == 1 and positional.datatypes[0] in ['Float', 'Integer']:
-                out_str += f'\t\tdefault={default},\n'
-            else:
-                out_str += f'\t\tdefault="{default}",\n'
+            if len(positional.datatypes) == 1:
+                if positional.datatypes[0] in ['Float', 'Integer']:
+                    out_str += f'\t\tdefault={default},\n'
+                else:
+                    out_str += f'\t\tdefault="{default}",\n'
         
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
@@ -290,6 +268,9 @@ class JanisFormatter:
         """
 
         self.update_datatype_imports(datatypes)
+
+        # just work with the classname now
+        datatypes = [d['classname'] for d in datatypes]
         
         # handle union type
         if len(datatypes) > 1:
@@ -317,17 +298,13 @@ class JanisFormatter:
         return out_str
 
     
-    def update_datatype_imports(self, datatypes: list[str]) -> None:
+    def update_datatype_imports(self, datatypes: list[dict[str, str]]) -> None:
         """
-        bad naming here. entity because it could be a Param or Output. 
-        either way have to update the import list for the datatypes it needs.
+        update the import list for the datatypes it needs.
         """
         for dtype in datatypes:
-            if dtype in self.datatype_categories:
-                category = self.datatype_categories[dtype]
-            else:
-                category = 'bioinformatics_types'
-            self.janis_import_dict[category].add(dtype)
+            import_str = f'from {dtype["import_path"]} import {dtype["classname"]}'
+            self.datatype_imports.add(import_str)
 
 
     def gen_outputs(self) -> list[str]:
@@ -355,7 +332,7 @@ class JanisFormatter:
         """
         need to add the selector type to imports too!
         """
-        self.janis_import_dict['janis_core'].add(output.selector)
+        self.default_imports['janis_core'].add(output.selector)
         
 
     def format_output_to_string(self, output: Output) -> str:
@@ -380,35 +357,22 @@ class JanisFormatter:
 
 
     def gen_imports(self) -> list[str]:
-        if len(self.tool.out_register.get_outputs()) > 0:
-            self.janis_import_dict['common_types'].add('Boolean')
-
         out_str = ''
-        jid = self.janis_import_dict
-        
-        # janis core
-        if len(jid['janis_core']) > 0:
-            modules = ', '.join(jid['janis_core'])
+
+        out_str += 'import sys\n'
+        out_str += 'import os\n'
+        out_str += 'sys.path.append(os.getcwd() + "\\src")\n'
+        # default imports from janis core
+
+        if len(self.default_imports['janis_core']) > 0:
+            modules = ', '.join(self.default_imports['janis_core'])
             out_str += f'\nfrom janis_core import {modules}\n'
 
-        # bioinformatics types
-        if len(jid['bioinformatics_types']) > 0:
-            modules = ', '.join(jid['bioinformatics_types'])
-            out_str += f'\nfrom janis_bioinformatics.data_types import {modules}\n'
-
-        # common types
-        if len(jid['common_types']) > 0:
-            modules = ', '.join(jid['common_types'])
-            out_str += f'\nfrom janis_core.types.common_data_types import {modules}\n'
-
-        # unix types
-        if len(jid['unix_types']) > 0:
-            out_str += '\n'
-            for module in jid['unix_types']:
-                if module == 'TextFile':  # who even wrote janis
-                    out_str += f'from janis_unix.data_types.text import TextFile\n'
-                else:
-                    out_str += f'from janis_unix.data_types.{module.lower()} import {module}\n'
+        # all the other datatypes we found
+        if len(self.tool.out_register.get_outputs()) > 0:
+            self.datatype_imports.add('from janis_core.types.common_data_types import Boolean')
+        for import_str in list(self.datatype_imports):
+            out_str += f'{import_str}\n'
 
         return out_str
 

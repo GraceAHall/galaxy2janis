@@ -20,7 +20,7 @@ class Output:
         self.name: str = ''
         self.gx_var: str = ''
         self.galaxy_type: str = ''
-        self.datatypes: list[str] = []
+        self.datatypes: list[dict[str, str]] = []
         self.help_text: str = ''  # ?
         self.is_optional: bool = False 
         self.is_array: bool = False
