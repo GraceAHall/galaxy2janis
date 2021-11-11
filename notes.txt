@@ -5,6 +5,80 @@
 
 
 
+Datatypes
+
+single read-only json file (persistable)
+
+janis types, galaxy types
+    - classname
+    - exts
+    - import path
+
+
+
+
+only accessed by format attrib or extension
+
+ext to format attrib
+
+
+then if getting by format, its just format -> types
+then for ext, its ext -> format -> types
+
+
+
+
+
+DatatypeAnnotator loads the above json and creates the following key maps:
+    - ext_type_map: dict[ext, list[classname]] 
+        - classname is either galaxy or janis. ie .fa -> [janis fasta classname, galaxy fasta classname] 
+    
+    - gx_capitalisation_map: dict[str(format attric), str(classname)]
+        - allows translating between the type listed in galaxy tool xml and the actual classname
+        
+from here, can access datatypes using:
+
+get_datatypes_by_name()
+    - name supplied (the galaxy format attrib)
+    - 
+
+get_datatypes_by_ext()
+    - ext supplied, janis & galaxy types returned 
+    -   [ 
+            {'source': 'janis', 'type': 'BAM'},
+            {'source': 'galaxy', 'type': 'Bam'}
+        ]
+    - would then prioritise janis types over galaxy
+
+
+
+
+still need
+    - galaxy format attrib -> galaxy classname (capitalisation map)
+    - 
+
+
+
+
+
+Datastructures needed 
+
+Janis
+
+
+Galaxy
+    - galaxy capitalisation map (text in format attrib to classname)
+    - 
+
+
+
+
+build 3 datastructures containing the above, indexed by:
+    - extension
+    - 
+
+
+
 v0.1 unsupported
 
 - command string
@@ -16,15 +90,6 @@ v0.1 unsupported
     - proper reconstruction of command order using cheetah command logic
     - tools with multiple commands (only first is interpreted at the moment) (bwa.xml is good example)
         - do I need to consider '&&' after the first '>' / '|' ? 
-
-
-sources of outputs
-    - STDOUT written to GX_OUT
-        - annotate output.is_stdout
-    - STDOUT written to file, file path is referenced by a GX_OUT
-        - 
-    - other GX_OUTs
-        - point to file(s) not encountered in the command string 
 
 
 

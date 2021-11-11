@@ -12,6 +12,7 @@ from classes.outputs.OutputRegister import OutputRegister
 from classes.command.Command import Positional, Flag, Option, Command, TokenType, Token
 from classes.Logger import Logger
 
+
 class DatatypeAnnotator:
     def __init__(self, command: Command, param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         self.command = command
