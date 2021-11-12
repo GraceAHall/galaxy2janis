@@ -27,7 +27,8 @@ class ContainerFetcher:
     def fetch(self):
         self.identify_main_requirement()
         self.load_container_cache()
-        self.set_container()
+        container_url = self.get_container()
+        return container_url
 
 
     def identify_main_requirement(self) -> None:
@@ -73,10 +74,10 @@ class ContainerFetcher:
 
         # load cache
         with open(self.container_cache_path, 'r') as fp:
-            return json.load(fp)
+            self.container_cache = json.load(fp)
 
     
-    def set_container(self) -> None:
+    def get_container(self) -> None:
         """
         requirements have been sorted by alignment match to tool id
         the main tool requirement should be 1st in self.requirements
@@ -93,27 +94,21 @@ class ContainerFetcher:
         in future, want to use the api specified at https://api.biocontainers.pro/ga4gh/trs/v2/ui/ to find biocontainers. see also: https://biocontainers.pro/registry
         currently can't do this because their servers are very very slow
         """
-        container_url = self.get_container_url()       
 
-        if self.container_exists(container_url):
-            self.container_url = container_url
-            self.update_container_cache(container_url)
-            
-        else:
-            self.logger.log(2, f'container could not be resolved: {container_url}')
-
-
-    def get_container_url(self) -> str:
         container_url = ''
   
-        if self.main_requirement['type'] == 'package':
-            container_url = self.get_container_url_by_package()
+        #if not self.url_is_cached(self.tool_id, self.tool_version):
+        if self.url_is_cached(self.tool_id, self.tool_version): # TODO REMOVE TESTING ONLY
+            if self.main_requirement['type'] == 'package':
+                container_url = self.get_container_url_by_package()
 
-        elif self.main_requirement['type'] == 'container':
-            container_url = self.get_container_url_by_container()             
+            elif self.main_requirement['type'] == 'container':
+                container_url = self.get_container_url_by_container()
 
+            self.update_container_cache(container_url)
+        
         return container_url
-
+        
 
     def get_container_url_by_package(self) -> str:
         # get data package from api request
@@ -137,7 +132,22 @@ class ContainerFetcher:
 
     def make_api_request(self,  request_url: str) -> dict:
         # make request to get information about tools with similar name
-        response = requests.get(request_url)
+        try:
+            response = requests.get(request_url, timeout=5)
+        except requests.exceptions.Timeout:
+            response = None
+
+        # if failed, retry. max 5 times. 
+        iterations = 1
+        while response is None:
+            if iterations > 5:
+                break
+            try:
+                response = requests.get(request_url, timeout=5)
+            except requests.exceptions.Timeout:
+                response = None
+            iterations += 1
+
         data = json.loads(response.text)
         if data == [] or data == {}:
             self.logger.log(2, 'api request return body was empty')
@@ -164,55 +174,51 @@ class ContainerFetcher:
 
 
     def get_biocontainer_image_url(self, images_data: dict) -> str:
+        # get images of correct version
+        version_level_images = []
         for image in images_data['images']:
             if image['registry_host'] == 'quay.io/':
-                return image['image_name']
-        
-        self.logger.log(2, 'could not find quayio image for tool version')
+                version_level_images.append(image)
 
+        if len(version_level_images) == 0:
+            self.logger.log(2, 'could not find quayio image for tool version')
         
-    def get_container_url_by_container(self, requirement: dict[str, Union[str, int]]) -> str:
-        container_url = ''
-        self.logger.log(1, 'container requirement encountered')
-        container_url = str(requirement['name']) 
+        # get the most recent image build of that version
+        images_dates = []
+        for image in version_level_images:
+            date_val = int(image['updated'].replace('-', '')[:8])
+            images_dates.append((date_val, image))
+
+        images_dates.sort(key = lambda x: x[0], reverse=True)
+        return images_dates[0][1]['image_name']
+        
+        
+    def get_container_url_by_container(self) -> str:
+        self.logger.log(0, 'container requirement encountered')
+        container_url = 'quay.io/biocontainers/' + self.main_requirement['name']
         return container_url
 
 
-    def container_exists(self, container_url: str) -> bool:
-        if self.url_is_cached(container_url):
-            return True
-        elif self.url_exists(container_url): 
-            return True
-        return False
-
-
-    def url_is_cached(self, container_url: str) -> bool:
+    def url_is_cached(self, tool_id: str, tool_version: str) -> bool:
         # does the tool_id exist in cache?
-        if self.tool_id in self.container_cache:
-            versions = self.container_cache[self.tool_id]
-
-            # does the specific tool_version exist for that tool_id?
-            if self.tool_version in versions:
-                if versions[self.tool_version] == container_url:
-                    return True
-
-        return False
-
-
-    def url_exists(self, container_url: str) -> bool:
-        response = requests.get(container_url)
-        if response.status_code == 200:
-            return True
-        else:
+        try:
+            cache_url = self.container_cache[tool_id][tool_version]
+            if cache_url:
+                return True
+        except KeyError:
             return False
 
 
     def update_container_cache(self, container_url: str) -> None:
-        if self.tool_name not in self.container_cache or self.container_cache[self.tool_name] != container_url:
-            # update cache in mem
-            self.container_cache[self.tool_name] = container_url
+        # create dict for tool_id if needed
+        if self.tool_id not in self.container_cache:
+            self.container_cache[self.tool_id] = {}
+
+        # set the container url for that version
+        if self.tool_version not in self.container_cache[self.tool_id]:
+            self.container_cache[self.tool_id][self.tool_version] = container_url
             
-            # write cache to file
-            with open(self.container_cache_path, 'w') as fp:
-                json.dump(self.container_cache, fp)
+        # write cache to file
+        with open(self.container_cache_path, 'w') as fp:
+            json.dump(self.container_cache, fp)
         
