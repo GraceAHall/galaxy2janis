@@ -8,14 +8,16 @@ add known extensions to galaxy parsed types.
 doesnt' know .fasta = .fa = .fna
 
 Today:
+    - get specific container
+    - test parsing
+    - galaxy templating system
+
     - when option is GX_OUT, create an input for it (-v '$output')
+    - sort out toolinputs, toolarguments and position of everything
     - parse tool xmls
     - gather parsing stats (how many worked etc)
         - call tool.py (should have tool().translate("wdl", to_console) set up)
           to check whether its valid janis 
-    - get specific container
-    - test parsing
-    - galaxy templating system
     
 
 Tomorrow:

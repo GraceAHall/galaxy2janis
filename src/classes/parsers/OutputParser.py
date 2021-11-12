@@ -32,9 +32,7 @@ class OutputParser:
         for output in outputs:
             output.parse()
             output.set_datatype(self.param_register)
-            #self.galaxy_type = consolidate_types(self.galaxy_type)
             self.log_pattern_status(output)
-            #self.log_datatype_status(output)
 
 
         self.outputs = outputs
@@ -46,13 +44,8 @@ class OutputParser:
         pattern = output.selector_contents
         for substr in banned_substrings:
             if substr in pattern:
-                self.logger.log(2, 'complex regex')
+                self.logger.log(1, 'complex regex')
                 break
-
-    
-    def log_datatype_status(self, output: Output) -> None:
-        if output.galaxy_type == '':
-            self.logger.log(1, 'complex regex')
 
 
     def get_all_outputs(self) -> list[et.Element]:

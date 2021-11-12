@@ -324,12 +324,11 @@ class CommandParser:
                     break
                 else:
                     self.logger.log(2, "pipe encountered as end of 1st command")
-                    print()
         
         # truncate or keep all cmd words 
         if cutoff != -1:
             out_words = command_words[:cutoff]
-            self.logger.log(1, "multiple commands encountered")
+            self.logger.log(0, "multiple commands encountered")
         else:
             out_words = command_words
 

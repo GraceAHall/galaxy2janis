@@ -33,14 +33,14 @@ class JanisFormatter:
                 'Stdout'
             }
         }
-        self.tag_counter = {
-            "identifier": 0,
-            "tool": 0,
-            "scatter": 0,
-            "ignore_missing": 0,
-            "output": 0,
-            "input": 0,
-            "inputs": 0
+        self.extra_prohibited_keys = {
+            "identifier",
+            "tool",
+            "scatter",
+            "ignore_missing",
+            "output",
+            "input",
+            "inputs"
         }
 
 
@@ -59,9 +59,9 @@ class JanisFormatter:
 
         base_command = self.infer_base_command()
 
-        toolname = self.tool.id.replace('-', '_')
-        container = self.tool.container
+        toolname = self.tool.id.replace('-', '_').lower()
         version = self.tool.version
+        container = self.tool.container
 
         out_str = f'\n{toolname} = CommandToolBuilder(\n'
         out_str += f'\ttool="{toolname}",\n'
@@ -70,7 +70,6 @@ class JanisFormatter:
         out_str += f'\toutputs=outputs,\n'
         out_str += f'\tcontainer="{container}",\n'
         out_str += f'\tversion="{version}",\n'
-        # TODO here add requirements (biocontainer for conda pkg or container + version)
         out_str += ')\n'
 
         return out_str
@@ -177,14 +176,10 @@ class JanisFormatter:
     def validate_tag(self, tag: str) -> str:
         """
         to avoid janis reserved keywords
-        if the tag is a keyword, appends an int (count of times that keyword has appeared)
-        """
-        if tag in self.tag_counter:
-            self.tag_counter[tag] += 1
-            tag = tag + str(self.tag_counter[tag])
 
-        if len(tag) == 1:
-            tag += '_'
+        """
+        if tag in self.extra_prohibited_keys or len(tag) == 1:
+            tag += '_janis'
 
         return tag
 
@@ -262,11 +257,10 @@ class JanisFormatter:
         else:
             out_str += f'\t\tprefix="{prefix}",\n'
 
-        if default is not None:
-            if len(opt.datatypes) == 1 and opt.datatypes[0] in ['Float', 'Integer']:
-                out_str += f'\t\tdefault={default},\n'
-            else:
-                out_str += f'\t\tdefault="{default}",\n'
+        if len(opt.datatypes) == 1 and opt.datatypes[0]['classname'] in ['Float', 'Int']:
+            out_str += f'\t\tdefault={default},\n'
+        else:
+            out_str += f'\t\tdefault="{default}",\n'
         
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
@@ -289,11 +283,14 @@ class JanisFormatter:
     
 
     def get_default(self, tokens: list[Token]) -> str:
+        # try from galaxy token first
         for token in tokens:
             if token.gx_ref != '':
                 gx_obj = self.get_gx_obj(token.gx_ref)
                 return gx_obj.get_default()
-        return None
+        
+        # if not
+        return tokens[0].text
         
 
     def format_janis_typestr(self, datatypes: list[str], is_array=False, is_optional=False) -> str:

@@ -34,8 +34,8 @@ class Logger:
             self.message_log.append(message)
             self.update_logs(message)
         
-        # if level == 2:
-        #     sys.exit()
+        if level == 2:
+            sys.exit()
 
 
     def update_logs(self, message: str) -> None:

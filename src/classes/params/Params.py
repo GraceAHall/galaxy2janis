@@ -249,13 +249,24 @@ class SelectParam(Param):
 
 
     def add_options_to_helptext(self) -> None:
-        options = ', '.join(self.options[:5])
-
+        """
+        adds non flag looking options to helptext
+        i hate how this is written for some reason
+        """
+        options = [opt for opt in self.options if not opt.startswith('-')]
+        
         # trail off if more than 5 options...
-        if len(self.options) > 5:
+        should_add_dots = False
+        if len(options) > 5:
+            should_add_dots = True
+        
+        options = ', '.join(options[:5])
+
+        if should_add_dots:
             options += '...' 
 
-        self.help_text += f'  example values: {options}'
+        if len(options) > 0:
+            self.help_text += f'  example values: {options}'
 
 
 

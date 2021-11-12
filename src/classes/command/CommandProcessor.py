@@ -550,14 +550,12 @@ class CommandProcessor:
         if len(word.expanded_text) > 1:
             print('multiple expanded forms of cmd word')
             self.logger.log(2, 'multiple expanded forms of cmd word')
-            sys.exit()
 
         # get best token representation of curr_word
         tokens = self.get_all_tokens(word.expanded_text[0])
         if len(tokens) == 0:
             print('could not resolve token')
             self.logger.log(2, 'could not resolve token')
-            sys.exit()
 
         best_token = self.select_highest_priority_token(tokens)
         
@@ -586,10 +584,13 @@ class CommandProcessor:
         if text == '__END_COMMAND__':
             return [Token('', TokenType.END_COMMAND)]
 
+        # find quoted numbers and strings. quotes are removed
         quoted_num_lits = get_quoted_numbers(text)
+        quoted_num_lits = [m.strip('\'"') for m in quoted_num_lits]
         tokens += [Token(m, TokenType.QUOTED_NUM) for m in quoted_num_lits]
 
         quoted_str_lits = get_quoted_strings(text)
+        quoted_str_lits = [m.strip('\'"') for m in quoted_str_lits]
         tokens += [Token(m, TokenType.QUOTED_STRING) for m in quoted_str_lits]
         
         raw_num_lits = get_raw_numbers(text)

@@ -5,12 +5,14 @@ import xml.etree.ElementTree as et
 from classes.Logger import Logger
 from typing import Union
 import sys
-from classes.command.Command import Command
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 
+from classes.command.Command import Command
 from classes.command.CommandProcessor import CommandProcessor
 from classes.command.Configfile import Configfile
+
+from classes.containers.ContainerFetcher import ContainerFetcher
 
 from classes.parsers.MacroParser import MacroParser
 from classes.parsers.TokenParser import TokenParser
@@ -68,7 +70,7 @@ class ToolParser:
         # tool metadata
         self.tool_name: str = ''
         self.tool_id: str = ''
-        self.galaxy_version: str = ''
+        self.tool_version: str = ''
         self.tool_creator: str = ''
         self.citations: list[dict[str, str]] = []
         self.requirements: list[dict[str, Union[str, int]]] = []
@@ -98,6 +100,7 @@ class ToolParser:
         self.parse_macros()
         self.parse_tokens()
         self.parse_metadata()
+        self.fetch_container()
 
         # gathering UI variables
         self.parse_params()
@@ -138,14 +141,16 @@ class ToolParser:
         mp.parse()
         self.tool_name = mp.tool_name
         self.tool_id = mp.tool_id
-        self.galaxy_version = mp.galaxy_version
-        self.citations = mp.citations
-        self.requirements = mp.requirements
-        self.description = mp.description
-        self.help = mp.help
-        self.base_command = mp.base_command
-        self.container = mp.container
         self.tool_version = mp.tool_version
+        self.description = mp.description
+        self.requirements = mp.requirements
+        self.citations = mp.citations
+        self.help = mp.help
+
+
+    def fetch_container(self):
+        cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements)
+        self.container = cf.fetch()
 
 
     # 4th step: param parsing
@@ -200,7 +205,7 @@ class ToolParser:
         tool = Tool()
         tool.name = self.tool_name
         tool.id = self.tool_id
-        tool.version = self.galaxy_version
+        tool.version = self.tool_version
         tool.creator = None  # TODO this is just temp
         tool.container = self.container
         tool.tests = None  # TODO this is just temp

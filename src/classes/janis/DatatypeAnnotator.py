@@ -158,7 +158,16 @@ class DatatypeAnnotator:
     def annotate_positional(self, the_positional) -> None:
         # can be string, int, float, file type (fasta, html etc)   
         the_positional.datatypes = self.get_token_datatypes(the_positional.token)
+        self.assert_has_datatype(the_positional)
         
+
+    def assert_has_datatype(self, obj):
+        datatypes = [d for d in obj.datatypes if d is not None]
+        if len(datatypes) == 0:
+            if type(obj) == Positional:
+                self.logger.log(2, f'missing datatype for positional {obj.token.text}')
+            else:
+                self.logger.log(2, f'missing datatype for positional {obj.sources[0].text}')
 
 
     def get_token_datatypes(self, the_token: Token) -> list[dict[str, str]]:
@@ -224,11 +233,13 @@ class DatatypeAnnotator:
         hits = []
 
         components = the_string.split('.')
+        components = [c for c in components if c != '']
+        #components = [c.strip("'\"") for c in components]
         if len(components) > 1:
             for i in range(1, len(components)):
                 ext = '.'.join(components[i:])
-                if ext in self.ext_to_gx:
-                    hits.append(self.ext_to_gx[ext])
+                if ext in self.ext_to_format_map:
+                    hits.append(self.ext_to_format_map[ext])
 
         return hits
 
@@ -313,6 +324,7 @@ class DatatypeAnnotator:
             source_datatypes.append([token.type, datatypes])
 
         the_option.datatypes = self.select_datatypes_source(source_datatypes)
+        self.assert_has_datatype(the_option)
 
 
     def annotate_output(self, the_output: Output) -> None:
@@ -320,6 +332,7 @@ class DatatypeAnnotator:
         a little different to the others. runs on a galaxy output obj not tokens
         """
         the_output.datatypes = self.get_output_datatype(the_output)
+        self.assert_has_datatype(the_output)
 
 
     def get_output_datatype(self, the_output: Output) -> list[str]:

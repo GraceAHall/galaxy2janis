@@ -1,104 +1,27 @@
 
 
+v0.1 supported -------------------------------------------------------------------
 
 
 
+v0.1 unsupported -----------------------------------------------------------------
 
-
-Datatypes
-
-single read-only yaml file (persistable)
-
-
-janis types, galaxy types
-
-format_attrib:
-    - source
-    - classname
-    - exts
-    - import path
-
-
-
-only accessed by format attrib or extension
-
-ext to format attrib
-
-
-then if getting by format, its just format -> types
-then for ext, its ext -> format -> types
-
-
-
-
-
-DatatypeAnnotator loads the above json and creates the following key maps:
-    - ext_type_map: dict[ext, list[classname]] 
-        - classname is either galaxy or janis. ie .fa -> [janis fasta classname, galaxy fasta classname] 
-    
-    - gx_capitalisation_map: dict[str(format attric), str(classname)]
-        - allows translating between the type listed in galaxy tool xml and the actual classname
-        
-from here, can access datatypes using:
-
-get_datatypes_by_name()
-    - name supplied (the galaxy format attrib)
-    - 
-
-get_datatypes_by_ext()
-    - ext supplied, janis & galaxy types returned 
-    -   [ 
-            {'source': 'janis', 'type': 'BAM'},
-            {'source': 'galaxy', 'type': 'Bam'}
-        ]
-    - would then prioritise janis types over galaxy
-
-
-
-
-still need
-    - galaxy format attrib -> galaxy classname (capitalisation map)
-    - 
-
-
-
-
-
-Datastructures needed 
-
-Janis
-
-
-Galaxy
-    - galaxy capitalisation map (text in format attrib to classname)
-    - 
-
-
-
-
-build 3 datastructures containing the above, indexed by:
-    - extension
-    - 
-
-
-
-v0.1 unsupported
+- general
+    - different versions of same tool
+        - container cache is holding version number at least 
 
 - command string
     - \$_GALAXY_JOB_TMP_DIR (no idea what to do)
     - for loops
     - multiline bash blocks
-    - MULTIPLE EXPANDED FORMS (filtlong)
+    - MULTIPLE EXPANDED FORMS (filtlong) why?
     - INDICIES (bwa-mem)
     - -o first${ext}
     - proper reconstruction of command order using cheetah command logic
     - tools with multiple commands (only first is interpreted at the moment) (bwa.xml is good example)
         - do I need to consider '&&' after the first '>' / '|' ? 
 
-
-
 - param features 
-
     - non-unique param / output names 
         - ie param1.name = param2.name but param1.gx_var !=
           param2.gx_var
@@ -124,8 +47,25 @@ v0.1 unsupported
             - sometimes even something simple like 'tr a-z A-Z < file.txt' is run as an individual step in a vanilla ubuntu container
 
 
+General Notes --------------------------------------------------------------------
+
+- tool versions
+    - the version in the tool xml may not actually be the same as the requirement
+    - merely represents the information in the wrapper, not the actual version of the tool that the container executes
+    - 
+
+- tool name
+    - both the tool_id and tool_name in the xml are unreliable.
+    - tool name is taken as tool_id.replace('-', '_').lower()
+    - this isn't necessarily the same name as the main requirement being executed
+    - again, simply gives a reasonable name specified from the tool xml
+    - this allows us to then parse gx workflows and actually understand what tool definition the janis should load. 
 
 
+
+
+
+end ------------------------------------------------------------------------------
 
 
 
