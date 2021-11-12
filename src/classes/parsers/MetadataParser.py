@@ -4,7 +4,7 @@
 
 from xml.etree import ElementTree as et
 from typing import Union
-from Bio import pairwise2
+
 
 
 from classes.Logger import Logger
@@ -15,7 +15,6 @@ class MetadataParser:
     def __init__(self, tree: et.ElementTree, logger: Logger) -> None:
         self.tree = tree
         self.logger = logger
-        self.container_cache_path = 'container_cache/cache.json' 
 
         # tool metadata to collect:
         self.tool_name: str = ''

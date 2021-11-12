@@ -149,7 +149,7 @@ class ToolParser:
 
 
     def fetch_container(self):
-        cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements)
+        cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements, self.logger)
         self.container = cf.fetch()
 
 
