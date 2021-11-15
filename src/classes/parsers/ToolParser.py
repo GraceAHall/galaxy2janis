@@ -105,9 +105,9 @@ class ToolParser:
         # gathering UI variables
         self.parse_params()
         self.parse_outputs()
+        self.parse_configfiles()
         
         # the business
-        #self.parse_configfiles()
         self.parse_command()
         self.annotate_datatypes()
         self.init_tool()

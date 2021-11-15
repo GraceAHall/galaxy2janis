@@ -7,11 +7,18 @@ TODO v0.1
 add known extensions to galaxy parsed types. 
 doesnt' know .fasta = .fa = .fna
 
+
+untested:
+    - recent 
+    - container fetching
+
+
 Today:
-    - get specific container
+    - bugs
+        - multiple expanded forms of cmd word
+        - IndexError tokens = self.get_all_tokens(word.expanded_text[0])  
     - test parsing
     - galaxy templating system
-
     - when option is GX_OUT, create an input for it (-v '$output')
     - sort out toolinputs, toolarguments and position of everything
     - parse tool xmls

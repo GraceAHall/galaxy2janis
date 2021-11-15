@@ -1,5 +1,27 @@
 
 
+current errors:
+
+no container
+allegro
+art tools
+bayescan
+
+silent
+augustus tools
+bamutil clip_overlap
+
+python err 
+multiple expanded forms of cmd word
+IndexError tokens = self.get_all_tokens(word.expanded_text[0])
+
+
+
+clip_overlap.xml
+basil.xml
+
+
+
 v0.1 supported -------------------------------------------------------------------
 
 
@@ -15,6 +37,13 @@ v0.1 unsupported ---------------------------------------------------------------
     - for loops
     - multiline bash blocks
     - MULTIPLE EXPANDED FORMS (filtlong) why?
+    - Multiline strings
+        #if $lib_repeat
+            lib='
+            #for $i in range(len($lib_repeat))
+                lib$i
+            #end for
+            '
     - INDICIES (bwa-mem)
     - -o first${ext}
     - proper reconstruction of command order using cheetah command logic

@@ -108,15 +108,19 @@ class JanisFormatter:
         inputs = []
 
         command = self.tool.command
+
+        inputs.append('\t# positionals\n')
         for posit in command.get_positionals():
             new_input = self.format_positional_to_string(posit)
             inputs.append(new_input)
 
-        for flag in command.flags.values():
+        inputs.append('\t# flags\n')
+        for flag in command.get_flags():
             new_input = self.format_flag_to_string(flag)
             inputs.append(new_input)
 
-        for opt in command.options.values():
+        inputs.append('\t# options\n')
+        for opt in command.get_options():
             new_input = self.format_option_to_string(opt)
             inputs.append(new_input)
 
@@ -135,6 +139,7 @@ class JanisFormatter:
         """
         tag, datatype, default, docstring = self.extract_positional_details(positional)
         tag = self.validate_tag(tag)
+        docstring = self.validate_docstring(docstring)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -142,11 +147,10 @@ class JanisFormatter:
         out_str += f'\t\tposition={positional.pos},\n'
 
         if default is not None:
-            if len(positional.datatypes) == 1:
-                if positional.datatypes[0] in ['Float', 'Integer']:
-                    out_str += f'\t\tdefault={default},\n'
-                else:
-                    out_str += f'\t\tdefault="{default}",\n'
+            if len(positional.datatypes) == 1 and positional.datatypes[0] in ['Float', 'Integer']:
+                out_str += f'\t\tdefault={default},\n'
+            else:
+                out_str += f'\t\tdefault="{default}",\n'
         
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
@@ -161,14 +165,14 @@ class JanisFormatter:
             gx_obj = self.get_gx_obj(token.gx_ref)
             tag = gx_obj.name
             default = gx_obj.get_default()
+            if default == '':
+                default = None
         else:
             tag = posit.token.text
             default = None
 
         docstring = self.get_docstring([token])
         datatype = self.format_janis_typestr(posit.datatypes)        
-        if len(tag) == 1:
-            tag += '_'
 
         return tag, datatype, default, docstring
 
@@ -182,6 +186,16 @@ class JanisFormatter:
             tag += '_janis'
 
         return tag
+    
+    
+    def validate_docstring(self, docstring: str) -> str:
+        """
+        to avoid janis reserved keywords
+
+        """
+        docstring = docstring.replace('"', '\\"')
+
+        return docstring
 
 
     def get_gx_obj(self, query_ref: str):
@@ -201,6 +215,7 @@ class JanisFormatter:
         """
         tag, datatype, prefix, docstring = self.extract_flag_details(flag)
         tag = self.validate_tag(tag)
+        docstring = self.validate_docstring(docstring)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -221,9 +236,6 @@ class JanisFormatter:
 
         prefix = flag.prefix
         docstring = self.get_docstring(flag.sources) # get from galaxy param otherwise blank
-
-        if len(tag) == 1:
-            tag += '_'
         
         return tag, datatype, prefix, docstring
         
@@ -246,6 +258,7 @@ class JanisFormatter:
         """
         tag, datatype, prefix, default, docstring = self.extract_option_details(opt)
         tag = self.validate_tag(tag)
+        docstring = self.validate_docstring(docstring)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -257,10 +270,11 @@ class JanisFormatter:
         else:
             out_str += f'\t\tprefix="{prefix}",\n'
 
-        if len(opt.datatypes) == 1 and opt.datatypes[0]['classname'] in ['Float', 'Int']:
-            out_str += f'\t\tdefault={default},\n'
-        else:
-            out_str += f'\t\tdefault="{default}",\n'
+        if default is not None:
+            if len(opt.datatypes) == 1 and opt.datatypes[0]['classname'] in ['Float', 'Int']:
+                out_str += f'\t\tdefault={default},\n'
+            else:
+                out_str += f'\t\tdefault="{default}",\n'
         
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
@@ -274,10 +288,9 @@ class JanisFormatter:
         prefix = opt.prefix
 
         default = self.get_default(opt.sources)
+        if default == '':
+            default = None
         docstring = self.get_docstring(opt.sources)
-
-        if len(tag) == 1:
-            tag += '_'
 
         return tag, datatype, prefix, default, docstring
     
@@ -375,6 +388,7 @@ class JanisFormatter:
         """
         datatype = self.format_janis_typestr(output.datatypes)
         tag = self.validate_tag(output.name)
+        docstring = self.validate_docstring(output.help_text)
 
         out_str = '\tToolOutput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -385,7 +399,7 @@ class JanisFormatter:
             out_str += f'\t\t{datatype},\n'
             out_str += f'\t\tselector={output.selector}("{output.selector_contents}"),\n'
         
-        out_str += f'\t\tdoc="{output.help_text}"\n'
+        out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
         return out_str
@@ -451,36 +465,3 @@ class JanisFormatter:
 
 
 
-
-"""
-    def format_param_to_string(self, param: Param) -> str:
-        # ToolInput(
-        #     'fastq1',
-        #     Fastq,
-        #     prefix='--in1',
-        #     doc="First fastq input. If paired end, input2 is used for the other PE fastq"
-        # )
-        # need to be able to get
-        #     - tag
-        #     - datatype (always Boolean for flags)
-        #     - optionality
-        #     - position (positional)
-        #     - prefix
-        #     - default
-        #     - doc
-
-
-        self.update_datatype_imports(param)
-        jtype = self.format_janis_typestr(param)
-
-        out_str = '\tToolInput(\n'
-        out_str += f'\t\t"{param.name}",\n'
-        out_str += f'\t\t{jtype},\n'
-        out_str += f'\t\tprefix="{param.prefix or ""}",\n'
-        out_str += f'\t\tdefault="{param.default_value}",\n'
-        out_str += f'\t\tdoc="{param.help_text}"\n'
-        out_str += '\t),\n'
-
-        return out_str
-
-"""

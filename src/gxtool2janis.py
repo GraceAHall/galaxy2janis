@@ -54,7 +54,7 @@ def get_outdir_path(workdir: str) -> str:
 
 
 def get_filenames(filename: str, outdir: str) -> Tuple[str, str]:
-    basename = filename.rstrip('.xml')
+    basename = filename[:-4]
     out_log = f'{outdir}/{basename}.log'
     out_def = f'{outdir}/{basename}.py'
     return out_log, out_def

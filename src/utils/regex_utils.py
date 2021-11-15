@@ -5,11 +5,13 @@ import numpy as np
 from typing import Optional
 
 
+
+
 def get_cheetah_vars(the_string: str) -> set[str]:
     """
     doesn't keep function calls
     """
-    matches = re.finditer(r'["\']?\$\{?[\w.]+\}?["\']?', the_string)
+    matches = re.finditer(r'\$\{?[\w.]+\}?', the_string)
     
     #matches = set([m[0] for m in matches])
     
@@ -19,6 +21,7 @@ def get_cheetah_vars(the_string: str) -> set[str]:
         match_end = m.end()
         match = get_base_var(match)
         match = strip_method_calls(match, match_end, the_string)
+        match = strip_common_attributes(match, match_end, the_string)
         
         if match != '':
             keep_matches.append(match)
@@ -54,6 +57,31 @@ def strip_method_calls(match: str, match_end: int, the_string: str) -> str:
             # is cheetah func call.  
             match = ''
 
+    return match
+
+
+def strip_common_attributes(match: str, match_end: int, the_string: str) -> str:
+    gx_attributes = set([
+        '.forward',
+        '.reverse',
+        '.ext',
+        '.value',
+        '.name',
+        '.files_path'
+    ])
+    # needs to be recursive so we can iterately peel back 
+    # eg  in1.forward.ext
+    # need to peel .ext then peel .forward.
+
+    if match_end < len(the_string):
+        for att in gx_attributes:
+            if match.endswith(att):
+                # strip from the right - num of chars in the att
+                match = match[:-len(att)]
+
+                # recurse
+                match = strip_common_attributes(match, match_end, the_string)
+    
     return match
 
 
@@ -95,7 +123,7 @@ def get_quoted_strings(the_string: str) -> list[str]:
 
 
 def get_raw_strings(the_string: str) -> list[str]:
-    pattern = r'(?<=\s|^)([\/\\\w\d-.])[-\w\d\{\}\$.\/\\_:]*(?=\s|$)'
+    pattern = r'(?<=\s|^)([\/\\\w\d-.*`])[-\w\d\{\}\$.\/\\_:*`]*(?=\s|$)'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 

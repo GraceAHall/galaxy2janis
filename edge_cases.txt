@@ -12,6 +12,17 @@ bandage:
 
 
 
+Multiline strings:
+
+#if $lib_repeat
+    lib='
+    #for $i in range(len($lib_repeat))
+        lib$i
+    #end for
+    '
+
+
+
 bool param which is actually 2 key-vals
 
 <param name="singlestrand" type="boolean" argument="--singlestrand"

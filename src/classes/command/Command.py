@@ -163,6 +163,25 @@ class Command:
         positionals = list(self.positionals.values())
         positionals.sort(key = lambda x: x.pos)
         return positionals
+    
+    
+    def get_flags(self) -> list[Positional]:
+        """
+        returns list of flags in alphabetical order
+        """
+        flags = list(self.flags.values())
+        flags.sort(key=lambda x: x.prefix)
+        return flags
+   
+    
+    def get_options(self) -> list[Positional]:
+        """
+        returns list of positionals in order
+        """
+        options = list(self.options.values())
+        options.sort(key=lambda x: x.prefix.lstrip('-'))
+        return options
+
 
     def remove_positional(self, pos: int) -> None:
         """

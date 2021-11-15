@@ -196,6 +196,16 @@
             ]
         },
         {
+            "name": "abricate_summary",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abricate_summary.xml", "tools/abricate"
+            ]
+        },
+        {
             "name": "clusterBed",
             "type": "python",
             "request": "launch",
@@ -313,6 +323,56 @@
             "console": "integratedTerminal",
             "args": [
                 "abyss-pe.xml", "tools/abyss"
+            ]
+        },
+        {
+            "name": "allegro",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "allegro.xml", "tools/allegro"
+            ]
+        },
+        {
+            "name": "anndata/export",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "export.xml", "tools/anndata"
+            ]
+        },
+        {
+            "name": "locuspocus",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "locuspocus.xml", "tools/aegean"
+            ]
+        },
+        {
+            "name": "parseval",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "parseval.xml", "tools/aegean"
+            ]
+        },
+        {
+            "name": "bcftools_call",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "bcftools_call.xml", "tools/bcftools"
             ]
         },
         {

@@ -40,7 +40,7 @@ class CommandParser:
         loop_keywords = ['#for ', '#end for', '#while ', '#end while']
         error_keywords = ['#try ', '#except', '#end try']
         cheetah_var_keywords = ['#def ', '#set ']
-        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ']
+        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ', 'cd ', 'echo ']
         return conditional_keywords + loop_keywords + error_keywords + cheetah_var_keywords + linux_commands
         
 
@@ -268,10 +268,10 @@ class CommandParser:
         for i, line in enumerate(lines):
             # incremet loop depth levels
             if line.startswith('#for '):
-                self.logger.log(2, 'for loop encountered')
+                self.logger.log(1, 'for loop encountered')
                 for_level += 1
             if line.startswith('#while '):
-                self.logger.log(2, 'for loop encountered')
+                self.logger.log(1, 'for loop encountered')
                 while_level += 1
 
             # decrement loop depth levels

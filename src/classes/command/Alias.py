@@ -32,66 +32,115 @@ class AliasRegister:
 
         # stores the aliases using alias.source as key
         # each source may actually have more than 1 alias if different dests
-        self.alias_dict: dict[str, list[Alias]] = defaultdict(list)
+        self.alias_dict: dict[str, list[Alias]] = {}
 
 
     def add(self, source: str, dest: str, instruction: str, text: str) -> None:
         # check its not referencing itself
         if source != dest:
-            known_aliases = self.alias_dict[source]
+            alias = Alias(source, dest, instruction, text)
+            
+            if alias.source not in self.alias_dict:
+                self.alias_dict[alias.source] = []
+
+            known_aliases = self.alias_dict[alias.source]
             if not any([dest == al.dest for al in known_aliases]):
                 # if valid, create new alias and store
-                new_alias = Alias(source, dest, instruction, text)
-                self.alias_dict[new_alias.source].append(new_alias)
+                self.alias_dict[alias.source].append(alias)
 
 
     def template(self, query_string: str) -> list[str]:
         """
         given a query string, templates first var with aliases. 
         ASSUMES ONLY 1 ALIAS IN STRING. otherwise this would get a little recursive. 
-        returns list of all possible forms of the query string
+        its doable, just not high priority right now
+
+        Example behaviour:
+        Aliases
+            $input: file.fasta
+
+        Galaxy params
+            $input.names
+        
+        Function input -> output:
+            $input -> file.fasta
+            $input/mystuff -> file.fasta/mystuff
+            $input.names -> $input.names      (not file.fasta.names)
+            $input.forward (galaxy attribute) -> file.fasta.forward
         """
 
         out = []
 
+        # for each alias source, check if in the query string
         for source in self.alias_dict.keys():
-            # in case the var has curly braces in text
-            if source.startswith('$'):
-                patterns = [source, '${' + source[1:] + '}']
-                patterns = [re.compile(f'\{p}(?![\w])') for p in patterns]
-            else:
-                patterns = [re.compile(f'{source}(?![\w])')]
-
-            for patt in patterns:
-                res = re.finditer(patt, query_string)
-                matches = [m for m in res]
-                if len(matches) > 0:
-                    possible_values = self.resolve(source)
-
-                    # may be multiple resolved values.
-                    for val in possible_values:
-                        for m in matches:
-                            supp_query_string = query_string[:m.start()] + val + query_string[m.end():]
-                            out.append(supp_query_string)
+            # get partial matches
+            matches = self.get_alias_match(source, query_string)
+            for m in matches:
+                print(m[0], m.start(), m.end())
+        
+            if len(matches) > 0:
+                destination_values = self.resolve(source)
+                for val in destination_values:
+                    for m in matches:
+                        supp_query_string = query_string[:m.start()] + val + query_string[m.end():]
+                        out.append(supp_query_string)           
                     
-                    return out
+        if len(out) == 0:
+            out = [query_string]
+        
+        return out
 
-        return [query_string]
 
+    def get_alias_match(self, source: str, query_string: str) -> list:
+        # just trust this crazy regex ok
+        temp = source.replace(r'\\', r'\\\\').replace('$', '\$').replace('.', '\.')
+        #pattern = temp + r'(?:(?!(\.[\w-]*\()|(\()|(\w)))((?=[^\w.\S]|\.(forward|reverse|ext|value|name|files_path)[^\w.\S]))'
+        pattern = temp + r'(?!(\.[\w-]*\()|(\()|(\w))(?=[^\w.]|(\.(forward|reverse|ext|value|name|files_path))+[^\w]|$)'
+        res = re.finditer(pattern, query_string)
+        matches = [m for m in res]
+        return matches
+        
+
+    # deprecated
+    def get_partial_matches(self, source: str, query_string: str) -> list:
+        temp = source.replace(r'\\', r'\\\\').replace('$', '\$').replace('.', '\.')
+        pattern = re.compile(f'{temp}(?![\w])')
+        res = re.finditer(pattern, query_string)
+        matches = [m for m in res]
+        return matches
+
+
+    # deprecated
+    def filter_non_full_matches(self, matches: str, query_string: str) -> list:
+        out_matches = []
+        for m in matches:
+            print(m[0], m.start(), m.end())
+
+            if m.end() < len(query_string):
+            #    if query_string[m.end() + 1] == '.'
+            #if query_string[]
+                pass
+        
+        return out_matches
 
 
     def resolve(self, query_var: str) -> list[str]:
         """
         returns list of all gx vars, and literals that are linked to the query_var
         cheetah vars should be fully resolved here 
+        
         """
-        aliases = self.alias_dict[query_var]
         out = []
+
+        if query_var in self.alias_dict:
+            aliases = self.alias_dict[query_var]
+        else:
+            return out
 
         for alias in aliases:
             # cheetah or galaxy var
             if alias.dest.startswith('$'):
-                # add if galaxy param
+                # check if galaxy param. if so, add
                 if self.param_register.get(alias.dest) is not None:
                     out.append(alias.dest)
 
@@ -106,9 +155,8 @@ class AliasRegister:
 
                 # recursive. resolves next link if ch or gx var
                 out += self.resolve(alias.dest)
-                print()
             
-            # literal
+            # literal not var 
             else:
                 out.append(alias.dest)
 
@@ -121,7 +169,8 @@ class AliasRegister:
             '.reverse',
             '.ext',
             '.value',
-            '.name'
+            '.name',
+            '.files_path'
         ])
         # needs to be recursive so we can iterately peel back 
         # eg  in1.forward.ext

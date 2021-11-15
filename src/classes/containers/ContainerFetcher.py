@@ -97,8 +97,10 @@ class ContainerFetcher:
 
         container_url = ''
   
-        #if not self.url_is_cached(self.tool_id, self.tool_version):
-        if self.url_is_cached(self.tool_id, self.tool_version): # TODO REMOVE TESTING ONLY
+        if self.url_is_cached(self.tool_id, self.tool_version):
+            container_url = self.container_cache[self.tool_id][self.tool_version]
+
+        else:
             if self.main_requirement['type'] == 'package':
                 container_url = self.get_container_url_by_package()
 
@@ -112,11 +114,11 @@ class ContainerFetcher:
 
     def get_container_url_by_package(self) -> str:
         # get data package from api request
-        request_url = f'https://api.biocontainers.pro/ga4gh/trs/v2/tools?name={self.tool_id}&limit=10&sort_field=id&sort_order=asc'
+        request_url = f'https://api.biocontainers.pro/ga4gh/trs/v2/tools?name={self.main_requirement["name"]}&limit=10&sort_field=id&sort_order=asc'
         tool_data_list = self.make_api_request(request_url)
         
         # choose the most similar tool in package
-        tool_data = self.get_most_similar_tool(self.tool_id, tool_data_list)
+        tool_data = self.get_most_similar_tool(self.main_requirement["name"], tool_data_list)
 
         # get the api url for the chosen tool + version
         version_url = self.get_tool_version_url(tool_data, self.tool_version)
@@ -148,10 +150,12 @@ class ContainerFetcher:
                 response = None
             iterations += 1
 
-        data = json.loads(response.text)
-        if data == [] or data == {}:
-            self.logger.log(2, 'api request return body was empty')
-        return data
+        if response.status_code != 200:
+            self.logger.log(2, f'no container found for {request_url}')
+
+        else:
+            data = json.loads(response.text)
+            return data
 
 
     def get_most_similar_tool(self, target_name: str, api_results: dict) -> dict:

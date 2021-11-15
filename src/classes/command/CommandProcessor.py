@@ -2,7 +2,7 @@
 
 import sys
 from typing import Tuple, Optional
-
+import regex as re
 
 from classes.command.Command import Command, Token, TokenType
 from classes.command.Alias import AliasRegister
@@ -50,6 +50,7 @@ class CommandProcessor:
 
 
     def process(self) -> Command:
+        self.standardise_cmd_words()
         self.extract_env_vars()
         self.set_aliases()
         self.expand_aliases()
@@ -75,6 +76,34 @@ class CommandProcessor:
             for token in token_list:
                 print(f'{counter:<3}{token}')
 
+
+    def standardise_cmd_words(self) -> None:
+        """
+        env vars and aliases are already standardised to correct format.
+        only cmd_words need to be addressed. 
+        """
+        for word in self.cmd_words:
+            word.text = self.standardise_var_format(word.text)
+
+
+    def standardise_var_format(self, text: str) -> str:
+        """
+        modifies cmd word to ensure the $var format is present, 
+        rather than ${var}
+        takes a safe approach using regex and resolving all vars one by one
+        """
+        matches = re.finditer(r'\$\{[\w.]+\}', text)
+        matches = [[m[0], m.start(), m.end()] for m in matches]
+
+        if len(matches) > 0:
+            m = matches[0]
+            # this is cursed but trust me it removes the 
+            # curly braces for the match span
+            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
+            text = self.standardise_var_format(text)
+
+        return text    
+                   
 
     def set_aliases(self) -> None:
         """
@@ -125,7 +154,6 @@ class CommandProcessor:
             if source is not None and dest is not None:
                 self.aliases.add(source, dest, 'set', line)
             
-
 
     def split_variable_assignment(self, line: str) -> Tuple[str, str]:
         operator_pattern = r'[-+\\/*=]?='
@@ -287,6 +315,8 @@ class CommandProcessor:
     def expand_aliases(self) -> None:
         for cmd_word in self.cmd_words:
             cmd_forms = self.aliases.template(cmd_word.text)
+            # if len(cmd_forms) == 0:
+            #     print()
             cmd_word.expanded_text = cmd_forms
 
 
@@ -302,7 +332,6 @@ class CommandProcessor:
         env_vars = []
 
         for line in self.lines:
-
             if line.startswith('export '):
                 left, right = self.split_variable_assignment(line)
                 left = left[7:] # removes the 'export ' from line start
@@ -350,6 +379,7 @@ class CommandProcessor:
         out_tokens: list[Token] = []
 
         values = self.param_register.get_realised_values(token.gx_ref)
+        values = [v for v in values if v != '']
 
         if self.should_expand(values):
             for val in values:
@@ -546,23 +576,28 @@ class CommandProcessor:
 
 
     def get_best_token(self, word: CommandWord) -> Token:
-        # TODO situations with more than 1!
-        if len(word.expanded_text) > 1:
-            print('multiple expanded forms of cmd word')
-            self.logger.log(2, 'multiple expanded forms of cmd word')
-
-        # get best token representation of curr_word
-        tokens = self.get_all_tokens(word.expanded_text[0])
-        if len(tokens) == 0:
-            print('could not resolve token')
-            self.logger.log(2, 'could not resolve token')
-
-        best_token = self.select_highest_priority_token(tokens)
+        tokens = []
         
-        # transfer in_conditional status to token
-        best_token.in_conditional = word.in_conditional
+        if len(word.expanded_text) > 1:
+            print()
 
-        return best_token
+        # get best-fit token for each form of curr_word 
+        for text in word.expanded_text:
+            temp_tokens = self.get_all_tokens(text)
+            if len(temp_tokens) == 0:
+                print('could not resolve token')
+                self.logger.log(2, 'could not resolve token')
+            
+            best_token = self.select_highest_priority_token(temp_tokens)
+            tokens.append(best_token)
+    
+        # from the best-fit tokens, choose the final best fit
+        final_token = self.select_highest_priority_token(tokens)
+
+        # transfer in_conditional status to token
+        final_token.in_conditional = word.in_conditional    
+
+        return final_token
 
 
     def get_all_tokens(self, text: str) -> list[Token]:
