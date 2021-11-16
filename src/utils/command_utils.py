@@ -39,9 +39,6 @@ def init_cmd_word(text: str, token=None) -> CommandWord:
 
 def get_best_token(word: CommandWord, param_register: ParamRegister, out_register: OutputRegister) -> Token:
     tokens = []
-    
-    if len(word.expanded_text) > 1:
-        print()
 
     # get best-fit token for each form of curr_word 
     for text in word.expanded_text:

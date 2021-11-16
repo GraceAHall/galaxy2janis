@@ -15,17 +15,20 @@ untested:
 
 Today:
     - bugs
+        - IndexError strip_to_numeric_version() (coords2clnt.xml)
+        - IndexError 'best_block = block_scores[0][0]' (bcftools_query.xml)
         - busco --limit being weird. shows a larger bug involving multiple references to something in command string
+        - augustus default for kvpairs (--singlestrand=true)
+        - 'could not find gx output: $targets_path' (bcftools_view)
         - repeat tags in tool xml (will solve issues?)
         - could not resolve token
             repeatmasker, cutadapt and a million others
         - multiple expanded forms of cmd word
-
         - missing datatype for positional (augustus)
         - missing datatype for positional '>' (bcftools)
-        - parseva worked (old version) but parseval didnt?????
         - the same var being seen in a million places (bcftools)
-
+    
+    - positional locations is important need to fix
     - test parsing
     - galaxy templating system
     - when option is GX_OUT, create an input for it (-v '$output')

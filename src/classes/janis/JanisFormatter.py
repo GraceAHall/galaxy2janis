@@ -73,7 +73,7 @@ class JanisFormatter:
         out_str += f'\toutputs=outputs,\n'
 
         if self.container_version_mismatch():
-            out_str += (f'\t# WARN contaniner version mismatch. \n\ttool requirement version was {self.tool.main_requirement["version"]}\n')
+            out_str += (f'\t# WARN contaniner version mismatch\n\t# tool requirement version was {self.tool.main_requirement["version"]}\n\t# container version is {container["version"]}\n')
 
         out_str += f'\tcontainer="{container["url"]}",\n'
         out_str += f'\tversion="{version}",\n'

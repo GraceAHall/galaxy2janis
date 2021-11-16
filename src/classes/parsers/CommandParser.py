@@ -227,8 +227,6 @@ class CommandParser:
             # only keep lines which don't start with keywords
             if not line.split(' ')[0] in banned_firstwords:
                 out.append(line)
-            else:
-                print()
 
         return out
 
@@ -242,6 +240,8 @@ class CommandParser:
     def set_cmd_words(self) -> None:
         command_words = self.init_command_words()
         command_words = self.translate_gx_keywords(command_words)
+        command_words = self.truncate_extra_commands(command_words)
+        
         # sentinel
         for statement_block, cmd_words in command_words.items():
             cmd_words.append(CommandWord('__END_COMMAND__', self.statement_block))
@@ -261,7 +261,6 @@ class CommandParser:
         for line in self.lines:
             self.update_levels(line)
             temp_line = remove_ands_from_line(line)
-            print()
             
             if not any([temp_line.startswith(kw) for kw in self.keywords]):
                 # DO NOT just line.split()
@@ -320,6 +319,35 @@ class CommandParser:
                 gx_keyword_value = get_galaxy_keyword_value(word.text)
                 if gx_keyword_value != None:
                     word.text = gx_keyword_value
+
+        return command_words
+
+
+    def truncate_extra_commands(self, command_words: list[CommandWord]) -> list[CommandWord]:
+        for statement_block, cmd_words in command_words.items():
+            first_command_complete = False
+            cutoff = -1
+
+            for i, word in enumerate(cmd_words):
+                if word.text == '>':
+                    if first_command_complete:
+                        cutoff = i
+                        break
+                    else:
+                        first_command_complete = True
+
+                elif word.text == '|':
+                    if not first_command_complete:
+                        self.logger.log(1, "pipe encountered as end of 1st command")
+                    cutoff = i
+                    break
+            
+            # truncate or keep all cmd words 
+            if cutoff != -1:
+                command_words[statement_block] = cmd_words[:cutoff]
+                self.logger.log(1, "multiple commands encountered")
+            else:
+                command_words[statement_block] = cmd_words
 
         return command_words
 

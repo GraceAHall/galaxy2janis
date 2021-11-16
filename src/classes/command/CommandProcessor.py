@@ -61,7 +61,6 @@ class CommandProcessor:
             # possibly split token if GX_PARAM is hiding flags or options
             if token.type == TokenType.GX_PARAM:
                 tokens = self.expand_galaxy_tokens(token)
-                print()
             else:
                 tokens = [token]
 
