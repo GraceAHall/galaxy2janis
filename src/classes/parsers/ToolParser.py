@@ -44,6 +44,8 @@ class Tool:
         self.version: str = ""
         self.creator: Optional[str] = None
         self.container: str = ""
+        self.container_status: str = ""
+        self.container_target_version: str = ""
         self.tests: Optional[str] = None
         self.help: str = ""
         self.citations: list[dict[str, str]] = []
@@ -75,6 +77,8 @@ class ToolParser:
         self.citations: list[dict[str, str]] = []
         self.requirements: list[dict[str, Union[str, int]]] = []
         self.container: str = ''
+        self.container_status: str = ''
+        self.container_target_version: str = ''
         self.description: str = ''
         self.help: str = ''
 
@@ -150,7 +154,7 @@ class ToolParser:
 
     def fetch_container(self):
         cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements, self.logger)
-        self.container = cf.fetch()
+        self.container, self.container_status, self.container_target_version = cf.fetch() # type: ignore
 
 
     # 4th step: param parsing
@@ -208,6 +212,8 @@ class ToolParser:
         tool.version = self.tool_version
         tool.creator = None  # TODO this is just temp
         tool.container = self.container
+        tool.container_status = self.container_status
+        tool.container_target_version = self.container_target_version
         tool.tests = None  # TODO this is just temp
         tool.help = self.help
         tool.citations = self.citations

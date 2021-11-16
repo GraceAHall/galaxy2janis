@@ -16,6 +16,8 @@ multiple expanded forms of cmd word
 IndexError tokens = self.get_all_tokens(word.expanded_text[0])
 
 
+could not resolve token:
+parseval.xml
 
 clip_overlap.xml
 basil.xml
@@ -81,8 +83,11 @@ General Notes ------------------------------------------------------------------
 - tool versions
     - the version in the tool xml may not actually be the same as the requirement
     - merely represents the information in the wrapper, not the actual version of the tool that the container executes
-    - 
-
+    - for some tools, there are multiple versions that appear to be the same. for bwa-mem (bwa) we have:
+        - 0.7.17
+        - v0.7.17
+        - v0.7.17-3-deb (debian?)
+        
 - tool name
     - both the tool_id and tool_name in the xml are unreliable.
     - tool name is taken as tool_id.replace('-', '_').lower()

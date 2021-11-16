@@ -62,12 +62,15 @@ class JanisFormatter:
         toolname = self.tool.id.replace('-', '_').lower()
         version = self.tool.version
         container = self.tool.container
-
+        
         out_str = f'\n{toolname} = CommandToolBuilder(\n'
         out_str += f'\ttool="{toolname}",\n'
         out_str += f'\tbase_command={base_command},\n'
         out_str += f'\tinputs=inputs,\n'
         out_str += f'\toutputs=outputs,\n'
+        if self.tool.container_status != 'ok':
+            print(f'\t# contaniner {self.tool.container_status}. tool requirement version was {self.tool.container_target_version}\n')
+
         out_str += f'\tcontainer="{container}",\n'
         out_str += f'\tversion="{version}",\n'
         out_str += ')\n'

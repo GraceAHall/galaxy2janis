@@ -7,9 +7,9 @@ import requests
 import json
 import os
 from Bio import pairwise2
+import regex as re
 
 from classes.Logger import Logger
-
 
 
 class ContainerFetcher:
@@ -22,13 +22,14 @@ class ContainerFetcher:
         self.container_cache = None
         self.container_cache_path = 'container_cache/cache.json' 
         self.container_url = None
+        self.container_status = 'ok'
 
 
     def fetch(self):
         self.identify_main_requirement()
         self.load_container_cache()
-        container_url = self.get_container()
-        return container_url
+        self.set_container()
+        return self.container_url, self.container_status, self.main_requirement["version"]
 
 
     def identify_main_requirement(self) -> None:
@@ -77,7 +78,7 @@ class ContainerFetcher:
             self.container_cache = json.load(fp)
 
     
-    def get_container(self) -> None:
+    def set_container(self) -> None:
         """
         requirements have been sorted by alignment match to tool id
         the main tool requirement should be 1st in self.requirements
@@ -109,7 +110,7 @@ class ContainerFetcher:
 
             self.update_container_cache(container_url)
         
-        return container_url
+        self.container_url = container_url
         
 
     def get_container_url_by_package(self) -> str:
@@ -170,11 +171,128 @@ class ContainerFetcher:
 
     def get_tool_version_url(self, tool_data: dict, target_version: str) -> str:
         # try to get exact version
-        for version in tool_data['versions']:
-            if version['meta_version'] == target_version:
-                return version['url']
+        image_versions = [v['meta_version'] for v in tool_data['versions']]
+        chosen_version = ''
+
+        # try perfect matches first        
+        chosen_version = self.get_version_from_vanilla(image_versions, target_version)
+
+        # try again removing nondigits from target_version and meta_versions
+        if chosen_version == '':
+            target_version = self.strip_to_numeric_version(target_version)
+            image_versions = self.trim_versions(image_versions)
+            chosen_version = self.get_version_from_trimmed(image_versions, target_version)
+
+        # try again if failed but just select the most similar numerically
+        if chosen_version == '':
+            chosen_version = self.get_version_from_trimmed_inexact(image_versions, target_version)
+
+        # actually get the chosen version url
+        if chosen_version != '':
+            for version in tool_data['versions']:
+                if version['meta_version'] == chosen_version:
+                    return version['url']
 
         self.logger.log(2, 'could not find tool version in api request')
+        
+
+    def get_version_from_vanilla(self, exact_versions: list[str], target_version: str) -> str:
+        for meta_version in exact_versions:
+            if meta_version == target_version:
+                self.container_status = 'ok'
+                return meta_version
+        return ''
+
+
+    def strip_to_numeric_version(self, the_string: str) -> str:
+        pattern = r'(\d+)(\.\d+)+'
+        matches = re.finditer(pattern, the_string)
+        matches = [m[0] for m in matches]
+        return matches[0]
+
+
+    def trim_versions(self, image_versions: list[str]) -> str:
+        """
+        trims any nondigits from meta_version, then chooses an exact trimmed verion
+        match if exists to target_version. target_version is also trimmed.
+        """
+        out_versions = []
+
+        # trimming
+        for meta_version in image_versions:
+            trans_version = self.strip_to_numeric_version(meta_version)
+            out_versions.append([meta_version, trans_version])
+        
+        out_versions.sort()
+        return out_versions
+
+    
+    def get_version_from_trimmed(self, image_versions: list[str], target_version: str) -> str:
+        """
+        version matching to trimmed version numbers
+        """
+        for meta_version, trans_version in image_versions:
+            if trans_version == target_version:
+                self.container_status = 'nonidentical version name'
+                return meta_version
+
+        return ''
+
+
+    def get_version_from_trimmed_inexact(self, image_versions: list[str], target_version: str) -> str:
+        """
+        try again if failed but just select the most similar numerically
+        process:
+            set up the version as num array,
+            compare to target version (as num array),
+            numeric sorts once all versions have been compared 
+        """
+        version_comparisons = []
+        array_size = self.get_version_array_size(target_version, image_versions)
+
+        for meta_version, trans_version in image_versions:
+            v_comparison_array = self.get_version_comparison(trans_version, target_version, array_size)
+            version_comparisons.append([meta_version, trans_version, v_comparison_array])
+
+        self.container_status = 'version mismatch'
+        return self.get_most_similar_version(version_comparisons)
+
+        
+    def get_version_array_size(self, target_version: str, versions: list[str]) -> int:
+        max_array_size = len(target_version.split('.'))
+        for _, trans_version in versions:
+            max_array_size = max(max_array_size, len(trans_version.split('.')))
+        return max_array_size
+
+
+    def get_version_comparison(self, trans_version: str, target_version: str, array_size: int) -> Tuple:
+        target_array = target_version.split('.')
+        trans_array = trans_version.split('.')
+        target_array = [int(digit) for digit in target_array]
+        trans_array = [int(digit) for digit in trans_array]
+
+        # standardise array size
+        while len(target_array) < array_size:
+            target_array.append(0)
+        while len(trans_array) < array_size:
+            trans_array.append(0)
+
+        # calc discrepancies per number
+        out_array = []
+        for target_num, trans_num in zip(target_array, trans_array):
+            out_array.append(abs(target_num - trans_num))
+        
+        return out_array
+
+
+    def get_most_similar_version(self, version_comparisons: list) -> str:       
+        # this looks really strange but works
+        # since python default sort is stable, sorts version num array
+        # from end to start. creates the intended sort behaviour. 
+        for i in range(len(version_comparisons[0][2])):
+            version_comparisons.sort(key=lambda x: x[2][-i])
+
+        return version_comparisons[0][0]
 
 
     def get_biocontainer_image_url(self, images_data: dict) -> str:

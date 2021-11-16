@@ -16,6 +16,16 @@
             ]
         },
         {
+            "name": "report tool parsing errors",
+            "type": "python",
+            "request": "launch",
+            "program": "src/parsing_manager.py",
+            "console": "integratedTerminal",
+            "args": [
+                "tools/", "parsed_tools/"
+            ]
+        },
+        {
             "name": "read_inputs",
             "type": "python",
             "request": "launch",
