@@ -7,12 +7,12 @@ from typing import Tuple
 from classes.Logger import Logger
 from classes.command.Alias import AliasRegister
 from classes.command.Command import TokenType
-from classes.command.CommandProcessor import CommandWord
+from classes.command.CommandWord  import CommandWord
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 
 from utils.regex_utils import find_unquoted
-from utils.command_utils import init_cmd_word, get_best_token
+from utils.command_utils import init_cmd_word, get_best_token,remove_ands_from_line
 
 """
 NOTE
@@ -39,17 +39,11 @@ class AliasExtractor:
         """
               
         for line in self.lines:
-            line = self.remove_ands(line)
+            line = remove_ands_from_line(line)
             self.extract_set_aliases(line)
             self.extract_symlink_aliases(line)
             self.extract_copy_aliases(line)
             
-
-    def remove_ands(self, line: str) -> str:
-        line_elems = line.split(' ')
-        line_elems = [e for e in line_elems if e != '&&' and e != ';']
-        return ' '.join(line_elems)
-
           
     def extract_set_aliases(self, line: str) -> None:
         """
@@ -89,7 +83,10 @@ class AliasExtractor:
 
     def init_token_from_text(self, text: str) -> CommandWord:
         cmd_word = init_cmd_word(text)
-        return get_best_token(cmd_word, self.param_register, self.out_register)
+        token = get_best_token(cmd_word, self.param_register, self.out_register)
+        if token == None:
+            self.logger.log(1, f'can resolve token {text}')
+        return token
 
     
     def extract_symlink_aliases(self, line: str) -> None:

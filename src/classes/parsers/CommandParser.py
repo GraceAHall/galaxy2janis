@@ -2,7 +2,7 @@
 
 # pyright: basic
 
-
+from collections import defaultdict
 from typing import Union
 import xml.etree.ElementTree as et
 import regex as re
@@ -10,10 +10,11 @@ import regex as re
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from classes.command.AliasExtractor import AliasExtractor
-from classes.command.CommandProcessor import CommandWord
+from classes.command.CommandWord  import CommandWord
 from classes.Logger import Logger
 
 from utils.regex_utils import find_unquoted, get_words, get_galaxy_keyword_value
+from utils.command_utils import remove_ands_from_line
 
 """
 role of this module is to preprocess the command string into a useable state
@@ -58,13 +59,13 @@ class CommandParser:
         self.set_command_string()
         self.set_lines()
         self.set_aliases()
-        self.set_command_blocks()
-        self.set_command_words()
+        self.set_cmd_words()
 
     
     def set_command_string(self) -> None:
         command_string = self.get_command_from_xmltree()
-        self.command_string = self.simplify_stdio(command_string)
+        command_string = self.simplify_stdio(command_string)
+        self.command_string = self.standardise_variable_format(command_string)
         
 
     def get_command_from_xmltree(self) -> str:
@@ -96,6 +97,36 @@ class CommandParser:
         command_string = re.sub('2> \S+', '', command_string)
 
         return command_string 
+
+
+    def standardise_variable_format(self, command_string: str) -> str:
+        out_words = []
+        cmd_words = command_string.split(' ')
+        for word in cmd_words:
+            word = self.standardise_var_format(word)
+            out_words.append(word)
+
+        command_string = ' '.join(out_words)
+        return command_string
+
+
+    def standardise_var_format(self, text: str) -> str:
+        """
+        modifies cmd word to ensure the $var format is present, 
+        rather than ${var}
+        takes a safe approach using regex and resolving all vars one by one
+        """
+        matches = re.finditer(r'\$\{[\w.]+\}', text)
+        matches = [[m[0], m.start(), m.end()] for m in matches]
+
+        if len(matches) > 0:
+            m = matches[0]
+            # this is cursed but trust me it removes the 
+            # curly braces for the match span
+            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
+            text = self.standardise_var_format(text)
+
+        return text  
 
 
     def set_lines(self) -> None:
@@ -205,64 +236,38 @@ class CommandParser:
     def set_aliases(self) -> None:
         ae = AliasExtractor(self.lines, self.param_register, self.out_register, self.logger)
         ae.extract()
-        self.alias_register = ae.aliases
+        self.alias_register = ae.alias_register
 
 
-    def set_command_blocks(self) -> None:
-        pass
-
-
-    def set_command_words(self) -> None:
-        pass
-
-
-        # convert each line into CommandWord and annotate with properties
-        command_dict = self.init_command_words(lines)
-        command_dict = self.annotate_conditional_words(command_dict, lines)
-        command_dict = self.annotate_loop_words(command_dict, lines)
-
-        # remove everything 
-        command_words = self.convert_to_words(command_dict)
+    def set_cmd_words(self) -> None:
+        command_words = self.init_command_words()
         command_words = self.translate_gx_keywords(command_words)
-        command_words = self.truncate_extra_commands(command_words)
-
-        # post sentinel & return
-        command_words.append(CommandWord('__END_COMMAND__', self.statement_block))
-        self.lines = lines
+        # sentinel
+        for statement_block, cmd_words in command_words.items():
+            cmd_words.append(CommandWord('__END_COMMAND__', self.statement_block))
         self.command_words = command_words
- 
-
-    def pretty_print_command_words(self) -> None:
-        print('Command Words --------------------------------------------------------------- \n')
-        for word in self.command_words:
-            print(f'{word.text[:39]:40}{word.statement_block:>5}')
-        print()
 
 
-    
-
-
-
-
-    
-
-
-    def init_command_words(self, lines: list[str]) -> dict[int, list[CommandWord]]:
-        """
-        inits a CommandWord for every meaningful line of the command string.
-        keys in the dict are line numbers, vals are list of CommandWord
-
-        cheetah constructs are ignored
-
-        the CommandWords will be annotated later with the constructs they appear in 
-        """
-        command_words = {}
+    def init_command_words(self) -> list[CommandWord]:
+        command_words = defaultdict(list)
         self.statement_block = 0
+        self.levels = {
+            'if': 0,
+            'unless': 0,
+            'for': 0,
+            'while': 0,
+        }
 
-        for i, line in enumerate(lines):
-            if not any([line.startswith(kw) for kw in self.keywords]):
-                command_words[i] = []
-                words = get_words(line)
+        for line in self.lines:
+            self.update_levels(line)
+            temp_line = remove_ands_from_line(line)
+            print()
+            
+            if not any([temp_line.startswith(kw) for kw in self.keywords]):
+                # DO NOT just line.split()
+                # regex used here to ensure quoted strings appear as 
+                # single words etc
+                words = get_words(line)  
 
                 for word in words:
                     if word == '&&' or word == ';':
@@ -270,162 +275,92 @@ class CommandParser:
                         continue
                     else:
                         new_cmd_word = CommandWord(word, self.statement_block)
-                        command_words[i].append(new_cmd_word)
+                        new_cmd_word = self.annotate_level_info(new_cmd_word)
+                        command_words[self.statement_block].append(new_cmd_word)
 
         return command_words
 
 
-    def annotate_conditional_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:
-        """
-        '#unless EXPR' is equivalent to '#if not EXPR'
-        """
+    def update_levels(self, line: str) -> None:
+        # incrementing
+        if line.startswith('#if '):
+            self.levels['if'] += 1
+        if line.startswith('#unless '):
+            self.levels['unless'] += 1
+        if line.startswith('#for '):
+            self.logger.log(1, 'for loop encountered')
+            self.levels['for'] += 1
+        if line.startswith('#while '):
+            self.logger.log(1, 'for loop encountered')
+            self.levels['while'] += 1
 
-        if_level = 0
-        unless_level = 0
+        # decrementing
+        if '#end if' in line:
+            self.levels['if'] -= 1
+        if '#end unless' in line:
+            self.levels['unless'] -= 1
+        if '#end for' in line:
+            self.levels['for'] -= 1
+        if '#end while' in line:
+            self.levels['while'] -= 1
 
-        for i, line in enumerate(lines):
-            # incremet conditional depth levels
-            if line.startswith('#if '):
-                if_level += 1
-            if line.startswith('#unless '):
-                unless_level += 1
 
-            # decrement conditional depth levels
-            if '#end if' in line:
-                if_level -= 1
-            if '#end unless' in line:
-                unless_level -= 1
-
-            if not any([line.startswith(kw) for kw in self.keywords]):
-                if if_level > 0 or unless_level > 0:
-                    for cmd_word in command_dict[i]:
-                        cmd_word.in_conditional = True
-                #print(command_dict[i].in_conditional, command_dict[i].text)
-
-        return command_dict
-
+    def annotate_level_info(self, word: CommandWord) -> CommandWord:
+        if self.levels['if'] > 0 or self.levels['unless'] > 0:
+            word.in_conditional = True
+        if self.levels['for'] > 0 or self.levels['while'] > 0:
+            word.in_loop = True
         
-    def annotate_loop_words(self, command_dict: dict[int, CommandWord], lines: list[str]) -> dict[int, CommandWord]:
-        loop_keywords = ['#for', '#end for', '#while', '#end while']
-
-        for_level = 0
-        while_level = 0
-
-        for i, line in enumerate(lines):
-            # incremet loop depth levels
-            if line.startswith('#for '):
-                self.logger.log(1, 'for loop encountered')
-                for_level += 1
-            if line.startswith('#while '):
-                self.logger.log(1, 'for loop encountered')
-                while_level += 1
-
-            # decrement loop depth levels
-            if '#end for' in line:
-                for_level -= 1
-            if '#end while' in line:
-                while_level -= 1
-
-            if not any([line.startswith(kw) for kw in self.keywords]):
-                if for_level > 0 or while_level > 0:
-                    for cmd_word in command_dict[i]:
-                        cmd_word.in_loop = True
-                #print(command_dict[i].in_loop, command_dict[i].text)
-
-        return command_dict
-
-
-    def convert_to_words(self, command_dict: dict[int, CommandWord]) -> list[CommandWord]:
-        command_lines = list(command_dict.items())
-        command_lines.sort(key = lambda x: x[0])
-        command_lines = [line for num, line in command_lines]
-        command_words = [item for word in command_lines for item in word]
-        return command_words
+        return word
 
 
     def translate_gx_keywords(self, command_words: list[CommandWord]) -> list[CommandWord]:
-        for word in command_words:
-            gx_keyword_value = get_galaxy_keyword_value(word.text)
-            if gx_keyword_value != None:
-                word.text = gx_keyword_value
+        for statement_block, cmd_words in command_words.items():
+            for word in cmd_words:
+                gx_keyword_value = get_galaxy_keyword_value(word.text)
+                if gx_keyword_value != None:
+                    word.text = gx_keyword_value
 
         return command_words
 
 
-    def truncate_extra_commands(self, command_words: list[CommandWord]) -> list[CommandWord]:
-        first_command_complete = False
-        cutoff = -1
+    def pretty_print_command_words(self) -> None:
+        print('Command Words --------------------------------------------------------------- \n')
+        for statement_block, cmd_words in self.command_words.items():
+            for word in cmd_words:
+                print(f'{word.text[:39]:40}{statement_block:>5}')
+        print()
 
-        for i, word in enumerate(command_words):
-            if word.text == '>':
-                if first_command_complete:
-                    cutoff = i
-                    break
-                else:
-                    first_command_complete = True
+    
+    # deprecated
+    # def truncate_extra_commands(self, command_words: list[CommandWord]) -> list[CommandWord]:
+    #     first_command_complete = False
+    #     cutoff = -1
 
-            elif word.text == '|':
-                if first_command_complete:
-                    cutoff = i
-                    break
-                else:
-                    self.logger.log(2, "pipe encountered as end of 1st command")
+    #     for i, word in enumerate(command_words):
+    #         if word.text == '>':
+    #             if first_command_complete:
+    #                 cutoff = i
+    #                 break
+    #             else:
+    #                 first_command_complete = True
+
+    #         elif word.text == '|':
+    #             if first_command_complete:
+    #                 cutoff = i
+    #                 break
+    #             else:
+    #                 self.logger.log(2, "pipe encountered as end of 1st command")
         
-        # truncate or keep all cmd words 
-        if cutoff != -1:
-            out_words = command_words[:cutoff]
-            self.logger.log(0, "multiple commands encountered")
-        else:
-            out_words = command_words
+    #     # truncate or keep all cmd words 
+    #     if cutoff != -1:
+    #         out_words = command_words[:cutoff]
+    #         self.logger.log(0, "multiple commands encountered")
+    #     else:
+    #         out_words = command_words
 
-        return out_words
-
-
+    #     return out_words
 
 
 
-
-
-    ## unused ------------------------
-    def split_by_sep(self, the_input: Union[list[str], str], sep: str) -> list[str]:
-        """
-        splits a list or string by sep
-        if list, attempts to split each elem using the sep
-        flattens the output list to 1 dimension. returns list.
-        """
-        out_list: list[str] = []
-
-        # if a string
-        if type(the_input) == str:
-            out_list += self.split_string_clean(the_input, sep) # type: ignore
-
-        # if a list
-        if type(the_input) == list:
-            for elem in the_input:
-                out_list += self.split_string_clean(elem, sep)
-                
-        return out_list
-
-
-    def split_string_clean(self, the_string: str, sep: str) -> list[str]:
-        """
-        splits string, then removes empty elems and elem whitespace
-        """
-        the_list = the_string.split(sep)
-        the_list = [item.strip(' ').strip('\t') for item in the_list]
-        the_list = [item for item in the_list if item != '']
-        return the_list
-
-    def is_inside_quote_pairs(self, loc: int, the_string: str) -> bool:
-        print(the_string[loc - 10: loc + 10])
-        
-        elem_count = the_string.split("'")
-        if len(elem_count) % 2 == 0:
-            return True
-
-        elem_count = the_string.split('"')
-        if len(elem_count) % 2 == 0:
-            return True
-
-        return False
 

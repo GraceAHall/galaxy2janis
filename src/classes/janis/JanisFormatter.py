@@ -71,14 +71,23 @@ class JanisFormatter:
         out_str += f'\tbase_command={base_command},\n'
         out_str += f'\tinputs=inputs,\n'
         out_str += f'\toutputs=outputs,\n'
-        if self.tool.container_status != 'ok':
-            out_str += (f'\t# contaniner {self.tool.container_status}. tool requirement version was {self.tool.container_target_version}\n')
 
-        out_str += f'\tcontainer="{container}",\n'
+        if self.container_version_mismatch():
+            out_str += (f'\t# WARN contaniner version mismatch. \n\ttool requirement version was {self.tool.main_requirement["version"]}\n')
+
+        out_str += f'\tcontainer="{container["url"]}",\n'
         out_str += f'\tversion="{version}",\n'
         out_str += ')\n'
 
         return out_str
+
+
+    def container_version_mismatch(self) -> bool:
+        target_version = self.tool.main_requirement['version']
+        acquired_version = self.tool.container['version']
+        if target_version != acquired_version:
+            return True
+        return False
 
 
     def infer_base_command(self) -> str:

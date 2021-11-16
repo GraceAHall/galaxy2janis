@@ -3,7 +3,7 @@
 
 
 from classes.command.Command import Token, TokenType
-from classes.command.CommandProcessor import CommandWord
+from classes.command.CommandWord  import CommandWord
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from utils.regex_utils import (
@@ -15,6 +15,13 @@ from utils.regex_utils import (
     get_linux_operators,
     get_keyval_pairs
 )
+
+
+def remove_ands_from_line(line: str) -> str:
+    line_elems = line.split(' ')
+    line_elems = [e for e in line_elems if e != '&&' and e != ';']
+    line_elems = [e for e in line_elems if e != '']
+    return ' '.join(line_elems)
 
 
 def init_cmd_word(text: str, token=None) -> CommandWord:
@@ -39,9 +46,6 @@ def get_best_token(word: CommandWord, param_register: ParamRegister, out_registe
     # get best-fit token for each form of curr_word 
     for text in word.expanded_text:
         temp_tokens = get_all_tokens(text, word.statement_block, param_register, out_register)
-        if len(temp_tokens) == 0:
-            print('could not resolve token')
-            self.logger.log(2, 'could not resolve token')
         
         best_token = select_highest_priority_token(temp_tokens)
         tokens.append(best_token)
@@ -110,7 +114,6 @@ def get_all_tokens(text: str, statement_block: int, param_register: ParamRegiste
 
     # fallback
     if len(tokens) == 0:
-        self.logger.log(1, f'can resolve token {text}')
         tokens += [Token(text, statement_block, TokenType.RAW_STRING)]
 
     return tokens

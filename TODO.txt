@@ -15,6 +15,7 @@ untested:
 
 Today:
     - bugs
+        - busco --limit being weird. shows a larger bug involving multiple references to something in command string
         - repeat tags in tool xml (will solve issues?)
         - could not resolve token
             repeatmasker, cutadapt and a million others

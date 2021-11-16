@@ -1,192 +1,73 @@
 
 
+from collections import defaultdict
 from typing import Tuple
 import regex as re
 
+from classes.command.Alias import AliasRegister
 from classes.command.Command import Command, Token, TokenType
+from classes.command.CommandWord  import CommandWord
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
 from classes.Logger import Logger
 
-
 from utils.regex_utils import find_unquoted
-
-
-class CommandWord:
-    def __init__(self, text: str, statement_block: int):
-        self.text = text
-        self.statement_block = statement_block
-        self.in_loop = False
-        self.in_conditional = False
-        self.expanded_text: list[str] = []
+from utils.command_utils import get_best_token, init_cmd_word
 
 
 class CommandProcessor:
-    def __init__(self, lines: list[str], cmd_words: list[CommandWord], param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
+    def __init__(self, command_words: dict[int, list[CommandWord]], param_register: ParamRegister, out_register: OutputRegister, alias_register: AliasRegister, logger: Logger):
         """
         Command class receives the CommandLines
         """
+        self.command_words = command_words
+        self.command_tokens: dict[int, list[list[Token]]] = {}
         self.param_register = param_register
         self.out_register = out_register
+        self.alias_register = alias_register
         self.logger = logger
-        self.lines = lines
-        self.cmd_words = cmd_words
-        self.env_vars: list[str] = []
-        self.cmd_tokens: list[Token] = []
+
+        # TODO include the following
+        # or maybe not? 
+        # self.main_requirement = main_requirement
 
 
     def process(self) -> Command:
-        self.standardise_cmd_words()
-        #self.extract_env_vars()
-        self.extract_aliases()
-        self.expand_aliases()
-        self.tokenify_command()
-        command = self.gen_command()
-        return command
-
-
-    def print_command_words(self) -> None:
-        print()
-        print(f'{"word":60s}{"cond":>6}{"loop":>6}')
-        for word in self.cmd_words:
-            print(f'{word.text:60s}{word.in_conditional:6}{word.in_loop:6}')
+        for statement_block, cmd_words in self.command_words.items():
+            cmd_words = self.expand_aliases(cmd_words)
+            cmd_tokens = self.tokenify_cmd_words(cmd_words)
+            self.command_tokens[statement_block] = cmd_tokens
         
-
-    def pretty_print_tokens(self) -> None:
-        print('tokens --------------')
-        print(f'{"text":<20}{"gx_ref":20}{"type":25}{"in_cond":10}{"sblock":>5}')
-        counter = 0
-        for token_list in self.cmd_tokens:
-            counter += 1
-            for token in token_list:
-                print(f'{counter:<3}{token}')
+        best_block = self.get_best_statement_block()
+        self.command = self.gen_command(best_block)
 
 
-    def standardise_cmd_words(self) -> None:
-        """
-        env vars and aliases are already standardised to correct format.
-        only cmd_words need to be addressed. 
-        """
-        for word in self.cmd_words:
-            word.text = self.standardise_var_format(word.text)
-
-
-    def standardise_var_format(self, text: str) -> str:
-        """
-        modifies cmd word to ensure the $var format is present, 
-        rather than ${var}
-        takes a safe approach using regex and resolving all vars one by one
-        """
-        matches = re.finditer(r'\$\{[\w.]+\}', text)
-        matches = [[m[0], m.start(), m.end()] for m in matches]
-
-        if len(matches) > 0:
-            m = matches[0]
-            # this is cursed but trust me it removes the 
-            # curly braces for the match span
-            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
-            text = self.standardise_var_format(text)
-
-        return text    
-                   
-
-           
-
-
-    # def extract_mv_aliases(self, line: str) -> list[Tuple[str, str]]:
-    #     """
-    #     mv ${output_dir}/summary.tab '$output_summary'
-    #     mv '${ _aligned_root }.2${_aligned_ext}' '$output_aligned_reads_r'
-    #     mv circos.svg ../
-    #     mv circos.svg outputs/circos.svg
-
-    #     mv input_file.tmp output${ ( $i + 1 ) % 2 }.tmp
-        
-    #     """
-    #     if line.startswith('mv '):
-    #         arg1, arg2 = line.split(' ')[-2:]
-
-    #         # for ../ where we move the fileyntax where only FILE is given (no DEST)
-    #         if arg1.startswith('-'):
-    #             arg1 = arg2
-
-    #         # set the source
-    #         dest = self.get_source(arg1)
+    def expand_aliases(self, cmd_words: list[CommandWord]) -> list[CommandWord]:
+        # is this the way to go? 
+        # not sure about expanded text rip
+        for word in cmd_words:
+            word.expanded_text = self.alias_register.template(word.text)
             
-    #         # set the dest
-    #         source = self.get_dest(arg2)
-
-    #         #print(line)
-    #         #print(f'{source} --> {dest}')
-    #         if source is not None and dest is not None:
-    #             self.aliases.add(source, dest, 'mv', line) 
+        return cmd_words
 
 
-    # develop later. too complex. 
-    # def extract_for_aliases(self, line: str) -> list[Tuple[str, str]]:
-    #     """
-    #     #for $bed in $names.beds
-    #     #for i, e in enumerate($input_cond.inS)
-    #     #for $i in $input_format_cond.input:
-    #         --input '${i}' '${i.hid}'
-
-    #     """
-    #     # use match groups? 
-    #     aliases = []
-    #     return aliases
-
-    def expand_aliases(self) -> None:
-        for cmd_word in self.cmd_words:
-            cmd_forms = self.aliases.template(cmd_word.text)
-            # if len(cmd_forms) == 0:
-            #     print()
-            cmd_word.expanded_text = cmd_forms
-
-
-    def extract_env_vars(self) -> None:
-        """
-        export TERM=vt100
-        export AUGUSTUS_CONFIG_PATH=`pwd`/augustus_dir/ &&
-        export BCFTOOLS_PLUGINS=`which bcftools | sed 's,bin/bcftools,libexec/bcftools,'`;
-        export MPLCONFIGDIR=\$TEMP &&
-        export JAVA_OPTS="-Djava.awt.headless=true -Xmx\${GALAXY_MEMORY_MB:-1024}m"
-        `pwd` -> set this as a known function? 
-
-        Just ignoring this for now. not used anyway and possibly a little complex.
-        """
-        env_vars = []
-
-        # for line in self.lines:
-        #     if line.startswith('export '):
-        #         left, right = self.split_variable_assignment(line)
-        #         left = left[7:] # removes the 'export ' from line start
-
-        #         # set the source
-        #         source = self.get_source(left)
-        #         dest = None # not even gonna worry about what it means. just marking as exists
-            
-        #         if source is not None:
-        #             env_vars.append(source) 
-
-        self.env_vars = env_vars
-
-
-    def tokenify_command(self) -> None:
+    def tokenify_cmd_words(self, cmd_words: list[CommandWord]) -> list[CommandWord]:
         cmd_tokens: list[Token] = []
 
-        for word in self.cmd_words:
+        for word in cmd_words:
             # get initial token
-            token = self.get_best_token(word, self.param_register, self.out_register)
+            token = get_best_token(word, self.param_register, self.out_register)
 
             # possibly split token if GX_PARAM is hiding flags or options
             if token.type == TokenType.GX_PARAM:
                 tokens = self.expand_galaxy_tokens(token)
+                print()
             else:
                 tokens = [token]
 
             cmd_tokens.append(tokens)
 
-        self.cmd_tokens = cmd_tokens
+        return cmd_tokens
 
 
     def expand_galaxy_tokens(self, token: Token) -> list[Token]:
@@ -214,8 +95,8 @@ class CommandProcessor:
 
                 # else its a single word or a quoted phrase TODO CHECK THIS
                 else:
-                    new_word = self.init_cmd_word(val, token=token)
-                    new_token = self.get_best_token(new_word, self.param_register, self.out_register)
+                    new_word = init_cmd_word(val, token=token)
+                    new_token = get_best_token(new_word, self.param_register, self.out_register)
                 
                 # transfer properties
                 new_token.in_conditional = token.in_conditional
@@ -242,17 +123,46 @@ class CommandProcessor:
         return True
 
 
-    def gen_command(self) -> None:
+    def get_best_statement_block(self) -> list[list[Token]]:
         """
+        just counts the number of galaxy objects and kvpairs which
+        appear in each block. simple for now. 
+        """
+        # single command block
+        if len(self.command_tokens) == 1:
+            return self.command_tokens[0]
+
+        # multiple command blocks
+        # tally num gx objs per block
+        # now thats nested!
+        block_scores_dict = defaultdict(int)
+        for statement_block, cmd_tokens in self.command_tokens.items():
+            for line_tokens in cmd_tokens:
+                for token in line_tokens:
+                    if token.type in [TokenType.GX_OUT, TokenType.GX_PARAM, TokenType.KV_PAIR]:
+                        block_scores_dict[statement_block] += 1
+
+        # sort by tally and return best
+        block_scores = list(block_scores_dict.items())
+        block_scores.sort(key=lambda x: x[1], reverse=True)
+        best_block = block_scores[0][0]
+
+        return self.command_tokens[best_block]
+
+
+    def gen_command(self, command_tokens: list[Token]) -> Command:
+        """
+        goes through the tokens to work out command structure
+        looks ahead to resolve difference between flag and opt with arg etc
 
         """
         command = Command()
         i = 0
 
         # iterate through command words (with next word for context)
-        while i < len(self.cmd_tokens) - 1:
-            curr_tokens = self.cmd_tokens[i]
-            next_tokens = self.cmd_tokens[i+1]
+        while i < len(command_tokens) - 1:
+            curr_tokens = command_tokens[i]
+            next_tokens = command_tokens[i+1]
 
             should_skip_next = False
             for ctoken in curr_tokens:
@@ -283,8 +193,8 @@ class CommandProcessor:
         """
         curr_word, next_word, delim = self.split_keyval_to_cmd_words(kv_token)
 
-        curr_token = self.get_best_token(curr_word, self.param_register, self.out_register)
-        next_token = self.get_best_token(next_word, self.param_register, self.out_register)
+        curr_token = get_best_token(curr_word, self.param_register, self.out_register)
+        next_token = get_best_token(next_word, self.param_register, self.out_register)
 
         if curr_token.gx_ref == '':
             curr_token.gx_ref = kv_token.gx_ref
@@ -309,8 +219,8 @@ class CommandProcessor:
         delim, delim_start, delim_end = self.get_first_unquoted(text, possible_delims)
         left_text, right_text = text[:delim_start], text[delim_end:]
        
-        curr_word = self.init_cmd_word(left_text, token=kv_token)
-        next_word = self.init_cmd_word(right_text, token=kv_token)
+        curr_word = init_cmd_word(left_text, token=kv_token)
+        next_word = init_cmd_word(right_text, token=kv_token)
 
         return curr_word, next_word, delim
 
@@ -332,8 +242,22 @@ class CommandProcessor:
         return hits[0]
 
 
+    def print_command_words(self) -> None:
+        print()
+        print(f'{"word":60s}{"cond":>6}{"loop":>6}')
+        for word in self.cmd_words:
+            print(f'{word.text:60s}{word.in_conditional:6}{word.in_loop:6}')
+        
     
-
+    # deprecated
+    def pretty_print_tokens(self) -> None:
+        print('tokens --------------')
+        print(f'{"text":<20}{"gx_ref":20}{"type":25}{"in_cond":10}{"sblock":>5}')
+        counter = 0
+        for token_list in self.cmd_tokens:
+            counter += 1
+            for token in token_list:
+                print(f'{counter:<3}{token}')
 
     
 

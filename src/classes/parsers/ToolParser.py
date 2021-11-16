@@ -193,10 +193,10 @@ class ToolParser:
             cpar.pretty_print_command_words()
         
         # create Command() object
-        cpro = CommandProcessor(cpar.lines, cpar.command_words, self.param_register, self.out_register, self.logger) # type: ignore
-        command = cpro.process()
-        cpro.pretty_print_tokens()
-        self.command = command
+        cpro = CommandProcessor(cpar.command_words, self.param_register, self.out_register, cpar.alias_register, self.logger) # type: ignore
+        cpro.process()
+        #cpro.pretty_print_tokens()
+        self.command = cpro.command
 
 
     # 8th step: annotating with datatypes
@@ -218,6 +218,7 @@ class ToolParser:
         tool.version = self.tool_version
         tool.creator = None  # TODO this is just temp
         tool.container = self.container
+        tool.main_requirement = self.main_requirement
         tool.tests = None  # TODO this is just temp
         tool.help = self.help
         tool.citations = self.citations
