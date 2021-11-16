@@ -6,26 +6,39 @@
 import sys
 import os
 from typing import Tuple
+import argparse
+
 
 
 from classes.parsers.ToolParser import ToolParser
 import xml.etree.ElementTree as et
 
 # main entry point
-def main(argv: list[str]):
-    tool_xml = argv[0]
-    tool_workdir = argv[1]
-    
+def main():
+    args = handle_program_args()
+
     # check we have the right file
-    if is_valid_tool_xml(tool_xml, tool_workdir):
+    if is_valid_tool_xml(args.toolxml, args.tooldir):
         
         # init outdir and contents
-        out_log, out_def = init_out_files(tool_xml, tool_workdir)
+        out_log, out_def = init_out_files(args.toolxml, args.tooldir)
 
         # parse tool 
-        tp = ToolParser(tool_xml, tool_workdir, out_log, out_def)
+        tp = ToolParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
         tp.parse()
+    
 
+def handle_program_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("toolxml", help="tool xml file")
+    parser.add_argument("tooldir", help="tool directory")
+    parser.add_argument( "--debug", help="run in debug mode (writes many lines to stdout)", action="store_true")
+    args = parser.parse_args()
+
+    if args.debug:
+        print('running in debug mode')
+
+    return args
 
 
 
@@ -69,7 +82,7 @@ def is_valid_tool_xml(filename: str, workdir: str) -> bool:
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
 
 
 

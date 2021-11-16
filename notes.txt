@@ -96,7 +96,11 @@ General Notes ------------------------------------------------------------------
     - this allows us to then parse gx workflows and actually understand what tool definition the janis should load. 
 
 
-
+- tricky command line situations
+    coords2clnt.py --threeprime '$alignment_coordinates' > '$crosslinking_coordinates'
+    is the $alignment_coordinates standalone, or an opt with --threeprime as prefix? its standalone in this case but really looks like an opt. --threeprime is a flag
+    
+- anything line beginning with with #silent is removed
 
 
 end ------------------------------------------------------------------------------

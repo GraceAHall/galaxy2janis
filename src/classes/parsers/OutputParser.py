@@ -113,6 +113,7 @@ class OutputParser:
         print('-' * 110)
         for output in self.outputs:
             print(output)
+        print('\n')
 
 
     # def initialize_collection_output(self, node: et.Element) -> Output:

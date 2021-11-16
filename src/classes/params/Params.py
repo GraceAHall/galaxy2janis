@@ -117,8 +117,8 @@ class Param:
         temp_prefix = self.argument or ''
         datatype = self.galaxy_type
         if type(self).__name__ == "BoolParam":
-            datatype += f'({self.subtype})'
-        return f'{self.gx_var[-49:]:50}{datatype[-14:]:15}{temp_prefix[-19:]:20}{self.default_value:20}'
+            datatype = 'boolean'
+        return f'{self.gx_var[-49:]:50}{datatype[-14:]:15}'
 
 
 
@@ -192,6 +192,28 @@ class BoolParam(Param):
         if self.truevalue != '':
             return self.truevalue
         return self.falsevalue
+
+
+    def values_are_flags(self) -> bool:
+        # get values and remove any key/val pairs
+        values = [self.truevalue, self.falsevalue]
+        values = [v for v in values if '=' not in v and ' ' not in v]
+        
+        # none were keyvals
+        if len(values) == 2:
+            num_blanks = len([v for v in values if v == ''])
+            num_opts = len([v for v in values if v.startswith('-')])
+            
+            # one is flag, other is empty
+            if num_blanks == 1 and num_opts == 1:
+                return True
+
+            # both are flags but different
+            if num_opts == 2 and values[0] != values[1]:
+                return True
+
+        return False
+
 
 
 
@@ -287,7 +309,27 @@ class SelectParam(Param):
         if len(options) > 0:
             self.help_text += f'  example values: {options}'
 
+    
+    def values_are_flags(self) -> bool:
+        if len(self.options) == 0:
+            return False
 
+        # get blanks or opt looking items
+        opts = [o for o in self.options if o.startswith('-') or o == '']
+
+        # remove kv pairs
+        opts = [o for o in opts if '=' not in o and ' ' not in o]
+
+        # all thats left are flags and blanks. 
+        # ensure there is at least 2 nonblanks
+        nonblanks = [o for o in opts if o != '']
+        if len(nonblanks) >= 2:
+            # if this is same length as original list (self.options), theyre probably individual flags
+            if len(opts) == len(self.options):
+                return True
+        
+        return False
+        
 
 class DataCollectionParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str]):

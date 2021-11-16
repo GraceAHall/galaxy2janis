@@ -12,24 +12,38 @@ import regex as re
 from classes.Logger import Logger
 
 
+class Container: 
+    def __init__(self):
+        self.tool: str = ''
+        self.version: str = ''
+        self.url: str = ''
+        self.image_type: str = ''
+        self.registry_host: str = ''
+
+
 class ContainerFetcher:
     def __init__(self, tool_id: str, tool_version: str, requirements: list[dict[str, Union[str, int]]], logger: Logger) -> None:
         self.tool_id = tool_id
         self.tool_version = tool_version
         self.requirements = requirements
         self.logger = logger
-        self.main_requirement = None
+
         self.container_cache = None
         self.container_cache_path = 'container_cache/cache.json' 
-        self.container_url = None
-        self.container_status = 'ok'
+        self.main_requirement: Optional[dict[str, str]] = None
+        self.container: dict[str, str] = {
+            'tool': '',
+            'version': '',
+            'url': '',
+            'image_type': '',
+            'registry_host': ''
+        }
 
 
     def fetch(self):
         self.identify_main_requirement()
         self.load_container_cache()
         self.set_container()
-        return self.container_url, self.container_status, self.main_requirement["version"]
 
 
     def identify_main_requirement(self) -> None:
@@ -96,30 +110,30 @@ class ContainerFetcher:
         currently can't do this because their servers are very very slow
         """
 
-        container_url = ''
+        container = None
   
         if self.url_is_cached(self.tool_id, self.tool_version):
-            container_url = self.container_cache[self.tool_id][self.tool_version]
+            self.container = self.container_cache[self.tool_id][self.tool_version]
 
         else:
             if self.main_requirement['type'] == 'package':
-                container_url = self.get_container_url_by_package()
+                self.set_biocontainer_by_package()
 
             elif self.main_requirement['type'] == 'container':
-                container_url = self.get_container_url_by_container()
+                self.set_biocontainer_by_container()
 
-            self.update_container_cache(container_url)
+            self.update_container_cache()
         
-        self.container_url = container_url
         
 
-    def get_container_url_by_package(self) -> str:
+    def set_biocontainer_by_package(self) -> str:
         # get data package from api request
         request_url = f'https://api.biocontainers.pro/ga4gh/trs/v2/tools?name={self.main_requirement["name"]}&limit=10&sort_field=id&sort_order=asc'
         tool_data_list = self.make_api_request(request_url)
         
         # choose the most similar tool in package
         tool_data = self.get_most_similar_tool(self.main_requirement["name"], tool_data_list)
+        self.container['tool'] = tool_data['name']
 
         # get the api url for the chosen tool + version
         version_url = self.get_tool_version_url(tool_data, self.tool_version)
@@ -128,9 +142,10 @@ class ContainerFetcher:
         images_data = self.make_api_request(version_url)
 
         # select the biocontainers image
-        biocontainer_image_url = self.get_biocontainer_image_url(images_data)
-
-        return biocontainer_image_url
+        biocontainer_image = self.get_biocontainer_image(images_data)
+        self.container['url'] = biocontainer_image['image_name']
+        self.container['image_type'] = biocontainer_image['image_type']
+        self.container['registry_host'] = biocontainer_image['registry_host']
 
 
     def make_api_request(self,  request_url: str) -> dict:
@@ -186,6 +201,11 @@ class ContainerFetcher:
         # try again if failed but just select the most similar numerically
         if chosen_version == '':
             chosen_version = self.get_version_from_trimmed_inexact(image_versions, target_version)
+        
+        # this is really messy. I shouldnt be doing it like this.
+        # setting important things shouldn't be buried in some 
+        # random func like here. 
+        self.container['version'] = chosen_version
 
         # actually get the chosen version url
         if chosen_version != '':
@@ -199,7 +219,6 @@ class ContainerFetcher:
     def get_version_from_vanilla(self, exact_versions: list[str], target_version: str) -> str:
         for meta_version in exact_versions:
             if meta_version == target_version:
-                self.container_status = 'ok'
                 return meta_version
         return ''
 
@@ -235,7 +254,6 @@ class ContainerFetcher:
         """
         for meta_version, trans_version in image_versions:
             if trans_version == target_version:
-                self.container_status = 'nonidentical version name'
                 return meta_version
 
         return ''
@@ -256,7 +274,6 @@ class ContainerFetcher:
             v_comparison_array = self.get_version_comparison(trans_version, target_version, array_size)
             version_comparisons.append([meta_version, trans_version, v_comparison_array])
 
-        self.container_status = 'version mismatch'
         return self.get_most_similar_version(version_comparisons)
 
         
@@ -297,7 +314,7 @@ class ContainerFetcher:
         return version_comparisons[0][0]
 
 
-    def get_biocontainer_image_url(self, images_data: dict) -> str:
+    def get_biocontainer_image(self, images_data: dict) -> str:
         # get images of correct version
         version_level_images = []
         for image in images_data['images']:
@@ -314,10 +331,10 @@ class ContainerFetcher:
             images_dates.append((date_val, image))
 
         images_dates.sort(key = lambda x: x[0], reverse=True)
-        return images_dates[0][1]['image_name']
+        return images_dates[0][1]
         
         
-    def get_container_url_by_container(self) -> str:
+    def set_biocontainer_by_container(self) -> str:
         self.logger.log(0, 'container requirement encountered')
         container_url = 'quay.io/biocontainers/' + self.main_requirement['name']
         return container_url
@@ -333,14 +350,14 @@ class ContainerFetcher:
             return False
 
 
-    def update_container_cache(self, container_url: str) -> None:
+    def update_container_cache(self) -> None:
         # create dict for tool_id if needed
         if self.tool_id not in self.container_cache:
             self.container_cache[self.tool_id] = {}
 
         # set the container url for that version
         if self.tool_version not in self.container_cache[self.tool_id]:
-            self.container_cache[self.tool_id][self.tool_version] = container_url
+            self.container_cache[self.tool_id][self.tool_version] = self.container
             
         # write cache to file
         with open(self.container_cache_path, 'w') as fp:

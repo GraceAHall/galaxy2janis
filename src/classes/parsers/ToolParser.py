@@ -43,9 +43,8 @@ class Tool:
         self.id: str = ""
         self.version: str = ""
         self.creator: Optional[str] = None
-        self.container: str = ""
-        self.container_status: str = ""
-        self.container_target_version: str = ""
+        self.main_requirement: Optional[dict[str, Union[str, int]]] = None
+        self.container: Optional[dict[str, str]] = None
         self.tests: Optional[str] = None
         self.help: str = ""
         self.citations: list[dict[str, str]] = []
@@ -57,9 +56,10 @@ class Tool:
 
 
 class ToolParser:
-    def __init__(self, tool_xml: str, tool_workdir: str, out_log: str, out_def: str):
+    def __init__(self, tool_xml: str, tool_workdir: str, out_log: str, out_def: str, debug: bool=False):
         self.filename = tool_xml
         self.workdir = tool_workdir
+        self.debug = debug
         self.logfile = out_log
         self.janis_out_path = out_def
         self.tree: et.ElementTree = et.parse(f'{self.workdir}/{self.filename}')
@@ -76,9 +76,8 @@ class ToolParser:
         self.tool_creator: str = ''
         self.citations: list[dict[str, str]] = []
         self.requirements: list[dict[str, Union[str, int]]] = []
-        self.container: str = ''
-        self.container_status: str = ''
-        self.container_target_version: str = ''
+        self.main_requirement: Optional[dict[str, Union[str, int]]] = None
+        self.container: Optional[dict[str, str]] = None
         self.description: str = ''
         self.help: str = ''
 
@@ -154,14 +153,18 @@ class ToolParser:
 
     def fetch_container(self):
         cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements, self.logger)
-        self.container, self.container_status, self.container_target_version = cf.fetch() # type: ignore
+        cf.fetch()
+
+        self.main_requirement = cf.main_requirement # type: ignore
+        self.container = cf.container # type: ignore
 
 
     # 4th step: param parsing
     def parse_params(self):
         pp = ParamParser(self.tree, self.logger)
         params = pp.parse()
-        #pp.pretty_print()
+        if self.debug:
+            pp.pretty_print()
         self.param_register.add(params)
 
 
@@ -169,7 +172,8 @@ class ToolParser:
     def parse_outputs(self):
         op = OutputParser(self.tree, self.param_register, self.logger)
         outputs = op.parse() 
-        #op.pretty_print()
+        if self.debug:
+            op.pretty_print()
         self.out_register.add(outputs)
 
 
@@ -183,14 +187,15 @@ class ToolParser:
     # 7th step: command parsing 
     def parse_command(self):
         # parse command text into useful representation
-        cp = CommandParser(self.tree, self.logger)
-        lines, commands = cp.parse()
-        #command.pretty_print()
+        cpar = CommandParser(self.tree, self.logger)
+        cpar.parse()
+        if self.debug:
+            cpar.pretty_print_command_words()
         
         # create Command() object
-        cs = CommandProcessor(lines, commands, self.param_register, self.out_register, self.logger) # type: ignore
-        command = cs.process()
-        #command.pretty_print()
+        cpro = CommandProcessor(cpar.lines, cpar.command_words, self.param_register, self.out_register, self.logger) # type: ignore
+        command = cpro.process()
+        cpro.pretty_print_tokens()
         self.command = command
 
 
@@ -198,7 +203,8 @@ class ToolParser:
     def annotate_datatypes(self):
         da = DatatypeAnnotator(self.command, self.param_register, self.out_register, self.logger)
         da.annotate()
-        #self.command.pretty_print()
+        if self.debug:
+            self.command.pretty_print()
 
 
     def init_tool(self):
@@ -212,8 +218,6 @@ class ToolParser:
         tool.version = self.tool_version
         tool.creator = None  # TODO this is just temp
         tool.container = self.container
-        tool.container_status = self.container_status
-        tool.container_target_version = self.container_target_version
         tool.tests = None  # TODO this is just temp
         tool.help = self.help
         tool.citations = self.citations

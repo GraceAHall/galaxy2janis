@@ -34,6 +34,7 @@ class CommandParser:
         self.tree = tree
         self.logger = logger
         self.keywords = self.get_keywords()
+        self.statement_block = 0
 
 
     def get_keywords(self) -> None:
@@ -52,9 +53,10 @@ class CommandParser:
         # clean the command string
         command_string = self.get_command_string()
         command_string = self.simplify_stdio(command_string)
+        commands = self.split_command()
         lines = self.split_command(command_string)
         lines = self.remove_comments(lines)
-        lines = self.remove_ands(lines)
+        #lines = self.remove_ands(lines)
         lines = self.remove_bash_constructs(lines)
         lines = self.remove_cheetah_definitions(lines)
         lines = self.remove_cheetah_misc(lines)
@@ -71,9 +73,17 @@ class CommandParser:
         command_words = self.truncate_extra_commands(command_words)
 
         # post sentinel & return
-        command_words.append(CommandWord('__END_COMMAND__'))
-        return lines, command_words
+        command_words.append(CommandWord('__END_COMMAND__', self.statement_block))
+        self.lines = lines
+        self.command_words = command_words
  
+
+    def pretty_print_command_words(self) -> None:
+        print('Command Words --------------------------------------------------------------- \n')
+        for word in self.command_words:
+            print(f'{word.text[:39]:40}{word.statement_block:>5}')
+        print()
+
 
     def get_command_string(self) -> str:
         command_string = ''
@@ -135,6 +145,7 @@ class CommandParser:
         return clean_list
     
 
+    # deprecated
     def remove_ands(self, command_list: list[str]) -> list[str]:
         """
         very basic approach. could use a quotes safe approach like for comments, but likely not needed. either way probably doesn't matter if we delete them. 
@@ -194,13 +205,12 @@ class CommandParser:
         """
         yea yea
         """
-        banned_firstwords = ['#import', '#from', '#break', '#continue', '#pass', '#assert']
+        banned_firstwords = ['#import', '#from', '#break', '#continue', '#pass', '#assert', '#silent']
         out = []
         
         # delete non-necessary words
         for line in command_lines:
             line = line.replace('#slurp ', '')
-            line = line.replace('#silent ', '')
         
             # only keep lines which don't start with keywords
             if not line.split(' ')[0] in banned_firstwords:
@@ -221,6 +231,7 @@ class CommandParser:
         the CommandWords will be annotated later with the constructs they appear in 
         """
         command_words = {}
+        self.statement_block = 0
 
         for i, line in enumerate(lines):
             if not any([line.startswith(kw) for kw in self.keywords]):
@@ -228,8 +239,12 @@ class CommandParser:
                 words = get_words(line)
 
                 for word in words:
-                    new_cmd_word = CommandWord(word)
-                    command_words[i].append(new_cmd_word)
+                    if word == '&&' or word == ';':
+                        self.statement_block =+ 1
+                        continue
+                    else:
+                        new_cmd_word = CommandWord(word, self.statement_block)
+                        command_words[i].append(new_cmd_word)
 
         return command_words
 

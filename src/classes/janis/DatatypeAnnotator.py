@@ -80,13 +80,16 @@ class DatatypeAnnotator:
     def get_datatype_by_format(self, gxformat: str) -> Optional[dict[str, str]]:
         if gxformat in self.format_datatype_map:
             datatypes = self.format_datatype_map[gxformat]
+
+            if len(datatypes) == 0:
+                return None
             
             if len(datatypes) > 1:            
                 for dtype in datatypes:
                     if dtype['source'] == 'janis':
                         return dtype
 
-                return datatypes[0]
+            return datatypes[0]
         
         return None
     
@@ -144,28 +147,35 @@ class DatatypeAnnotator:
     def annotate(self) -> None:
         for item in self.command.positionals.values():
             self.annotate_positional(item)
+            self.assert_has_datatype(item)
 
         for item in self.command.options.values():
             self.annotate_option(item)
+            self.assert_has_datatype(item)
         
         for item in self.out_register.get_outputs():
             self.annotate_output(item)
+            self.assert_has_datatype(item)
 
 
     def annotate_positional(self, the_positional) -> None:
         # can be string, int, float, file type (fasta, html etc)   
         the_positional.datatypes = self.get_token_datatypes(the_positional.token)
-        self.assert_has_datatype(the_positional)
         
 
     def assert_has_datatype(self, obj):
         datatypes = [d for d in obj.datatypes if d is not None]
+
+        if type(obj) == Output:
+            print()
         
         if len(datatypes) == 0:
             if type(obj) == Positional:
-                self.logger.log(2, f'missing datatype for positional {obj.token.text}')
-            else:
-                self.logger.log(2, f'missing datatype for positional {obj.sources[0].text}')
+                self.logger.log(2, f'missing datatype for Positional {obj.token.text}')
+            elif type(obj) in [Flag, Option]:
+                self.logger.log(2, f'missing datatype for {type(obj)} {obj.sources[0].text}')
+            elif type(obj) == Output:
+                self.logger.log(2, f'missing datatype for Output {obj.gx_var}')
 
 
     def get_token_datatypes(self, the_token: Token) -> list[dict[str, str]]:
@@ -335,7 +345,6 @@ class DatatypeAnnotator:
             source_datatypes.append([token.type, datatypes])
 
         the_option.datatypes = self.select_datatypes_source(source_datatypes)
-        self.assert_has_datatype(the_option)
 
 
     def annotate_output(self, the_output: Output) -> None:
@@ -343,16 +352,14 @@ class DatatypeAnnotator:
         a little different to the others. runs on a galaxy output obj not tokens
         """
         the_output.datatypes = self.get_output_datatype(the_output)
-        self.assert_has_datatype(the_output)
 
 
     def get_output_datatype(self, the_output: Output) -> list[str]:
         # try from galaxy_type first
         if the_output.galaxy_type != '':
-            gxformat_list = the_output.galaxy_type.split(',')
-
-            # TODO CHECK THIS
+            
             datatypes = []
+            gxformat_list = the_output.galaxy_type.split(',')
             for gxformat in gxformat_list:
                 datatypes.append(self.get_datatype_by_format(gxformat))
 

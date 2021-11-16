@@ -1,12 +1,15 @@
 
 
+from typing import Union, Tuple
+import sys 
+import io
+
 
 from classes.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType, Token
 from classes.outputs.Outputs import Output
 from classes.params.Params import Param
 
-from typing import Union, Tuple
 
 class JanisFormatter:
     def __init__(self, tool, janis_out_path: str, logger: Logger) -> None:
@@ -449,7 +452,7 @@ class JanisFormatter:
 
         """
 
-        with open(self.janis_out_path, 'w') as fp:
+        with open(self.janis_out_path, 'w', encoding="utf-8") as fp:
             fp.write(self.imports + '\n\n')
 
             fp.write('inputs = [\n')

@@ -15,9 +15,9 @@ untested:
 
 Today:
     - bugs
-        - strip_to_numeric_version coords2clnt.xml
+        - repeat tags in tool xml (will solve issues?)
         - could not resolve token
-            quast, repeatmasker, cutadapt and a million others
+            repeatmasker, cutadapt and a million others
         - multiple expanded forms of cmd word
 
         - missing datatype for positional (augustus)

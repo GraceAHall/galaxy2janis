@@ -4,6 +4,8 @@
 from typing import Tuple, Optional, Union
 from enum import Enum
 from classes.outputs.OutputRegister import OutputRegister
+from classes.params.ParamRegister import ParamRegister
+from classes.params.Params import BoolParam, SelectParam
 
 from utils.regex_utils import (
     find_unquoted,
@@ -36,8 +38,9 @@ class TokenType(Enum):
 
 
 class Token:
-    def __init__(self, text: str, token_type: TokenType):
+    def __init__(self, text: str, statement_block: int, token_type: TokenType):
         self.text = text
+        self.statement_block = statement_block
         self.type = token_type
         self.in_conditional = False
         self.in_loop = False
@@ -45,7 +48,7 @@ class Token:
         
 
     def __str__(self) -> str:
-        return f'{self.text[:29]:<30}{self.gx_ref[:29]:30}{self.type.name:25}{self.in_conditional:>10}'
+        return f'{self.text[:29]:<30}{self.gx_ref[:29]:30}{self.type.name:25}{self.in_conditional:5}{self.statement_block:>10}'
 
 
 
@@ -202,7 +205,7 @@ class Command:
         self.positionals = new_positionals
 
 
-    def update(self, ctoken: Token, ntoken: Token, out_register: OutputRegister) -> None:
+    def update(self, ctoken: Token, ntoken: Token, param_register: ParamRegister, out_register: OutputRegister) -> None:
         skip_next = False
         
         # first linux '>' to stdout
@@ -211,11 +214,11 @@ class Command:
             skip_next = True
 
         # flag
-        elif self.is_flag(ctoken, ntoken):
+        elif self.is_flag(ctoken, ntoken, param_register):
             self.update_flags(ctoken)
 
         # option
-        elif self.is_option(ctoken, ntoken):
+        elif self.is_option(ctoken, ntoken, param_register):
             self.update_options(ctoken, ntoken, ' ')
             skip_next = True
 
@@ -294,19 +297,16 @@ class Command:
         return False
 
 
-    def is_flag(self, ctoken: Token, ntoken: Token) -> bool:
+    def is_flag(self, ctoken: Token, ntoken: Token, param_register: ParamRegister) -> bool:
         # is this a raw flag or option?
-        # could be a raw string or galaxy param with flag as default value 
-        curr_is_gx_flag = self.get_gx_flag_status(ctoken)
         curr_is_raw_flag = ctoken.type == TokenType.RAW_STRING and ctoken.text.startswith('-')
 
         # the current token has to be a flag 
-        if curr_is_raw_flag or curr_is_gx_flag:
-            next_is_gx_flag = self.get_gx_flag_status(ntoken)
-            next_is_raw_flag = ntoken.type == TokenType.RAW_STRING and ntoken.text.startswith('-')
+        if curr_is_raw_flag:
 
             # next token is a flag
-            if next_is_raw_flag or next_is_gx_flag:
+            next_is_raw_flag = ntoken.type == TokenType.RAW_STRING and ntoken.text.startswith('-')
+            if next_is_raw_flag:
                 return True
 
             # next token is linux operation
@@ -324,24 +324,30 @@ class Command:
         return False
 
 
-    def get_gx_flag_status(self, token: Token) -> bool:
-        if token.type == TokenType.GX_PARAM:        
-            if token.text.startswith('-'):
-                return True
+    # def get_gx_flag_status(self, token: Token, param_register: ParamRegister) -> bool:
+    #     if token.text.startswith('-'):
+    #         if token.type == TokenType.GX_PARAM:        
+    #             return True
+    #         else:
+    #             if token.gx_ref != '':
+    #                 param = param_register.get(token.gx_ref)
+                    
+    #                 if type(param) in [BoolParam, SelectParam]:
+    #                     if param.values_are_flags():
+    #                         return True
         
-        return False
+    #     return False
 
 
-    def is_option(self, ctoken: Token, ntoken: Token) -> bool:
+    def is_option(self, ctoken: Token, ntoken: Token, param_register: ParamRegister) -> bool:
         # happens 2nd after 'is_flag()'
         # already know that its not a flag, so if the current token
         # looks like a flag/option, it has to be an option. 
 
-        curr_is_gx_flag = self.get_gx_flag_status(ctoken)
         curr_is_raw_flag = ctoken.type == TokenType.RAW_STRING and ctoken.text.startswith('-')
 
         # the current token has to be a flag 
-        if curr_is_raw_flag or curr_is_gx_flag:
+        if curr_is_raw_flag:
             return True
                 
         return False

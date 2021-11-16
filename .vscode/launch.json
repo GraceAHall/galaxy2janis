@@ -82,7 +82,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "bwa-mem.xml", "tools/bwa"
+                "bwa-mem.xml", "tools/bwa", "--debug"
             ]
         },
         {
@@ -92,7 +92,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "busco.xml", "tools/busco"
+                "busco.xml", "tools/busco", "--debug"
             ]
         },
         {
@@ -102,7 +102,27 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "sortBed.xml", "tools/bedtools"
+                "sortBed.xml", "tools/bedtools", "--debug"
+            ]
+        },
+        {
+            "name": "quast",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "quast.xml", "tools/quast", "--debug"
+            ]
+        },
+        {
+            "name": "repeatmasker",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "repeatmasker.xml", "tools/repeatmasker", "--debug"
             ]
         },
         {
@@ -112,7 +132,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "coords2clnt.xml", "tools/bctools"
+                "coords2clnt.xml", "tools/bctools", "--debug"
             ]
         },
         {
@@ -122,7 +142,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "clip_overlap.xml", "tools/bamutil"
+                "clip_overlap.xml", "tools/bamutil", "--debug"
             ]
         },
         {
@@ -132,7 +152,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "lastz.xml", "tools/lastz"
+                "lastz.xml", "tools/lastz", "--debug"
             ]
         },
         {
@@ -142,7 +162,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "spades.xml", "tools/spades"
+                "spades.xml", "tools/spades", "--debug"
             ]
         },
         {
@@ -152,7 +172,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "augustus.xml", "tools/augustus"
+                "augustus.xml", "tools/augustus", "--debug"
             ]
         },
         {
@@ -162,7 +182,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "sniffles.xml", "tools/sniffles"
+                "sniffles.xml", "tools/sniffles", "--debug"
             ]
         },
         {
@@ -172,7 +192,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "bandage_image.xml", "tools/bandage"
+                "bandage_image.xml", "tools/bandage", "--debug"
             ]
         },
         {
@@ -182,7 +202,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "bandage_info.xml", "tools/bandage"
+                "bandage_info.xml", "tools/bandage", "--debug"
             ]
         },
         {
@@ -192,7 +212,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "velvetg.xml", "tools/velvet"
+                "velvetg.xml", "tools/velvet", "--debug"
             ]
         },
         {
@@ -202,7 +222,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "cutadapt.xml", "tools/cutadapt"
+                "cutadapt.xml", "tools/cutadapt", "--debug"
             ]
         },
         {
@@ -212,7 +232,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "genetrack.xml", "tools/genetrack"
+                "genetrack.xml", "tools/genetrack", "--debug"
             ]
         },
         {
@@ -222,7 +242,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "disco.xml", "tools/disco"
+                "disco.xml", "tools/disco", "--debug"
             ]
         },
         {
@@ -232,7 +252,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "abricate.xml", "tools/abricate"
+                "abricate.xml", "tools/abricate", "--debug"
             ]
         },
         {
@@ -242,7 +262,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "abricate_summary.xml", "tools/abricate"
+                "abricate_summary.xml", "tools/abricate", "--debug"
             ]
         },
         {
@@ -252,7 +272,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "clusterBed.xml", "tools/bedtools"
+                "clusterBed.xml", "tools/bedtools", "--debug"
             ]
         },
         {
@@ -262,7 +282,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "pca.xml", "tools/mothur"
+                "pca.xml", "tools/mothur", "--debug"
             ]
         },
         {
@@ -272,7 +292,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "filtlong.xml", "tools/filtlong"
+                "filtlong.xml", "tools/filtlong", "--debug"
             ]
         },
         {
@@ -282,7 +302,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "abricate.xml", "tools/abricate"
+                "abricate.xml", "tools/abricate", "--debug"
             ]
         },
         {
@@ -292,7 +312,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "annotateBed.xml", "tools/bedtools"
+                "annotateBed.xml", "tools/bedtools", "--debug"
             ]
         },
         {
@@ -302,7 +322,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "spacingBed.xml", "tools/bedtools"
+                "spacingBed.xml", "tools/bedtools", "--debug"
             ]
         },
         {
@@ -312,7 +332,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "subtractBed.xml", "tools/bedtools"
+                "subtractBed.xml", "tools/bedtools", "--debug"
             ]
         },
         {
@@ -322,7 +342,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "collection_element_identifiers.xml", "tools/collection_element_identifiers"
+                "collection_element_identifiers.xml", "tools/, "--debug"collection_element_identifiers"
             ]
         },
         {
@@ -332,7 +352,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "fastp.xml", "tools/fastp"
+                "fastp.xml", "tools/fastp", "--debug"
             ]
         },
         {
@@ -342,7 +362,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "kma_map.xml", "tools/kma"
+                "kma_map.xml", "tools/kma", "--debug"
             ]
         },
         {
@@ -352,7 +372,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "deseq2.xml", "tools/deseq2"
+                "deseq2.xml", "tools/deseq2", "--debug"
             ]
         },
         {
@@ -362,7 +382,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "abyss-pe.xml", "tools/abyss"
+                "abyss-pe.xml", "tools/abyss", "--debug"
             ]
         },
         {
@@ -372,7 +392,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "allegro.xml", "tools/allegro"
+                "allegro.xml", "tools/allegro", "--debug"
             ]
         },
         {
@@ -382,7 +402,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "export.xml", "tools/anndata"
+                "export.xml", "tools/anndata", "--debug"
             ]
         },
         {
@@ -392,7 +412,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "locuspocus.xml", "tools/aegean"
+                "locuspocus.xml", "tools/aegean", "--debug"
             ]
         },
         {
@@ -402,7 +422,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "parseval.xml", "tools/aegean"
+                "parseval.xml", "tools/aegean", "--debug"
             ]
         },
         {
@@ -412,7 +432,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "bcftools_call.xml", "tools/bcftools"
+                "bcftools_call.xml", "tools/bcftools", "--debug"
             ]
         },
         {
@@ -422,7 +442,7 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "cat_bins.xml", "tools/cat"
+                "cat_bins.xml", "tools/cat", "--debug"
             ]
         },
         {
@@ -439,7 +459,7 @@
             "program": "command_parsing/command_parser.py",
             "console": "integratedTerminal",
             "args": [
-                "command_parsing/data/busco.txt"
+                "command_parsing/data/busco.txt", "--debug"
             ]
         },
         {

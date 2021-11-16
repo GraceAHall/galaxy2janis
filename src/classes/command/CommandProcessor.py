@@ -27,8 +27,9 @@ from utils.regex_utils import (
 
 
 class CommandWord:
-    def __init__(self, text: str):
+    def __init__(self, text: str, statement_block: int):
         self.text = text
+        self.statement_block = statement_block
         self.in_loop = False
         self.in_conditional = False
         self.expanded_text: list[str] = []
@@ -55,7 +56,6 @@ class CommandProcessor:
         self.set_aliases()
         self.expand_aliases()
         self.tokenify_command()
-        #self.pretty_print_tokens()
         command = self.gen_command()
         return command
 
@@ -69,7 +69,7 @@ class CommandProcessor:
 
     def pretty_print_tokens(self) -> None:
         print('tokens --------------')
-        print(f'{"text":<20}{"gx_ref":20}{"type":25}{"in_cond":>10}')
+        print(f'{"text":<20}{"gx_ref":20}{"type":25}{"in_cond":10}{"sblock":>5}')
         counter = 0
         for token_list in self.cmd_tokens:
             counter += 1
@@ -153,7 +153,8 @@ class CommandProcessor:
 
         # update
         if source is not None and dest is not None:
-            self.aliases.add(source.text, dest.text, from_cmd, line)
+            if dest.type in [TokenType.GX_OUT, TokenType.GX_PARAM]:
+                self.aliases.add(source.text, dest.text, from_cmd, line)
         else:
             self.logger.log(1, f'could not add alias from line: {line}')
 
@@ -247,7 +248,6 @@ class CommandProcessor:
     #     aliases = []
     #     return aliases
 
-
     def expand_aliases(self) -> None:
         for cmd_word in self.cmd_words:
             cmd_forms = self.aliases.template(cmd_word.text)
@@ -264,20 +264,22 @@ class CommandProcessor:
         export MPLCONFIGDIR=\$TEMP &&
         export JAVA_OPTS="-Djava.awt.headless=true -Xmx\${GALAXY_MEMORY_MB:-1024}m"
         `pwd` -> set this as a known function? 
+
+        Just ignoring this for now. not used anyway and possibly a little complex.
         """
         env_vars = []
 
-        for line in self.lines:
-            if line.startswith('export '):
-                left, right = self.split_variable_assignment(line)
-                left = left[7:] # removes the 'export ' from line start
+        # for line in self.lines:
+        #     if line.startswith('export '):
+        #         left, right = self.split_variable_assignment(line)
+        #         left = left[7:] # removes the 'export ' from line start
 
-                # set the source
-                source = self.get_source(left)
-                dest = None # not even gonna worry about what it means. just marking as exists
+        #         # set the source
+        #         source = self.get_source(left)
+        #         dest = None # not even gonna worry about what it means. just marking as exists
             
-                if source is not None:
-                    env_vars.append(source) 
+        #         if source is not None:
+        #             env_vars.append(source) 
 
         self.env_vars = env_vars
 
@@ -321,11 +323,11 @@ class CommandProcessor:
             for val in values:
                 # in case its something like '-read_trkg yes'
                 if val.startswith('-') and len(val.split(' ')) == 2:
-                    new_token = Token(val, TokenType.KV_PAIR)
+                    new_token = Token(val, token.statement_block, TokenType.KV_PAIR)
 
                 # else its a single word or a quoted phrase TODO CHECK THIS
                 else:
-                    new_word = self.init_cmd_word(val, in_conditional=token.in_conditional, in_loop=token.in_loop)
+                    new_word = self.init_cmd_word(val, token=token)
                     new_token = self.get_best_token(new_word)
                 
                 # transfer properties
@@ -377,11 +379,16 @@ class CommandProcessor:
     #     return expanded_tokens
 
 
-    def init_cmd_word(self, text: str, in_conditional=False, in_loop=False) -> CommandWord:
-        new_word = CommandWord(text)
-        new_word.in_conditional = in_conditional
-        new_word.in_loop = in_loop
+    def init_cmd_word(self, text: str, token=None) -> CommandWord:
+        new_word = CommandWord(text, -1)
         new_word.expanded_text = [text]
+
+        # if token give, pass its attributes to the cmd word
+        if token:
+            new_word.in_conditional = token.in_conditional
+            new_word.in_loop = token.in_loop
+            new_word.statement_block = token.statement_block
+
         return new_word
 
 
@@ -444,7 +451,7 @@ class CommandProcessor:
 
                 # everything else
                 for ntoken in next_tokens:
-                    skip_next = command.update(ctoken, ntoken, self.out_register)
+                    skip_next = command.update(ctoken, ntoken, self.param_register, self.out_register)
                     if skip_next:
                         should_skip_next = True
             
@@ -488,8 +495,8 @@ class CommandProcessor:
         delim, delim_start, delim_end = self.get_first_unquoted(text, possible_delims)
         left_text, right_text = text[:delim_start], text[delim_end:]
        
-        curr_word = self.init_cmd_word(left_text, in_conditional=kv_token.in_conditional, in_loop=kv_token.in_loop)
-        next_word = self.init_cmd_word(right_text, in_conditional=kv_token.in_conditional, in_loop=kv_token.in_loop)
+        curr_word = self.init_cmd_word(left_text, token=kv_token)
+        next_word = self.init_cmd_word(right_text, token=kv_token)
 
         return curr_word, next_word, delim
 
@@ -519,7 +526,7 @@ class CommandProcessor:
 
         # get best-fit token for each form of curr_word 
         for text in word.expanded_text:
-            temp_tokens = self.get_all_tokens(text)
+            temp_tokens = self.get_all_tokens(text, word.statement_block)
             if len(temp_tokens) == 0:
                 print('could not resolve token')
                 self.logger.log(2, 'could not resolve token')
@@ -536,7 +543,7 @@ class CommandProcessor:
         return final_token
 
 
-    def get_all_tokens(self, text: str) -> list[Token]:
+    def get_all_tokens(self, text: str, statement_block: int) -> list[Token]:
         """
         detects the type of object being dealt with.
         first task is to resolve any aliases or env_variables. 
@@ -553,45 +560,50 @@ class CommandProcessor:
         tokens = []
 
         if text == '__END_COMMAND__':
-            return [Token('', TokenType.END_COMMAND)]
+            return [Token('', statement_block, TokenType.END_COMMAND)]
 
         # find quoted numbers and strings. quotes are removed
         quoted_num_lits = get_quoted_numbers(text)
         quoted_num_lits = [m.strip('\'"') for m in quoted_num_lits]
-        tokens += [Token(m, TokenType.QUOTED_NUM) for m in quoted_num_lits]
+        tokens += [Token(m, statement_block, TokenType.QUOTED_NUM) for m in quoted_num_lits]
 
         quoted_str_lits = get_quoted_strings(text)
         quoted_str_lits = [m.strip('\'"') for m in quoted_str_lits]
-        tokens += [Token(m, TokenType.QUOTED_STRING) for m in quoted_str_lits]
+        tokens += [Token(m, statement_block, TokenType.QUOTED_STRING) for m in quoted_str_lits]
         
         raw_num_lits = get_raw_numbers(text)
-        tokens += [Token(m, TokenType.RAW_NUM) for m in raw_num_lits]
+        tokens += [Token(m, statement_block, TokenType.RAW_NUM) for m in raw_num_lits]
         
         raw_str_lits = get_raw_strings(text)
-        tokens += [Token(m, TokenType.RAW_STRING) for m in raw_str_lits]
+        tokens += [Token(m, statement_block, TokenType.RAW_STRING) for m in raw_str_lits]
         
         # galaxy inputs
         # quoted or not doesn't matter. just linking. can resolve its datatype later. 
         ch_vars = get_cheetah_vars(text)
         gx_params = [x for x in ch_vars if self.param_register.get(x) is not None]
-        tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
+        tokens += [Token(gx_var, statement_block, TokenType.GX_PARAM) for gx_var in gx_params]
        
         # galaxy 
         ch_vars = get_cheetah_vars(text) # get cheetah vars
         gx_out = [x for x in ch_vars if self.out_register.get(x) is not None]  # subsets to galaxy out vars
-        tokens += [Token(out, TokenType.GX_OUT) for out in gx_out]  # transform to tokens
+        tokens += [Token(out, statement_block, TokenType.GX_OUT) for out in gx_out]  # transform to tokens
 
         # TODO this is pretty weak. actually want to search for 
         # unquoted operator in word. split if necessary. 
         linux_operators = get_linux_operators(text)
-        tokens += [Token(op, TokenType.LINUX_OP) for op in linux_operators]
+        tokens += [Token(op, statement_block, TokenType.LINUX_OP) for op in linux_operators]
 
         #gx_keywords = get_galaxy_keywords(text) TODO REMOVE
-        #tokens += [Token(kw, TokenType.GX_KEYWORD) for kw in gx_keywords] TODO REMOVE
+        #tokens += [Token(kw, statement_block, TokenType.GX_KEYWORD) for kw in gx_keywords] TODO REMOVE
 
         kv_pairs = get_keyval_pairs(text)
-        tokens += [Token(kv, TokenType.KV_PAIR) for kv in kv_pairs]
-        
+        tokens += [Token(kv, statement_block, TokenType.KV_PAIR) for kv in kv_pairs]
+
+        # fallback
+        if len(tokens) == 0:
+            self.logger.log(1, f'can resolve token {text}')
+            tokens += [Token(text, statement_block, TokenType.RAW_STRING)]
+
         return tokens
 
     
