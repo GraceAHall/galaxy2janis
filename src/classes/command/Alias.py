@@ -1,10 +1,10 @@
 
 
 
-from collections import defaultdict
-import re
+import regex as re
 
 from classes.params.ParamRegister import ParamRegister
+from classes.outputs.OutputRegister import OutputRegister
 
 
 
@@ -25,11 +25,13 @@ Facilitates
 This whole class needs to be written cleaner
 Started with simple logic but quickly expanded
 """
-class AliasRegister:
-    def __init__(self, param_register: ParamRegister):
-        # parsed galaxy params. needed to resolve aliases to a param. 
-        self.param_register = param_register
 
+class AliasRegister:
+    # def __init__(self, param_register: ParamRegister, out_register: OutputRegister):
+    #     # parsed galaxy objs. needed to resolve aliases 
+    #     self.param_register = param_register
+    #     self.out_register = out_register
+    def __init__(self):
         # stores the aliases using alias.source as key
         # each source may actually have more than 1 alias if different dests
         self.alias_dict: dict[str, list[Alias]] = {}
@@ -122,6 +124,24 @@ class AliasRegister:
 
 
     def resolve(self, query_var: str) -> list[str]:
+        """
+        returns list of all gx vars, and literals that are linked to the query_var
+        cheetah vars should be fully resolved here 
+        """
+        out = []
+
+        if query_var in self.alias_dict:
+            aliases = self.alias_dict[query_var]
+        else:
+            return out
+
+        for alias in aliases:
+            out.append(alias.dest)
+
+        return out
+        
+
+    def resolve_old(self, query_var: str) -> list[str]:
         """
         returns list of all gx vars, and literals that are linked to the query_var
         cheetah vars should be fully resolved here 

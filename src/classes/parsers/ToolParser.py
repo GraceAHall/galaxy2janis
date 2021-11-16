@@ -187,7 +187,7 @@ class ToolParser:
     # 7th step: command parsing 
     def parse_command(self):
         # parse command text into useful representation
-        cpar = CommandParser(self.tree, self.logger)
+        cpar = CommandParser(self.tree, self.param_register, self.out_register, self.logger)
         cpar.parse()
         if self.debug:
             cpar.pretty_print_command_words()
