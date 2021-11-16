@@ -14,19 +14,17 @@ untested:
 
 
 Today:
-    - bug reporter 
     - bugs
+        - strip_to_numeric_version coords2clnt.xml
         - could not resolve token
             quast, repeatmasker, cutadapt and a million others
-        - IndexError tokens = self.get_all_tokens(word.expanded_text[0])  
-        - the same var being seen in a million places (bcftools)
-        - missing datatype for positional '>' (bcftools)
-        - missing datatype for positional (augustus)
-        - parseva worked (old version) but parseval didnt?????
-        - could not find tool version in api request
-        - bedtools suite uncaught error
         - multiple expanded forms of cmd word
-        - for loop encountered should go to WARN level, not ERROR level
+
+        - missing datatype for positional (augustus)
+        - missing datatype for positional '>' (bcftools)
+        - parseva worked (old version) but parseval didnt?????
+        - the same var being seen in a million places (bcftools)
+
     - test parsing
     - galaxy templating system
     - when option is GX_OUT, create an input for it (-v '$output')

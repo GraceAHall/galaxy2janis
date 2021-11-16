@@ -96,6 +96,36 @@
             ]
         },
         {
+            "name": "sortBed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "sortBed.xml", "tools/bedtools"
+            ]
+        },
+        {
+            "name": "coords2clnt",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "coords2clnt.xml", "tools/bctools"
+            ]
+        },
+        {
+            "name": "clip_overlap",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "clip_overlap.xml", "tools/bamutil"
+            ]
+        },
+        {
             "name": "lastz",
             "type": "python",
             "request": "launch",

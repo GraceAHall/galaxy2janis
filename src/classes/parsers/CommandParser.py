@@ -5,8 +5,9 @@
 
 from typing import Union
 import xml.etree.ElementTree as et
-from classes.command.Command import Command
+import regex as re
 
+from classes.command.Command import Command
 from classes.command.CommandProcessor import CommandWord
 from classes.Logger import Logger
 
@@ -40,11 +41,14 @@ class CommandParser:
         loop_keywords = ['#for ', '#end for', '#while ', '#end while']
         error_keywords = ['#try ', '#except', '#end try']
         cheetah_var_keywords = ['#def ', '#set ']
-        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ', 'cd ', 'echo ']
+        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ', 'cd ', 'echo ', 'trap ', 'touch ']
         return conditional_keywords + loop_keywords + error_keywords + cheetah_var_keywords + linux_commands
         
 
     def parse(self) -> list[str]:
+        """
+        NOTE: would potentially be useful to employ lark here
+        """
         # clean the command string
         command_string = self.get_command_string()
         command_string = self.simplify_stdio(command_string)
@@ -97,6 +101,7 @@ class CommandParser:
         command_string = command_string.replace("2>&1", "")
         command_string = command_string.replace("1>&2", "")
         command_string = command_string.replace(">&2", "")
+        command_string = re.sub('2> \S+', '', command_string)
 
         return command_string
 

@@ -208,6 +208,8 @@ class ContainerFetcher:
         pattern = r'(\d+)(\.\d+)+'
         matches = re.finditer(pattern, the_string)
         matches = [m[0] for m in matches]
+        if len(matches) == 0:
+            print()
         return matches[0]
 
 

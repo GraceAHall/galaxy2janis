@@ -140,7 +140,7 @@ class ParamParser:
             return BoolParam(node, tree_path)
 
         elif param_type == 'select':
-            return SelectParam(node, tree_path)
+            return SelectParam(node, tree_path, self.logger)
 
 
     def parse_repeat_elem(self, node, tree_path):

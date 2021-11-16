@@ -69,7 +69,7 @@ class JanisFormatter:
         out_str += f'\tinputs=inputs,\n'
         out_str += f'\toutputs=outputs,\n'
         if self.tool.container_status != 'ok':
-            print(f'\t# contaniner {self.tool.container_status}. tool requirement version was {self.tool.container_target_version}\n')
+            out_str += (f'\t# contaniner {self.tool.container_status}. tool requirement version was {self.tool.container_target_version}\n')
 
         out_str += f'\tcontainer="{container}",\n'
         out_str += f'\tversion="{version}",\n'

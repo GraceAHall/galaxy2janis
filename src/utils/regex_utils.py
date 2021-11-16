@@ -6,7 +6,6 @@ from typing import Optional
 
 
 
-
 def get_cheetah_vars(the_string: str) -> set[str]:
     """
     doesn't keep function calls

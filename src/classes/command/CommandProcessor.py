@@ -143,17 +143,20 @@ class CommandProcessor:
             # split the line at the operator and trim
             left, right = self.split_variable_assignment(line)
             left = left[5:] # removes the '#set ' from line start
+            self.update_aliases(left, right, 'set', line)  
             
-            # set the source
-            source = self.get_source(left)
-            
-            # set the dest
-            dest = self.get_dest(right)
 
-            #print(f'{source} --> {dest}')
-            if source is not None and dest is not None:
-                self.aliases.add(source, dest, 'set', line)
-            
+    def update_aliases(self, left: str, right: str, from_cmd: str, line: str) -> None:
+        # get tokens from text
+        source = self.init_token_from_text(left)
+        dest = self.init_token_from_text(right)
+
+        # update
+        if source is not None and dest is not None:
+            self.aliases.add(source.text, dest.text, from_cmd, line)
+        else:
+            self.logger.log(1, f'could not add alias from line: {line}')
+
 
     def split_variable_assignment(self, line: str) -> Tuple[str, str]:
         operator_pattern = r'[-+\\/*=]?='
@@ -164,57 +167,9 @@ class CommandProcessor:
         return left, right
 
 
-    def get_source(self, source_str: str) -> str:
-        source = None
-        if not source_str[0] in ['"', "'"]:
-            if source_str[0] != '$':
-                source_str = '$' + source_str
-        
-        source_vars = get_cheetah_vars(source_str)
-        assert(len(source_vars) == 1)
-        source = source_vars[0]
-        return source
-
-
-    def get_dest(self, dest_str: str) -> Optional[str]:
-        # any cheetah vars?
-        dest_vars = get_cheetah_vars(dest_str)
-        dest_vars = self.remove_common_modules(dest_vars)
-
-        # any literals?
-        dest_literals = get_numbers_and_strings(dest_str)
-
-        # raw strings?
-        dest_raw_strings = get_raw_strings(dest_str)
-
-        # case: single cheetah var      
-        if len(dest_vars) == 1:
-            return dest_vars[0]
-        elif len(dest_vars) > 1:
-            return None
-
-        # case: single literal
-        if len(dest_literals) == 1:
-            return dest_literals[0]
-        elif len(dest_literals) > 1:
-            return None
-
-        # case: single raw string (alphanumeric symbol)
-        if len(dest_raw_strings) == 1:
-            return dest_raw_strings[0]
-
-        return None           
-
-        
-    def remove_common_modules(self, var_list: list[str]) -> list[str]:
-        common_modules = {'$re'}
-        
-        out_vars = []
-        for var in var_list:
-            if not var in common_modules:
-                out_vars.append(var)
-
-        return out_vars
+    def init_token_from_text(self, text: str) -> CommandWord:
+        cmd_word = self.init_cmd_word(text)
+        return self.get_best_token(cmd_word)
 
     
     def extract_symlink_aliases(self, line: str) -> None:
@@ -222,22 +177,13 @@ class CommandProcessor:
         NOTE - dest and source are swapped for symlinks.
         """
         if line.startswith('ln '):
-            arg1, arg2 = line.split(' ')[-2:]
+            left, right = line.split(' ')[-2:]
 
             # for ln syntax where only FILE is given (no DEST)
-            if arg1.startswith('-'):
-                arg1 = arg2
+            if left.startswith('-'):
+                left = right
 
-            # set the source
-            dest = self.get_source(arg1)
-            
-            # set the dest
-            source = self.get_dest(arg2)
-
-            #print(line)
-            #print(f'{source} --> {dest}')
-            if source is not None and dest is not None:
-                self.aliases.add(source, dest, 'ln', line) 
+            self.update_aliases(right, left, 'ln', line)  
 
 
     def extract_copy_aliases(self, line: str) -> None:
@@ -255,47 +201,37 @@ class CommandProcessor:
                 cp '${data.data_source}' circos/data/links-${hi}.txt
         """       
         if line.startswith('cp '):
-            arg1, arg2 = line.split(' ')[-2:]
-            # set the source
-            dest = self.get_source(arg1)
-            
-            # set the dest
-            source = self.get_dest(arg2)
+            left, right = line.split(' ')[-2:]
+            self.update_aliases(right, left, 'cp', line)        
 
-            #print(line)
-            #print(f'{source} --> {dest}')
-            if source is not None and dest is not None:
-                self.aliases.add(source, dest, 'cp', line)  
+
+    # def extract_mv_aliases(self, line: str) -> list[Tuple[str, str]]:
+    #     """
+    #     mv ${output_dir}/summary.tab '$output_summary'
+    #     mv '${ _aligned_root }.2${_aligned_ext}' '$output_aligned_reads_r'
+    #     mv circos.svg ../
+    #     mv circos.svg outputs/circos.svg
+
+    #     mv input_file.tmp output${ ( $i + 1 ) % 2 }.tmp
         
+    #     """
+    #     if line.startswith('mv '):
+    #         arg1, arg2 = line.split(' ')[-2:]
 
+    #         # for ../ where we move the fileyntax where only FILE is given (no DEST)
+    #         if arg1.startswith('-'):
+    #             arg1 = arg2
 
-    def extract_mv_aliases(self, line: str) -> list[Tuple[str, str]]:
-        """
-        mv ${output_dir}/summary.tab '$output_summary'
-        mv '${ _aligned_root }.2${_aligned_ext}' '$output_aligned_reads_r'
-        mv circos.svg ../
-        mv circos.svg outputs/circos.svg
-
-        mv input_file.tmp output${ ( $i + 1 ) % 2 }.tmp
-        
-        """
-        if line.startswith('mv '):
-            arg1, arg2 = line.split(' ')[-2:]
-
-            # for ../ where we move the fileyntax where only FILE is given (no DEST)
-            if arg1.startswith('-'):
-                arg1 = arg2
-
-            # set the source
-            dest = self.get_source(arg1)
+    #         # set the source
+    #         dest = self.get_source(arg1)
             
-            # set the dest
-            source = self.get_dest(arg2)
+    #         # set the dest
+    #         source = self.get_dest(arg2)
 
-            #print(line)
-            #print(f'{source} --> {dest}')
-            if source is not None and dest is not None:
-                self.aliases.add(source, dest, 'mv', line) 
+    #         #print(line)
+    #         #print(f'{source} --> {dest}')
+    #         if source is not None and dest is not None:
+    #             self.aliases.add(source, dest, 'mv', line) 
 
 
     # develop later. too complex. 

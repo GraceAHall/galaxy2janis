@@ -35,7 +35,7 @@ class Param:
 
     # override method
     def get_default(self) -> str:
-        pass
+        return ''
 
 
     def parse_common_features(self) -> None:
@@ -174,8 +174,8 @@ class DataParam(Param):
         self.parse_common_features()
 
 
-    def get_default(self) -> None:
-        return None
+    def get_default(self) -> str:
+        return ''
 
 
 
@@ -196,30 +196,49 @@ class BoolParam(Param):
 
 
 class SelectParam(Param):
-    def __init__(self, node: et.Element, tree_path: list[str]):
+    def __init__(self, node: et.Element, tree_path: list[str], logger: Logger):
         super().__init__(node, tree_path)
-        self.options: list[str] = self.get_param_options()
+        self.options: list[str] = self.get_param_options(logger)
         self.set_datatype()
         self.parse_common_features()
         self.add_options_to_helptext()
 
 
     def get_default(self) -> str:
-        return self.options[0]
+        if len(self.options) > 0:
+            return self.options[0]
+        return ''
 
 
-    def get_param_options(self) -> list[str]:
+    def get_param_options(self, logger: Logger) -> list[str]:
+        # get options from child option nodes
         option_values = []
-
         for child in self.node:
             if child.tag == 'option':
                 optval = get_attribute_value(child, 'value')
 
-                # if 'selected=True' put at top of list
+                # if 'selected=True', put this option at the top of list
                 if get_attribute_value(child, 'selected') in self.truths:
                     option_values = [optval] + option_values
                 else:
                     option_values.append(optval)  # type: ignore
+            
+            # error messages for unsupported features
+            elif child.tag == 'options':
+                if 'from_dataset' in child.attrib:
+                    logger.log(2, 'options from_dataset encountered')
+                if 'from_file' in child.attrib:
+                    logger.log(2, 'options from_file encountered')
+                if 'from_data_table' in child.attrib:
+                    logger.log(2, 'options from_data_table encountered')
+                if 'from_parameter' in child.attrib:
+                    logger.log(2, 'options from_parameter encountered')
+                if 'options_filter_attribute' in child.attrib:
+                    logger.log(2, 'options options_filter_attribute encountered')
+                if 'transform_lines' in child.attrib:
+                    logger.log(2, 'options transform_lines encountered')
+                if 'startswith' in child.attrib:
+                    logger.log(2, 'options startswith encountered')                
 
         # option list is same order as in galaxy except 'selected' option is 1st
         return option_values
@@ -279,8 +298,8 @@ class DataCollectionParam(Param):
         self.is_array: bool = True
 
 
-    def get_default(self) -> None:
-        return None
+    def get_default(self) -> str:
+        return ''
 
 
 

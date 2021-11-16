@@ -75,9 +75,7 @@ class AliasRegister:
         for source in self.alias_dict.keys():
             # get partial matches
             matches = self.get_alias_match(source, query_string)
-            for m in matches:
-                print(m[0], m.start(), m.end())
-        
+       
             if len(matches) > 0:
                 destination_values = self.resolve(source)
                 for val in destination_values:
@@ -94,7 +92,6 @@ class AliasRegister:
     def get_alias_match(self, source: str, query_string: str) -> list:
         # just trust this crazy regex ok
         temp = source.replace(r'\\', r'\\\\').replace('$', '\$').replace('.', '\.')
-        #pattern = temp + r'(?:(?!(\.[\w-]*\()|(\()|(\w)))((?=[^\w.\S]|\.(forward|reverse|ext|value|name|files_path)[^\w.\S]))'
         pattern = temp + r'(?!(\.[\w-]*\()|(\()|(\w))(?=[^\w.]|(\.(forward|reverse|ext|value|name|files_path))+[^\w]|$)'
         res = re.finditer(pattern, query_string)
         matches = [m for m in res]

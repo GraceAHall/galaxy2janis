@@ -150,7 +150,7 @@ class Output:
 
 
     def get_default(self):
-        return None
+        return ''
 
 
 
