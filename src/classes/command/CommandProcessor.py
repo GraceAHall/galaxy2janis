@@ -1,7 +1,7 @@
 
 
 from collections import defaultdict
-from typing import Tuple
+from typing import Tuple, Union
 import regex as re
 
 from classes.command.Alias import AliasRegister
@@ -13,23 +13,21 @@ from classes.Logger import Logger
 
 from utils.regex_utils import find_unquoted
 from utils.command_utils import get_best_token, init_cmd_word
+from utils.general_utils import global_align
 
 
 class CommandProcessor:
-    def __init__(self, command_words: dict[int, list[CommandWord]], param_register: ParamRegister, out_register: OutputRegister, alias_register: AliasRegister, logger: Logger):
+    def __init__(self, command_words: dict[int, list[CommandWord]], main_requirement: dict[str, Union[str, int]], param_register: ParamRegister, out_register: OutputRegister, alias_register: AliasRegister, logger: Logger):
         """
         Command class receives the CommandLines
         """
         self.command_words = command_words
         self.command_tokens: dict[int, list[list[Token]]] = {}
+        self.main_requirement = main_requirement
         self.param_register = param_register
         self.out_register = out_register
         self.alias_register = alias_register
         self.logger = logger
-
-        # TODO include the following
-        # or maybe not? 
-        # self.main_requirement = main_requirement
 
 
     def process(self) -> Command:
@@ -124,29 +122,92 @@ class CommandProcessor:
 
     def get_best_statement_block(self) -> list[list[Token]]:
         """
-        just counts the number of galaxy objects and kvpairs which
-        appear in each block. simple for now. 
+        choose how to resolve best block.
+        uses number of gx obj references and the first token
+        to identify the best block. 
         """
+        if len(self.command_tokens) == 0:
+            self.logger.log(2, 'no command block found')
+
         # single command block
         if len(self.command_tokens) == 1:
             return self.command_tokens[0]
+        
+        # real block should have the most gx obj references,
+        gx_token_tallies = self.get_blocks_gx_token_count()
+        
+        # should start with a raw_string that is similar
+        # to the main requirement
+        first_token_scores = self.get_first_token_similarities()
 
-        # multiple command blocks
-        # tally num gx objs per block
-        # now thats nested!
-        block_scores_dict = defaultdict(int)
+        # decide how to use the above information
+        best_block = self.choose_best_block(gx_token_tallies, first_token_scores)
+
+        return self.command_tokens[best_block]
+
+        
+    def get_blocks_gx_token_count(self) -> list[Tuple[int, int]]:
+        """
+        for each command block, tallies the number of galaxy and kv_pair tokens
+        idea is that the real command will have the most references to galaxy objs
+        """
+        block_scores_dict = {}
         for statement_block, cmd_tokens in self.command_tokens.items():
-            for line_tokens in cmd_tokens:
-                for token in line_tokens:
+            block_scores_dict[statement_block] = 0
+            for expanded_tokens in cmd_tokens:
+                for token in expanded_tokens:
                     if token.type in [TokenType.GX_OUT, TokenType.GX_PARAM, TokenType.KV_PAIR]:
                         block_scores_dict[statement_block] += 1
 
         # sort by tally and return best
         block_scores = list(block_scores_dict.items())
         block_scores.sort(key=lambda x: x[1], reverse=True)
-        best_block = block_scores[0][0]
+        return block_scores
 
-        return self.command_tokens[best_block]
+
+    def get_first_token_similarities(self) -> list[Tuple[int, float]]:
+        first_token_scores_dict = {}
+        for statement_block, cmd_tokens in self.command_tokens.items():
+            first_token_scores_dict[statement_block] = 0
+            first_token = cmd_tokens[0][0]
+            score = global_align(self.main_requirement['name'], first_token.text)
+            first_token_scores_dict[statement_block] = score
+        
+        # sort by align score and return best
+        first_token_scores = list(first_token_scores_dict.items())
+        first_token_scores.sort(key=lambda x: x[1], reverse=True)
+        return first_token_scores
+
+
+    def choose_best_block(self, gx_token_tallies: list[Tuple[int, int]], first_token_scores: list[Tuple[int, float]]) -> int:
+
+        # condition 1: 
+        # gx ref based
+        # one block has at least 4 gx tokens and is 2x second highest
+        if gx_token_tallies[0][1] >= 4:
+            if gx_token_tallies[0][1] >= 2 * gx_token_tallies[1][1]:
+                return gx_token_tallies[0][0]
+
+        # condition 2: 
+        # first token similarity to main_requirement and gx token tally
+        # all first tokens which have 80% of max possible alignment score
+        # (usually 1) then sort by gx token count
+        perfect_score = global_align(self.main_requirement['name'], self.main_requirement['name']) 
+        filtered_blocks = [b for b, s in first_token_scores if s > 0.8 * perfect_score]
+        if len(filtered_blocks) > 0:
+            token_tallies = [item for item in gx_token_tallies if item[0] in filtered_blocks]
+            token_tallies.sort(key=lambda x: x[1], reverse=True)
+            return token_tallies[0][0]
+
+        # condition 3:
+        # highest first token score is at least half of max possible alignment score
+        # and is 2x second highest score
+        if first_token_scores[0][1] > 0.5 * perfect_score:
+            if first_token_scores[0][1] >= 2 * first_token_scores[1][1]: 
+                return first_token_scores[0][0]
+
+        # condition 4: (fallback) return block with most gx tokens
+        return gx_token_tallies[0][0]
 
 
     def gen_command(self, command_tokens: list[Token]) -> Command:
@@ -229,6 +290,9 @@ class CommandProcessor:
         returns the first item in the_list found unquoted in the_string
         """
         hits = []
+        # workaround for when entire string is quoted
+        if the_string[0] in ['"', "'"] and the_string[-1] in ['"', "'"]:
+            the_string = '_' + the_string[1:-1] + '_'
 
         # get locations of each item in the_list in the_string
         for item in the_list:

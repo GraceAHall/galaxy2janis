@@ -193,7 +193,7 @@ class ToolParser:
             cpar.pretty_print_command_words()
         
         # create Command() object
-        cpro = CommandProcessor(cpar.command_words, self.param_register, self.out_register, cpar.alias_register, self.logger) # type: ignore
+        cpro = CommandProcessor(cpar.command_words, self.main_requirement, self.param_register, self.out_register, cpar.alias_register, self.logger) # type: ignore
         cpro.process()
         #cpro.pretty_print_tokens()
         self.command = cpro.command

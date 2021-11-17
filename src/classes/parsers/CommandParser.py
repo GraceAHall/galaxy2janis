@@ -65,7 +65,8 @@ class CommandParser:
     def set_command_string(self) -> None:
         command_string = self.get_command_from_xmltree()
         command_string = self.simplify_stdio(command_string)
-        self.command_string = self.standardise_variable_format(command_string)
+        self.command_string = self.simplify_galaxy_reserved_words(command_string)
+
         
 
     def get_command_from_xmltree(self) -> str:
@@ -82,11 +83,9 @@ class CommandParser:
     def simplify_stdio(self, command_string: str) -> str:
         """
         this function aims to remove some of the more complex constructs in the tool xml command
-        
         """
         command_string = command_string.replace("&amp;", "&")
         command_string = command_string.replace(">>", ">")
-
         command_string = command_string.replace("| tee ", "> ")
         command_string = command_string.replace("| tee\n", "> ")
         command_string = command_string.replace("|& tee ", "> ")
@@ -95,43 +94,18 @@ class CommandParser:
         command_string = command_string.replace("1>&2", "")
         command_string = command_string.replace(">&2", "")
         command_string = re.sub('2> \S+', '', command_string)
-
         return command_string 
 
 
-    def standardise_variable_format(self, command_string: str) -> str:
-        out_words = []
-        cmd_words = command_string.split(' ')
-        for word in cmd_words:
-            word = self.standardise_var_format(word)
-            out_words.append(word)
-
-        command_string = ' '.join(out_words)
+    def simplify_galaxy_reserved_words(self, command_string: str) -> str:
+        command_string = re.sub("['\"]?\$__tool_directory__['\"]?/", "", command_string)
         return command_string
-
-
-    def standardise_var_format(self, text: str) -> str:
-        """
-        modifies cmd word to ensure the $var format is present, 
-        rather than ${var}
-        takes a safe approach using regex and resolving all vars one by one
-        """
-        matches = re.finditer(r'\$\{[\w.]+\}', text)
-        matches = [[m[0], m.start(), m.end()] for m in matches]
-
-        if len(matches) > 0:
-            m = matches[0]
-            # this is cursed but trust me it removes the 
-            # curly braces for the match span
-            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
-            text = self.standardise_var_format(text)
-
-        return text  
-
+        
 
     def set_lines(self) -> None:
         # clean the command string
         lines = self.split_lines(self.command_string)
+        lines = self.standardise_variable_format(lines)
         lines = self.remove_comments(lines)
         lines = self.remove_bash_constructs(lines)
         lines = self.remove_cheetah_definitions(lines)
@@ -144,6 +118,43 @@ class CommandParser:
         lines = [ln.strip() for ln in lines]
         lines = [ln for ln in lines if ln != '']
         return lines
+
+    
+    def standardise_variable_format(self, cmd_lines: list[str]) -> str:
+        out_lines = []
+
+        for line in cmd_lines:
+            line = line.split(' ')
+            out_line = []
+            for word in line:
+                word = self.standardise_var(word)
+                out_line.append(word)
+
+            out_line = ' '.join(out_line)
+            out_lines.append(out_line)
+        return out_lines
+
+
+    def standardise_var(self, text: str) -> str:
+        """
+        modifies cmd word to ensure the $var format is present, 
+        rather than ${var}
+        takes a safe approach using regex and resolving all vars one by one
+        """
+        if text == '':
+            return text
+
+        matches = re.finditer(r'\$\{[\w.]+\}', text)
+        matches = [[m[0], m.start(), m.end()] for m in matches]
+
+        if len(matches) > 0:
+            m = matches[0]
+            # this is cursed but trust me it removes the 
+            # curly braces for the match span
+            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
+            text = self.standardise_var(text)
+
+        return text  
 
        
     def remove_comments(self, command_list: list[str]) -> list[str]:

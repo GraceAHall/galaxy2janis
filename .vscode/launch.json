@@ -126,6 +126,36 @@
             ]
         },
         {
+            "name": "bcftools_query",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "bcftools_query.xml", "tools/bcftools", "--debug"
+            ]
+        },
+        {
+            "name": "anndata_import",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "import.xml", "tools/anndata", "--debug"
+            ]
+        },
+        {
+            "name": "commet",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "commet.xml", "tools/colibread", "--debug"
+            ]
+        },
+        {
             "name": "coords2clnt",
             "type": "python",
             "request": "launch",
@@ -173,6 +203,16 @@
             "console": "integratedTerminal",
             "args": [
                 "augustus.xml", "tools/augustus", "--debug"
+            ]
+        },
+        {
+            "name": "manhattan_plot",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "manhattan_plot.xml", "tools/gwastools", "--debug"
             ]
         },
         {
@@ -403,6 +443,36 @@
             "console": "integratedTerminal",
             "args": [
                 "export.xml", "tools/anndata", "--debug"
+            ]
+        },
+        {
+            "name": "art_454",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "art_454.xml", "tools/art", "--debug"
+            ]
+        },
+        {
+            "name": "newick_display",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "newick_display.xml", "tools/newick_utils", "--debug"
+            ]
+        },
+        {
+            "name": "basil",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "basil.xml", "tools/basil", "--debug"
             ]
         },
         {

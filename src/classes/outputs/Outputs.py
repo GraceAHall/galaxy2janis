@@ -191,24 +191,26 @@ class DiscoverDatasetsOutput(Output):
 
         # easiest & most common option
         if gx_format != '':
-            return gx_format
+            self.galaxy_type = gx_format
 
         # get datatype from referenced param
         elif format_source != '':
             param = param_register.get(format_source)
-            return param.galaxy_type or ''
+            if param is not None:
+                self.galaxy_type = param.galaxy_type
 
-        dd_node = self.node.find('discover_datasets')
-        dd_format = get_attribute_value(dd_node, 'format') # type: ignore
-        dd_ext = get_attribute_value(dd_node, 'ext') # type: ignore
+        else:
+            dd_node = self.node.find('discover_datasets')
+            dd_format = get_attribute_value(dd_node, 'format') # type: ignore
+            dd_ext = get_attribute_value(dd_node, 'ext') # type: ignore
 
-        if dd_format != '':
-            return dd_format
+            if dd_format != '':
+                self.galaxy_type = dd_format
 
-        elif dd_ext != '':
-            return dd_ext
+            elif dd_ext != '':
+                self.galaxy_type = dd_ext
         
-        return 'File'
+        self.galaxy_type = 'file'
 
 
     def set_selector_contents(self) -> None:

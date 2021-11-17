@@ -186,6 +186,7 @@ class JanisFormatter:
             tag = posit.token.text
             default = None
 
+        
         docstring = self.get_docstring([token])
         datatype = self.format_janis_typestr(posit.datatypes)        
 
@@ -194,9 +195,10 @@ class JanisFormatter:
 
     def validate_tag(self, tag: str) -> str:
         """
+        to satisfy janis tag requirements
         to avoid janis reserved keywords
-
         """
+        tag = tag.replace('-', '_')
         if tag in self.extra_prohibited_keys or len(tag) == 1:
             tag += '_janis'
 

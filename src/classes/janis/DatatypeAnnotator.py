@@ -165,16 +165,13 @@ class DatatypeAnnotator:
 
     def assert_has_datatype(self, obj):
         datatypes = [d for d in obj.datatypes if d is not None]
-
-        if type(obj) == Output:
-            print()
         
         if len(datatypes) == 0:
             if type(obj) == Positional:
                 self.logger.log(2, f'missing datatype for Positional {obj.token.text}')
-            elif type(obj) in [Flag, Option]:
+            elif type(obj) == Flag or type(obj) == Option:
                 self.logger.log(2, f'missing datatype for {type(obj)} {obj.sources[0].text}')
-            elif type(obj) == Output:
+            else:
                 self.logger.log(2, f'missing datatype for Output {obj.gx_var}')
 
 
@@ -355,30 +352,34 @@ class DatatypeAnnotator:
 
 
     def get_output_datatype(self, the_output: Output) -> list[str]:
-        # try from galaxy_type first
-        if the_output.galaxy_type != '':
-            
-            datatypes = []
-            gxformat_list = the_output.galaxy_type.split(',')
-            for gxformat in gxformat_list:
-                datatypes.append(self.get_datatype_by_format(gxformat))
-
-            return datatypes
-
-        # then from the extension on the selector contents
-        ext_types = self.infer_types_from_ext(the_output.selector_contents)
-        if len(ext_types) > 0:
-            return ext_types
-
-        # fallback   
-             
-        return [{
+        fallback_datatypes = [{
             'format': 'file',
             'source': 'janis',
             'classname': 'File',
             'extensions': None,
             'import_path': 'janis_core.types.common_data_types'
         }]
+
+        datatypes = []
+
+        # try from galaxy_type first
+        if the_output.galaxy_type != '':    
+            gxformat_list = the_output.galaxy_type.split(',')
+            for gxformat in gxformat_list:
+                dtype = self.get_datatype_by_format(gxformat)
+                if dtype is not None:
+                    datatypes.append(dtype)
+
+        # then from the extension on the selector contents
+        if len(datatypes) == 0:
+            datatypes = self.infer_types_from_ext(the_output.selector_contents)
+            datatypes = [d for d in datatypes if d['classname'] != 'String']
+        
+        if len(datatypes) >= 1:
+            return datatypes
+
+        # fallback   
+        return fallback_datatypes     
 
 
 

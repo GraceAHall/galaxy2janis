@@ -24,7 +24,7 @@ class Runner:
 
 
     def run(self) -> None:
-        TH_COUNT = 1
+        TH_COUNT = 10
         jobs = []
 
         # set up all jobs to complete
@@ -86,7 +86,7 @@ class Reporter:
         
     def update_errors_from_logfile(self, parsed_dir: str, logfile: str) -> None:
         filepath = f'{self.workdir}/{parsed_dir}/{logfile}'
-        with open(filepath, 'r') as fp:
+        with open(filepath, 'r', encoding="utf-8") as fp:
             log_lines = fp.readlines()
             log_lines = [ln.rstrip('\n') for ln in log_lines]
             
@@ -126,34 +126,34 @@ class Reporter:
             status, message = line.split(',')
 
             if 'tool contains configfiles' in message:
-                self.error_counter['configfiles'] += 1
+                self.error_counter['configfiles_ERROR'] += 1
 
             elif 'missing datatype for' in message:
-                self.error_counter['missing_datatype'] += 1
+                self.error_counter['missing_datatype_WARN'] += 1
 
-            elif 'could not find tool version in api request' or 'no container found' in message:
-                self.error_counter['container_not_found'] += 1
+            elif 'could not find tool version in api request' in message or 'no container found' in message:
+                self.error_counter['container_not_found_ERROR'] += 1
             
             elif 'chosen base command is set_environment' in message:
-                self.error_counter['set_environment'] += 1
+                self.error_counter['set_environment_ERROR'] += 1
             
             elif 'pipe encountered as end of 1st command' in message:
-                self.error_counter['pipe_command'] += 1
+                self.error_counter['pipe_command_ERROR'] += 1
             
             elif 'multiple commands encountered' in message:
-                self.error_counter['multiple_commands_INFO'] += 1
+                self.error_counter['multiple_commands_WARN'] += 1
             
-            elif 'for loop encountered' or 'while loop' in message:
-                self.error_counter['for_loop_INFO'] += 1
+            elif 'for loop encountered' in message or 'while loop' in message:
+                self.error_counter['for_loop_WARN'] += 1
     
 
     def update_errors_from_filepair(self, parsed_dir: str, logfile: str, pyfile: str) -> None:
         logfile_path = f'{self.workdir}/{parsed_dir}/{logfile}'
         pyfile_path = f'{self.workdir}/{parsed_dir}/{pyfile}'
 
-        with open(logfile_path, 'r') as fp:
+        with open(logfile_path, 'r', encoding="utf-8") as fp:
             logfile_contents = fp.read()
-        with open(pyfile_path, 'r') as fp:
+        with open(pyfile_path, 'r', encoding="utf-8") as fp:
             pyfile_contents = fp.read()
 
         if logfile_contents == '' and pyfile_contents == '':
@@ -179,9 +179,6 @@ class Reporter:
         print(f'ERROR:\t{len(errors)}')
 
 
-
-
-
 def main(argv):
     tools_folder = argv[0]
     parsed_folder = argv[1]
@@ -189,8 +186,8 @@ def main(argv):
     tool_directories = get_directories(tools_folder)
     parsed_directories = get_directories(parsed_folder)
 
-    runner = Runner(tools_folder, tool_directories)
-    runner.run()
+    #runner = Runner(tools_folder, tool_directories)
+    #runner.run()
 
     reporter = Reporter(parsed_folder, parsed_directories)
     reporter.report()

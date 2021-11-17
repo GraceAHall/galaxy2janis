@@ -14,19 +14,21 @@ untested:
 
 
 Today:
-    - bugs
-        - IndexError strip_to_numeric_version() (coords2clnt.xml)
-        - IndexError 'best_block = block_scores[0][0]' (bcftools_query.xml)
+    - high priority bugs
         - busco --limit being weird. shows a larger bug involving multiple references to something in command string
-        - augustus default for kvpairs (--singlestrand=true)
-        - 'could not find gx output: $targets_path' (bcftools_view)
+        - the same var being seen in a million places (bcftools)
+
+    - med priority bugs
         - repeat tags in tool xml (will solve issues?)
         - could not resolve token
             repeatmasker, cutadapt and a million others
         - multiple expanded forms of cmd word
+
+    - low priority bugs
+        - newick_display.xml R style patterns in cmd string
         - missing datatype for positional (augustus)
         - missing datatype for positional '>' (bcftools)
-        - the same var being seen in a million places (bcftools)
+        - augustus default for kvpairs (--singlestrand=true)
     
     - positional locations is important need to fix
     - test parsing
@@ -38,7 +40,6 @@ Today:
         - call tool.py (should have tool().translate("wdl", to_console) set up)
           to check whether its valid janis 
     
-
 Tomorrow:
     - configfiles
     - testing

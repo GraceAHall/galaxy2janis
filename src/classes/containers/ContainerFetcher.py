@@ -1,15 +1,13 @@
 
 
 from typing import Union, Tuple, Optional
-
-
 import requests
 import json
 import os
-from Bio import pairwise2
 import regex as re
 
 from classes.Logger import Logger
+from utils.general_utils import global_align
 
 
 class Container: 
@@ -60,22 +58,11 @@ class ContainerFetcher:
 
         else:
             for req in self.requirements:
-                req['aln_score'] = self.global_align(self.tool_id, req['name']) # type: ignore
-                #req['aln_score'] = self.global_align(self.tool_name, req['name']) # type: ignore
+                req['aln_score'] = global_align(self.tool_id, req['name']) # type: ignore
+                #req['aln_score'] = global_align(self.tool_name, req['name']) # type: ignore
             
             self.requirements.sort(key=lambda x: x['aln_score'], reverse=True)
             self.main_requirement = self.requirements[0]
-
-
-    def global_align(self, pattern: str, template: str) -> int:
-        pattern = pattern.lower()
-        template = template.lower()
-        outcome = pairwise2.align.globalms(pattern, template, 2, -1, -.5, -.1) # type: ignore
-        if len(outcome) > 0: # type: ignore
-            score = outcome[0].score # type: ignore
-        else:
-            score = 0
-        return score # type: ignore
 
 
     def load_container_cache(self) -> dict[str, str]:
@@ -177,7 +164,7 @@ class ContainerFetcher:
     def get_most_similar_tool(self, target_name: str, api_results: dict) -> dict:
         result_similarities = []
         for tool in api_results:
-            score = self.global_align(tool['name'], target_name)
+            score = global_align(tool['name'], target_name)
             result_similarities.append((score, tool))
 
         result_similarities.sort(key = lambda x: x[0], reverse=True)
@@ -224,7 +211,7 @@ class ContainerFetcher:
 
 
     def strip_to_numeric_version(self, the_string: str) -> str:
-        pattern = r'(\d+)(\.\d+)+'
+        pattern = r'(\d+)(\.\d+)*'
         matches = re.finditer(pattern, the_string)
         matches = [m[0] for m in matches]
         return matches[0]
