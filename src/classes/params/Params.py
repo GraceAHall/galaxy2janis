@@ -221,7 +221,8 @@ class SelectParam(Param):
     def __init__(self, node: et.Element, tree_path: list[str], logger: Logger):
         super().__init__(node, tree_path)
         self.options: list[str] = self.get_param_options(logger)
-        self.set_datatype()
+        self.opts_from_data_table: bool = False
+        self.galaxy_type: str = self.get_datatype()
         self.parse_common_features()
         self.add_options_to_helptext()
 
@@ -244,49 +245,53 @@ class SelectParam(Param):
                     option_values = [optval] + option_values
                 else:
                     option_values.append(optval)  # type: ignore
-            
-            # error messages for unsupported features
+                
             elif child.tag == 'options':
+                # 135 iuc tools. This is now supported!
+                if 'from_data_table' in child.attrib:
+                    self.opts_from_data_table = True
+                    
+                # error messages for unsupported features
+                # 2 iuc tools
                 if 'from_dataset' in child.attrib:
                     logger.log(2, 'options from_dataset encountered')
+                # 0 iuc tools
                 if 'from_file' in child.attrib:
                     logger.log(2, 'options from_file encountered')
-                if 'from_data_table' in child.attrib:
-                    logger.log(2, 'options from_data_table encountered')
+                # 0 iuc tools
                 if 'from_parameter' in child.attrib:
                     logger.log(2, 'options from_parameter encountered')
+                # 3 iuc tools
                 if 'options_filter_attribute' in child.attrib:
                     logger.log(2, 'options options_filter_attribute encountered')
+                # 0 iuc tools
                 if 'transform_lines' in child.attrib:
                     logger.log(2, 'options transform_lines encountered')
+                # 0 iuc tools
                 if 'startswith' in child.attrib:
                     logger.log(2, 'options startswith encountered')                
 
         # option list is same order as in galaxy except 'selected' option is 1st
         return option_values
-    
+        
 
-    def set_datatype(self) -> None:
+    def get_datatype(self) -> str:
         """
         infers select param type. 
         Uses the different values in the option elems.
         param options are already stored in param.options
         """
-        param_type = "string"  # fallback
+        fallback = "string"  # fallback
 
-        # do the option values all have a common extension? 
-        common_extension = get_common_extension(self.options)
-        
+        if self.opts_from_data_table:
+            return 'file'
+         
         # are the option values all a particular type?
         castable_type = cast_list(self.options)
+        if castable_type != '':
+            return castable_type
         
-        # deciding what the type should be from our results
-        if common_extension != '':
-            param_type = common_extension
-        elif castable_type != '':
-            param_type = castable_type
-
-        self.galaxy_type = param_type      
+        return fallback   
 
 
     def add_options_to_helptext(self) -> None:

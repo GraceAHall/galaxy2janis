@@ -4,123 +4,44 @@ NOTE check janis-patterns github for tricky situations
 
 TODO v0.1
 
-add known extensions to galaxy parsed types. 
-doesnt' know .fasta = .fa = .fna
 
+TODO:
+    - duplicate name resolving 
+    - duplicate references to same token (gx var, positional raw string etc)
+    - positional locations is important need to fix
+    - sort out toolinputs, toolarguments and position of everything
 
-untested:
-    - recent 
-    - container fetching
-
-
-Today:
     - high priority bugs
-        - busco --limit being weird. shows a larger bug involving multiple references to something in command string
-        - the same var being seen in a million places (bcftools)
 
     - med priority bugs
-        - repeat tags in tool xml (will solve issues?)
-        - could not resolve token
-            repeatmasker, cutadapt and a million others
-        - multiple expanded forms of cmd word
-
+        
     - low priority bugs
         - newick_display.xml R style patterns in cmd string
         - missing datatype for positional (augustus)
         - missing datatype for positional '>' (bcftools)
         - augustus default for kvpairs (--singlestrand=true)
     
-    - positional locations is important need to fix
+
     - test parsing
-    - galaxy templating system
-    - when option is GX_OUT, create an input for it (-v '$output')
-    - sort out toolinputs, toolarguments and position of everything
-    - parse tool xmls
-    - gather parsing stats (how many worked etc)
-        - call tool.py (should have tool().translate("wdl", to_console) set up)
-          to check whether its valid janis 
-    
-Tomorrow:
+    - galaxy templating engine
     - configfiles
-    - testing
-
-Redirect handling
-    - 
 
 
-from non-galaxy command string
---augustus=true
-
-have a registry
-know that
-    --augustus=true is key-val pair
-    --augustus= can be set from $use_augustus boolean gx param
-    can simply look at $use_augustus and confirm that either truevalue or falsevalue == '--augustus=true'
-    can then set that attribute when translating external -> galaxy 
-
-
-
-ON HOLD TILL COMMAND PARSER IS UPDATED
-- unsupported_param (group_tag, data_collection, data_column, hidden)
-    - data_collection
-        - paired files ie fastq will be two individual datasets or paired collection
-    - hidden
-        - parse as HiddenParam, resolve in parampostprocessor
-        - get all references to params with that variable name
-        - use the types and values to decide on one of three options:
-
-            
-            as static var (create StaticVar?):
-                <param name="snpEff_rod_name" type="hidden" value="snpEff" label="ROD Name"/>
-
-            as flag bool:
-                <param name="EOL" type="hidden" value="--bol" />
-                <param name="EOL" type="hidden" value="--eol" />
-
-                either:
-                    - make a flag bool (across occurances, theres only 2 options: no value, or a string)
-                    - make a select param (if 2 or more vals)
-
-
-            ignore hidden param:
-                <param name="info_ids" type="hidden" value="" />
-                <param name="info_ids" type="text" value="" label="Limit INFO annotation to these INFO IDs" help="List is a comma separated list of fields. When blank, all INFO fields are included" >
-
-                <param name="output_full" type="hidden" value='F' />
-                <param name="output_full" type="select" label="Create a tabular output with coefficients for all predictors" >
-                
-
-    - group_tag
-
-
-
-- improve command string parsing
-    - CommandString becomes a class
-    - supports finding a query var and returns a VariableReference (move all VariableFinder logic to CommandString)
-    - finding variable references needs to be more flexible
-    - informs on the context of the variable (appears in #set, appears in conditional block etc)
-    - understands if the data is paired that galaxy will format to $var.forward and $var.reverse
-    - 
-
-
-
-    - aliases 
-    - rework param variable detection
-    - compound params (multiple methods or using multiple params to set program flag)
-    - positional args
-    - (cutadapt) --minimum-length=$filter_options.minimum_length
-    - (cutadapt) '-a', "'${a.adapter_source.adapter.fields.name}'='${a.adapter_source.adapter}${adapter_options.internal}'"
 
 - tool tests
     - janis has the galaxy tests. parse to janis format
     - galaxy test evalutation - https://github.com/galaxyproject/galaxy/tree/dev/lib/galaxy/tool_util/verify/asserts
     - during tool testing - check whether WilcardSelector can handle the galaxy regex
 
-- duplicate name resolving to LCA in gx_var path?
+
+
+Complete 
 
 
 
-Complete Milestones
+
+
+
 
 
 

@@ -97,12 +97,12 @@ class ParamParser:
 
 
     def parse_elem(self, node: et.Element, tree_path: list[str]) -> None:
+        """
+        repeat tags not parsed. too complex. 
+        """
         if node.tag == 'param':
             new_param = self.parse_param_elem(node, tree_path)
             self.param_list.append(new_param)
-
-        #elif node.tag == 'repeat':  TODO!
-        #    self.parse_repeat_elem(node, tree_path)
  
 
     def parse_param_elem(self, node: et.Element, tree_path: list[str]) -> Param:

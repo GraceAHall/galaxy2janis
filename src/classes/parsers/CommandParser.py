@@ -13,7 +13,7 @@ from classes.command.AliasExtractor import AliasExtractor
 from classes.command.CommandWord  import CommandWord
 from classes.Logger import Logger
 
-from utils.regex_utils import find_unquoted, get_words, get_galaxy_keyword_value
+from utils.regex_utils import find_unquoted, get_words, get_galaxy_keywords, get_galaxy_keyword_value, get_unpaired_quotes_start
 from utils.command_utils import remove_ands_from_line
 
 """
@@ -66,7 +66,6 @@ class CommandParser:
         command_string = self.get_command_from_xmltree()
         command_string = self.simplify_stdio(command_string)
         self.command_string = self.simplify_galaxy_reserved_words(command_string)
-
         
 
     def get_command_from_xmltree(self) -> str:
@@ -110,6 +109,8 @@ class CommandParser:
         lines = self.remove_bash_constructs(lines)
         lines = self.remove_cheetah_definitions(lines)
         lines = self.remove_cheetah_misc(lines)
+        # TODO experimental
+        lines = self.remove_unpaired_quote_text(lines)
         self.lines = lines
 
 
@@ -229,7 +230,7 @@ class CommandParser:
         yea yea
         """
         banned_firstwords = ['#import', '#from', '#break', '#continue', '#pass', '#assert', '#silent']
-        out = []
+        out_lines = []
         
         # delete non-necessary words
         for line in command_lines:
@@ -237,9 +238,23 @@ class CommandParser:
         
             # only keep lines which don't start with keywords
             if not line.split(' ')[0] in banned_firstwords:
-                out.append(line)
+                out_lines.append(line)
 
-        return out
+        return out_lines
+
+
+    def remove_unpaired_quote_text(self, command_lines: list[str]) -> list[str]:
+        out_lines = []
+        for line in command_lines:
+            unpaired_quotes_start = get_unpaired_quotes_start(line)
+            
+            # keep line if no unpaired quotes else continue
+            if unpaired_quotes_start != -1:
+                continue
+            else:
+                out_lines.append(line)
+        
+        return out_lines
 
 
     def set_aliases(self) -> None:
@@ -272,21 +287,26 @@ class CommandParser:
         for line in self.lines:
             self.update_levels(line)
             temp_line = remove_ands_from_line(line)
-            
-            if not any([temp_line.startswith(kw) for kw in self.keywords]):
-                # DO NOT just line.split()
-                # regex used here to ensure quoted strings appear as 
-                # single words etc
-                words = get_words(line)  
 
-                for word in words:
-                    if word == '&&' or word == ';':
-                        self.statement_block =+ 1
-                        continue
-                    else:
-                        new_cmd_word = CommandWord(word, self.statement_block)
-                        new_cmd_word = self.annotate_level_info(new_cmd_word)
-                        command_words[self.statement_block].append(new_cmd_word)
+            # ignore anything within a for/while block
+            if self.levels['for'] == 0 and self.levels['while'] == 0:
+                
+                # checks if the line is syntax or statement
+                if not any([temp_line.startswith(kw) for kw in self.keywords]):
+                    # DO NOT just line.split()
+                    # regex used here to ensure quoted strings appear as 
+                    # single words etc
+                    # TODO could possibly handle multiline strings here?
+                    words = get_words(line)  
+
+                    for word in words:
+                        if word == '&&' or word == ';':
+                            self.statement_block =+ 1
+                            continue
+                        else:
+                            new_cmd_word = CommandWord(word, self.statement_block)
+                            new_cmd_word = self.annotate_level_info(new_cmd_word)
+                            command_words[self.statement_block].append(new_cmd_word)
 
         return command_words
 
@@ -327,9 +347,10 @@ class CommandParser:
     def translate_gx_keywords(self, command_words: list[CommandWord]) -> list[CommandWord]:
         for statement_block, cmd_words in command_words.items():
             for word in cmd_words:
-                gx_keyword_value = get_galaxy_keyword_value(word.text)
-                if gx_keyword_value != None:
-                    word.text = gx_keyword_value
+                gx_keywords = get_galaxy_keywords(word.text)
+                for keyword in gx_keywords:
+                    kw_val = get_galaxy_keyword_value(keyword)
+                    word.text = word.text.replace(keyword, kw_val)
 
         return command_words
 

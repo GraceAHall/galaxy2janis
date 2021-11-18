@@ -266,6 +266,16 @@
             ]
         },
         {
+            "name": "hmmscan",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "hmmscan.xml", "tools/hmmer3", "--debug"
+            ]
+        },
+        {
             "name": "genetrack",
             "type": "python",
             "request": "launch",

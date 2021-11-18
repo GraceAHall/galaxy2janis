@@ -6,6 +6,25 @@ from typing import Optional
 
 
 
+def get_unpaired_quotes_start(the_string: str) -> int:
+    first_unpaired_quote = -1
+
+    # find all quotes
+    pattern = r'[\'"]'
+    matches = re.finditer(pattern, the_string)
+    quote_locations = [m.start() for m in matches]
+    
+    # find paired quotes sections
+    quotes_mask = get_quoted_sections(the_string)
+
+    # check each quote is part of quoted section
+    for loc in quote_locations:
+        if quotes_mask[loc] != 1:
+            return loc
+    
+    return -1
+
+
 def get_cheetah_vars(the_string: str) -> set[str]:
     """
     doesn't keep function calls
@@ -139,7 +158,6 @@ def get_galaxy_keyword_value(the_string: str) -> Optional[str]:
     for m in matches:
         return m.group(1)
     return None
-
 
 
 def get_galaxy_keywords(the_string: str) -> list[str]:

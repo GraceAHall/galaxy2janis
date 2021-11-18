@@ -374,13 +374,6 @@ class JanisFormatter:
     def gen_outputs(self) -> list[str]:
         """
         each str elem in out list is tool output
-        identifier: str,
-        datatype: Optional[ParseableType] = None,
-        source: Union[Selector, ConnectionSource]=None # or List[Selector, ConnectionSource]
-        output_folder: Union[str, Selector, List[Union[str, Selector]]] = None,
-        output_name: Union[bool, str, Selector, ConnectionSource] = True, # let janis decide output name
-        extension: Optional[str] = None, # file extension if janis names file
-        doc: Union[str, OutputDocumentation] = None,
         """
         outputs = []
 
@@ -403,9 +396,18 @@ class JanisFormatter:
         """
         formats outputs into janis tooldef string
         """
+        self.update_output_selector_from_command(output)
         datatype = self.format_janis_typestr(output.datatypes)
         tag = self.validate_tag(output.name)
         docstring = self.validate_docstring(output.help_text)
+        selector = output.selector
+        selector_contents = output.selector_contents
+
+        # if selector is InputSelector, its referencing an input
+        # that input tag will have been converted to a janis-friendly tag
+        # same must be done to the selector contents
+        if selector == 'InputSelector':
+            selector_contents = self.validate_tag(selector_contents)        
 
         out_str = '\tToolOutput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -414,12 +416,29 @@ class JanisFormatter:
             out_str += f'\t\tStdout({datatype}),\n'
         else:
             out_str += f'\t\t{datatype},\n'
-            out_str += f'\t\tselector={output.selector}("{output.selector_contents}"),\n'
+            out_str += f'\t\tselector={selector}("{selector_contents}"),\n'
         
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
         return out_str
+
+
+    def update_output_selector_from_command(self, output: Output) -> None:
+        command = self.tool.command
+
+        # is this a TODO? add logic incase of positional output? 
+        # would be pretty weird 
+        for positional in command.get_positionals():
+            pass
+        
+        for option in command.get_options():
+            for source in option.sources:
+                if source.type == TokenType.GX_OUT:
+                    if '$' + output.gx_var == source.gx_ref:
+                        output.selector = 'InputSelector'
+                        output.selector_contents = option.prefix.lstrip('-')
+
 
 
     def gen_imports(self) -> list[str]:
