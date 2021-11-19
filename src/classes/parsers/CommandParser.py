@@ -152,7 +152,7 @@ class CommandParser:
             m = matches[0]
             # this is cursed but trust me it removes the 
             # curly braces for the match span
-            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2] + 1:]
+            text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2]:]
             text = self.standardise_var(text)
 
         return text  

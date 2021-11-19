@@ -186,8 +186,8 @@ def main(argv):
     tool_directories = get_directories(tools_folder)
     parsed_directories = get_directories(parsed_folder)
 
-    #runner = Runner(tools_folder, tool_directories)
-    #runner.run()
+    runner = Runner(tools_folder, tool_directories)
+    runner.run()
 
     reporter = Reporter(parsed_folder, parsed_directories)
     reporter.report()

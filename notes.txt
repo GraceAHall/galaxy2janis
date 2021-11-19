@@ -1,72 +1,8 @@
 
 
-current errors:
+Questions
 
-no container
-allegro
-art tools
-bayescan
-
-silent
-augustus tools
-bamutil clip_overlap
-
-python err 
-multiple expanded forms of cmd word
-IndexError tokens = self.get_all_tokens(word.expanded_text[0])
-
-
-could not resolve token:
-parseval.xml
-
-clip_overlap.xml
-basil.xml
-
-
-outputs
-
-filename based
-    positional
-        minimap2 input.fa output.fa
-
-    option
-        ... -v output.fa
-
-    stdout
-        ... > output.fa
-
-no action. this is fine. there is no link needed between GX_OUT and command line. as long as output.fa is a positional we're good. 
-
-
-galaxy var based
-    positional
-        minimap2 $input $output
-        - i dont think this happens
-        - cant find any evidence in tools-iuc
-
-    option
-        ... -v $output
-
-        # option
-        ToolInput(
-            "v_janis",
-            Gff3,
-            prefix="-v",
-            doc=""
-        ),
-
-        ToolOutput(
-            "output_janis",
-            Gff3,
-            selector=InputSelector("v_janis"),
-            doc=""
-        ),
-
-    stdout
-        ... > $output
-        - done
-
-
+what to do when the tool version doesnt match the main requirement version?
 
 
 
@@ -98,6 +34,9 @@ v0.1 unsupported ---------------------------------------------------------------
     - proper reconstruction of command order using cheetah command logic
     - tools with multiple commands (only first is interpreted at the moment) (bwa.xml is good example)
         - do I need to consider '&&' after the first '>' / '|' ? 
+    - python logic contained in between {} (currently just causes errors):
+        -t ${ ','.join( [ "'%s'" %  $x for $x in $treatment.input_treatment_file] ) }
+
 
 
 - param features 

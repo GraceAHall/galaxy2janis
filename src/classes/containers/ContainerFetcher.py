@@ -97,8 +97,6 @@ class ContainerFetcher:
         currently can't do this because their servers are very very slow
         """
 
-        container = None
-  
         if self.url_is_cached(self.tool_id, self.tool_version):
             self.container = self.container_cache[self.tool_id][self.tool_version]
 
@@ -123,7 +121,7 @@ class ContainerFetcher:
         self.container['tool'] = tool_data['name']
 
         # get the api url for the chosen tool + version
-        version_url = self.get_tool_version_url(tool_data, self.tool_version)
+        version_url = self.get_tool_version_url(tool_data, self.main_requirement['version'])
         
         # get the images of the specific tool + version
         images_data = self.make_api_request(version_url)

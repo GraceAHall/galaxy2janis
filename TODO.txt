@@ -6,12 +6,10 @@ TODO v0.1
 
 
 TODO:
-    - duplicate name resolving 
-    - duplicate references to same token (gx var, positional raw string etc)
-    - positional locations is important need to fix
-    - sort out toolinputs, toolarguments and position of everything
+     
 
     - high priority bugs
+        base_command=["samtools", "faidx", "artic", "minion"] (artic_minion.xml) 
 
     - med priority bugs
         
@@ -35,45 +33,18 @@ TODO:
 
 
 
-Complete 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 Milestones to v0.1 -------------------------------
 
  - galaxy type parsing                          (complete)
  - galaxy types integrated into janis           (richard)
- - improved command string parsing              (working, almost complete)
+ - improved command string parsing              (complete)
  - small additions (rare params)                (queued) 
  - configfiles (1 day)                          (queued) 
  - tool test platform parsing into janis        (queued)
     - includes ingesting param vals and templating
       command string
-
-
-
-
-
-
-
-
-
 
 
 
@@ -92,7 +63,6 @@ Future -------------------------------------------
  - new tools added to toolshed automatically parsed 
  - any which do not pass tests can have manual intervention (fornight / monthly activity)
  - start galaxy workflow parser -> janis
-
 
 
 Notes --------------------------------------------

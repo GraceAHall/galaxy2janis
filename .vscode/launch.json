@@ -96,6 +96,16 @@
             ]
         },
         {
+            "name": "genrich",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "genrich.xml", "tools/genrich", "--debug"
+            ]
+        },
+        {
             "name": "sortBed",
             "type": "python",
             "request": "launch",
@@ -223,6 +233,16 @@
             "console": "integratedTerminal",
             "args": [
                 "sniffles.xml", "tools/sniffles", "--debug"
+            ]
+        },
+        {
+            "name": "chira_map",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "chira_map.xml", "tools/chira", "--debug"
             ]
         },
         {

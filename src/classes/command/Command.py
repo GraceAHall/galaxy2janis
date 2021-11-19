@@ -4,6 +4,7 @@
 from typing import Tuple, Optional, Union
 from enum import Enum
 from classes.outputs.OutputRegister import OutputRegister
+from classes.outputs.Outputs import Output
 from classes.params.ParamRegister import ParamRegister
 from classes.params.Params import BoolParam, SelectParam
 
@@ -77,6 +78,7 @@ Valid sources are RAW_STRING and GX_PARAM
 class Flag:
     def __init__(self, prefix: str):
         self.prefix: str = prefix
+        self.pos: int = 0
         self.sources: list[Token] = [] 
         self.datatypes: list[dict[str, str]] = []
 
@@ -117,6 +119,7 @@ class Option:
     def __init__(self, prefix: str, delim: str):
         self.prefix: str = prefix
         self.delim: str = delim
+        self.pos: int = 0
         self.sources: list[Token] = []
         self.datatypes: list[dict[str, str]] = []
 
@@ -149,12 +152,6 @@ class Command:
         self.options: dict[str, Option] = {}
 
 
-    def has_options(self) -> bool:
-        if len(self.options) != 0:
-            return True
-        return False
-
-
     def get_positional_count(self) -> int:
         return len(self.positionals)
 
@@ -166,8 +163,23 @@ class Command:
         positionals = list(self.positionals.values())
         positionals.sort(key = lambda x: x.pos)
         return positionals
+
     
-    
+    def remove_positional(self, query_pos: int) -> None:
+        """
+        removes positional and renumbers remaining positionals, flags and options
+        """
+
+        for positional in self.positionals.values():
+            if positional.pos == query_pos:
+                key_to_delete = positional.token.text
+                break
+        
+        del self.positionals[key_to_delete]
+
+        self.shift_input_positions(startpos=query_pos, amount=-1)
+
+
     def get_flags(self) -> list[Positional]:
         """
         returns list of flags in alphabetical order
@@ -175,8 +187,8 @@ class Command:
         flags = list(self.flags.values())
         flags.sort(key=lambda x: x.prefix)
         return flags
-   
-    
+
+
     def get_options(self) -> list[Positional]:
         """
         returns list of positionals in order
@@ -186,23 +198,30 @@ class Command:
         return options
 
 
-    def remove_positional(self, pos: int) -> None:
-        """
-        removes positional and renumbers remaining positionals
-        does this by just creating a new dict and moving items across
-        """
-        new_positionals = {}
+    def has_options(self) -> bool:
+        if len(self.flags) != 0 or len(self.options) != 0:
+            return True
+        return False
+   
 
-        for key, val in self.positionals.items():
-            if key == pos:
-                continue
-            elif key > pos:
-                val.pos = val.pos - 1
-                new_positionals[key - 1] = val
-            else:
-                new_positionals[key] = val
-        
-        self.positionals = new_positionals
+    def shift_input_positions(self, startpos: int = 0, amount: int = 1) -> None:
+        """
+        shifts positionals position [amount] 
+        starting at [startpos]
+        ie if we have   inputs at 0,1,4,5,
+                        shift_input_positions(2, -2)
+                        inputs now at 0,1,2,3
+        """
+        for input_category in [self.positionals, self.flags, self.options]:
+            for the_input in input_category.values():
+                if the_input.pos >= startpos:
+                    the_input.pos = the_input.pos + amount 
+
+  
+    def set_flags_options_position(self, new_position: int) -> None:
+        for input_category in [self.flags, self.options]:
+            for the_input in input_category.values():
+                the_input.pos = new_position
 
 
     def update(self, ctoken: Token, ntoken: Token, param_register: ParamRegister, out_register: OutputRegister) -> None:
@@ -242,22 +261,28 @@ class Command:
 
     def update_outputs(self, token: Token, out_register: OutputRegister) -> None:
         if token.type == TokenType.GX_OUT:
-            gx_out = out_register.get(token.text)
+            the_output = out_register.get(token.text)
 
         elif token.type == TokenType.RAW_STRING:
-            gx_out = out_register.get_output_by_filepath(token.text)
-        
-        if gx_out is None:
-            raise Exception(f"could not find gx output: {token.text}")
+            the_output = out_register.get_output_by_filepath(token.text)
 
-        gx_out.is_stdout = True
+        if the_output is None:
+            token.text = token.text.lstrip('$')
+            out_register.create_output_from_text(token.text)
+            # the following line is kinda bad. dollar sign shouldnt be here really...this will cause issues
+            the_output = out_register.get('$' + token.text)
+
+        the_output.is_stdout = True
 
 
     def update_positionals(self, token: Token) -> None:
-        is_after_options = self.has_options()
-        pos = self.get_positional_count()
-        new_positional = Positional(pos, token, is_after_options)
-        self.positionals[pos] = new_positional
+        key = token.text
+
+        if key not in self.positionals:
+            is_after_options = self.has_options()
+            pos = self.get_positional_count()
+            new_positional = Positional(pos, token, is_after_options)
+            self.positionals[key] = new_positional
 
 
     def update_flags(self, token: Token) -> None:
@@ -322,21 +347,6 @@ class Command:
                 return True
                 
         return False
-
-
-    # def get_gx_flag_status(self, token: Token, param_register: ParamRegister) -> bool:
-    #     if token.text.startswith('-'):
-    #         if token.type == TokenType.GX_PARAM:        
-    #             return True
-    #         else:
-    #             if token.gx_ref != '':
-    #                 param = param_register.get(token.gx_ref)
-                    
-    #                 if type(param) in [BoolParam, SelectParam]:
-    #                     if param.values_are_flags():
-    #                         return True
-        
-    #     return False
 
 
     def is_option(self, ctoken: Token, ntoken: Token, param_register: ParamRegister) -> bool:

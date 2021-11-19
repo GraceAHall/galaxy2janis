@@ -230,7 +230,7 @@ class JanisFormatter:
             prefix="--cs_string",
             doc=""
         """
-        tag, datatype, prefix, docstring = self.extract_flag_details(flag)
+        tag, datatype, prefix, position, docstring = self.extract_flag_details(flag)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
 
@@ -238,6 +238,7 @@ class JanisFormatter:
         out_str += f'\t\t"{tag}",\n'
         out_str += f'\t\t{datatype},\n'
         out_str += f'\t\tprefix="{prefix}",\n'
+        out_str += f'\t\tposition={position},\n'
         out_str += f'\t\tdoc="{docstring}"\n'
         out_str += '\t),\n'
 
@@ -252,9 +253,11 @@ class JanisFormatter:
             datatype += "(optional=True)"
 
         prefix = flag.prefix
-        docstring = self.get_docstring(flag.sources) # get from galaxy param otherwise blank
+        position = flag.pos
+        # get from galaxy param otherwise blank
+        docstring = self.get_docstring(flag.sources) 
         
-        return tag, datatype, prefix, docstring
+        return tag, datatype, prefix, position, docstring
         
 
     def get_docstring(self, tokens: list[Token]) -> str:
@@ -273,7 +276,7 @@ class JanisFormatter:
             prefix='--max_len1',
             doc="[Optional] Max read length",
         """
-        tag, datatype, prefix, default, docstring = self.extract_option_details(opt)
+        tag, datatype, prefix, default, position, docstring = self.extract_option_details(opt)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
 
@@ -287,6 +290,8 @@ class JanisFormatter:
         else:
             out_str += f'\t\tprefix="{prefix}",\n'
 
+        out_str += f'\t\tposition={position},\n'
+        
         if default is not None:
             if len(opt.datatypes) == 1 and opt.datatypes[0]['classname'] in ['Float', 'Int']:
                 out_str += f'\t\tdefault={default},\n'
@@ -303,13 +308,14 @@ class JanisFormatter:
         tag = opt.prefix.lstrip('-')
         datatype = self.format_janis_typestr(opt.datatypes)        
         prefix = opt.prefix
+        position = opt.pos
 
         default = self.get_default(opt.sources)
         if default == '':
             default = None
         docstring = self.get_docstring(opt.sources)
 
-        return tag, datatype, prefix, default, docstring
+        return tag, datatype, prefix, default, position, docstring
     
 
     def get_default(self, tokens: list[Token]) -> str:

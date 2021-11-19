@@ -94,7 +94,7 @@ class AliasRegister:
     def get_alias_match(self, source: str, query_string: str) -> list:
         # just trust this crazy regex ok
         temp = source.replace(r'\\', r'\\\\').replace('$', '\$').replace('.', '\.')
-        pattern = temp + r'(?!(\.[\w-]*\()|(\()|(\w))(?=[^\w.]|(\.(forward|reverse|ext|value|name|files_path))+[^\w]|$)'
+        pattern = temp + r'(?!(\.[\w-]*\()|(\()|(\w))(?=[^\w.]|(\.(forward|reverse|ext|value|name|files_path|element_identifier))+[^\w]|$)'
         res = re.finditer(pattern, query_string)
         matches = [m for m in res]
         return matches

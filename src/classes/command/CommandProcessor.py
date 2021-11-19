@@ -38,6 +38,7 @@ class CommandProcessor:
         
         best_block = self.get_best_statement_block()
         self.command = self.gen_command(best_block)
+        self.update_input_positions()
 
 
     def expand_aliases(self, cmd_words: list[CommandWord]) -> list[CommandWord]:
@@ -303,6 +304,32 @@ class CommandProcessor:
         # sort by pos ascending and return
         hits.sort(key=lambda x: x[1])
         return hits[0]
+
+
+    def update_input_positions(self) -> None:
+        options_start = self.get_options_position()
+
+        # update positionals
+        self.command.shift_input_positions(startpos=options_start, amount=1)
+        
+        # update flags and opts position
+        self.command.set_flags_options_position(options_start) 
+
+        
+    def get_options_position(self) -> int:
+        # positionals will be sorted list in order of position
+        # can loop through and find the first which is 
+        # 'after_options' and store that int
+        positionals = self.command.get_positionals()
+
+        options_start = len(positionals)
+        for positional in positionals:
+            if positional.after_options:
+                options_start = positional.pos
+                break
+        
+        return options_start
+
 
 
     def print_command_words(self) -> None:

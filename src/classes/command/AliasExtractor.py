@@ -11,7 +11,7 @@ from classes.command.CommandWord  import CommandWord
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 
-from utils.regex_utils import find_unquoted
+from utils.regex_utils import find_unquoted, get_simple_strings
 from utils.command_utils import init_cmd_word, get_best_token,remove_ands_from_line
 
 """
@@ -57,19 +57,6 @@ class AliasExtractor:
             left, right = self.split_variable_assignment(line)
             left = left[5:] # removes the '#set ' from line start
             self.update_aliases(left, right, 'set', line)  
-            
-
-    def update_aliases(self, left: str, right: str, from_cmd: str, line: str) -> None:
-        # get tokens from text
-        source = self.init_token_from_text(left)
-        dest = self.init_token_from_text(right)
-
-        # update
-        if source is not None and dest is not None:
-            if dest.type in [TokenType.GX_OUT, TokenType.GX_PARAM]:
-                self.alias_register.add(source.text, dest.text, from_cmd, line)
-        else:
-            self.logger.log(1, f'could not add alias from line: {line}')
 
 
     def split_variable_assignment(self, line: str) -> Tuple[str, str]:
@@ -80,6 +67,30 @@ class AliasExtractor:
         left, right = line[:operator_start].strip(), line[operator_end:].strip()
         return left, right
 
+            
+    def update_aliases(self, left: str, right: str, from_cmd: str, line: str) -> None:
+        # get tokens from text
+        source = self.init_token_from_text(left)
+        dest = self.init_token_from_text(right)
+
+        # update
+        if source is not None and dest is not None:
+            # destination is a know galaxy object
+            if dest.type in [TokenType.GX_OUT, TokenType.GX_PARAM]:
+                self.alias_register.add(source.text, dest.text, from_cmd, line)
+
+            # destination is a number
+            elif dest.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]:
+                self.alias_register.add(source.text, dest.text, from_cmd, line)
+
+            # destination is a string but its very simple looking
+            elif dest.type in [TokenType.RAW_STRING, TokenType.QUOTED_STRING]:
+                if self.string_is_polite(dest.text):
+                    self.alias_register.add(source.text, dest.text, from_cmd, line)
+
+        else:
+            self.logger.log(1, f'could not add alias from line: {line}')
+
 
     def init_token_from_text(self, text: str) -> CommandWord:
         cmd_word = init_cmd_word(text)
@@ -87,6 +98,13 @@ class AliasExtractor:
         if token == None:
             self.logger.log(1, f'can resolve token {text}')
         return token
+
+
+    def string_is_polite(self, text: str) -> bool:
+        simple_strings = get_simple_strings(text)
+        if len(simple_strings) == 1 and simple_strings[0] == text:
+            return True
+        return False
 
     
     def extract_symlink_aliases(self, line: str) -> None:

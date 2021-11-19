@@ -2,9 +2,9 @@
 
 
 from typing import Optional
+from xml.etree import ElementTree as et
 
-
-from classes.outputs.Outputs import Output
+from classes.outputs.Outputs import Output, WorkdirOutput
 
 
 class OutputRegister:
@@ -48,8 +48,23 @@ class OutputRegister:
         return None
 
 
-            
+    def create_output_from_text(self, text: str) -> None:
+        """
+        creates a new output using a dummy et.Element
+        the new et.Element node is populated with some default details
+        then is parsed as normal created the new output. 
+        the output is added to our collection of outputs. 
+        """
+        # create dummy node
+        name = text.split('.', 1)[0]
+        dummy_node = et.Element('data', attrib={'name': name, 'format': 'file', 'from_work_dir': text})
+        
+        # create and parse output
+        new_output = WorkdirOutput(dummy_node)
+        new_output.parse()
 
+        # add to collection
+        self.add([new_output])
 
 
     def restructure_outputs(self, outputs: list[Output]) -> None:

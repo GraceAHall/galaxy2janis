@@ -85,7 +85,8 @@ def strip_common_attributes(match: str, match_end: int, the_string: str) -> str:
         '.ext',
         '.value',
         '.name',
-        '.files_path'
+        '.files_path',
+        '.element_identifier'
     ])
     # needs to be recursive so we can iterately peel back 
     # eg  in1.forward.ext
@@ -142,6 +143,12 @@ def get_quoted_strings(the_string: str) -> list[str]:
 
 def get_raw_strings(the_string: str) -> list[str]:
     pattern = r'(?<=\s|^)([\/\\\w\d-.*`])[-\w\d\{\}\$.\/\\_:*`]*(?=\s|$)'
+    matches = re.finditer(pattern, the_string)
+    return [m[0] for m in matches]
+
+
+def get_simple_strings(the_string: str) -> list[str]:
+    pattern = r'[\w$_-]+'
     matches = re.finditer(pattern, the_string)
     return [m[0] for m in matches]
 
