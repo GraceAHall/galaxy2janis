@@ -6,3 +6,4 @@ parsed_tools/*
 parsed_tools/*/*.py
 parsed_tools/*/*.log
 galaxy_types
+venv

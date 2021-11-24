@@ -1,1 +1,0 @@
-if [ -z "\$AUGUSTUS_CONFIG_PATH" ] ; then BUSCO_PATH=\$(dirname \$(which busco)) ; export AUGUSTUS_CONFIG_PATH=\$(realpath \${BUSCO_PATH}/../config) ; fi

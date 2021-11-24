@@ -1,9 +1,0 @@
-
-if [ -b there ] ; then
-    if [ -b there ] ; then 
-        die ;
-    fi
-    spam the chat;
-else 
-    die hitmap;
-fi
