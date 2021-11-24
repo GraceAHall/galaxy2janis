@@ -6,6 +6,16 @@ TODO v0.1
 
 
 TODO:
+    - add test suite (pytest)
+
+
+    - add the following metadata
+    - tool_provider
+    - version
+    - contributors
+    - documentation
+    - dateCreated
+    - dateUpdated
      
 
     - high priority bugs

@@ -6,6 +6,13 @@
     "configurations": [
 
         {
+            "name": "GTE",
+            "type": "python",
+            "request": "launch",
+            "program": "galaxy_templating_engine/template_tool_command.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "rip galaxy types",
             "type": "python",
             "request": "launch",
