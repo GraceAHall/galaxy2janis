@@ -3,7 +3,7 @@
 from copy import deepcopy
 from xml.etree import ElementTree as et
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from classes.params.Params import (
     Param, 
     TextParam, 
@@ -17,7 +17,7 @@ from classes.params.Params import (
 ) 
 
 
-class ParamParser:
+class ParamXMLParser:
     """
     iterates through xml tree nodes, initializing param subclass if encountered.
     most operations are imported from utils files.  

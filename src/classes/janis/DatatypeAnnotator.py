@@ -4,13 +4,13 @@
 
 
 import yaml
-from typing import Union, Optional
+from typing import Optional
 from classes.outputs.Outputs import Output
 
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
 from classes.command.Command import Positional, Flag, Option, Command, TokenType, Token
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 
 
 class DatatypeAnnotator:

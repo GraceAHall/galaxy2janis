@@ -5,10 +5,10 @@
 
 from xml.etree import ElementTree as et
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 
 
-class TokenParser:
+class TokenXMLParser:
     def __init__(self, tree: et.ElementTree, existing_tokens: dict[str, str], logger: Logger):
         self.tree = tree
         self.tokens = existing_tokens

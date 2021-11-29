@@ -1,14 +1,11 @@
 
 
-from typing import Union, Tuple
-import sys 
-import io
+from typing import Tuple
+from datetime import date
 
-
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType, Token
 from classes.outputs.Outputs import Output
-from classes.params.Params import Param
 
 
 class JanisFormatter:
@@ -58,6 +55,9 @@ class JanisFormatter:
     def gen_commandtool(self) -> list[str]:
         """
         each str elem in out list is tool output
+        - contributors
+        - dateCreated
+        - dateUpdated
         """
 
         base_command = self.infer_base_command()
@@ -65,6 +65,7 @@ class JanisFormatter:
         toolname = self.tool.id.replace('-', '_').lower()
         version = self.tool.version
         container = self.tool.container
+        citation = self.tool.get_main_citation()
         
         out_str = f'\n{toolname} = CommandToolBuilder(\n'
         out_str += f'\ttool="{toolname}",\n'
@@ -77,17 +78,14 @@ class JanisFormatter:
 
         out_str += f'\tcontainer="{container["url"]}",\n'
         out_str += f'\tversion="{version}",\n'
+        out_str += f'\ttool_provider="{citation}",\n'
+        out_str += f'\tcontributors="janis",\n'
+        out_str += f'\tdateCreated="{date.today()}",\n'
+        out_str += f'\tdateUpdated="{date.today()}",\n'
+        out_str += f'\tdocumentation="""{self.tool.help}""",\n'
         out_str += ')\n'
 
         return out_str
-
-
-    def container_version_mismatch(self) -> bool:
-        target_version = self.tool.main_requirement['version']
-        acquired_version = self.tool.container['version']
-        if target_version != acquired_version:
-            return True
-        return False
 
 
     def infer_base_command(self) -> str:
@@ -110,6 +108,14 @@ class JanisFormatter:
         base_command = ', '.join(base_command)
         base_command = '[' + base_command + ']'
         return base_command
+
+
+    def container_version_mismatch(self) -> bool:
+        target_version = self.tool.main_requirement['version']
+        acquired_version = self.tool.container['version']
+        if target_version != acquired_version:
+            return True
+        return False
 
 
     def gen_inputs(self) -> list[str]:

@@ -2,11 +2,11 @@
 
 from xml.etree import ElementTree as et
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from classes.command.Configfile import Configfile
 
 
-class ConfigfileParser:
+class ConfigfileXMLParser:
     def __init__(self, tree: et.ElementTree, tokens: dict[str, str], logger: Logger) -> None:
         self.tree = tree
         self.tokens = tokens

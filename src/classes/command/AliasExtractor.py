@@ -4,7 +4,7 @@
 from typing import Tuple
 
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from classes.command.Alias import AliasRegister
 from classes.command.Command import TokenType
 from classes.command.CommandWord  import CommandWord

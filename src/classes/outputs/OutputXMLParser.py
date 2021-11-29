@@ -4,13 +4,13 @@
 
 from xml.etree import ElementTree as et
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from classes.outputs.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
 from classes.params.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 
 
-class OutputParser:
+class OutputXMLParser:
     def __init__(self, tree: et.ElementTree, param_register: ParamRegister, logger: Logger) -> None:
         self.tree = tree
         self.param_register = param_register

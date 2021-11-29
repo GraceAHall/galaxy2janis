@@ -2,7 +2,7 @@
 # pyright: basic
 
 import xml.etree.ElementTree as et
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from typing import Union
 import sys
 from classes.outputs.OutputRegister import OutputRegister
@@ -12,17 +12,20 @@ from classes.command.Command import Command
 from classes.command.CommandProcessor import CommandProcessor
 from classes.command.Configfile import Configfile
 
-from classes.containers.ContainerFetcher import ContainerFetcher
+from classes.metadata.ContainerFetcher import ContainerFetcher
 
-from classes.parsers.MacroParser import MacroParser
-from classes.parsers.TokenParser import TokenParser
-from classes.parsers.ConfigfileParser import ConfigfileParser
-from classes.parsers.CommandParser import CommandParser
-from classes.parsers.ParamParser import ParamParser
+from classes.tool.MacroXMLParser import MacroXMLParser
+from classes.tool.TokenXMLParser import TokenXMLParser
+from classes.configfiles.ConfigfileXMLParser import ConfigfileXMLParser
+from classes.command.CommandXMLParser import CommandXMLParser
+from classes.params.ParamXMLParser import ParamXMLParser
 from classes.janis.DatatypeAnnotator import DatatypeAnnotator
 from classes.janis.JanisFormatter import JanisFormatter
-from classes.parsers.OutputParser import OutputParser
-from classes.parsers.MetadataParser import MetadataParser
+from classes.outputs.OutputXMLParser import OutputXMLParser
+from classes.metadata.MetadataXMLParser import MetadataXMLParser
+
+from biblib.biblib import bib
+
 
 """
 This class mostly acts as an orchestrator.
@@ -54,8 +57,40 @@ class Tool:
         self.out_register: Optional[OutputRegister] = None
 
 
+    def get_main_citation(self) -> str:
+        doi_citations = [c for c in self.citations if c['type'] == 'doi']
+        if len(doi_citations) > 0:
+            doi_citation = doi_citations[0]
+            return str(doi_citation['text'])
+        
+        bibtex_citations = [c for c in self.citations if c['type'] == 'bibtex']
+        if len(bibtex_citations) > 0:
+            bibtex_citation = self.parse_bibtex(bibtex_citations[0])
+            return str(bibtex_citation) 
+        
+        else:
+            return 'tool xml missing citation'
+    
 
-class ToolParser:
+    def parse_bibtex(self, bibtex_citation: dict[str, str]) -> str:
+        # define and parse using biblib
+        bp = bib.Parser()
+        data = bp.parse(bibtex_citation['text'], log_fp=sys.stderr).get_entries() # type: ignore
+
+        # get the key: value pairs
+        entry = list(data.values())[0]  # type: ignore
+        return str(entry['url']) # type: ignore
+
+
+    # def get_help(self) -> str:
+    #     return repr(self.help)
+        
+
+
+
+
+
+class ToolXMLParser:
     def __init__(self, tool_xml: str, tool_workdir: str, out_log: str, out_def: str, debug: bool=False):
         self.filename = tool_xml
         self.workdir = tool_workdir
@@ -121,7 +156,7 @@ class ToolParser:
 
     # 1st step: macro expansion (preprocessing)
     def parse_macros(self) -> None:
-        mp = MacroParser(self.workdir, self.filename, self.logger)
+        mp = MacroXMLParser(self.workdir, self.filename, self.logger)
         mp.parse()
         self.tree = mp.tree 
         
@@ -133,14 +168,14 @@ class ToolParser:
 
     # 2nd step: token handling (preprocessing)
     def parse_tokens(self):
-        tp = TokenParser(self.tree, self.tokens, self.logger)
+        tp = TokenXMLParser(self.tree, self.tokens, self.logger)
         tp.parse()
         self.tree = tp.tree
 
 
     # 3rd step: parsing tool metadata
     def parse_metadata(self):
-        mp = MetadataParser(self.tree, self.logger)
+        mp = MetadataXMLParser(self.tree, self.logger)
         mp.parse()
         self.tool_name = mp.tool_name
         self.tool_id = mp.tool_id
@@ -161,7 +196,7 @@ class ToolParser:
 
     # 4th step: param parsing
     def parse_params(self):
-        pp = ParamParser(self.tree, self.logger)
+        pp = ParamXMLParser(self.tree, self.logger)
         params = pp.parse()
         if self.debug:
             pp.pretty_print()
@@ -170,7 +205,7 @@ class ToolParser:
 
     # 5th step: output parsing
     def parse_outputs(self):
-        op = OutputParser(self.tree, self.param_register, self.logger)
+        op = OutputXMLParser(self.tree, self.param_register, self.logger)
         outputs = op.parse() 
         if self.debug:
             op.pretty_print()
@@ -179,7 +214,7 @@ class ToolParser:
 
     # 6th step: configfile parsing
     def parse_configfiles(self):
-        cp = ConfigfileParser(self.tree, self.tokens, self.logger)
+        cp = ConfigfileXMLParser(self.tree, self.tokens, self.logger)
         cp.parse()
         self.configfiles = cp.configfiles
 
@@ -187,7 +222,7 @@ class ToolParser:
     # 7th step: command parsing 
     def parse_command(self):
         # parse command text into useful representation
-        cpar = CommandParser(self.tree, self.param_register, self.out_register, self.logger)
+        cpar = CommandXMLParser(self.tree, self.param_register, self.out_register, self.logger)
         cpar.parse()
         if self.debug:
             cpar.pretty_print_command_words()

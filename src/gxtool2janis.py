@@ -1,16 +1,13 @@
 
 
 
-#pyright: strict
+#pyright: basic
 
-import sys
 import os
 from typing import Tuple
 import argparse
 
-
-
-from classes.parsers.ToolParser import ToolParser
+from classes.tool.ToolXMLParser import ToolXMLParser
 import xml.etree.ElementTree as et
 
 # main entry point
@@ -24,7 +21,7 @@ def main():
         out_log, out_def = init_out_files(args.toolxml, args.tooldir)
 
         # parse tool 
-        tp = ToolParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
+        tp = ToolXMLParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
         tp.parse()
     
 

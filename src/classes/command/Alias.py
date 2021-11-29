@@ -3,8 +3,8 @@
 
 import regex as re
 
-from classes.params.ParamRegister import ParamRegister
-from classes.outputs.OutputRegister import OutputRegister
+#from classes.params.ParamRegister import ParamRegister
+#from classes.outputs.OutputRegister import OutputRegister
 
 
 

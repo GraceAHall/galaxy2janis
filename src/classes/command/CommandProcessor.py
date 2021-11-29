@@ -1,15 +1,13 @@
 
 
-from collections import defaultdict
 from typing import Tuple, Union
-import regex as re
 
 from classes.command.Alias import AliasRegister
 from classes.command.Command import Command, Token, TokenType
 from classes.command.CommandWord  import CommandWord
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 
 from utils.regex_utils import find_unquoted
 from utils.command_utils import get_best_token, init_cmd_word

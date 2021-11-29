@@ -6,17 +6,12 @@ TODO v0.1
 
 
 TODO:
-    - add test suite (pytest)
-
-
-    - add the following metadata
-    - tool_provider
-    - version
-    - contributors
-    - documentation
-    - dateCreated
-    - dateUpdated
-     
+    - add param loading module
+    - 
+    - test parsing
+    - configfiles
+    - add code test suite (pytest)
+    
 
     - high priority bugs
         base_command=["samtools", "faidx", "artic", "minion"] (artic_minion.xml) 
@@ -30,9 +25,7 @@ TODO:
         - augustus default for kvpairs (--singlestrand=true)
     
 
-    - test parsing
-    - galaxy templating engine
-    - configfiles
+
 
 
 

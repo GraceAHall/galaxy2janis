@@ -4,6 +4,10 @@
 Now on WSL
 
 
+run tool parsing
+
+
+
 Questions
 
 what to do when the tool version doesnt match the main requirement version?

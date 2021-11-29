@@ -5,9 +5,9 @@
 import xml.etree.ElementTree as et
 import os
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 
-class MacroParser:
+class MacroXMLParser:
     def __init__(self, workdir: str, filename: str, logger: Logger) -> None:
         self.workdir = workdir
         self.filename = filename
@@ -54,7 +54,7 @@ class MacroParser:
 
     def import_xml(self, node: et.Element) -> None:
         xml_file = node.text or ""
-        mp = MacroParser(self.workdir, xml_file, self.logger)
+        mp = MacroXMLParser(self.workdir, xml_file, self.logger)
         mp.collect()
         self.tokens.update(mp.tokens)
         self.macros.update(mp.macros)

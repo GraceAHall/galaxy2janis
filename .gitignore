@@ -7,3 +7,4 @@ parsed_tools/*/*.py
 parsed_tools/*/*.log
 galaxy_types
 venv
+src/galaxy

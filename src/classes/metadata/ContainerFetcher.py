@@ -6,7 +6,7 @@ import json
 import os
 import regex as re
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from utils.general_utils import global_align
 
 
@@ -27,7 +27,7 @@ class ContainerFetcher:
         self.logger = logger
 
         self.container_cache = None
-        self.container_cache_path = 'container_cache/cache.json' 
+        self.container_cache_path = 'container_cache.json' 
         self.main_requirement: Optional[dict[str, str]] = None
         self.container: dict[str, str] = {
             'tool': '',

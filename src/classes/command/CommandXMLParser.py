@@ -3,7 +3,6 @@
 # pyright: basic
 
 from collections import defaultdict
-from typing import Union
 import xml.etree.ElementTree as et
 import regex as re
 
@@ -11,7 +10,7 @@ from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from classes.command.AliasExtractor import AliasExtractor
 from classes.command.CommandWord  import CommandWord
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 
 from utils.regex_utils import find_unquoted, get_words, get_galaxy_keywords, get_galaxy_keyword_value, get_unpaired_quotes_start
 from utils.command_utils import remove_ands_from_line
@@ -32,7 +31,7 @@ after this module, the list of CommandWord() gets parsed to CommandProcessor() w
 """
 
 
-class CommandParser:
+class CommandXMLParser:
     def __init__(self, tree: et.ElementTree, param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         self.tree = tree
         self.param_register = param_register

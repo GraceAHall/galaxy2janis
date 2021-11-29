@@ -7,11 +7,11 @@ from typing import Union
 
 
 
-from classes.Logger import Logger
+from classes.logging.Logger import Logger
 from utils.etree_utils import get_attribute_value
 
 
-class MetadataParser:
+class MetadataXMLParser:
     def __init__(self, tree: et.ElementTree, logger: Logger) -> None:
         self.tree = tree
         self.logger = logger
