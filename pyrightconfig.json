@@ -1,6 +1,5 @@
 {
     "include": [
-        "classes/*",
         "XMLParser.py",
         "gxtool2janis.py",
       ],

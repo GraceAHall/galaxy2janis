@@ -4,6 +4,7 @@
 # pyright: basic
 
 import json
+import threading
 from typing import Union
 from pydantic.types import Json 
 import tempfile
@@ -274,15 +275,80 @@ ABRICATE_OUTPUTS = ['report']
 #TOOL_FILE = 'busco.xml'
 #TOOL_DIR = 'busco'
 TOOL_FILE = 'abricate.xml'
-TOOL_DIR = 'abricate'
+TOOL_DIR = 'tools/abricate'
 
-
+JOB_SUCCESS = 0
+JOB_FAIL = 0
+    
 def main():
+    run_single_tool()
+    #run_all_tools()
+
+
+def run_single_tool():
     tmpl = Templator(TOOL_FILE, TOOL_DIR)
     tmpl.init_objects()
     tmpl.setup_job()
     tmpl.evaluate()
-    print()
+
+
+def run_all_tools():
+    tools_folder = 'tools'
+    tool_directories = get_directories(tools_folder)
+    run(tools_folder, tool_directories)
+
+
+def get_directories(folder_path):
+    files = os.listdir(folder_path)
+    directories = [f for f in files if os.path.isdir(f'{folder_path}/{f}')]
+    return directories
+
+
+def run(tools_folder, tool_directories) -> None:
+    TH_COUNT = 10
+    jobs = []
+
+    # set up all jobs to complete
+    for tool_dir in tool_directories:
+        xmls = get_xmls(tools_folder, tool_dir)
+        for xml in xmls:
+            jobs.append([tools_folder, tool_dir, xml])
+
+    # execute jobs using threads
+    for i in range(0, len(jobs), TH_COUNT):
+        threads = []
+
+        for j in range(TH_COUNT):
+            if i + j < len(jobs):
+                job = jobs[i + j]
+                t = threading.Thread(target=worker, args=(job,))
+                t.daemon = True
+                threads.append(t)
+
+        for j in range(len(threads)):
+            threads[j].start()
+
+        for j in range(len(threads)):
+            threads[j].join()
+            
+
+def get_xmls(workdir, tool_dir) -> list[str]:
+    files = os.listdir(f'{workdir}/{tool_dir}')
+    xmls = [f for f in files if f.endswith('xml')]
+    xmls = [x for x in xmls if 'macros' not in x]
+    return xmls
+
+
+def worker(job: list[str]) -> None:
+    try:
+        tmpl = Templator(f'{job[2]}', f'{job[0]}/{job[1]}')
+        tmpl.init_objects()
+        print(f'success {job[1]}')
+    except:
+        print(f'fail {job[1]}')
+    #tmpl.setup_job()
+    #tmpl.evaluate()
+    #print()
 
 
 if __name__ == '__main__':

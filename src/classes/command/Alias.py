@@ -70,9 +70,6 @@ class AliasRegister:
             $input.names -> $input.names      (not file.fasta.names)
             $input.forward (galaxy attribute) -> file.fasta.forward
         """
-
-        out = []
-
         # for each alias source, check if in the query string
         for source in self.alias_dict.keys():
             # get partial matches
@@ -82,13 +79,9 @@ class AliasRegister:
                 destination_values = self.resolve(source)
                 for val in destination_values:
                     for m in matches:
-                        supp_query_string = query_string[:m.start()] + val + query_string[m.end():]
-                        out.append(supp_query_string)           
-                    
-        if len(out) == 0:
-            out = [query_string]
+                        query_string = query_string[:m.start()] + val + query_string[m.end():]
         
-        return out
+        return query_string
 
 
     def get_alias_match(self, source: str, query_string: str) -> list:

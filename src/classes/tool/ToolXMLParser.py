@@ -1,30 +1,38 @@
 
 # pyright: basic
 
-import xml.etree.ElementTree as et
-from classes.logging.Logger import Logger
+#import xml.etree.ElementTree as et
+
 from typing import Union
 import sys
-from classes.outputs.OutputRegister import OutputRegister
-from classes.params.ParamRegister import ParamRegister
+from classes.templating.MockClasses import MockApp
+from classes.tool.Tool import Tool
+from galaxy.tools import Tool as GalaxyTool
 
-from classes.command.Command import Command
-from classes.command.CommandProcessor import CommandProcessor
-from classes.command.Configfile import Configfile
+# from classes.tool.MacroXMLParser import MacroXMLParser
+# from classes.tool.TokenXMLParser import TokenXMLParser
 
+from classes.metadata.Metadata import Metadata
 from classes.metadata.ContainerFetcher import ContainerFetcher
 
-from classes.tool.MacroXMLParser import MacroXMLParser
-from classes.tool.TokenXMLParser import TokenXMLParser
+#from classes.outputs.OutputXMLParser import OutputXMLParser
+from classes.outputs.OutputRegister import OutputRegister
+
+#from classes.params.ParamXMLParser import ParamXMLParser
+from classes.params.ParamRegister import ParamRegister
+
+from classes.configfiles.Configfile import Configfile
 from classes.configfiles.ConfigfileXMLParser import ConfigfileXMLParser
+
 from classes.command.CommandXMLParser import CommandXMLParser
-from classes.params.ParamXMLParser import ParamXMLParser
+from classes.command.CommandString import CommandString
+from classes.command.Command import Command
+
 from classes.janis.DatatypeAnnotator import DatatypeAnnotator
 from classes.janis.JanisFormatter import JanisFormatter
-from classes.outputs.OutputXMLParser import OutputXMLParser
-from classes.metadata.MetadataXMLParser import MetadataXMLParser
 
-from biblib.biblib import bib
+from classes.logging.Logger import Logger
+from classes.tool.GalaxyLoader import GalaxyLoader
 
 
 """
@@ -33,101 +41,54 @@ Tool.xml is parsed in a stepwise manner, where each step has its own class to pe
 """
 
 
-#pyright: strict
-
 from typing import Optional
 
 #from classes.datastructures import Param
 
  
-class Tool:
-    def __init__(self):
-        self.name: str = ""
-        self.id: str = ""
-        self.version: str = ""
-        self.creator: Optional[str] = None
-        self.main_requirement: Optional[dict[str, Union[str, int]]] = None
-        self.container: Optional[dict[str, str]] = None
-        self.tests: Optional[str] = None
-        self.help: str = ""
-        self.citations: list[dict[str, str]] = []
-        self.tool_module: str = 'bioinformatics' 
-        self.command: Optional[Command] = None  
-        self.param_register: Optional[ParamRegister] = None
-        self.out_register: Optional[OutputRegister] = None
 
-
-    def get_main_citation(self) -> str:
-        doi_citations = [c for c in self.citations if c['type'] == 'doi']
-        if len(doi_citations) > 0:
-            doi_citation = doi_citations[0]
-            return str(doi_citation['text'])
         
-        bibtex_citations = [c for c in self.citations if c['type'] == 'bibtex']
-        if len(bibtex_citations) > 0:
-            bibtex_citation = self.parse_bibtex(bibtex_citations[0])
-            return str(bibtex_citation) 
-        
-        else:
-            return 'tool xml missing citation'
-    
-
-    def parse_bibtex(self, bibtex_citation: dict[str, str]) -> str:
-        # define and parse using biblib
-        bp = bib.Parser()
-        data = bp.parse(bibtex_citation['text'], log_fp=sys.stderr).get_entries() # type: ignore
-
-        # get the key: value pairs
-        entry = list(data.values())[0]  # type: ignore
-        return str(entry['url']) # type: ignore
-
-
-    # def get_help(self) -> str:
-    #     return repr(self.help)
-        
-
-
-
-
 
 class ToolXMLParser:
     def __init__(self, tool_xml: str, tool_workdir: str, out_log: str, out_def: str, debug: bool=False):
         self.filename = tool_xml
         self.workdir = tool_workdir
-        self.debug = debug
-        self.logfile = out_log
         self.janis_out_path = out_def
-        self.tree: et.ElementTree = et.parse(f'{self.workdir}/{self.filename}')
-        self.root: et.Element = self.tree.getroot()
-
-        self.galaxy_depth_elems = ['conditional', 'section']
-        self.ignore_elems = ['outputs', 'tests']
-        self.parsable_elems = ['description', 'command', 'param', 'repeat', 'help', 'citations']
+        self.debug = debug
+        
+        self.gx_loader: GalaxyLoader = GalaxyLoader(self.workdir, self.filename)
+        self.app: MockApp = self.gx_loader.init_app()
+        self.gxtool: GalaxyTool = self.gx_loader.init_tool(self.app)
+        self.tool: Tool = Tool()
+        
+        self.logfile = out_log
+        self.logger = Logger(self.logfile)
+        
+        # self.tree: et.ElementTree = et.parse(f'{self.workdir}/{self.filename}')
+        # self.root: et.Element = self.tree.getroot()
+        # self.galaxy_depth_elems = ['conditional', 'section']
+        # self.ignore_elems = ['outputs', 'tests']
+        # self.parsable_elems = ['description', 'command', 'param', 'repeat', 'help', 'citations']
 
         # tool metadata
-        self.tool_name: str = ''
-        self.tool_id: str = ''
-        self.tool_version: str = ''
-        self.tool_creator: str = ''
-        self.citations: list[dict[str, str]] = []
-        self.requirements: list[dict[str, Union[str, int]]] = []
-        self.main_requirement: Optional[dict[str, Union[str, int]]] = None
-        self.container: Optional[dict[str, str]] = None
-        self.description: str = ''
-        self.help: str = ''
+        # self.tool_name: str = ''
+        # self.tool_id: str = ''
+        # self.tool_version: str = ''
+        # self.tool_creator: str = ''
+        # self.citations: list[dict[str, str]] = []
+        # self.requirements: list[dict[str, Union[str, int]]] = []
+        # self.main_requirement: dict[str, Union[str, int]] = {}
+        # self.container: dict[str, str] = {}
+        # self.description: str = ''
+        # self.help: str = ''
 
         # param and output parsing
-        self.tree_path: list[str] = []
-        self.tokens: dict[str, str] = {}
-        self.command_lines: list[str] = [] 
-        self.configfiles: list[Configfile] = []
-        self.command: Command = Command() 
-        self.param_register: ParamRegister = ParamRegister()  
-        self.out_register: OutputRegister = OutputRegister() 
-
-        self.logger = Logger(self.logfile)
-        self.tool = None
-
+        # self.tree_path: list[str] = []
+        # self.tokens: dict[str, str] = {}
+        # self.command_lines: list[str] = [] 
+        # self.configfiles: list[Configfile] = []
+        # self.command: Command = Command() 
+    
 
     def parse(self) -> None:
         """
@@ -135,18 +96,19 @@ class ToolXMLParser:
         to do stuff like confirm the base command etc
         """
         # basic setup
-        self.parse_macros()
-        self.parse_tokens()
-        self.parse_metadata()
-        self.fetch_container()
+        self.set_metadata()
+        self.set_container()
 
         # gathering UI variables
-        self.parse_params()
-        self.parse_outputs()
-        self.parse_configfiles()
+        self.set_param_register()
+        self.set_out_register()
+        #self.set_configfiles()
         
         # the business
-        self.parse_command()
+        self.set_tests()
+        self.set_command()
+
+        # post
         self.annotate_datatypes()
         self.init_tool()
         self.write_janis()
@@ -154,84 +116,52 @@ class ToolXMLParser:
         #self.postprocess()
 
 
-    # 1st step: macro expansion (preprocessing)
-    def parse_macros(self) -> None:
-        mp = MacroXMLParser(self.workdir, self.filename, self.logger)
-        mp.parse()
-        self.tree = mp.tree 
-        
-        # update the xml tree
-        self.tokens.update(mp.tokens)
-        self.root = self.tree.getroot()
-        self.check_macro_expansion(self.root)
+    def set_metadata(self):
+        meta = Metadata(self.gxtool)
+        self.tool.update_metadata(meta)
 
-
-    # 2nd step: token handling (preprocessing)
-    def parse_tokens(self):
-        tp = TokenXMLParser(self.tree, self.tokens, self.logger)
-        tp.parse()
-        self.tree = tp.tree
-
-
-    # 3rd step: parsing tool metadata
-    def parse_metadata(self):
-        mp = MetadataXMLParser(self.tree, self.logger)
-        mp.parse()
-        self.tool_name = mp.tool_name
-        self.tool_id = mp.tool_id
-        self.tool_version = mp.tool_version
-        self.description = mp.description
-        self.requirements = mp.requirements
-        self.citations = mp.citations
-        self.help = mp.help
-
-
-    def fetch_container(self):
-        cf = ContainerFetcher(self.tool_id, self.tool_version, self.requirements, self.logger)
-        cf.fetch()
-
-        self.main_requirement = cf.main_requirement # type: ignore
-        self.container = cf.container # type: ignore
+    
+    def set_container(self):
+        cf = ContainerFetcher(self.tool, self.logger)
+        self.tool.container = cf.fetch()
 
 
     # 4th step: param parsing
-    def parse_params(self):
-        pp = ParamXMLParser(self.tree, self.logger)
-        params = pp.parse()
-        if self.debug:
-            pp.pretty_print()
-        self.param_register.add(params)
+    def set_param_register(self):
+        self.tool.param_register = ParamRegister(self.gxtool.inputs)
 
 
     # 5th step: output parsing
-    def parse_outputs(self):
-        op = OutputXMLParser(self.tree, self.param_register, self.logger)
-        outputs = op.parse() 
-        if self.debug:
-            op.pretty_print()
-        self.out_register.add(outputs)
+    def set_out_register(self):
+        self.tool.out_register = OutputRegister(self.gxtool.outputs)
 
 
     # 6th step: configfile parsing
-    def parse_configfiles(self):
-        cp = ConfigfileXMLParser(self.tree, self.tokens, self.logger)
-        cp.parse()
-        self.configfiles = cp.configfiles
+    def set_configfiles(self):
+        self.tool.configfiles = self.gxtool.config_files
+
+
+    def set_tests(self):
+        self.tool.tests = self.gxtool.tests
 
 
     # 7th step: command parsing 
-    def parse_command(self):
+    def set_command(self):
         # parse command text into useful representation
-        cpar = CommandXMLParser(self.tree, self.param_register, self.out_register, self.logger)
-        cpar.parse()
-        if self.debug:
-            cpar.pretty_print_command_words()
+        xml_par = CommandXMLParser(self.gxtool.command, self.logger)
+        xml_cs = CommandString(
+            xml_par.command_lines, 
+            self.tool,
+            self.logger)
         
-        # create Command() object
-        cpro = CommandProcessor(cpar.command_words, self.main_requirement, self.param_register, self.out_register, cpar.alias_register, self.logger) # type: ignore
-        cpro.process()
-        #cpro.pretty_print_tokens()
-        self.command = cpro.command
+        for block in xml_cs.command_blocks:
+            print(block)
+
+        xml_cmd = Command()
+        xml_cmd.update(xml_cs.best_block)
+
+        print()
+
 
 
     # 8th step: annotating with datatypes
@@ -274,6 +204,69 @@ class ToolXMLParser:
 
 
 
+
+
+
+
+"""
+SHAME CORNER
+
+    # 1st step: macro expansion (preprocessing)
+    def parse_macros(self) -> None:
+        mp = MacroXMLParser(self.workdir, self.filename, self.logger)
+        mp.parse()
+        self.tree = mp.tree 
+        
+        # update the xml tree
+        self.tokens.update(mp.tokens)
+        self.root = self.tree.getroot()
+        self.check_macro_expansion(self.root)
+
+
+    # 2nd step: token handling (preprocessing)
+    def parse_tokens(self):
+        tp = TokenXMLParser(self.tree, self.tokens, self.logger)
+        tp.parse()
+        self.tree = tp.tree
+
+
+def set_metadata(self):
+        mp = MetadataXMLParser(self.tree, self.logger)
+        mp.parse()
+        self.tool_name = mp.tool_name
+        self.tool_id = mp.tool_id
+        self.tool_version = mp.tool_version
+        self.description = mp.description
+        self.requirements = mp.requirements
+        self.citations = mp.citations
+        self.help = mp.help
+
+
+    # 4th step: param parsing
+    def set_param_register(self):
+        pp = ParamXMLParser(self.tree, self.logger)
+        params = pp.parse()
+        if self.debug:
+            pp.pretty_print()
+        self.param_register.add(params)
+
+
+    # 5th step: output parsing
+    def set_out_register(self):
+        op = OutputXMLParser(self.tree, self.param_register, self.logger)
+        outputs = op.parse() 
+        if self.debug:
+            op.pretty_print()
+        self.out_register.add(outputs)
+
+
+    # 6th step: configfile parsing
+    def set_configfiles(self):
+        cp = ConfigfileXMLParser(self.tree, self.tokens, self.logger)
+        cp.parse()
+        self.configfiles = cp.configfiles
+
+
     # ============== debugging ============== #
 
     def check_macro_expansion(self, node: et.Element) -> None:
@@ -292,7 +285,4 @@ class ToolXMLParser:
         pass
 
 
-
-
-
-
+"""

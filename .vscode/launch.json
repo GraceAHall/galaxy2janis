@@ -4,12 +4,21 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "name": "abricate",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abricate.xml", "tools/abricate", "--debug"
+            ]
+        },
         {
             "name": "GTE",
             "type": "python",
             "request": "launch",
-            "program": "galaxy_templating_engine/template_tool_command.py",
+            "program": "src/classes/templating/template.py",
             "console": "integratedTerminal"
         },
         {
@@ -322,16 +331,7 @@
                 "disco.xml", "tools/disco", "--debug"
             ]
         },
-        {
-            "name": "abricate",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "abricate.xml", "tools/abricate", "--debug"
-            ]
-        },
+        
         {
             "name": "abricate_summary",
             "type": "python",

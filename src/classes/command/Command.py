@@ -1,128 +1,13 @@
 
 
-from enum import Enum
+
+from typing import Tuple
+
+from classes.command.CommandBlock import CommandBlock
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
-
-
-class TokenType(Enum):
-    GX_PARAM        = 0
-    GX_OUT          = 1
-    QUOTED_STRING   = 2
-    RAW_STRING      = 3
-    QUOTED_NUM      = 4
-    RAW_NUM         = 5
-    LINUX_OP        = 6
-    GX_KEYWORD      = 7
-    KV_PAIR         = 8
-    END_COMMAND     = 9
-
-
-
-class Token:
-    def __init__(self, text: str, statement_block: int, token_type: TokenType):
-        self.text = text
-        self.statement_block = statement_block
-        self.type = token_type
-        self.in_conditional = False
-        self.in_loop = False
-        self.gx_ref: str = text if token_type in [TokenType.GX_PARAM, TokenType.GX_OUT] else ''
-        
-
-    def __str__(self) -> str:
-        return f'{self.text[:29]:<30}{self.gx_ref[:29]:30}{self.type.name:25}{self.in_conditional:5}{self.statement_block:>10}'
-
-
-
-class Positional:
-    def __init__(self, pos: int, token: Token, after_options: bool):
-        self.pos = pos
-        self.token = token
-        self.after_options = after_options
-        self.datatypes: list[dict[str, str]] = []
-
-
-    def is_optional(self) -> bool:
-        return self.token.in_conditional
-
-
-    def __str__(self) -> str:
-        t = self.token
-        return f'{self.pos:<10}{t.text[:19]:20}{t.gx_ref[:19]:20}{t.type.name:20}{self.after_options:>5}'
-
-
-"""
-Flags have a text element and sources
-Flags arguments can be included in the command string via sources
-Valid sources are RAW_STRING and GX_PARAM 
-"""
-class Flag:
-    def __init__(self, prefix: str):
-        self.prefix: str = prefix
-        self.pos: int = 0
-        self.sources: list[Token] = [] 
-        self.datatypes: list[dict[str, str]] = []
-
-
-    def is_optional(self) -> bool:
-        for source in self.sources:
-            if not source.in_conditional:
-                return False
-        return True
-
-
-    def __str__(self) -> str:
-        """
-        print(f'{"prefix":30}{"token type":>20}')
-        """
-        
-        the_str = ''
-
-        t = self.sources[0]
-        the_str += f'{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{t.in_conditional:>5}'
-
-        if len(self.sources) > 1:
-            for t in self.sources[1:]:
-                the_str += f'\n{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{t.in_conditional:>5}'
-
-        return the_str
-
-
-"""
-Options have a flag and an argument 
-prefix can be set from a RAW_STRING and/or GX_PARAM?
-Sources can be set from just about anything 
-
-sources has a little bit different meaning to as seen in Flags.
-
-"""
-class Option:
-    def __init__(self, prefix: str, delim: str):
-        self.prefix: str = prefix
-        self.delim: str = delim
-        self.pos: int = 0
-        self.sources: list[Token] = []
-        self.datatypes: list[dict[str, str]] = []
-
-
-    def is_optional(self) -> bool:
-        for source in self.sources:
-            if not source.in_conditional:
-                return False
-        return True
-
-
-    def __str__(self) -> str:
-        the_str = ''
-
-        t = self.sources[0]
-        the_str += f'{self.prefix[:29]:30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{t.in_conditional:>5}'
-
-        if len(self.sources) > 1:
-            for t in self.sources[1:]:
-                the_str += f'\n{"":30}{t.text[:29]:30}{t.gx_ref[:29]:30}{t.type.name:20}{t.in_conditional:>5}'
-
-        return the_str
+from classes.command.CommandComponents import Positional, Flag, Option
+from classes.command.Tokens import Token, TokenType 
 
 
 
@@ -131,81 +16,70 @@ class Command:
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
+        self.base_command: list[str] = []
 
 
-    def get_positional_count(self) -> int:
-        return len(self.positionals)
-
-
-    def get_positionals(self) -> list[Positional]:
+    def update(self, command_block: CommandBlock) -> None:
         """
-        returns list of positionals in order
+        providing a list of tokens allows the command to be updated with new info.
+        the list of tokens could be from initial tool xml parsing, or from
+        templated command line strings passed through galaxy tool evaluation engine.
         """
-        positionals = list(self.positionals.values())
-        positionals.sort(key = lambda x: x.pos)
-        return positionals
+        # iterate through command words (with next word for context)
+        
+        i = 0
+        while i < len(command_block.tokens) - 1:
+            curr_tokens = command_block.tokens[i]
+            next_tokens = command_block.tokens[i+1]
+            should_skip_next = False
 
-    
-    def remove_positional(self, query_pos: int) -> None:
-        """
-        removes positional and renumbers remaining positionals, flags and options
-        """
+            for ctoken in curr_tokens:
+                # kv pair handling. add as option with correct delim. 
+                if ctoken.type == TokenType.KV_PAIR: 
+                    ctoken, ntoken, delim = self.split_keyval_to_best_tokens(ctoken)
+                    self.update_options(ctoken, ntoken, delim=delim)
+                    continue
 
-        for positional in self.positionals.values():
-            if positional.pos == query_pos:
-                key_to_delete = positional.token.text
+                # everything else
+                for ntoken in next_tokens:
+                    skip_next = self.update_components(ctoken, ntoken, self.param_register, self.out_register)
+                    if skip_next:
+                        should_skip_next = True
+            
+            if should_skip_next:
+                i += 2
+            else:
+                i += 1
+
+        self.command = command
+
+
+    def update_input_positions(self) -> None:
+        options_start = self.get_options_position()
+
+        # update positionals
+        self.command.shift_input_positions(startpos=options_start, amount=1)
+        
+        # update flags and opts position
+        self.command.set_flags_options_position(options_start) 
+
+        
+    def get_options_position(self) -> int:
+        # positionals will be sorted list in order of position
+        # can loop through and find the first which is 
+        # 'after_options' and store that int
+        positionals = self.command.get_positionals()
+
+        options_start = len(positionals)
+        for positional in positionals:
+            if positional.after_options:
+                options_start = positional.pos
                 break
         
-        del self.positionals[key_to_delete]
-
-        self.shift_input_positions(startpos=query_pos, amount=-1)
+        return options_start
 
 
-    def get_flags(self) -> list[Positional]:
-        """
-        returns list of flags in alphabetical order
-        """
-        flags = list(self.flags.values())
-        flags.sort(key=lambda x: x.prefix)
-        return flags
-
-
-    def get_options(self) -> list[Positional]:
-        """
-        returns list of positionals in order
-        """
-        options = list(self.options.values())
-        options.sort(key=lambda x: x.prefix.lstrip('-'))
-        return options
-
-
-    def has_options(self) -> bool:
-        if len(self.flags) != 0 or len(self.options) != 0:
-            return True
-        return False
-   
-
-    def shift_input_positions(self, startpos: int = 0, amount: int = 1) -> None:
-        """
-        shifts positionals position [amount] 
-        starting at [startpos]
-        ie if we have   inputs at 0,1,4,5,
-                        shift_input_positions(2, -2)
-                        inputs now at 0,1,2,3
-        """
-        for input_category in [self.positionals, self.flags, self.options]:
-            for the_input in input_category.values():
-                if the_input.pos >= startpos:
-                    the_input.pos = the_input.pos + amount 
-
-  
-    def set_flags_options_position(self, new_position: int) -> None:
-        for input_category in [self.flags, self.options]:
-            for the_input in input_category.values():
-                the_input.pos = new_position
-
-
-    def update(self, ctoken: Token, ntoken: Token, param_register: ParamRegister, out_register: OutputRegister) -> None:
+    def update_components(self, ctoken: Token, ntoken: Token, param_register: ParamRegister, out_register: OutputRegister) -> None:
         skip_next = False
         
         # first linux '>' to stdout
@@ -344,6 +218,78 @@ class Command:
         return False
 
 
+    def get_positional_count(self) -> int:
+        return len(self.positionals)
+
+
+    def get_positionals(self) -> list[Positional]:
+        """
+        returns list of positionals in order
+        """
+        positionals = list(self.positionals.values())
+        positionals.sort(key = lambda x: x.pos)
+        return positionals
+
+    
+    def remove_positional(self, query_pos: int) -> None:
+        """
+        removes positional and renumbers remaining positionals, flags and options
+        """
+
+        for positional in self.positionals.values():
+            if positional.pos == query_pos:
+                key_to_delete = positional.token.text
+                break
+        
+        del self.positionals[key_to_delete]
+
+        self.shift_input_positions(startpos=query_pos, amount=-1)
+
+
+    def get_flags(self) -> list[Positional]:
+        """
+        returns list of flags in alphabetical order
+        """
+        flags = list(self.flags.values())
+        flags.sort(key=lambda x: x.prefix)
+        return flags
+
+
+    def get_options(self) -> list[Positional]:
+        """
+        returns list of positionals in order
+        """
+        options = list(self.options.values())
+        options.sort(key=lambda x: x.prefix.lstrip('-'))
+        return options
+
+
+    def has_options(self) -> bool:
+        if len(self.flags) != 0 or len(self.options) != 0:
+            return True
+        return False
+   
+
+    def shift_input_positions(self, startpos: int = 0, amount: int = 1) -> None:
+        """
+        shifts positionals position [amount] 
+        starting at [startpos]
+        ie if we have   inputs at 0,1,4,5,
+                        shift_input_positions(2, -2)
+                        inputs now at 0,1,2,3
+        """
+        for input_category in [self.positionals, self.flags, self.options]:
+            for the_input in input_category.values():
+                if the_input.pos >= startpos:
+                    the_input.pos = the_input.pos + amount 
+
+  
+    def set_flags_options_position(self, new_position: int) -> None:
+        for input_category in [self.flags, self.options]:
+            for the_input in input_category.values():
+                the_input.pos = new_position
+
+
     def pretty_print(self) -> None:
         print('\npositionals ---------\n')
         print(f'{"pos":<10}{"text":20}{"gx_ref":20}{"token":20}{"datatype":20}{"after opts":>5}')
@@ -361,3 +307,4 @@ class Command:
             print(opt)
 
 
+   

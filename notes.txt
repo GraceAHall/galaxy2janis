@@ -1,10 +1,51 @@
 
 
 
-Now on WSL
 
 
-run tool parsing
+
+
+
+commands
+
+CommandXMLParser 
+- loads command from XMl
+- cleans lines
+- sets aliases
+- expands aliases
+- translates galaxy keywords
+- breaks command into statement_blocks
+
+
+CommandBlock
+- truncates extra command words after first pipe etc in each statement_block
+- tokenifies itself
+- gets num galaxy references
+- gets first token 
+- etc
+
+
+ToolCommand
+- defines the command elements (Flag, Option, Positional, Output)
+- turns token pairs (ctoken, ntoken) into command elements
+- sets positions of each command element 
+
+
+- chooses best statement_block
+- generates a Command()
+
+
+Command
+- split_keybal_to_best_tokens handled here
+- CommandBlock should store unaltered tokens, Command decides what the tool options etc are based on the tokens
+
+
+
+
+
+
+
+
 
 
 

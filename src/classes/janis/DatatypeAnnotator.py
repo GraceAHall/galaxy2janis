@@ -5,7 +5,8 @@
 
 import yaml
 from typing import Optional
-from classes.outputs.Outputs import Output
+#from classes.outputs.Outputs import Output
+from galaxy.tool_util.parser.output_objects import ToolOutput
 
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
@@ -344,14 +345,14 @@ class DatatypeAnnotator:
         the_option.datatypes = self.select_datatypes_source(source_datatypes)
 
 
-    def annotate_output(self, the_output: Output) -> None:
+    def annotate_output(self, the_output: ToolOutput) -> None:
         """
         a little different to the others. runs on a galaxy output obj not tokens
         """
         the_output.datatypes = self.get_output_datatype(the_output)
 
 
-    def get_output_datatype(self, the_output: Output) -> list[str]:
+    def get_output_datatype(self, the_output: ToolOutput) -> list[str]:
         fallback_datatypes = [{
             'format': 'file',
             'source': 'janis',

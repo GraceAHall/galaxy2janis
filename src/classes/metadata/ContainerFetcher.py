@@ -5,6 +5,7 @@ import requests
 import json
 import os
 import regex as re
+from classes.tool.Tool import Tool
 
 from classes.logging.Logger import Logger
 from utils.general_utils import global_align
@@ -20,15 +21,12 @@ class Container:
 
 
 class ContainerFetcher:
-    def __init__(self, tool_id: str, tool_version: str, requirements: list[dict[str, Union[str, int]]], logger: Logger) -> None:
-        self.tool_id = tool_id
-        self.tool_version = tool_version
-        self.requirements = requirements
+    def __init__(self, tool: Tool, logger: Logger) -> None:
+        self.tool = tool
         self.logger = logger
 
         self.container_cache = None
         self.container_cache_path = 'container_cache.json' 
-        self.main_requirement: Optional[dict[str, str]] = None
         self.container: dict[str, str] = {
             'tool': '',
             'version': '',
@@ -39,30 +37,9 @@ class ContainerFetcher:
 
 
     def fetch(self):
-        self.identify_main_requirement()
         self.load_container_cache()
         self.set_container()
-
-
-    def identify_main_requirement(self) -> None:
-        """
-        sets the main tool requirement
-
-        if no requirements parsed, sets to tool info
-        else, sets from the parsed requirements. method:
-            align each requirement to the tool id
-            pick the one with best alignment score
-        """
-        if len(self.requirements) == 0:
-            self.main_requirement = {'type': 'package', 'version': self.tool_version, 'name': self.tool_id, 'aln_score': 0}
-
-        else:
-            for req in self.requirements:
-                req['aln_score'] = global_align(self.tool_id, req['name']) # type: ignore
-                #req['aln_score'] = global_align(self.tool_name, req['name']) # type: ignore
-            
-            self.requirements.sort(key=lambda x: x['aln_score'], reverse=True)
-            self.main_requirement = self.requirements[0]
+        return self.container
 
 
     def load_container_cache(self) -> dict[str, str]:
@@ -97,14 +74,14 @@ class ContainerFetcher:
         currently can't do this because their servers are very very slow
         """
 
-        if self.url_is_cached(self.tool_id, self.tool_version):
-            self.container = self.container_cache[self.tool_id][self.tool_version]
+        if self.url_is_cached(self.tool.id, self.tool.version):
+            self.container = self.container_cache[self.tool.id][self.tool.version]
 
         else:
-            if self.main_requirement['type'] == 'package':
+            if self.tool.main_requirement['type'] == 'package':
                 self.set_biocontainer_by_package()
 
-            elif self.main_requirement['type'] == 'container':
+            elif self.tool.main_requirement['type'] == 'container':
                 self.set_biocontainer_by_container()
 
             self.update_container_cache()
@@ -113,15 +90,15 @@ class ContainerFetcher:
 
     def set_biocontainer_by_package(self) -> str:
         # get data package from api request
-        request_url = f'https://api.biocontainers.pro/ga4gh/trs/v2/tools?name={self.main_requirement["name"]}&limit=10&sort_field=id&sort_order=asc'
+        request_url = f'https://api.biocontainers.pro/ga4gh/trs/v2/tools?name={self.tool.main_requirement["name"]}&limit=10&sort_field=id&sort_order=asc'
         tool_data_list = self.make_api_request(request_url)
         
         # choose the most similar tool in package
-        tool_data = self.get_most_similar_tool(self.main_requirement["name"], tool_data_list)
+        tool_data = self.get_most_similar_tool(self.tool.main_requirement["name"], tool_data_list)
         self.container['tool'] = tool_data['name']
 
         # get the api url for the chosen tool + version
-        version_url = self.get_tool_version_url(tool_data, self.main_requirement['version'])
+        version_url = self.get_tool_version_url(tool_data, self.tool.main_requirement['version'])
         
         # get the images of the specific tool + version
         images_data = self.make_api_request(version_url)
@@ -319,7 +296,7 @@ class ContainerFetcher:
         
     def set_biocontainer_by_container(self) -> str:
         self.logger.log(0, 'container requirement encountered')
-        container_url = 'quay.io/biocontainers/' + self.main_requirement['name']
+        container_url = 'quay.io/biocontainers/' + self.tool.main_requirement['name']
         return container_url
 
 
@@ -335,12 +312,12 @@ class ContainerFetcher:
 
     def update_container_cache(self) -> None:
         # create dict for tool_id if needed
-        if self.tool_id not in self.container_cache:
-            self.container_cache[self.tool_id] = {}
+        if self.tool.id not in self.container_cache:
+            self.container_cache[self.tool.id] = {}
 
         # set the container url for that version
-        if self.tool_version not in self.container_cache[self.tool_id]:
-            self.container_cache[self.tool_id][self.tool_version] = self.container
+        if self.tool.version not in self.container_cache[self.tool.id]:
+            self.container_cache[self.tool.id][self.tool.version] = self.container
             
         # write cache to file
         with open(self.container_cache_path, 'w') as fp:

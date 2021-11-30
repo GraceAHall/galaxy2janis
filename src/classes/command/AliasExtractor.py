@@ -3,16 +3,14 @@
 
 from typing import Tuple
 
-
 from classes.logging.Logger import Logger
 from classes.command.Alias import AliasRegister
-from classes.command.Command import TokenType
-from classes.command.CommandWord  import CommandWord
-from classes.outputs.OutputRegister import OutputRegister
-from classes.params.ParamRegister import ParamRegister
+from classes.command.Tokens import Token, TokenType
+from classes.tool.Tool import Tool
 
 from utils.regex_utils import find_unquoted, get_simple_strings
-from utils.command_utils import init_cmd_word, get_best_token,remove_ands_from_line
+from utils.token_utils import get_best_token, split_line_by_ands
+
 
 """
 NOTE
@@ -23,10 +21,9 @@ only stores aliases when they involve a galaxy param or output.
 
 
 class AliasExtractor:
-    def __init__(self, lines: list[str], param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
-        self.lines = lines
-        self.param_register = param_register
-        self.out_register = out_register
+    def __init__(self, command_lines: list[str], tool: Tool, logger: Logger):
+        self.command_lines = command_lines
+        self.tool = tool
         self.logger = logger
         self.alias_register: AliasRegister = AliasRegister()
 
@@ -38,11 +35,12 @@ class AliasExtractor:
         and allows aliases to be resolved.
         """
               
-        for line in self.lines:
-            line = remove_ands_from_line(line)
-            self.extract_set_aliases(line)
-            self.extract_symlink_aliases(line)
-            self.extract_copy_aliases(line)
+        for line in self.command_lines:
+            sublines = split_line_by_ands(line)
+            for subline in sublines:
+                self.extract_set_aliases(subline)
+                self.extract_symlink_aliases(subline)
+                self.extract_copy_aliases(subline)
             
           
     def extract_set_aliases(self, line: str) -> None:
@@ -92,9 +90,8 @@ class AliasExtractor:
             self.logger.log(1, f'could not add alias from line: {line}')
 
 
-    def init_token_from_text(self, text: str) -> CommandWord:
-        cmd_word = init_cmd_word(text)
-        token = get_best_token(cmd_word, self.param_register, self.out_register)
+    def init_token_from_text(self, text: str) -> Token:
+        token = get_best_token(text, self.tool.param_register, self.tool.out_register)
         if token == None:
             self.logger.log(1, f'can resolve token {text}')
         return token

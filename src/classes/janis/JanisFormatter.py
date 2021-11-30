@@ -5,7 +5,7 @@ from datetime import date
 
 from classes.logging.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType, Token
-from classes.outputs.Outputs import Output
+from galaxy.tool_util.parser.output_objects import ToolOutput
 
 
 class JanisFormatter:
@@ -397,14 +397,14 @@ class JanisFormatter:
         return outputs
 
 
-    def update_component_imports(self, output: Output) -> None:
+    def update_component_imports(self, output: ToolOutput) -> None:
         """
         need to add the selector type to imports too!
         """
         self.default_imports['janis_core'].add(output.selector)
         
 
-    def format_output_to_string(self, output: Output) -> str:
+    def format_output_to_string(self, output: ToolOutput) -> str:
         """
         formats outputs into janis tooldef string
         """
@@ -421,7 +421,7 @@ class JanisFormatter:
         if selector == 'InputSelector':
             selector_contents = self.validate_tag(selector_contents)        
 
-        out_str = '\tToolOutput(\n'
+        out_str = '\tToolToolOutput(\n'
         out_str += f'\t\t"{tag}",\n'
 
         if output.is_stdout:
@@ -436,7 +436,7 @@ class JanisFormatter:
         return out_str
 
 
-    def update_output_selector_from_command(self, output: Output) -> None:
+    def update_output_selector_from_command(self, output: ToolOutput) -> None:
         command = self.tool.command
 
         # is this a TODO? add logic incase of positional output? 
