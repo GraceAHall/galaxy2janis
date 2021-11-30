@@ -153,12 +153,13 @@ class ToolXMLParser:
             xml_par.command_lines, 
             self.tool,
             self.logger)
-        
+
         for block in xml_cs.command_blocks:
             print(block)
 
-        xml_cmd = Command()
+        xml_cmd = Command(self.tool.param_register, self.tool.out_register)
         xml_cmd.update(xml_cs.best_block)
+        xml_cmd.update_input_positions()
 
         print()
 

@@ -18,22 +18,22 @@ from utils.regex_utils import (
 )  
 
 
-def split_keyval_to_best_tokens(self, kv_token: Token) -> Tuple[Token, Token, str]:
+def split_keyval_to_best_tokens(kv_token: Token, param_register: ParamRegister, out_register: OutputRegister) -> Tuple[Token, Token, str]:
     """
     keyval options need to be split into two tokens
     """
-    curr_word, next_word, delim = self.split_keyval_to_text(kv_token)
+    curr_word, next_word, delim = split_keyval_to_text(kv_token)
 
-    curr_token = get_best_token(curr_word, self.param_register, self.out_register)
+    curr_token = get_best_token(curr_word, param_register, out_register)
     curr_token = transfer_token_attributes(kv_token, curr_token)
         
-    next_token = get_best_token(next_word, self.param_register, self.out_register)
+    next_token = get_best_token(next_word, param_register, out_register)
     next_token = transfer_token_attributes(kv_token, next_token)
 
     return curr_token, next_token, delim
 
 
-def split_keyval_to_text(self, kv_token: Token) -> list[str]:
+def split_keyval_to_text(kv_token: Token) -> list[str]:
     """
     handles the following patterns:
     --minid=$adv.min_dna_id
@@ -44,7 +44,7 @@ def split_keyval_to_text(self, kv_token: Token) -> list[str]:
     text = kv_token.text
     possible_delims = ['=', ':', ' ']
 
-    delim, delim_start, delim_end = self.get_first_unquoted(text, possible_delims)
+    delim, delim_start, delim_end = get_first_unquoted(text, possible_delims)
     left_text, right_text = text[:delim_start], text[delim_end:]
 
     return left_text, right_text, delim
@@ -148,7 +148,7 @@ def get_longest_token(token_list: list[Token]) -> list[Token]:
     return longest_tokens
 
 
-def get_first_unquoted(self, the_string: str, the_list: list[str]) -> Tuple[str, int]:
+def get_first_unquoted(the_string: str, the_list: list[str]) -> Tuple[str, int]:
     """
     returns the first item in the_list found unquoted in the_string
     """

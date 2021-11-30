@@ -20,6 +20,8 @@ class CommandString:
     - breaks command into statement_blocks
     - creates command words for each statement_block
     - truncates extra command words after first pipe etc in each statement_block
+
+    I dont like how the __init__ method is written, would rather getters
     """
     def __init__(self, command_lines: list[str], tool: Tool, logger: Logger) -> None:
         self.command_lines = command_lines
@@ -156,19 +158,20 @@ class CommandString:
 
         # single command block
         if len(self.command_blocks) == 1:
-            return self.command_blocks[0]
+            best_block = 0
         
-        # real block should have the most gx obj references,
-        gx_ref_counts = self.get_blocks_gx_ref_count()
-        
-        # should start with a raw_string that is similar
-        # to the main requirement
-        first_token_scores = self.get_blocks_first_token_similarities()
+        else:
+            # real block should have the most gx obj references,
+            gx_ref_counts = self.get_blocks_gx_ref_count()
+            
+            # should start with a raw_string that is similar
+            # to the main requirement
+            first_token_scores = self.get_blocks_first_token_similarities()
 
-        # decide how to use the above information
-        best_block = self.choose_best_block(gx_ref_counts, first_token_scores)
+            # decide how to use the above information
+            best_block = self.choose_best_block(gx_ref_counts, first_token_scores)
 
-        return self.command_blocks[best_block]
+        self.best_block = self.command_blocks[best_block]
 
         
     def get_blocks_gx_ref_count(self) -> list[Tuple[int, int]]:

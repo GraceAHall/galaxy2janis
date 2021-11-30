@@ -1,18 +1,18 @@
 
 
 
-from typing import Tuple
-
 from classes.command.CommandBlock import CommandBlock
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from classes.command.CommandComponents import Positional, Flag, Option
-from classes.command.Tokens import Token, TokenType 
-
+from classes.command.Tokens import Token, TokenType
+from utils.token_utils import split_keyval_to_best_tokens 
 
 
 class Command:
-    def __init__(self):
+    def __init__(self, param_register: ParamRegister, out_register: OutputRegister):
+        self.param_register = param_register
+        self.out_register = out_register
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
@@ -33,16 +33,16 @@ class Command:
             next_tokens = command_block.tokens[i+1]
             should_skip_next = False
 
-            for ctoken in curr_tokens:
+            for ctoken in curr_tokens:  
                 # kv pair handling. add as option with correct delim. 
                 if ctoken.type == TokenType.KV_PAIR: 
-                    ctoken, ntoken, delim = self.split_keyval_to_best_tokens(ctoken)
+                    ctoken, ntoken, delim = split_keyval_to_best_tokens(ctoken, self.param_register, self.out_register)
                     self.update_options(ctoken, ntoken, delim=delim)
                     continue
 
                 # everything else
                 for ntoken in next_tokens:
-                    skip_next = self.update_components(ctoken, ntoken, self.param_register, self.out_register)
+                    skip_next = self.update_components(ctoken, ntoken)
                     if skip_next:
                         should_skip_next = True
             
@@ -51,24 +51,22 @@ class Command:
             else:
                 i += 1
 
-        self.command = command
-
 
     def update_input_positions(self) -> None:
         options_start = self.get_options_position()
 
         # update positionals
-        self.command.shift_input_positions(startpos=options_start, amount=1)
+        self.shift_input_positions(startpos=options_start, amount=1)
         
         # update flags and opts position
-        self.command.set_flags_options_position(options_start) 
+        self.set_flags_options_position(options_start) 
 
         
     def get_options_position(self) -> int:
         # positionals will be sorted list in order of position
         # can loop through and find the first which is 
         # 'after_options' and store that int
-        positionals = self.command.get_positionals()
+        positionals = self.get_positionals()
 
         options_start = len(positionals)
         for positional in positionals:
@@ -79,20 +77,20 @@ class Command:
         return options_start
 
 
-    def update_components(self, ctoken: Token, ntoken: Token, param_register: ParamRegister, out_register: OutputRegister) -> None:
+    def update_components(self, ctoken: Token, ntoken: Token) -> None:
         skip_next = False
         
         # first linux '>' to stdout
         if self.is_stdout(ctoken, ntoken):
-            self.update_outputs(ntoken, out_register)
+            self.update_outputs(ntoken)
             skip_next = True
 
         # flag
-        elif self.is_flag(ctoken, ntoken, param_register):
+        elif self.is_flag(ctoken, ntoken):
             self.update_flags(ctoken)
 
         # option
-        elif self.is_option(ctoken, ntoken, param_register):
+        elif self.is_option(ctoken, ntoken):
             self.update_options(ctoken, ntoken, ' ')
             skip_next = True
 
@@ -114,18 +112,18 @@ class Command:
         return False             
 
 
-    def update_outputs(self, token: Token, out_register: OutputRegister) -> None:
+    def update_outputs(self, token: Token) -> None:
         if token.type == TokenType.GX_OUT:
-            the_output = out_register.get(token.text)
+            the_output = self.out_register.get(token.text)
 
         elif token.type == TokenType.RAW_STRING:
-            the_output = out_register.get_output_by_filepath(token.text)
+            the_output = self.out_register.get_output_by_filepath(token.text)
 
         if the_output is None:
             token.text = token.text.lstrip('$')
-            out_register.create_output_from_text(token.text)
+            self.out_register.create_output_from_text(token.text)
             # the following line is kinda bad. dollar sign shouldnt be here really...this will cause issues
-            the_output = out_register.get('$' + token.text)
+            the_output = self.out_register.get('$' + token.text)
 
         the_output.is_stdout = True
 
@@ -177,7 +175,7 @@ class Command:
         return False
 
 
-    def is_flag(self, ctoken: Token, ntoken: Token, param_register: ParamRegister) -> bool:
+    def is_flag(self, ctoken: Token, ntoken: Token) -> bool:
         # is this a raw flag or option?
         curr_is_raw_flag = ctoken.type == TokenType.RAW_STRING and ctoken.text.startswith('-')
 
@@ -204,7 +202,7 @@ class Command:
         return False
 
 
-    def is_option(self, ctoken: Token, ntoken: Token, param_register: ParamRegister) -> bool:
+    def is_option(self, ctoken: Token, ntoken: Token) -> bool:
         # happens 2nd after 'is_flag()'
         # already know that its not a flag, so if the current token
         # looks like a flag/option, it has to be an option. 
