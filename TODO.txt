@@ -7,12 +7,9 @@ TODO v0.1
 
 TODO:
     - add CitationManager class from galaxy source 
-    - move Token and TokenType classes to own file
-
 
     - add param loading module (from_test(), from_workflow_step())
-    - add command string parsing module (split from current form)
-    - 
+
     - test runner
     - configfiles
     - add code test suite (pytest)

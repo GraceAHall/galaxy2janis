@@ -1,12 +1,18 @@
 
+# pyright: basic
 
-from typing import Tuple
+from __future__ import annotations
+from typing import Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from classes.tool.Tool import Tool
+
+
 from classes.command.AliasExtractor import AliasExtractor
 from classes.command.CommandBlock import CommandBlock
 
 from classes.command.Tokens import TokenType
 from classes.logging.Logger import Logger
-from classes.tool.Tool import Tool
 
 from utils.general_utils import global_align
 from utils.regex_utils import get_galaxy_keyword_value, get_galaxy_keywords, get_words

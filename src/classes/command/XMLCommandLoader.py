@@ -2,39 +2,19 @@
 
 # pyright: basic
 
-import xml.etree.ElementTree as et
 import regex as re
-from collections import defaultdict
 
-from classes.command.AliasExtractor import AliasExtractor
-from classes.command.CommandBlock import CommandBlock
-from classes.params.ParamRegister import ParamRegister
-from classes.outputs.OutputRegister import OutputRegister
+from galaxy.tools import Tool as GalaxyTool
 from classes.logging.Logger import Logger
-
-from utils.token_utils import split_line_by_ands
-from utils.regex_utils import (
-    find_unquoted, 
-    get_unpaired_quotes_start, 
-    get_words, 
-    get_galaxy_keywords, 
-    get_galaxy_keyword_value
-)
-
-
-# class CommandWord:
-#     def __init__(self, text: str, statement_block: int):
-#         self.text = text
-#         self.statement_block = statement_block
-#         self.in_loop = False
-#         self.in_conditional = False
-#         self.expanded_text: list[str] = []
+from utils.regex_utils import find_unquoted, get_unpaired_quotes_start
 
 
 
-class CommandXMLParser:
+class XMLCommandLoader:
     """
-    role of this module is to preprocess the command string into a useable state
+    loads and processes xml command section
+
+    the raw xml command string is processed into a more usable state
 
     aim is to remove constructs like cheetah comments, conditional lines without
     removing other elements like #set directives which will be used later. 
@@ -43,22 +23,24 @@ class CommandXMLParser:
 
     command string is also de-indented and generally cleaned (blank lines removed etc)
 
-
     process
     - loads command from XMl
     - cleans lines
 
-
     """
-    def __init__(self, command_section: str, logger: Logger):
-        self.command_section = command_section
+    def __init__(self, gxtool: GalaxyTool, logger: Logger):
+        self.gxtool = gxtool
         self.logger = logger
-        self.command_string = self.get_command_string()
-        self.command_lines = self.get_command_lines()
+
         
-       
+    def load(self) -> list[str]:
+        command_string = self.get_command_string()
+        command_lines = self.get_command_lines(command_string)
+        return command_lines
+
+
     def get_command_string(self) -> str:
-        command_string = self.simplify_stdio(self.command_section)
+        command_string = self.simplify_stdio(self.gxtool.command)
         return self.simplify_galaxy_reserved_words(command_string)
         
 
@@ -95,8 +77,8 @@ class CommandXMLParser:
         return command_string
 
 
-    def get_command_lines(self) -> list[str]:
-        lines = self.split_lines(self.command_string)
+    def get_command_lines(self, command_string: str) -> list[str]:
+        lines = self.split_lines(command_string)
         lines = self.standardise_variable_format(lines)
         lines = self.remove_comments(lines)
         lines = self.remove_bash_constructs(lines)

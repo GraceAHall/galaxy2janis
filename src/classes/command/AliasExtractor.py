@@ -1,12 +1,16 @@
 
+# pyright: basic
 
+from __future__ import annotations
+from typing import Tuple, TYPE_CHECKING
 
-from typing import Tuple
+if TYPE_CHECKING:
+    from classes.tool.Tool import Tool
+
 
 from classes.logging.Logger import Logger
 from classes.command.Alias import AliasRegister
 from classes.command.Tokens import Token, TokenType
-from classes.tool.Tool import Tool
 
 from utils.regex_utils import find_unquoted, get_simple_strings
 from utils.token_utils import get_best_token, split_line_by_ands

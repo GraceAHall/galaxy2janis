@@ -12,13 +12,11 @@ from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
 from classes.command.Command import Positional, Flag, Option, Command, TokenType, Token
 from classes.logging.Logger import Logger
-
+from classes.tool.Tool import Tool
 
 class DatatypeAnnotator:
-    def __init__(self, command: Command, param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
-        self.command = command
-        self.param_register = param_register
-        self.out_register = out_register
+    def __init__(self, tool: Tool, logger: Logger):
+        self.tool = tool
         self.logger = logger
         self.init_datastructures()
 
@@ -146,15 +144,15 @@ class DatatypeAnnotator:
 
 
     def annotate(self) -> None:
-        for item in self.command.positionals.values():
+        for item in self.tool.command.positionals.values():
             self.annotate_positional(item)
             self.assert_has_datatype(item)
 
-        for item in self.command.options.values():
+        for item in self.tool.command.options.values():
             self.annotate_option(item)
             self.assert_has_datatype(item)
         
-        for item in self.out_register.get_outputs():
+        for item in self.tool.out_register.get_outputs():
             self.annotate_output(item)
             self.assert_has_datatype(item)
 
@@ -222,11 +220,11 @@ class DatatypeAnnotator:
             }]
 
         if the_token.type == TokenType.GX_PARAM:
-            param = self.param_register.get(the_token.gx_ref)
+            param = self.tool.param_register.get(the_token.gx_ref)
             gxformat_list = param.galaxy_type.split(',')
 
         elif the_token.type == TokenType.GX_OUT:
-            output = self.out_register.get(the_token.gx_ref)
+            output = self.tool.out_register.get(the_token.gx_ref)
             gxformat_list = output.galaxy_type.split(',')
 
         if len(gxformat_list) == 0:

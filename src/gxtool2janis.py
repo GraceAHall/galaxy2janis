@@ -7,7 +7,7 @@ import os
 from typing import Tuple
 import argparse
 
-from classes.tool.ToolXMLParser import ToolXMLParser
+from classes.tool.ToolParser import ToolParser
 import xml.etree.ElementTree as et
 
 # main entry point
@@ -21,7 +21,7 @@ def main():
         out_log, out_def = init_out_files(args.toolxml, args.tooldir)
 
         # parse tool 
-        tp = ToolXMLParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
+        tp = ToolParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
         tp.parse()
     
 

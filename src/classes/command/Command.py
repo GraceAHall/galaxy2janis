@@ -2,6 +2,7 @@
 
 
 from classes.command.CommandBlock import CommandBlock
+from classes.command.CommandString import CommandString
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from classes.command.CommandComponents import Positional, Flag, Option
@@ -19,14 +20,15 @@ class Command:
         self.base_command: list[str] = []
 
 
-    def update(self, command_block: CommandBlock) -> None:
+    def update(self, command_string: CommandString) -> None:
         """
         providing a list of tokens allows the command to be updated with new info.
         the list of tokens could be from initial tool xml parsing, or from
         templated command line strings passed through galaxy tool evaluation engine.
         """
         # iterate through command words (with next word for context)
-        
+        command_block = command_string.best_block
+
         i = 0
         while i < len(command_block.tokens) - 1:
             curr_tokens = command_block.tokens[i]
@@ -91,7 +93,7 @@ class Command:
 
         # option
         elif self.is_option(ctoken, ntoken):
-            self.update_options(ctoken, ntoken, ' ')
+            self.update_options(ctoken, ntoken)
             skip_next = True
 
         else:

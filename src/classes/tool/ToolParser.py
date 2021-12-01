@@ -24,8 +24,8 @@ from classes.params.ParamRegister import ParamRegister
 from classes.configfiles.Configfile import Configfile
 from classes.configfiles.ConfigfileXMLParser import ConfigfileXMLParser
 
-from classes.command.CommandXMLParser import CommandXMLParser
 from classes.command.CommandString import CommandString
+from classes.command.CommandParser import CommandParser
 from classes.command.Command import Command
 
 from classes.janis.DatatypeAnnotator import DatatypeAnnotator
@@ -49,7 +49,7 @@ from typing import Optional
 
         
 
-class ToolXMLParser:
+class ToolParser:
     def __init__(self, tool_xml: str, tool_workdir: str, out_log: str, out_def: str, debug: bool=False):
         self.filename = tool_xml
         self.workdir = tool_workdir
@@ -110,10 +110,8 @@ class ToolXMLParser:
 
         # post
         self.annotate_datatypes()
-        self.init_tool()
         self.write_janis()
-        sys.exit()
-        #self.postprocess()
+
 
 
     def set_metadata(self):
@@ -147,52 +145,19 @@ class ToolXMLParser:
 
     # 7th step: command parsing 
     def set_command(self):
-        # parse command text into useful representation
-        xml_par = CommandXMLParser(self.gxtool.command, self.logger)
-        xml_cs = CommandString(
-            xml_par.command_lines, 
-            self.tool,
-            self.logger)
-
-        for block in xml_cs.command_blocks:
-            print(block)
-
-        xml_cmd = Command(self.tool.param_register, self.tool.out_register)
-        xml_cmd.update(xml_cs.best_block)
-        xml_cmd.update_input_positions()
-
-        print()
-
+        cmdpar = CommandParser(self.gxtool, self.tool, self.logger)
+        workflow_step = None
+        cmdpar.parse(workflow_step=workflow_step)
+        self.command = cmdpar.command
 
 
     # 8th step: annotating with datatypes
     def annotate_datatypes(self):
-        da = DatatypeAnnotator(self.command, self.param_register, self.out_register, self.logger)
+        da = DatatypeAnnotator(self.tool, self.logger)
         da.annotate()
         if self.debug:
             self.command.pretty_print()
 
-
-    def init_tool(self):
-        """
-        this just creates a clean format for conversion to janis
-        mostly for my own mental clutter
-        """
-        tool = Tool()
-        tool.name = self.tool_name
-        tool.id = self.tool_id
-        tool.version = self.tool_version
-        tool.creator = None  # TODO this is just temp
-        tool.container = self.container
-        tool.main_requirement = self.main_requirement
-        tool.tests = None  # TODO this is just temp
-        tool.help = self.help
-        tool.citations = self.citations
-        tool.command = self.command
-        tool.param_register = self.param_register
-        tool.out_register = self.out_register
-        self.tool = tool  
-        
 
     # 9th step: convert to janis definition & write
     def write_janis(self):
