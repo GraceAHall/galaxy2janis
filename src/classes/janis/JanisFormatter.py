@@ -222,10 +222,10 @@ class JanisFormatter:
 
 
     def get_gx_obj(self, query_ref: str):
-        obj = self.tool.param_register.get(query_ref)
+        varname, obj = self.tool.param_register.get(query_ref)
         if obj is None:
-            obj = self.tool.out_register.get(query_ref) 
-        return obj
+            varname, obj = self.tool.out_register.get(query_ref) 
+        return varname, obj
 
 
     def format_flag_to_string(self, flag: Flag) -> str:

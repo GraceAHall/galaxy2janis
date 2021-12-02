@@ -132,45 +132,6 @@ class AliasRegister:
             out.append(alias.dest)
 
         return out
-        
-
-    def resolve_old(self, query_var: str) -> list[str]:
-        """
-        returns list of all gx vars, and literals that are linked to the query_var
-        cheetah vars should be fully resolved here 
-        
-        """
-        out = []
-
-        if query_var in self.alias_dict:
-            aliases = self.alias_dict[query_var]
-        else:
-            return out
-
-        for alias in aliases:
-            # cheetah or galaxy var
-            if alias.dest.startswith('$'):
-                # check if galaxy param. if so, add
-                if self.param_register.get(alias.dest) is not None:
-                    out.append(alias.dest)
-
-                # sometimes its weird.
-                # eg '$single_paired.paired_input.forward'
-                # this is actually an attribute (forward mate pair) of $single_paired.paired_input
-                # temp solution: strip common galaxy attributes and try again
-                else:
-                    stripped_var = self.strip_gx_attributes(alias.dest)
-                    if self.param_register.get(stripped_var) is not None:
-                        out.append(stripped_var)
-
-                # recursive. resolves next link if ch or gx var
-                out += self.resolve(alias.dest)
-            
-            # literal not var 
-            else:
-                out.append(alias.dest)
-
-        return out
 
 
     def strip_gx_attributes(self, the_string: str) -> str:

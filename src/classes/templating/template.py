@@ -259,7 +259,7 @@ ABRICATE_LIST_INPUTS = []
 ABRICATE_LIST_OUTPUTS = ['report']
 
 ABRICATE_PARAMS = {
-    'file_input': 'hello.txt',
+    'file_input': ['hello.txt'],
     'adv': json.dumps({
         'db': 'resfinder',
         'no_header': False,

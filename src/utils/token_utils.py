@@ -91,16 +91,14 @@ def get_all_tokens(text: str, param_register: ParamRegister, out_register: Outpu
     raw_str_lits = get_raw_strings(text)
     tokens += [Token(m, TokenType.RAW_STRING) for m in raw_str_lits]
     
-    # galaxy inputs
+    # galaxy inputs / outputs
     # quoted or not doesn't matter. just linking. can resolve its datatype later. 
-    ch_vars = get_cheetah_vars(text)
-    gx_params = [x for x in ch_vars if param_register.get(x) is not None]
-    tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
-    
-    # galaxy 
     ch_vars = get_cheetah_vars(text) # get cheetah vars
-    gx_out = [x for x in ch_vars if out_register.get(x) is not None]  # subsets to galaxy out vars
-    tokens += [Token(out, TokenType.GX_OUT) for out in gx_out]  # transform to tokens
+
+    gx_params = [x for x in ch_vars if param_register.get(x)[0] is not None]
+    tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
+    gx_outs = [x for x in ch_vars if out_register.get(x) is not None]  
+    tokens += [Token(out, TokenType.GX_OUT) for out in gx_outs]  
 
     # TODO this is pretty weak. actually want to search for 
     # unquoted operator in word. split if necessary. 

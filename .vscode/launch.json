@@ -112,6 +112,16 @@
             ]
         },
         {
+            "name": "necat",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "necat.xml", "tools/necat", "--debug"
+            ]
+        },
+        {
             "name": "genrich",
             "type": "python",
             "request": "launch",

@@ -1,8 +1,9 @@
 
 
 
-from typing import Optional
+from typing import Optional, Tuple
 from xml.etree import ElementTree as et
+from classes.deprecated.Outputs import Output
 
 
 from galaxy.tool_util.parser.output_objects import ToolOutput
@@ -26,40 +27,72 @@ class OutputRegister:
                 self.add_from_dict(obj.outputs, next_levels)
             else:
                 if len(levels) == 0:
-                    key = '$' + label
+                    key = label
                 else:
-                    key = '$' + '.'.join(levels) + '.' + label
+                    key = '.'.join(levels) + '.' + label
                 if key not in self.outputs:
                     self.outputs[key] = obj
-
-
-    def get(self, query_key: str) -> Optional[ToolOutput]:
-        if query_key in self.outputs:
-            return self.outputs[query_key]
-        return None
 
 
     def get_outputs(self) -> list[ToolOutput]:
         return list(self.outputs.values())
 
 
-    def get_output_by_filepath(self, filepath: str) -> Optional[ToolOutput]:
+    def get(self, query_key: str, allow_lca=False) -> Tuple[Optional[str], Optional[ToolOutput]]:
+        # quick check if the full key is present
+        if query_key in self.outputs:
+            return (query_key, self.outputs[query_key])
+
+        # otherwise, get the param with best match (LCA)
+        if allow_lca:
+            return self.get_lca(query_key)
+
+        return (None, None)
+
+
+    def get_lca(self, query_key: str) -> Tuple[Optional[str], Optional[ToolOutput]]:
+        """
+        see classes.params.ParamRegister.get_lca() for explanation
+        """
+        query_path = query_key.split('.')
+        out_scores: list[Tuple[int, str, ToolOutput]] = []
+
+        for output_var, output in self.outputs.items():
+            var_path = output_var.split('.')
+            score = 0
+            for i in range(1, len(query_path) + 1):
+                if var_path[-i] == query_path[-i]:
+                    score += 1
+                else:
+                    break
+            out_scores.append((score, output_var, output))
+        out_scores.sort(key=lambda x: x[0], reverse=True)
+
+        if out_scores[0][0] >= 1:
+            return out_scores[0][1,2]
+        return (None, None)
+
+
+    def get_by_filepath(self, filepath: str, allow_nopath: bool=False, allow_anywhere: bool=False) -> Tuple[Optional[str], Optional[ToolOutput]]:
         # try to match the whole path
-        for out in self.outputs.values():
-            if out.selector_contents == filepath:
-                return out
+        for output_var, output in self.outputs.items():
+            if hasattr(output, 'from_work_dir'):
+                if output.from_work_dir == filepath:
+                    return (output_var, output)
         
-        # no success, try to match the end of the path
-        for out in self.outputs.values():
-            if out.selector_contents.endswith(filepath):
-                return out
+        # # no success, try to match the end of the path
+        # if allow_nopath:
+        #     for output_var, output in self.outputs.items():
+        #         if output.selector_contents.endswith(filepath):
+        #             return (output_var, output)
 
-        # again no success, try to match the filepath anywhere in the selector contents
-        for out in self.outputs.values():
-            if filepath in out.selector_contents:
-                return out
+        # # again no success, try to match the filepath anywhere in the selector contents
+        # if allow_anywhere:
+        #     for output_var, output in self.outputs.items():
+        #         if filepath in output.selector_contents:
+        #             return (output_var, output)
 
-        return None
+        return (None, None)
 
 
     def create_output_from_text(self, text: str) -> None:
@@ -69,6 +102,8 @@ class OutputRegister:
         then is parsed as normal created the new output. 
         the output is added to our collection of outputs. 
         """
+        # TODO 
+        raise Exception('TODO: make galaxy ToolOutput not old Output')
         # create dummy node
         name = text.split('.', 1)[0]
         dummy_node = et.Element('data', attrib={'name': name, 'format': 'file', 'from_work_dir': text})
@@ -80,13 +115,6 @@ class OutputRegister:
         # add to collection
         self.add([new_output])
 
-
-    def restructure_outputs(self, outputs: list[ToolOutput]) -> None:
-        output_dict = {}
-        for out in self.outputs:
-            key = '$' + out.gx_var
-            output_dict[key] = out
-        self.outputs = output_dict
 
 
 

@@ -145,7 +145,7 @@ class ToolParser:
 
     # 7th step: command parsing 
     def set_command(self):
-        cmdpar = CommandParser(self.gxtool, self.tool, self.logger)
+        cmdpar = CommandParser(self.app, self.gxtool, self.tool, self.logger)
         workflow_step = None
         cmdpar.parse(workflow_step=workflow_step)
         self.command = cmdpar.command

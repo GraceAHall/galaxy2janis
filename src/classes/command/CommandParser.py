@@ -4,22 +4,22 @@ from typing import Optional, Any
 
 
 from galaxy.tools import Tool as GalaxyTool
+from classes.tool.Tool import Tool
+from classes.templating.MockClasses import MockApp
 from classes.command.CommandString import CommandString
 from classes.command.Command import Command
-from classes.logging.Logger import Logger
-from classes.tool.Tool import Tool
-
 from classes.command.XMLCommandLoader import XMLCommandLoader
 from classes.command.TestCommandLoader import TestCommandLoader
 from classes.command.WorkflowStepCommandLoader import WorkflowStepCommandLoader
-
+from classes.logging.Logger import Logger
 
 
 class CommandParser:
     """
     returns a Command()
     """
-    def __init__(self, gxtool: GalaxyTool, tool: Tool, logger: Logger):
+    def __init__(self, app: MockApp, gxtool: GalaxyTool, tool: Tool, logger: Logger):
+        self.app = app
         self.gxtool = gxtool
         self.tool = tool
         self.logger = logger
@@ -41,7 +41,7 @@ class CommandParser:
 
     
     def update_command_from_tests(self) -> None:
-        loader = TestCommandLoader(self.gxtool, self.logger)
+        loader = TestCommandLoader(self.app, self.gxtool, self.tool, self.logger)
         for test in self.tool.tests:
             cmd_txt = loader.load(test)
             #cmd_str = CommandString(cmd_txt, self.tool, self.logger)

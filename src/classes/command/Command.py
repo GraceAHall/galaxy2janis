@@ -116,18 +116,18 @@ class Command:
 
     def update_outputs(self, token: Token) -> None:
         if token.type == TokenType.GX_OUT:
-            the_output = self.out_register.get(token.text)
+            output_var, output = self.out_register.get(token.text)
 
         elif token.type == TokenType.RAW_STRING:
-            the_output = self.out_register.get_output_by_filepath(token.text)
+            output_var, output = self.out_register.get_by_filepath(token.text, allow_nopath=True)
 
-        if the_output is None:
+        if output is None:
             token.text = token.text.lstrip('$')
             self.out_register.create_output_from_text(token.text)
             # the following line is kinda bad. dollar sign shouldnt be here really...this will cause issues
-            the_output = self.out_register.get('$' + token.text)
+            output_var, output = self.out_register.get(token.text)
 
-        the_output.is_stdout = True
+        output.is_stdout = True
 
 
     def update_positionals(self, token: Token) -> None:

@@ -43,7 +43,8 @@ def get_cheetah_vars(the_string: str) -> set[str]:
         
         if match != '':
             keep_matches.append(match)
-
+    
+    keep_matches = [m.lstrip('$') for m in keep_matches]
     return keep_matches
 
 
