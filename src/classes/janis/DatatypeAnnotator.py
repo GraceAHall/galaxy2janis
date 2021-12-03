@@ -220,7 +220,7 @@ class DatatypeAnnotator:
             }]
 
         if the_token.type == TokenType.GX_PARAM:
-            param_var, param = self.tool.param_register.get(the_token.gx_ref)
+            varname, param = self.tool.param_register.get(the_token.gx_ref)
             gxformat_list = param.galaxy_type.split(',')
 
         elif the_token.type == TokenType.GX_OUT:

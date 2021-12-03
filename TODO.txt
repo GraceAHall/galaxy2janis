@@ -6,10 +6,15 @@ TODO v0.1
 
 
 TODO:
+    - workflowstep command loading
+        - '__current_case__' - delete keyval
+        - '__class__': 'ConnectedValue' - lookup param, if data make dataset else take default
+        - '__class__': 'RuntimeValue' - lookup param, if data make dataset else take default
+
+
+
     - add CitationManager class from galaxy source 
-
-    - add param loading module (from_test(), from_workflow_step())
-
+    - add support for repeat elements in tests
     - test runner
     - configfiles
     - add code test suite (pytest)
@@ -63,6 +68,10 @@ Rollout plan -------------------------------------
 
 
 Future -------------------------------------------
+    
+ - workflowstep command loading
+    - '__class__': 'ConnectedValue' - do traceback to original dataset
+    - '__class__': 'RuntimeValue' - write warning to user stating the value needs to be set on the run
 
  - paired files & collections (short reads, composite types imzml)
  - new tools added to toolshed automatically parsed 

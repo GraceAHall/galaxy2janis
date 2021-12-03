@@ -16,36 +16,102 @@ class ParamRegister:
     def __init__(self, inputs: dict) -> None:
         self.params: dict[str, ToolParameter] = {}
         self.update(inputs, [])
-        print()
 
 
     def to_job_dict(self, value_overrides: Optional[dict]=None) -> dict:
-        out_dict = {}
+        """comment"""
+        job_dict = self.get_job_dict()
+
+        if value_overrides is not None:
+            job_dict = self.override_job_dict_vals(job_dict, value_overrides)
+
+            # incase anything went wrong matching test values to tool params
+            if job_dict is None:
+                return None
+
+        # testing purposes
+        job_dict = self.jsonify_job_dict(job_dict)
+        return job_dict
+
+
+    def get_job_dict(self) -> dict:
+        job_dict = {}
 
         for varname, param in self.params.items():
             varpath = varname.split('.')
-            node = out_dict
+            node = job_dict
             
             for i, text in enumerate(varpath):
                 if text not in node:
                     if i == len(varpath) - 1:
                         # terminal path, add param to node
-                        if value_overrides is not None and varname in value_overrides:
-                            node[text] = value_overrides[varname]
-                        else:
-                            node[text] = self.get_param_default_value(param)
+                        node[text] = self.get_param_default_value(param)
                         break
                     else:
                         # create new node for section
                         node[text] = {}
 
                 node = node[text]    
-
-        for key, val in out_dict.items():
-            if type(val) == dict:
-                out_dict[key] = json.dumps(val)            
         
-        return out_dict
+        return job_dict
+
+    
+    def override_job_dict_vals(self, job_dict: dict, value_overrides: dict) -> Optional[dict]:
+        for varname, value in value_overrides.items():
+            varpath = varname.split('.')
+            node = job_dict
+
+            for i, text in enumerate(varpath):
+                # terminal path, add / overwrite value
+                if i == len(varpath) - 1:
+                    node[text] = value
+                    break
+
+                # not terminal path, but subdict doesn't 
+                # exist for some reason (probably repeat param)
+                elif text not in node:
+                    return None
+                    #node[text] = {}
+
+                node = node[text]
+
+        return job_dict
+
+
+    def jsonify_job_dict(self, job_dict: dict) -> dict:
+        for key, val in job_dict.items():
+            if type(val) == dict:
+                job_dict[key] = json.dumps(val)  
+        return job_dict
+
+
+    # def to_job_dict_old(self, value_overrides: Optional[dict]=None) -> dict:
+    #     out_dict = {}
+
+    #     for varname, param in self.params.items():
+    #         varpath = varname.split('.')
+    #         node = out_dict
+            
+    #         for i, text in enumerate(varpath):
+    #             if text not in node:
+    #                 if i == len(varpath) - 1:
+    #                     # terminal path, add param to node
+    #                     if value_overrides is not None and varname in value_overrides:
+    #                         node[text] = value_overrides[varname]
+    #                     else:
+    #                         node[text] = self.get_param_default_value(param)
+    #                     break
+    #                 else:
+    #                     # create new node for section
+    #                     node[text] = {}
+
+    #             node = node[text]    
+
+    #     for key, val in out_dict.items():
+    #         if type(val) == dict:
+    #             out_dict[key] = json.dumps(val)            
+        
+    #     return out_dict
 
 
     def get_param_default_value(self, param: ToolParameter) -> Any:
@@ -129,15 +195,15 @@ class ParamRegister:
         query_path = query_key.split('.')
         param_scores: list[Tuple[int, str, ToolParameter]] = []
 
-        for param_var, param in self.params.items():
-            var_path = param_var.split('.')
+        for varname, param in self.params.items():
+            varpath = varname.split('.')
             score = 0
             for i in range(1, len(query_path) + 1):
-                if var_path[-i] == query_path[-i]:
+                if varpath[-i] == query_path[-i]:
                     score += 1
                 else:
                     break
-            param_scores.append((score, param_var, param))
+            param_scores.append((score, varname, param))
         
         # params are ordered by the place in xml
         # python sort is stable so if there are multiple equally
@@ -146,7 +212,7 @@ class ParamRegister:
         param_scores.sort(key=lambda x: x[0], reverse=True)
 
         if param_scores[0][0] >= 1:
-            return param_scores[0][1,2]
+            return param_scores[0][1:]
         return (None, None)
 
 

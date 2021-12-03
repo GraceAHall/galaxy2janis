@@ -100,7 +100,7 @@ class Output:
 
         # get datatype from referenced param
         elif format_source != '':
-            param_var, param = param_register.get(format_source)
+            varname, param = param_register.get(format_source)
             return param.galaxy_type
 
         # get datatype from referenced file extension
@@ -195,7 +195,7 @@ class DiscoverDatasetsOutput(Output):
 
         # get datatype from referenced param
         elif format_source != '':
-            param_var, param = param_register.get(format_source)
+            varname, param = param_register.get(format_source)
             if param is not None:
                 self.galaxy_type = param.galaxy_type
 

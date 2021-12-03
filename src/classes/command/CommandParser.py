@@ -26,11 +26,11 @@ class CommandParser:
         self.command = Command(self.tool.param_register, self.tool.out_register)
         
 
-    def parse(self, workflow_step: Optional[dict[str, Any]]=None) -> Command:
+    def parse(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> Command:
         # self.update_command_from_janis_definition()  # NOTE FUTURE
         self.update_command_from_xml()
-        self.update_command_from_tests()
-        self.update_command_from_workflowstep(workflow_step)
+        #self.update_command_from_tests()
+        self.update_command_from_workflowstep(workflow, workflow_step)
       
 
     def update_command_from_xml(self) -> None:
@@ -48,12 +48,11 @@ class CommandParser:
             #self.command.update(cmd_str)
     
 
-    def update_command_from_workflowstep(self, workflow_step: dict[str, Any]) -> None:
+    def update_command_from_workflowstep(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> None:
         # temp testing
-        workflow_step = {}
         if workflow_step is not None:
-            loader = WorkflowStepCommandLoader(self.gxtool, self.logger)
-            cmd_txt = loader.load(workflow_step)
+            loader = WorkflowStepCommandLoader(self.app, self.gxtool, self.tool, self.logger)
+            cmd_txt = loader.load(workflow, workflow_step)
             #cmd_str = CommandString(cmd_txt, self.tool, self.logger)
             #self.command.update(cmd_str)
     

@@ -2,7 +2,7 @@
 
 #from galaxy.tools import Tool as GalaxyTool
 import tempfile
-from typing import Union
+from typing import Union, Optional
 
 from classes.templating.MockClasses import MockApp, ComputeEnvironment
 from classes.tool.Tool import Tool
@@ -39,27 +39,37 @@ class TestCommandLoader:
         self.dataset_counter: int = 1
 
 
-    def load(self, test: ToolTestDescription) -> list[str]:
+    def load(self, test: ToolTestDescription) -> Optional[list[str]]:
         """comment"""
         job = self.setup_job(test)
+        # setup_job() will return None if there are errors creating a job
+        # at the moment only repeat param should cause setup_job() to return None
+        if job is None:
+            return None
+
         evaluator = self.setup_evaluator(job)
         command_line, _, __ = evaluator.build()
         print('\n', command_line)
         return command_line
 
 
-    def setup_job(self, test: ToolTestDescription) -> Job:
+    def setup_job(self, test: ToolTestDescription) -> Optional[Job]:
         job = Job()
         
-        param_dict = {}
+        defined_inputs = {}
         for name, values in test.inputs.items():
-            self.update_defined_inputs(name, values, param_dict, job)
+            self.update_defined_inputs(name, values, defined_inputs, job)
 
-        job_dict = self.tool.param_register.to_job_dict(value_overrides=param_dict)
+        job_dict = self.tool.param_register.to_job_dict(value_overrides=defined_inputs)
+        
+        # incase anything went wrong in the job_dict creation phase
+        if job_dict is None:
+            return None
+        
         job.parameters = [JobParameter(name=k, value=v) for k, v in job_dict.items()]
         
-        for out in test.outputs:
-            self.update_defined_outputs(out['name'], job)
+        for out in self.gxtool.outputs:
+            self.update_job_outputs(out, job)
         
         return job
 
@@ -67,30 +77,32 @@ class TestCommandLoader:
     def update_defined_inputs(self, label: str, values: list[str], param_dict: dict, job: Job) -> None:
         # get the param variable name and param
         query_var = label.replace('|', '.')
-        param_var, param = self.tool.param_register.get(query_var)
+        varname, param = self.tool.param_register.get(query_var, allow_lca=True)
+        # allowing lca means repeat params are properly found. shouldn't affect anything else? the returned param_var in case of repeats has a different name to query_var.
         
         # creating (fake) datasets for the data inputs and outputs
+        # each repeat in a repeat param which is type="data" will 
+        # be fed individually here, with a unique name, so all good. 
+        
         if param.type == 'data':
             job_input = self.gen_dataset(values[0], 'input')
-            param_dict[param_var] = str(job_input.dataset.dataset_id)
             job.input_datasets.append(job_input)
+            param_dict[query_var] = str(job_input.dataset.dataset_id)
         elif param.type == 'data_collection':
             pass
-        # TODO OUTPUTS? 
 
-        # not a data input / output param
+        # not a data input param
         else:   
             if len(values) == 1:
-                param_dict[param_var] = values[0]
+                param_dict[query_var] = values[0]
             else:
-                param_dict[param_var] = values
+                param_dict[query_var] = values
 
 
-    def update_defined_outputs(self, label: str, job: Job) -> None:
-        output_var = label.replace('|', '.')
+    def update_job_outputs(self, label: str, job: Job) -> None:
+        output_var = label.replace('|', '_')
         job_output = self.gen_dataset(output_var, 'output')
         job.output_datasets.append(job_output)
-        print()
 
 
     def gen_dataset(self, fname: str, iotype: str) -> Union[JobToInputDatasetAssociation, JobToOutputDatasetAssociation]:

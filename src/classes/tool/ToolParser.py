@@ -109,8 +109,8 @@ class ToolParser:
         self.set_command()
 
         # post
-        self.annotate_datatypes()
-        self.write_janis()
+        #self.annotate_datatypes()
+        #self.write_janis()
 
 
 
@@ -146,10 +146,10 @@ class ToolParser:
     # 7th step: command parsing 
     def set_command(self):
         cmdpar = CommandParser(self.app, self.gxtool, self.tool, self.logger)
-        workflow_step = None
-        cmdpar.parse(workflow_step=workflow_step)
+        workflow, workflow_step = 'test/test-data/assembly_qc.ga', 3
+        cmdpar.parse(workflow=workflow, workflow_step=workflow_step)
         self.command = cmdpar.command
-
+    
 
     # 8th step: annotating with datatypes
     def annotate_datatypes(self):
