@@ -149,6 +149,8 @@ class MockApp(di.Container):
         self.execution_timer_factory = Bunch(get_timer=StructuredExecutionTimer)
         self.is_job_handler = False
         self.biotools_metadata_source = BiotoolsMetadataSource()
+        # new param not native to the aApp class
+        self.dataset_counter: int = 1
 
         def url_for(*args, **kwds):
             return "/mock/url"

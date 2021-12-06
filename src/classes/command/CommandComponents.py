@@ -67,7 +67,7 @@ sources has a little bit different meaning to as seen in Flags.
 
 """
 class Option:
-    def __init__(self, prefix: str, delim: str):
+    def __init__(self, prefix: str, delim: str=' '):
         self.prefix: str = prefix
         self.delim: str = delim
         self.pos: int = 0

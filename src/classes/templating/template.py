@@ -232,7 +232,6 @@ class Templator:
     def evaluate(self) -> None:
         self.set_compute_environment()
         command_line, _, __ = self.evaluator.build()
-        print('\n', command_line)
 
     
     def set_compute_environment(self, **kwds):

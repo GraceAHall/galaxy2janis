@@ -50,10 +50,10 @@ def split_keyval_to_text(kv_token: Token) -> list[str]:
     return left_text, right_text, delim
 
 
-def get_best_token(word: str, param_register: ParamRegister, out_register: OutputRegister) -> Token:
+def get_best_token(word: str, param_register: ParamRegister, out_register: OutputRegister, prioritise_tokens: bool=True) -> Token:
     # get best-fit token for word 
     temp_tokens = get_all_tokens(word, param_register, out_register)
-    best_token = select_highest_priority_token(temp_tokens)
+    best_token = select_highest_priority_token(temp_tokens, prioritise_tokens)
     return best_token
 
 
@@ -115,10 +115,16 @@ def get_all_tokens(text: str, param_register: ParamRegister, out_register: Outpu
     return tokens
 
 
-def select_highest_priority_token(tokens: list[Token]) -> Token:
+def select_highest_priority_token(tokens: list[Token], prioritise_tokens: True) -> Token:
     # extremely simple. just the token with longest text match.
     # solves issues of galaxy param being embedded in string. 
+    if prioritise_tokens:
+        return get_highest_priority_token(tokens)
+    else:
+        return get_longest_token(tokens)
     
+
+def get_highest_priority_token(tokens: list[Token]) -> Token:
     kv_pairs = [t for t in tokens if t.type == TokenType.KV_PAIR]
     gx_params = [t for t in tokens if t.type == TokenType.GX_PARAM]
     gx_outs = [t for t in tokens if t.type == TokenType.GX_OUT]
@@ -142,8 +148,12 @@ def get_longest_token(token_list: list[Token]) -> list[Token]:
     returns multiple tokens if both have max len
     """   
     longest_text_len = max([len(t.text) for t in token_list])
-    longest_tokens = [t for t in token_list if len(t.text) == longest_text_len]
-    return longest_tokens
+    tokens = [t for t in token_list if len(t.text) == longest_text_len]
+    
+    if len(tokens) > 1:
+        return get_highest_priority_token(tokens)
+    else:
+        return tokens[0]
 
 
 def get_first_unquoted(the_string: str, the_list: list[str]) -> Tuple[str, int]:

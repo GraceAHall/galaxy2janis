@@ -160,42 +160,43 @@ def get_linux_operators(the_string: str) -> list[str]:
     return [m[0] for m in matches]
 
 
+def get_galaxy_keywords(the_string: str) -> list[str]:
+    # out = []
+
+    # # handle reserved words
+    # static_keywords = [
+    #     '$__tool_directory__',
+    #     '$__new_file_path__',
+    #     '$__tool_data_path__',
+    #     '$__root_dir__',
+    #     '$__datatypes_config__',
+    #     '$__user_id__',
+    #     '$__user_email__',
+    #     '$__app__',
+    #     '$__target_datatype__',
+    #     '$GALAXY_MEMORY_MB',
+    #     '$GALAXY_MEMORY_MB_PER_SLOT',
+    #     '$_GALAXY_JOB_TMP_DIR'
+    # ]
+
+    # for reserved_word in static_keywords:
+    #     if reserved_word in the_string:
+    #         out.append(reserved_word)
+
+    # handle galaxy slots
+    out = []
+    slots_pattern = r'\\?\$\{GALAXY_SLOTS:-\d+}'
+    slots_matches = re.finditer(slots_pattern, the_string)
+    out += [m[0] for m in slots_matches]
+    return out
+
+
 def get_galaxy_keyword_value(the_string: str) -> Optional[str]:
-    pattern = r'\\\$\{?GALAXY_.*?[\s:]-(\w+?)\}'
+    pattern = r'\\?\$\{?GALAXY_.*?[\s:]-(\w+?)\}'
     matches = re.finditer(pattern, the_string)
     for m in matches:
         return m.group(1)
     return None
-
-
-def get_galaxy_keywords(the_string: str) -> list[str]:
-    out = []
-
-    # handle reserved words
-    gx_keywords = [
-        '$__tool_directory__',
-        '$__new_file_path__',
-        '$__tool_data_path__',
-        '$__root_dir__',
-        '$__datatypes_config__',
-        '$__user_id__',
-        '$__user_email__',
-        '$__app__',
-        '$__target_datatype__',
-        '\$GALAXY_MEMORY_MB',
-        '\$GALAXY_MEMORY_MB_PER_SLOT',
-        '\$_GALAXY_JOB_TMP_DIR'
-    ]
-
-    for reserved_word in gx_keywords:
-        if reserved_word in the_string:
-            out.append(reserved_word)
-
-    # handle galaxy slots
-    slots_pattern = r'\\\$\{GALAXY_SLOTS:-\d+}'
-    slots_matches = re.finditer(slots_pattern, the_string)
-    out += [m[0] for m in slots_matches]
-    return out
 
 
 def get_keyval_pairs(the_string: str) -> list[str]:

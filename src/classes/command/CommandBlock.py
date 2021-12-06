@@ -26,15 +26,15 @@ class CommandBlock:
         self.tokens: list[list[Token]] = []
 
 
-    def add(self, word: str, cond_levels: dict[str, int]) -> None:
+    def add(self, word: str, levels: dict[str, int]) -> None:
         # tokenise
         tokens = self.init_tokens(word)
 
         # add conditional labels
         for token in tokens:
-            if cond_levels['if'] > 0 or cond_levels['unless'] > 0:
+            if levels['conditional'] > 0:
                 token.in_conditional = True
-            if cond_levels['for'] > 0 or cond_levels['while'] > 0:
+            if levels['loop'] > 0:
                 token.in_loop = True
 
         self.tokens.append(tokens)

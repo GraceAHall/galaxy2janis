@@ -1,6 +1,9 @@
 
 
 
+from typing import Union
+
+
 from classes.command.CommandBlock import CommandBlock
 from classes.command.CommandString import CommandString
 from classes.outputs.OutputRegister import OutputRegister
@@ -18,6 +21,7 @@ class Command:
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
         self.base_command: list[str] = []
+        self.skip_next: bool = False
 
 
     def update(self, command_string: CommandString) -> None:
@@ -30,80 +34,85 @@ class Command:
         command_block = command_string.best_block
 
         i = 0
-        while i < len(command_block.tokens) - 1:
+        while i < len(command_block.tokens):
+            self.skip_next = False
             curr_tokens = command_block.tokens[i]
             next_tokens = command_block.tokens[i+1]
-            should_skip_next = False
 
             for ctoken in curr_tokens:  
+                
+                # stdout token pair
+                if self.is_stdout(ctoken, ntoken):
+                    self.update_outputs(ntoken)
+                    self.skip_next = True
+
                 # kv pair handling. add as option with correct delim. 
-                if ctoken.type == TokenType.KV_PAIR: 
+                elif ctoken.type == TokenType.KV_PAIR: 
                     ctoken, ntoken, delim = split_keyval_to_best_tokens(ctoken, self.param_register, self.out_register)
-                    self.update_options(ctoken, ntoken, delim=delim)
+                    component = self.make_option(ctoken, ntoken, delim=delim)
+                    self.update_components(component)
                     continue
 
                 # everything else
-                for ntoken in next_tokens:
-                    skip_next = self.update_components(ctoken, ntoken)
-                    if skip_next:
-                        should_skip_next = True
-            
-            if should_skip_next:
+                else:
+                    for ntoken in next_tokens:
+                        component = self.make_component(ctoken, ntoken)
+                        self.update_components(component)
+
+            if self.skip_next:
                 i += 2
             else:
                 i += 1
 
 
-    def update_input_positions(self) -> None:
-        options_start = self.get_options_position()
+    def update_components(self, current_comp: Union[Positional, Flag, Option]) -> None:
+        # prioritise position of positionals from test / workflow cmdstrings 
+        # (positionals need to appear every time program is run)
 
-        # update positionals
-        self.shift_input_positions(startpos=options_start, amount=1)
+        # split option into flag 
         
-        # update flags and opts position
-        self.set_flags_options_position(options_start) 
+        # add new source for the component
+
 
         
-    def get_options_position(self) -> int:
-        # positionals will be sorted list in order of position
-        # can loop through and find the first which is 
-        # 'after_options' and store that int
-        positionals = self.get_positionals()
-
-        options_start = len(positionals)
-        for positional in positionals:
-            if positional.after_options:
-                options_start = positional.pos
-                break
-        
-        return options_start
+        cached_comp = self.get(ctoken)
+        current_comp = self.make_component(ctoken, ntoken)
+        # if current component
+            # update understanding of component 
+            # change component class
+        # 
 
 
-    def update_components(self, ctoken: Token, ntoken: Token) -> None:
-        skip_next = False
-        
-        # first linux '>' to stdout
-        if self.is_stdout(ctoken, ntoken):
-            self.update_outputs(ntoken)
-            skip_next = True
-
+    def make_component(self, ctoken: Token, ntoken: Token) -> Union[Positional, Flag, Option]:
         # flag
-        elif self.is_flag(ctoken, ntoken):
-            self.update_flags(ctoken)
-
+        if self.is_flag(ctoken, ntoken):
+            return self.make_flag(ctoken)
         # option
         elif self.is_option(ctoken, ntoken):
-            self.update_options(ctoken, ntoken)
-            skip_next = True
-
+            return self.make_option(ctoken, ntoken)
+        # positional
         else:
-            # text positional
             # this has to happen last, as last resort
             # some examples of options which don't start with '-' exist. 
-            self.update_positionals(ctoken)  
+            return self.make_positional(ctoken)
 
-        return skip_next 
 
+    def make_flag(self, token: Token) -> Flag:
+        flag = Flag(token.text)
+        flag.sources.append(token) 
+        return flag 
+
+
+    def make_option(self, ctoken: Token, ntoken: Token) -> Option:
+        opt = Option(ctoken.text)
+        opt.sources.append(ntoken)
+        return opt
+
+
+    def make_positional(self, token: Token, pos: int) -> Positional:
+        is_after_options = self.has_options()
+        return Positional(pos, token, is_after_options)
+             
 
     def is_stdout(self, ctoken: Token, ntoken: Token) -> bool:
         """
@@ -114,58 +123,11 @@ class Command:
         return False             
 
 
-    def update_outputs(self, token: Token) -> None:
-        if token.type == TokenType.GX_OUT:
-            output_var, output = self.out_register.get(token.text)
-
-        elif token.type == TokenType.RAW_STRING:
-            output_var, output = self.out_register.get_by_filepath(token.text, allow_nopath=True)
-
-        if output is None:
-            token.text = token.text.lstrip('$')
-            self.out_register.create_output_from_text(token.text)
-            # the following line is kinda bad. dollar sign shouldnt be here really...this will cause issues
-            output_var, output = self.out_register.get(token.text)
-
-        output.is_stdout = True
-
-
-    def update_positionals(self, token: Token) -> None:
-        key = token.text
-
-        if key not in self.positionals:
-            is_after_options = self.has_options()
-            pos = self.get_positional_count()
-            new_positional = Positional(pos, token, is_after_options)
-            self.positionals[key] = new_positional
-
-
-    def update_flags(self, token: Token) -> None:
-        key = token.text
-
-        # make entry if not exists
-        if key not in self.flags:
-            new_flag = Flag(key)
-            self.flags[key] = new_flag
-                
-        self.flags[key].sources.append(token)       
-
-
     def are_identical_tokens(self, token1: Token, token2: Token) -> bool:
         if token1.text == token2.text:
             if token1.gx_ref == token2.gx_ref:
                 return True
         return False
-
-
-    def update_options(self, ctoken: Token, ntoken: Token, delim=' ') -> None:
-        key = ctoken.text
-
-        if key not in self.options:
-            new_option = Option(key, delim)
-            self.options[key] = new_option
-            
-        self.options[key].sources.append(ntoken)
 
 
     def is_kv_pair(self, ctoken: Token) -> bool:
@@ -218,6 +180,22 @@ class Command:
         return False
 
 
+    def update_outputs(self, token: Token) -> None:
+        if token.type == TokenType.GX_OUT:
+            output_var, output = self.out_register.get(token.text)
+
+        elif token.type == TokenType.RAW_STRING:
+            output_var, output = self.out_register.get_by_filepath(token.text, allow_nopath=True)
+
+        if output is None:
+            token.text = token.text.lstrip('$')
+            self.out_register.create_output_from_text(token.text)
+            # the following line is kinda bad. dollar sign shouldnt be here really...this will cause issues
+            output_var, output = self.out_register.get(token.text)
+
+        output.is_stdout = True
+
+
     def get_positional_count(self) -> int:
         return len(self.positionals)
 
@@ -268,6 +246,31 @@ class Command:
         if len(self.flags) != 0 or len(self.options) != 0:
             return True
         return False
+
+
+    def update_input_positions(self) -> None:
+        options_start = self.get_options_position()
+
+        # update positionals
+        self.shift_input_positions(startpos=options_start, amount=1)
+        
+        # update flags and opts position
+        self.set_flags_options_position(options_start) 
+
+        
+    def get_options_position(self) -> int:
+        # positionals will be sorted list in order of position
+        # can loop through and find the first which is 
+        # 'after_options' and store that int
+        positionals = self.get_positionals()
+
+        options_start = len(positionals)
+        for positional in positionals:
+            if positional.after_options:
+                options_start = positional.pos
+                break
+        
+        return options_start
    
 
     def shift_input_positions(self, startpos: int = 0, amount: int = 1) -> None:
@@ -290,21 +293,24 @@ class Command:
                 the_input.pos = new_position
 
 
-    def pretty_print(self) -> None:
-        print('\npositionals ---------\n')
-        print(f'{"pos":<10}{"text":20}{"gx_ref":20}{"token":20}{"datatype":20}{"after opts":>5}')
+    def __str__(self) -> str:
+        out_str = ''
+        out_str += '\npositionals ---------\n'
+        out_str += f'{"pos":<10}{"text":20}{"gx_ref":20}{"token":20}{"after opts":>5}\n'
         for p in self.positionals.values():
-            print(p)
+            out_str += p.__str__() + '\n'
 
-        print('\nflags ---------------\n')
-        print(f'{"text":30}{"gx_ref":30}{"token":20}{"datatype":20}{"cond":>5}')
+        out_str += '\nflags ---------------\n'
+        out_str += f'{"text":30}{"gx_ref":30}{"token":20}{"cond":>5}\n'
         for f in self.flags.values():
-            print(f)
+            out_str += f.__str__() + '\n'
 
-        print('\noptions -------------\n')
-        print(f'{"prefix":30}{"text":30}{"gx_ref":30}{"token":20}{"datatype":20}{"cond":>5}')
+        out_str += '\noptions -------------\n'
+        out_str += f'{"prefix":30}{"text":30}{"gx_ref":30}{"token":20}{"cond":>5}\n'
         for opt in self.options.values():
-            print(opt)
+            out_str += opt.__str__() + '\n'
+        
+        return out_str
 
 
    

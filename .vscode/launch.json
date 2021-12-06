@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "quast",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "quast.xml", "tools/quast", "--debug"
+            ]
+        },
+        {
             "name": "abricate",
             "type": "python",
             "request": "launch",
@@ -141,16 +151,7 @@
                 "sortBed.xml", "tools/bedtools", "--debug"
             ]
         },
-        {
-            "name": "quast",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "quast.xml", "tools/quast", "--debug"
-            ]
-        },
+        
         {
             "name": "repeatmasker",
             "type": "python",

@@ -38,7 +38,6 @@ class WorkflowStepCommandLoader:
         self.tool = tool
         self.test_directory = tempfile.mkdtemp()  
         self.logger = logger
-        self.dataset_counter: int = 1
 
 
     def load(self, workflow: dict[str, Any], workflow_step: int) -> Optional[list[str]]:
@@ -52,8 +51,7 @@ class WorkflowStepCommandLoader:
 
         evaluator = self.setup_evaluator(job)
         command_line, _, __ = evaluator.build()
-        print('\n', command_line)
-        return command_line
+        return [command_line]
 
 
     def setup_job(self, workflow: dict[str, Any], workflow_step: int) -> Optional[Job]:
@@ -105,7 +103,7 @@ class WorkflowStepCommandLoader:
                 varname, param = self.tool.param_register.get(query_key)
                 
                 if param.type == 'data':
-                    job_input = self.gen_dataset(query_key, 'input')
+                    job_input = self.generate_dataset(query_key, 'input')
                     job.input_datasets.append(job_input)
                     return str(job_input.dataset.dataset_id)
 
@@ -125,25 +123,25 @@ class WorkflowStepCommandLoader:
 
     def update_job_outputs(self, label: str, job: Job) -> None:
         output_var = label.replace('|', '.')
-        job_output = self.gen_dataset(output_var, 'output')
+        job_output = self.generate_dataset(output_var, 'output')
         job.output_datasets.append(job_output)
 
 
-    def gen_dataset(self, fname: str, iotype: str) -> Union[JobToInputDatasetAssociation, JobToOutputDatasetAssociation]:
+    def generate_dataset(self, fname: str, iotype: str) -> Union[JobToInputDatasetAssociation, JobToOutputDatasetAssociation]:
         """
         creates a dataset association. 
         this process creates a dataset and updates the sql database model.
         """
-        i, path = self.dataset_counter, fname
-        self.dataset_counter += 1
+        i, path = self.app.dataset_counter, fname
+        self.app.dataset_counter += 1
 
         if iotype == 'input':
-            return JobToInputDatasetAssociation(name=fname, dataset=self.gen_hda(i, fname, path))
+            return JobToInputDatasetAssociation(name=fname, dataset=self.generate_hda(i, fname, path))
         elif iotype == 'output':
-            return JobToOutputDatasetAssociation(name=fname, dataset=self.gen_hda(i, fname, path))
+            return JobToOutputDatasetAssociation(name=fname, dataset=self.generate_hda(i, fname, path))
 
 
-    def gen_hda(self, id, name, path) -> HistoryDatasetAssociation:
+    def generate_hda(self, id, name, path) -> HistoryDatasetAssociation:
         hda = HistoryDatasetAssociation(name=name, metadata=dict())
         hda.dataset = Dataset(id=id, external_filename=path)
         hda.dataset.metadata = dict()

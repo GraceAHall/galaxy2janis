@@ -6,10 +6,7 @@ TODO v0.1
 
 
 TODO:
-    - workflowstep command loading
-        - '__current_case__' - delete keyval
-        - '__class__': 'ConnectedValue' - lookup param, if data make dataset else take default
-        - '__class__': 'RuntimeValue' - lookup param, if data make dataset else take default
+    - 
 
 
 

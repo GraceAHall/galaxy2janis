@@ -36,8 +36,7 @@ class TestCommandLoader:
         self.tool = tool
         self.test_directory = tempfile.mkdtemp()  
         self.logger = logger
-        self.dataset_counter: int = 1
-
+        
 
     def load(self, test: ToolTestDescription) -> Optional[list[str]]:
         """comment"""
@@ -49,8 +48,7 @@ class TestCommandLoader:
 
         evaluator = self.setup_evaluator(job)
         command_line, _, __ = evaluator.build()
-        print('\n', command_line)
-        return command_line
+        return [command_line]
 
 
     def setup_job(self, test: ToolTestDescription) -> Optional[Job]:
@@ -110,8 +108,8 @@ class TestCommandLoader:
         creates a dataset association. 
         this process creates a dataset and updates the sql database model.
         """
-        i, path = self.dataset_counter, fname
-        self.dataset_counter += 1
+        i, path = self.app.dataset_counter, fname
+        self.app.dataset_counter += 1
 
         if iotype == 'input':
             return JobToInputDatasetAssociation(name=fname, dataset=self.gen_hda(i, fname, path))

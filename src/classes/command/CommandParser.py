@@ -28,33 +28,39 @@ class CommandParser:
 
     def parse(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> Command:
         # self.update_command_from_janis_definition()  # NOTE FUTURE
+        self.update_command_from_tests()
         self.update_command_from_xml()
-        #self.update_command_from_tests()
         self.update_command_from_workflowstep(workflow, workflow_step)
       
+
+    def update_command_from_tests(self) -> None:
+        loader = TestCommandLoader(self.app, self.gxtool, self.tool, self.logger)
+        for i, test in enumerate(self.tool.tests):
+            cmd_txt = loader.load(test)
+            if cmd_txt is not None:
+                cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+                #print('\nTEST\n', cmd_str)
+                self.command.update(cmd_str)
+                print(f'\nTEST {i}\n', self.command)
+
 
     def update_command_from_xml(self) -> None:
         loader = XMLCommandLoader(self.gxtool, self.logger)
         cmd_txt = loader.load()
         cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+        #print('\nXML\n', cmd_str)
         self.command.update(cmd_str)
-
-    
-    def update_command_from_tests(self) -> None:
-        loader = TestCommandLoader(self.app, self.gxtool, self.tool, self.logger)
-        for test in self.tool.tests:
-            cmd_txt = loader.load(test)
-            #cmd_str = CommandString(cmd_txt, self.tool, self.logger)
-            #self.command.update(cmd_str)
+        print(f'\nXML\n', self.command)
     
 
     def update_command_from_workflowstep(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> None:
-        # temp testing
+        loader = WorkflowStepCommandLoader(self.app, self.gxtool, self.tool, self.logger)
         if workflow_step is not None:
-            loader = WorkflowStepCommandLoader(self.app, self.gxtool, self.tool, self.logger)
             cmd_txt = loader.load(workflow, workflow_step)
-            #cmd_str = CommandString(cmd_txt, self.tool, self.logger)
-            #self.command.update(cmd_str)
+            cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+            #print('\nWORKFLOW STEP\n', cmd_str)
+            self.command.update(cmd_str)
+            print(f'\nWORKFLOW STEP\n', self.command)
     
 
 

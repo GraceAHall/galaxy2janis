@@ -8,10 +8,10 @@ if TYPE_CHECKING:
     from classes.tool.Tool import Tool
 
 
-from classes.command.AliasExtractor import AliasExtractor
+from classes.command.Alias import AliasRegister
 from classes.command.CommandBlock import CommandBlock
 
-from classes.command.Tokens import TokenType
+from classes.command.Tokens import Token, TokenType
 from classes.logging.Logger import Logger
 
 from utils.general_utils import global_align
@@ -33,94 +33,85 @@ class CommandString:
         self.command_lines = command_lines
         self.tool = tool
         self.logger = logger
+        self.alias_register = AliasRegister(self.tool, self.logger)
         self.command_blocks: list[CommandBlock] = []
         self.keywords = self.get_keywords()
-        self.set_aliases()
-        self.expand_aliases()
-        self.translate_gx_keywords()
+        
+        self.statement_block = -1
+        self.levels = {
+            'conditional': 0,
+            'loop': 0
+        }
         self.set_command_blocks()
         self.set_best_block()
 
 
-    def get_keywords(self) -> None:
-        conditional_keywords = ['#if ', '#else if ', '#elif ', '#else', '#end if', '#unless ', '#end unless']
-        loop_keywords = ['#for ', '#end for', '#while ', '#end while']
-        error_keywords = ['#try ', '#except', '#end try']
-        cheetah_var_keywords = ['#def ', '#set ']
-        linux_commands = ['set ', 'ln ', 'cp ', 'mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'export ', 'gzip ', 'gunzip ', 'cd ', 'echo ', 'trap ', 'touch ']
-        return conditional_keywords + loop_keywords + error_keywords + cheetah_var_keywords + linux_commands
+    def get_keywords(self) -> dict[str, set[str]]:
+        keywords: dict[str, set[str]] = {}
+        keywords['ch_open_conditional'] = set(['#if ', '#unless '])
+        keywords['ch_close_conditional'] = set(['#end if', '#end unless'])
 
+        keywords['ch_open_loop'] = set(['#for ', '#while '])
+        keywords['ch_close_loop'] = set(['#end for', '#end while'])
 
-    def set_aliases(self) -> None:
-        ae = AliasExtractor(self.command_lines, self.tool, self.logger)
-        ae.extract()
-        self.alias_register = ae.alias_register
+        keywords['cheetah_misc'] = set(['#def ', '#else if ', '#elif ', '#else', '#try ', '#except', '#end try'])
+        keywords['linux'] = set(['mkdir ', 'tar ', 'ls ', 'head ', 'wget ', 'grep ', 'awk ', 'cut ', 'sed ', 'gzip ', 'gunzip ', 'cd ', 'echo ', 'trap ', 'touch '])
+        keywords['alias'] = set(['set ', 'ln ', 'cp ', 'mv ', 'export ', '#set '])
 
-
-    def expand_aliases(self) -> None:
-        out_lines: list[str] = []
-
-        for line in self.command_lines:
-            expanded_line = []
-            for word in line.split():
-                expanded_word = self.alias_register.template(word)
-                expanded_line.append(expanded_word)
-            out_lines.append(' '.join(expanded_line))
-
-        self.command_lines = out_lines
-
-
-    def translate_gx_keywords(self) -> None:
-        out_lines: list[str] = []
-
-        for line in self.command_lines:
-            translated_line = []
-            for word in line.split():
-                gx_keywords = get_galaxy_keywords(word)
-                for keyword in gx_keywords:
-                    kw_val = get_galaxy_keyword_value(keyword)
-                    word = word.replace(keyword, kw_val)
-                translated_line.append(word)
-            out_lines.append(' '.join(translated_line))
-
-        self.command_lines = out_lines
+        return keywords
 
 
     def set_command_blocks(self) -> None:
-        self.statement_block = 0
-        self.levels = {
-            'if': 0,
-            'unless': 0,
-            'for': 0,
-            'while': 0,
-        }
-
         active_block = self.new_block()
-
+        cheetah_cond =      self.keywords['ch_open_conditional'] |\
+                            self.keywords['ch_close_conditional'] |\
+                            self.keywords['ch_open_loop'] |\
+                            self.keywords['ch_close_loop']
+                         
         for line in self.command_lines:
-            # update conditional depth levels 
-            self.update_levels(line)
-            sublines = split_line_by_ands(line) 
+            # update conditional / loop depth levels 
+            self.update_cheetah_levels(line)
 
-            for sline in sublines:
-                # do not include anything within a for/while block
-                if self.levels['for'] == 0 and self.levels['while'] == 0:
-                    if not any([sline.startswith(kw) for kw in self.keywords]):
-                        
-                        words = get_words(sline)  
-                        for word in words:
-                            if word == '&&' or word == ';':
-                                self.command_blocks.append(active_block)
-                                active_block = self.new_block()
-                                continue
-                            else:
-                                active_block.add(word, self.levels)
+            if any ([line.startswith(kw) for kw in cheetah_cond]):
+                continue
+            elif any ([line.startswith(kw) for kw in self.keywords['alias']]):
+                self.alias_register.update(line)
+            elif not any ([line.startswith(kw) for kw in self.keywords['cheetah_misc']]):
+                active_block = self.handle_new_line(line, active_block)
 
         # add final active block to command_blocks
         self.command_blocks.append(active_block)
+        self.add_block_sentinels()
+
+
+    def add_block_sentinels(self) -> None:
+        for block in self.command_blocks:
+            end_sentinel = Token('__END__', TokenType.END_COMMAND)
+            block.tokens.append([end_sentinel])
+
+
+    def handle_new_line(self, line: str, active_block: CommandBlock) -> CommandBlock:
+        # do not consider anything within a for/while block
+        if self.levels['loop'] == 0:
+            words = get_words(line)
+
+            for word in words:
+                # this should really use the find_unquoted() method 
+                # and operate on the whole line. 
+                if word == '&&': 
+                    self.command_blocks.append(active_block)
+                    active_block = self.new_block()
+                    continue
+                else:
+                    word = self.alias_register.template(word)
+                    word = self.translate_gx_keywords(word)
+                    active_block.add(word, self.levels)
+        
+        return active_block 
 
 
     def new_block(self) -> CommandBlock:
+        self.statement_block += 1
         return CommandBlock(    
             self.statement_block, 
             self.tool.param_register,
@@ -129,29 +120,35 @@ class CommandString:
         )
 
 
-    def update_levels(self, line: str) -> None:
+    def update_cheetah_levels(self, line: str) -> None:
+        """updates current cheetah conditional and loop nest levels"""
         # incrementing
-        if line.startswith('#if '):
-            self.levels['if'] += 1
-        if line.startswith('#unless '):
-            self.levels['unless'] += 1
-        if line.startswith('#for '):
-            self.logger.log(1, 'for loop encountered')
-            self.levels['for'] += 1
-        if line.startswith('#while '):
-            self.logger.log(1, 'for loop encountered')
-            self.levels['while'] += 1
+        for keyword in self.keywords['ch_open_conditional']:
+            if line.startswith(keyword):
+                self.levels['conditional'] += 1
+        
+        for keyword in self.keywords['ch_open_loop']:
+            if line.startswith(keyword):
+                self.levels['loop'] += 1
 
         # decrementing
-        if '#end if' in line:
-            self.levels['if'] -= 1
-        if '#end unless' in line:
-            self.levels['unless'] -= 1
-        if '#end for' in line:
-            self.levels['for'] -= 1
-        if '#end while' in line:
-            self.levels['while'] -= 1
-     
+        for keyword in self.keywords['ch_close_conditional']:
+            if line.startswith(keyword):
+                self.levels['conditional'] -= 1
+        
+        for keyword in self.keywords['ch_close_loop']:
+            if line.startswith(keyword):
+                self.levels['loop'] -= 1
+
+
+    def translate_gx_keywords(self, word: str) -> str:
+        gx_keywords = get_galaxy_keywords(word)
+        for keyword in gx_keywords:
+            kw_val = get_galaxy_keyword_value(keyword)
+            word = word.replace(keyword, kw_val)
+
+        return word
+             
     
     def set_best_block(self) -> None:
         """
@@ -192,11 +189,10 @@ class CommandString:
 
     def get_blocks_first_token_similarities(self) -> list[Tuple[int, float]]:
         first_token_scores_dict = {}
-        for statement_block, cmd_tokens in self.command_blocks.items():
-            first_token_scores_dict[statement_block] = 0
-            first_token = cmd_tokens[0][0]
+        for command_block in self.command_blocks:
+            first_token = command_block.tokens[0][0]
             score = global_align(self.tool.main_requirement['name'], first_token.text)
-            first_token_scores_dict[statement_block] = score
+            first_token_scores_dict[command_block.statement_block] = score
         
         # sort by align score and return best
         first_token_scores = list(first_token_scores_dict.items())
@@ -205,7 +201,6 @@ class CommandString:
 
 
     def choose_best_block(self, gx_token_tallies: list[Tuple[int, int]], first_token_scores: list[Tuple[int, float]]) -> int:
-
         # condition 1: 
         # gx ref based
         # one block has at least 4 gx tokens and is 2x second highest
@@ -233,5 +228,15 @@ class CommandString:
 
         # condition 4: (fallback) return block with most gx tokens
         return gx_token_tallies[0][0]
+
+
+    def __str__(self) -> str:
+        out_str = ''
+        for command_block in self.command_blocks:
+            out_str += f'\nBLOCK {command_block.statement_block}\n'
+            for i, token_list in enumerate(command_block.tokens):
+                for token in token_list:
+                    out_str += f'{i:<4}{token.type:<25}{token.text[:39]:<40}\n'
+        return out_str
 
     
