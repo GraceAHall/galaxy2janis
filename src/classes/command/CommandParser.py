@@ -29,8 +29,8 @@ class CommandParser:
     def parse(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> Command:
         # self.update_command_from_janis_definition()  # NOTE FUTURE
         self.update_command_from_tests()
-        self.update_command_from_xml()
         self.update_command_from_workflowstep(workflow, workflow_step)
+        self.update_command_from_xml()
       
 
     def update_command_from_tests(self) -> None:
@@ -40,17 +40,8 @@ class CommandParser:
             if cmd_txt is not None:
                 cmd_str = CommandString(cmd_txt, self.tool, self.logger)
                 #print('\nTEST\n', cmd_str)
-                self.command.update(cmd_str)
+                self.command.update(cmd_str, source='test')
                 print(f'\nTEST {i}\n', self.command)
-
-
-    def update_command_from_xml(self) -> None:
-        loader = XMLCommandLoader(self.gxtool, self.logger)
-        cmd_txt = loader.load()
-        cmd_str = CommandString(cmd_txt, self.tool, self.logger)
-        #print('\nXML\n', cmd_str)
-        self.command.update(cmd_str)
-        print(f'\nXML\n', self.command)
     
 
     def update_command_from_workflowstep(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> None:
@@ -59,9 +50,16 @@ class CommandParser:
             cmd_txt = loader.load(workflow, workflow_step)
             cmd_str = CommandString(cmd_txt, self.tool, self.logger)
             #print('\nWORKFLOW STEP\n', cmd_str)
-            self.command.update(cmd_str)
+            self.command.update(cmd_str, source='workflowstep')
             print(f'\nWORKFLOW STEP\n', self.command)
     
 
+    def update_command_from_xml(self) -> None:
+        loader = XMLCommandLoader(self.gxtool, self.logger)
+        cmd_txt = loader.load()
+        cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+        #print('\nXML\n', cmd_str)
+        self.command.update(cmd_str, source='xml')
+        print(f'\nXML\n', self.command)
 
 
