@@ -29,7 +29,7 @@ def get_cheetah_vars(the_string: str) -> set[str]:
     """
     doesn't keep function calls
     """
-    matches = re.finditer(r'\$\{?[\w.]+\}?', the_string)
+    matches = re.finditer(r'(?<=\$|__gxvar_)\{?[\w.]+\}?', the_string)
     
     #matches = set([m[0] for m in matches])
     

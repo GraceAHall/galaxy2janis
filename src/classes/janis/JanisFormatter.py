@@ -1,11 +1,16 @@
 
 
-from typing import Tuple
+from typing import Tuple, Union
 from datetime import date
+
+from sqlalchemy.orm import base
+from classes.janis.DatatypeExtractor import DatatypeExtractor
 
 from classes.logging.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType, Token
 from galaxy.tool_util.parser.output_objects import ToolOutput
+
+CommandComponent = Union[Positional, Flag, Option]
 
 
 class JanisFormatter:
@@ -13,6 +18,7 @@ class JanisFormatter:
         self.tool = tool
         self.janis_out_path = janis_out_path
         self.logger = logger
+        self.dtype_extractor = DatatypeExtractor(logger)
 
         # janis attributes to create
         self.commandtool: str = ''
@@ -61,11 +67,11 @@ class JanisFormatter:
         """
 
         base_command = self.infer_base_command()
-
         toolname = self.tool.id.replace('-', '_').lower()
         version = self.tool.version
         container = self.tool.container
-        citation = self.tool.get_main_citation()
+        citation = "NOT NOW ILL DO IT LATER"
+        # citaiton = self.tool.get_main_citation()
         
         out_str = f'\n{toolname} = CommandToolBuilder(\n'
         out_str += f'\ttool="{toolname}",\n'
@@ -90,20 +96,26 @@ class JanisFormatter:
 
     def infer_base_command(self) -> str:
         """
-        base command is all RAW_STRING tokens before options begin
-        can be accessed going through positionals by pos.        
+        base command is all positionals before options begin, where all sources are RAW_STRING types and only 1 value was witnessed.    
         """
-        # get base command positionals
+        # get positionals before opts
         positionals = self.tool.command.get_positionals()
         positionals = [p for p in positionals if not p.after_options]
-        positionals = [p for p in positionals if p.token.type == TokenType.RAW_STRING]
 
-        # remove these positionals 
+        # get positionals which are part of base command
+        base_positionals = []
         for p in positionals:
+            p_types = p.get_token_types()
+            if TokenType.RAW_STRING in p_types and len(p_types) == 1 and p.has_unique_value():
+                base_positionals.append(p)
+
+        # remove these Positional CommandComponents as they are now considered 
+        # base command, not positionals
+        for p in base_positionals:
             self.tool.command.remove_positional(p.pos)
 
         # format to string
-        base_command = [p.token.text for p in positionals]
+        base_command = [p.get_values(tolist=True)[0] for p in base_positionals]
         base_command = ['"' + cmd + '"' for cmd in base_command]
         base_command = ', '.join(base_command)
         base_command = '[' + base_command + ']'
@@ -124,23 +136,22 @@ class JanisFormatter:
             - positional is part of the base_command (will have been removed)
             - positional with TokenType = GX_OUT
             - option with only 1 source token and the TokenType is GX_OUT
-            - 
         """
         inputs = []
 
         command = self.tool.command
 
-        inputs.append('\t# positionals\n')
+        inputs.append('\n\t# positionals\n')
         for posit in command.get_positionals():
             new_input = self.format_positional_to_string(posit)
             inputs.append(new_input)
 
-        inputs.append('\t# flags\n')
+        inputs.append('\n\t# flags\n')
         for flag in command.get_flags():
             new_input = self.format_flag_to_string(flag)
             inputs.append(new_input)
 
-        inputs.append('\t# options\n')
+        inputs.append('\n\t# options\n')
         for opt in command.get_options():
             new_input = self.format_option_to_string(opt)
             inputs.append(new_input)
@@ -179,24 +190,19 @@ class JanisFormatter:
         return out_str
 
 
-    def extract_positional_details(self, posit: Positional) -> Tuple[str, str, str, str]:
-        token = posit.token
-        
-        if token.gx_ref != '':
-            gx_obj = self.get_gx_obj(token.gx_ref)
-            tag = gx_obj.name
-            default = gx_obj.get_default()
-            if default == '':
-                default = None
+    def extract_positional_details(self, posit: Positional) -> Tuple[str, str, str, str]:       
+        if posit.galaxy_object is not None:
+            # TODO
+            print()
         else:
-            tag = posit.token.text
-            default = None
+            tag = '_'.join(posit.get_values(as_list=True))
+            default = posit.get_primary_value()
+            
+        docstring = self.get_docstring(posit)
+        datatype = self.dtype_extractor.extract(posit)        
+        typestring = self.format_typestring(datatype)
 
-        
-        docstring = self.get_docstring([token])
-        datatype = self.format_janis_typestr(posit.datatypes)        
-
-        return tag, datatype, default, docstring
+        return tag, typestring, default, docstring
 
 
     def validate_tag(self, tag: str) -> str:
@@ -266,12 +272,16 @@ class JanisFormatter:
         return tag, datatype, prefix, position, docstring
         
 
-    def get_docstring(self, tokens: list[Token]) -> str:
-        for token in tokens:
-            if token.gx_ref != '':
-                gx_obj = self.get_gx_obj(token.gx_ref)
-                return gx_obj.help_text
-        return ''
+    def get_docstring(self, component: CommandComponent) -> str:
+        if component.galaxy_object is not None:
+            docstring = component.galaxy_object.help
+        elif type(component) in [Positional, Option]:
+            values = component.get_values(as_list=True)
+            docstring = f'possible values: {", ".join(values[:5])}'
+        else:
+            docstring = ''
+
+        return docstring
 
 
     def format_option_to_string(self, opt: Option) -> str:
@@ -312,7 +322,7 @@ class JanisFormatter:
 
     def extract_option_details(self, opt: Option) -> Tuple[str, str, str, str, str]:
         tag = opt.prefix.lstrip('-')
-        datatype = self.format_janis_typestr(opt.datatypes)        
+        datatype = self.format_typestring(opt.datatypes)        
         prefix = opt.prefix
         position = opt.pos
 
@@ -335,7 +345,7 @@ class JanisFormatter:
         return tokens[0].text
         
 
-    def format_janis_typestr(self, datatypes: list[str], is_array=False, is_optional=False) -> str:
+    def format_typestring(self, datatypes: list[str], is_array=False, is_optional=False) -> str:
         """
         String
         String(optional=True)
@@ -409,7 +419,7 @@ class JanisFormatter:
         formats outputs into janis tooldef string
         """
         self.update_output_selector_from_command(output)
-        datatype = self.format_janis_typestr(output.datatypes)
+        datatype = self.format_typestring(output.datatypes)
         tag = self.validate_tag(output.name)
         docstring = self.validate_docstring(output.help_text)
         selector = output.selector

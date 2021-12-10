@@ -29,8 +29,10 @@ class CommandParser:
     def parse(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> Command:
         # self.update_command_from_janis_definition()  # NOTE FUTURE
         self.update_command_from_tests()
-        self.update_command_from_workflowstep(workflow, workflow_step)
+        #self.update_command_from_workflowstep(workflow, workflow_step)
         self.update_command_from_xml()
+        self.command.set_component_positions()
+        return self.command
       
 
     def update_command_from_tests(self) -> None:
@@ -38,6 +40,7 @@ class CommandParser:
         for i, test in enumerate(self.tool.tests):
             cmd_txt = loader.load(test)
             if cmd_txt is not None:
+                print(cmd_txt)
                 cmd_str = CommandString(cmd_txt, self.tool, self.logger)
                 #print('\nTEST\n', cmd_str)
                 self.command.update(cmd_str, source='test')

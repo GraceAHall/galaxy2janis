@@ -2,6 +2,7 @@
 
 # pyright: basic 
 
+from re import L
 from typing import Union, Optional
 
 from classes.command.CommandString import CommandString
@@ -9,6 +10,8 @@ from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
 from classes.command.CommandComponents import Positional, Flag, Option, Stdout
 from classes.command.Tokens import Token, TokenType
+from galaxy.tool_util.parser.output_objects import ToolOutput
+from galaxy.tools.parameters.basic import ToolParameter
 from utils.token_utils import split_keyval_to_best_tokens 
 
 CommandComponent = Union[Positional, Flag, Option]
@@ -170,20 +173,34 @@ class Command:
     def make_flag(self, token: Token) -> Flag:
         flag = Flag(token.text)
         flag.add_token(token) 
+        if token.gx_ref != '':
+            flag.galaxy_object = self.get_gx_object(token)
         return flag 
+
+
+    def get_gx_object(self, token: Token) -> Optional[Union[ToolParameter, ToolOutput]]:
+        varname, gx_object = self.param_register.get(token.gx_ref, allow_lca=True)
+        if gx_object is None:
+            varname, gx_object = self.out_register.get(token.gx_ref, allow_lca=True)
+
+        return gx_object
 
 
     def make_option(self, ctoken: Token, ntoken: Token) -> Option:
         opt = Option(ctoken.text)
         opt.add_token(ntoken)
+        if ntoken.gx_ref != '':
+            opt.galaxy_object = self.get_gx_object(ntoken)
         return opt
 
 
     def make_positional(self, token: Token) -> Positional:
         pos = self.positional_count
-        new_posit = Positional(pos)
-        new_posit.add_token(token)
-        return new_posit
+        posit = Positional(pos)
+        posit.add_token(token)
+        if token.gx_ref != '':
+            posit.galaxy_object = self.get_gx_object(token)
+        return posit
      
 
     def update_components(self, the_comp: CommandComponent, disallow: list[CommandComponent]=[]) -> None:
@@ -218,7 +235,7 @@ class Command:
             
             elif type(the_comp) == Flag:
                 if type(cached_comp) == Option:
-                    self.reassign_option_as_flag(cached_comp, the_comp)
+                    the_comp = self.reassign_option_as_flag(cached_comp, the_comp)
                 else:
                     self.update_flags(the_comp)
                 
@@ -302,6 +319,12 @@ class Command:
         self.positional_count += 1
 
 
+    def reassign_option_as_flag(self, the_opt: Option, the_flag: Flag) -> Flag:
+        key = the_opt.prefix
+        del self.options[key]
+        return the_flag
+
+
     def update_flags(self, incoming: Flag) -> None:
         key = incoming.prefix
         if key not in self.flags:
@@ -372,13 +395,8 @@ class Command:
         """
         removes positional and renumbers remaining positionals, flags and options
         """
-
-        for positional in self.positionals.values():
-            if positional.pos == query_pos:
-                key_to_delete = positional.token.text
-                break
-        
-        del self.positionals[key_to_delete]
+        if query_pos in self.positionals:
+            del self.positionals[query_pos]
 
         self.shift_input_positions(startpos=query_pos, amount=-1)
 
@@ -401,7 +419,7 @@ class Command:
         return options
 
 
-    def update_input_positions(self) -> None:
+    def set_component_positions(self) -> None:
         options_start = self.get_options_position()
 
         # update positionals
@@ -465,117 +483,3 @@ class Command:
         
         return out_str
 
-
-"""
-    def update_outputs(self, token: Token) -> None:
-        if token.type == TokenType.GX_OUT:
-            output_var, output = self.out_register.get(token.text)
-
-        elif token.type == TokenType.RAW_STRING:
-            output_var, output = self.out_register.get_by_filepath(token.text, allow_nopath=True)
-
-        if output is None:
-            token.text = token.text.lstrip('$')
-            self.out_register.create_output_from_text(token.text)
-            output_var, output = self.out_register.get(token.text)
-
-        output.is_stdout = True
-
-
-    def parse_from_xml(self, command_string: CommandString) -> None:
-        \"""
-        providing a list of tokens allows the command to be updated with new info.
-        the list of tokens could be from initial tool xml parsing, or from
-        templated command line strings passed through galaxy tool evaluation engine.
-        \"""
-
-        # a galaxy bool or select can be a flag, option, positional. 
-        # a galaxy data, data_collection param can be a positional or option.
-        # a galaxy int, float, text, color param can be a positional or option, 
-        # but much more likely to be option
-
-        self.positional_count = 0
-        self.command_source = source
-        command_block = command_string.best_block
-
-        # iterate through command words (with next word for context)
-        i = 0
-        while i < len(command_block.tokens):
-            self.step_size = False
-            curr_tokens = command_block.tokens[i]
-            next_tokens = command_block.tokens[i+1]
-
-            for ctoken in curr_tokens:  
-                
-                # stdout token pair
-                if self.is_stdout(ctoken, ntoken):
-                    self.update_stdout(ntoken)
-                    self.step_size = True
-
-                # kv pair handling. add as option with correct delim. 
-                elif ctoken.type == TokenType.KV_PAIR: 
-                    ctoken, ntoken, delim = split_keyval_to_best_tokens(ctoken, self.param_register, self.out_register)
-                    component = self.make_option(ctoken, ntoken, delim=delim)
-                    self.update_components(component)
-                    continue
-
-                # everything else
-                else:
-                    for ntoken in next_tokens:
-                        component = self.make_component(ctoken, ntoken)
-                        self.update_components(component)
-
-            if self.step_size:
-                i += 2
-            else:
-                i += 1
-
-
-
-    def update_components(self, current_comp: CommandComponent) -> None:
-        \"""
-        attempts to update tool knowledge using a CommandComponent.
-        the component (positional, flag, option) may already be registered in the Command.
-        
-        if no component exists, add the component. 
-        if it looks the same as another known component, update that comp's sources 
-        (want to keep a reference of all the occurances of that component).
-        if it changes our understanding of the command string (ie what we thought was
-        an option actually looks like a flag in this context), redefine that component 
-        to be the correct form. 
-        \"""
-        # update here whether we will actually skip_next or not
-        
-        cached_comp = self.get_similar_component(current_comp)
-        
-        # XML source
-        # the only modification we can do to components is add galaxy param as source.
-        # not allowed to add positionals unless no test / workflow step data
-        if self.command_source == 'XML':
-            if type(current_comp) == Positional and not self.has_nonxml_knowledge:
-                self.add_positional(current_comp)
-
-        # Test or workflowstep source 
-        else:
-            # prioritise position of positionals from test / workflow cmdstrings 
-            # (positionals need to appear every time program is run)
-            if type(current_comp) == Positional:
-                self.update_positionals(current_comp)
-            
-            elif type(current_comp) == Flag:
-                if type(cached_comp) == Option:
-                    self.reassign_option_as_flag(cached_comp, current_comp)
-                else:
-                    self.update_flags(current_comp)
-                
-            elif type(current_comp) == Option:
-                self.update_options(current_comp)  
-               
-        
-        # a galaxy bool or select can be a flag, option, positional. 
-        # a galaxy data, data_collection param can be a positional or option.
-        # a galaxy int, float, text, color param can be a positional or option, 
-        # but much more likely to be option
-    
-
-"""

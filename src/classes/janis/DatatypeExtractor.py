@@ -4,21 +4,50 @@
 
 
 import yaml
-from typing import Optional
-#from classes.outputs.Outputs import Output
+from typing import Optional, Union
+
 from galaxy.tool_util.parser.output_objects import ToolOutput
 
-from classes.params.ParamRegister import ParamRegister
-from classes.outputs.OutputRegister import OutputRegister
-from classes.command.Command import Positional, Flag, Option, Command, TokenType, Token
+from classes.command.Command import Positional, Flag, Option, TokenType, Token
 from classes.logging.Logger import Logger
-from classes.tool.Tool import Tool
 
-class DatatypeAnnotator:
-    def __init__(self, tool: Tool, logger: Logger):
-        self.tool = tool
+CommandComponent = Union[Positional, Flag, Option]
+
+
+class DatatypeExtractor:
+    def __init__(self, logger: Logger):
         self.logger = logger
         self.init_datastructures()
+        
+        # fallback types
+        self.string_t = [{
+            'format': 'string',
+            'source': 'janis',
+            'classname': 'String',
+            'extensions': None,
+            'import_path': 'janis_core.types.common_data_types'
+        }] 
+        self.integer_t = [{
+            'format': 'integer',
+            'source': 'janis',
+            'classname': 'Int',
+            'extensions': None,
+            'import_path': 'janis_core.types.common_data_types'
+        }]
+        self.float_t = [{
+            'format': 'float',
+            'source': 'janis',
+            'classname': 'Float',
+            'extensions': None,
+            'import_path': 'janis_core.types.common_data_types'
+        }]
+        self.file_t = [{
+            'format': 'file',
+            'source': 'janis',
+            'classname': 'File',
+            'extensions': None,
+            'import_path': 'janis_core.types.common_data_types'
+        }]
 
 
     def init_datastructures(self) -> None:
@@ -74,6 +103,80 @@ class DatatypeAnnotator:
         return ext_format_map
 
 
+    def extract(self, component: CommandComponent) -> list[dict]:
+        """
+        function delegates what method to use for datatype inference.
+        """
+        # galaxy 
+        if component.galaxy_object is not None:
+            return self.extract_types_from_gx(component)
+        
+        # int or float
+        numbers_set = set([TokenType.RAW_NUM, TokenType.QUOTED_NUM])
+        component_set = component.get_token_types()
+        if component_set.issubset(numbers_set):
+            return self.extract_types_from_numeric(component)
+
+        # from string
+        elif TokenType.RAW_STRING in component_set or TokenType.QUOTED_STRING in component_set:
+            return self.extract_types_from_strings(component)
+
+        # fallback
+        return self.string_t
+
+
+    def extract_types_from_gx(self, component: CommandComponent) -> list[dict]:
+        pass
+
+
+    def extract_types_from_numeric(self, component: CommandComponent) -> list[dict]:
+        """
+        all occurances of the CommandComponent were numeric.
+        if any of the sources are floats, return float, else int
+        """
+        for value in component.get_values(as_list=True):
+            pass
+
+        if '.' in the_string:
+            return self.float_t
+
+        return self.integer_t
+
+
+    def extract_types_from_strings(self, component: CommandComponent) -> list[dict]:
+        out_types = []
+
+        for value in component.get_values(as_list=True):
+            ext_datatype = self.get_extension_datatype(value)
+            if ext_datatype is not None:
+                out_types.append(ext_datatype)
+        
+        return out_types
+
+
+    def get_extension_datatype(self, the_string: str) -> Optional[dict]:
+        components = the_string.split('.')
+        components = [c for c in components if c != '']
+
+        # extract gxformats which we are aware of through extensions
+        # this is iterative and will prioritise the longest extension match
+        gxformat = ''
+        if len(components) > 1:
+            for i in range(1, len(components)):
+                ext = '.'.join(components[i:])
+                if ext in self.ext_to_format_map:
+                    gxformat = self.ext_to_format_map[ext]
+                    break
+
+        # for the final chosen gxformat, convert to janis datatype if exists
+        if gxformat != '':
+            dtype = self.get_datatype_by_format(gxformat)
+            if dtype is not None:
+                return dtype
+
+        return None
+
+
     # now the datastructures are initialised, here are some methods
     # to access types given gxformat or extension
     def get_datatype_by_format(self, gxformat: str) -> Optional[dict[str, str]]:
@@ -93,131 +196,62 @@ class DatatypeAnnotator:
         return None
     
 
-    # def get_datatype_by_ext(self, ext: str) -> Optional[dict[str, str]]:
-    #     if ext in self.ext_to_format_map:
-    #         gxformat_list = self.ext_to_format_map[ext]
-
-    #         if len(gxformat_list) == 0:
-    #             return None
-
-    #         best_gxformat = self.get_best_gxformat(ext, gxformat_list)
-    #         return self.get_datatype_by_format(best_gxformat)
-
-    #     return None
-
-
-    def get_best_gxformat(self, ext: str, gxformat_list: list[str]) -> str:
-        """
-        gxformat_list will always be passed with 1+ items
-        """
-        gxformat_distances = []
-
-        for gxformat in gxformat_list:
-            dist = self.levenshtein(ext, gxformat)
-            gxformat_distances.append((gxformat, dist))
-        
-        gxformat_distances.sort(key=lambda x: x[1])
-        return gxformat_distances[0]
-
-
-    # this is adapted from:
-    # https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
-    @staticmethod
-    def levenshtein(s1, s2):
-        if len(s1) < len(s2):
-            s1, s2 = s2, s1
-
-        if len(s2) == 0:
-            return len(s1)
-
-        previous_row = range(len(s2) + 1)
-        for i, c1 in enumerate(s1):
-            current_row = [i + 1]
-            for j, c2 in enumerate(s2):
-                insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
-                deletions = current_row[j] + 1       # than s2
-                substitutions = previous_row[j] + (c1 != c2)
-                current_row.append(min(insertions, deletions, substitutions))
-            previous_row = current_row
-        
-        return previous_row[-1]
-
-
-    def annotate(self) -> None:
-        for item in self.tool.command.positionals.values():
-            self.annotate_positional(item)
-            self.assert_has_datatype(item)
-
-        for item in self.tool.command.options.values():
-            self.annotate_option(item)
-            self.assert_has_datatype(item)
-        
-        for item in self.tool.out_register.get_outputs():
-            self.annotate_output(item)
-            self.assert_has_datatype(item)
-
-
-    def annotate_positional(self, the_positional) -> None:
-        # can be string, int, float, file type (fasta, html etc)   
-        the_positional.datatypes = self.get_token_datatypes(the_positional.token)
-        
 
     def assert_has_datatype(self, obj):
-        datatypes = [d for d in obj.datatypes if d is not None]
-        
-        if len(datatypes) == 0:
-            if type(obj) == Positional:
-                self.logger.log(2, f'missing datatype for Positional {obj.token.text}')
-            elif type(obj) == Flag or type(obj) == Option:
-                self.logger.log(2, f'missing datatype for {type(obj)} {obj.sources[0].text}')
-            else:
-                self.logger.log(2, f'missing datatype for Output {obj.gx_var}')
+        # TODO
+        pass
 
 
-    def get_token_datatypes(self, the_token: Token) -> list[dict[str, str]]:
-        """
-        accepts a token, works out the best datatype
-        different logic depending on the token type
-        """
-        # galaxy variables
-        if the_token.type in [TokenType.GX_PARAM, TokenType.GX_OUT]:
-            return self.infer_types_from_gx(the_token)
     
-        # strings
-        elif the_token.type in [TokenType.RAW_STRING, TokenType.QUOTED_STRING]:
-            # return string or file type inferred from .extension
-            return self.infer_types_from_ext(the_token.text)
-           
-        # numeric
-        elif the_token.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]:
-            # return int or float
-            return self.infer_types_from_numeric(the_token)
-        
-        # linux
-        elif the_token.type == TokenType.LINUX_OP:
-            return [{
-                'format': 'string',
-                'source': 'janis',
-                'classname': 'String',
-                'extensions': None,
-                'import_path': 'janis_core.types.common_data_types'
-            }]
-        
 
-    def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
-        """
+
+"""
+  
+  
+def get_best_gxformat(self, ext: str, gxformat_list: list[str]) -> str:
+    \"""
+    gxformat_list will always be passed with 1+ items
+    \"""
+    gxformat_distances = []
+
+    for gxformat in gxformat_list:
+        dist = self.levenshtein(ext, gxformat)
+        gxformat_distances.append((gxformat, dist))
+    
+    gxformat_distances.sort(key=lambda x: x[1])
+    return gxformat_distances[0]
+
+
+# this is adapted from:
+# https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
+@staticmethod
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        s1, s2 = s2, s1
+
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+
+def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
+        \"""
         for gx params or gx outputs
         gx params and outputs already have type annotation
         extracted from the xml
         always returns list, but list may have zero items
-        """
-        fallback_datatypes = [{
-                'format': 'file',
-                'source': 'janis',
-                'classname': 'File',
-                'extensions': None,
-                'import_path': 'janis_core.types.common_data_types'
-            }]
+        \"""
+        fallback_datatypes = self.file_t
 
         if the_token.type == TokenType.GX_PARAM:
             varname, param = self.tool.param_register.get(the_token.gx_ref)
@@ -243,20 +277,14 @@ class DatatypeAnnotator:
 
 
     def infer_types_from_ext(self, the_string: str) -> list[dict[str, str]]:
-        """
+        \"""
         2 steps: ext -> gxformat, gxformat -> dtype
         returns the datatypes which use the identified extension
         the best extension is identified then translated to gxformat
         the longest extension is used
         ie for input.fq.gz, .fq.gz is set as best extension rather than .gz
-        """
-        fallback_datatypes = [{
-                'format': 'string',
-                'source': 'janis',
-                'classname': 'String',
-                'extensions': None,
-                'import_path': 'janis_core.types.common_data_types'
-            }]
+        \"""
+        fallback_datatypes = self.string_t
             
         gxformat = ''
         components = the_string.split('.')
@@ -277,34 +305,13 @@ class DatatypeAnnotator:
         return fallback_datatypes
 
 
-    def infer_types_from_numeric(self, the_token: Token) -> list[dict[str, str]]:
-        # check string against 
-        the_string = the_token.text
-        if '.' in the_string:
-            return [{
-                'format': 'float',
-                'source': 'janis',
-                'classname': 'Float',
-                'extensions': None,
-                'import_path': 'janis_core.types.common_data_types'
-            }]
-
-        return [{
-            'format': 'integer',
-            'source': 'janis',
-            'classname': 'Int',
-            'extensions': None,
-            'import_path': 'janis_core.types.common_data_types'
-        }]
-
-
     def select_datatypes_source(self, source_datatypes) -> list[str]:  # type: ignore
-        """
+        \"""
         flags or option can have multiple references in the command string
         and therefore be set from multiple tokens
         some tokens (ie GX_PARAM or GX_OUT) are more informative of the real type(s)
         this func selects the best source to annotate types from
-        """
+        \"""
 
         from_galaxy = []
         for token_type, datatypes in source_datatypes:
@@ -329,35 +336,9 @@ class DatatypeAnnotator:
         # don't care about the rest. equal importance. 
         return source_datatypes[0][1]
 
-  
-    def annotate_option(self, the_option) -> None:
-        """
-        copy of annotate_flag()
-        """
-        source_datatypes = []
-
-        for token in the_option.sources:
-            datatypes = self.get_token_datatypes(token)
-            source_datatypes.append([token.type, datatypes])
-
-        the_option.datatypes = self.select_datatypes_source(source_datatypes)
-
-
-    def annotate_output(self, the_output: ToolOutput) -> None:
-        """
-        a little different to the others. runs on a galaxy output obj not tokens
-        """
-        the_output.datatypes = self.get_output_datatype(the_output)
-
 
     def get_output_datatype(self, the_output: ToolOutput) -> list[str]:
-        fallback_datatypes = [{
-            'format': 'file',
-            'source': 'janis',
-            'classname': 'File',
-            'extensions': None,
-            'import_path': 'janis_core.types.common_data_types'
-        }]
+        fallback_datatypes = self.file_t
 
         datatypes = []
 
@@ -382,4 +363,5 @@ class DatatypeAnnotator:
 
 
 
-  
+    
+"""

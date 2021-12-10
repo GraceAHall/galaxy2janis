@@ -1,20 +1,67 @@
 
-
+# pyright: strict
 
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Union
+from collections import Counter
 
-from classes.command.Tokens import Token
+from classes.command.Tokens import Token, TokenType
 from galaxy.tools.parameters.basic import DataToolParameter
 
 
-class Positional:
-    def __init__(self, pos: int):
-        self.pos = pos
-        self.values: set[str] = set()
+
+class CommandComponent:
+    def __init__(self) -> None:
         self.sources: set[Token] = set()
+        self.galaxy_object: Optional[DataToolParameter] = None
+
+    
+    def add_token(self, the_token: Token) -> None:
+        self.sources.add(the_token)
+
+
+    def get_token_types(self, as_list: bool=False) -> Union[list[TokenType], set[TokenType]]:
+        values = set([t.type for t in self.sources])
+        if as_list:
+            values = list(values)
+        return values
+    
+    
+    def get_values(self, as_list: bool=False) -> Union[list[str], set[str]]:
+        values = set([t.text for t in self.sources])
+        if as_list:
+            values = list(values)
+        return values
+
+    
+    def get_primary_value(self) -> str:
+        """
+        gets most commonly occuring text string among source tokens
+        prioritises the first witnessed token if equal occurances
+        """
+        counter = Counter([t.text for t in self.sources])
+        max_c = counter.most_common(1)[0][1]
+        values = [t.text for t in self.sources if counter[t.text] == max_c]
+        return values[0]
+
+
+    def is_optional(self) -> bool:
+        if type(self) == Positional:
+            return False
+
+        for source in self.sources:
+            if not source.in_conditional:
+                return False
+
+        return True
+
+
+
+class Positional(CommandComponent):
+    def __init__(self, pos: int):
+        super().__init__()
+        self.pos = pos
         self.after_options: bool = False
-        self.galaxy_param: Optional[DataToolParameter] = None
 
 
     def merge(self, incoming: Positional) -> None:
@@ -23,169 +70,104 @@ class Positional:
             self.after_options = True
 
         # galaxy param reference        
-        if incoming.galaxy_param is not None:
+        if incoming.galaxy_object is not None:
             # check the params do not clash
-            if self.galaxy_param is not None:
-                if not incoming.galaxy_param == self.galaxy_param:
+            if self.galaxy_object is not None:
+                if not incoming.galaxy_object == self.galaxy_object:
                     raise Exception('two different galaxy params for one component')
             
-            self.galaxy_param = incoming.galaxy_param
+            self.galaxy_object = incoming.galaxy_object
 
         # sources
         for token in incoming.sources:
             self.add_token(token)
 
-   
-    def add_token(self, the_token: Token) -> None:
-        self.values.add(the_token.text)
-        self.sources.add(the_token)
-
-
-    def get_sources(self) -> list[Token]:
-        return list(self.sources)
-
-
-    def get_values(self) -> list[str]:
-        return list(self.values)
-
-
-    def is_optional(self) -> bool:
-        return self.token.in_conditional
-
+    
+    def has_unique_value(self) -> bool:
+        values = self.get_values()
+        if len(values) == 1:
+            return True
+        return False
+ 
 
     def __str__(self) -> str:
         values = ';'.join(self.get_values())
-        gx_param_name = self.galaxy_param.name if self.galaxy_param else ''
-        return f'{self.pos:<10}{values[:39]:40}{gx_param_name[:19]:20}{self.after_options:>5}'
+        has_gx_ref = True if self.galaxy_object is not None else False
+        return f'{self.pos:<10}{values[:39]:40}{has_gx_ref:10}{self.after_options:>5}'
 
 
-"""
-Flags have a text element and sources
-Flags arguments can be included in the command string via sources
-Valid sources are RAW_STRING and GX_PARAM 
-"""
-class Flag:
+
+
+class Flag(CommandComponent):
     def __init__(self, prefix: str):
+        super().__init__()
         self.prefix = prefix
         self.pos: int = 0
-        self.sources: set[Token] = set()
-        self.galaxy_param: Optional[DataToolParameter] = None
 
-    
-    def merge(self, incoming: Positional) -> None:
+
+    def merge(self, incoming: Flag) -> None:
         # galaxy param reference        
-        if incoming.galaxy_param is not None:
+        if incoming.galaxy_object is not None:
             # check the params do not clash
-            if self.galaxy_param is not None:
-                if not incoming.galaxy_param == self.galaxy_param:
+            if self.galaxy_object is not None:
+                if not incoming.galaxy_object == self.galaxy_object:
                     raise Exception('two different galaxy params for one component')
             
-            self.galaxy_param = incoming.galaxy_param
+            self.galaxy_object = incoming.galaxy_object
+            print()
 
         # sources
         for token in incoming.sources:
             self.add_token(token)
 
 
-    def add_token(self, the_token: Token) -> None:
-        self.sources.add(the_token)
-
-
-    def get_sources(self) -> list[Token]:
-        return list(self.sources)
-
-
-    def is_optional(self) -> bool:
-        for source in self.sources:
-            if not source.in_conditional:
-                return False
-        return True
-
-
     def __str__(self) -> str:
-        gx_param_name = self.galaxy_param.name if self.galaxy_param else ''
-        return f'{self.pos:<10}{self.prefix[:19]:20}{gx_param_name[:19]:20}'
+        has_gx_ref = True if self.galaxy_object is not None else False
+        return f'{self.pos:<10}{self.prefix[:19]:20}{has_gx_ref:10}'
 
 
-"""
-Options have a flag and an argument 
-prefix can be set from a RAW_STRING and/or GX_PARAM?
-Sources can be set from just about anything 
 
-sources has a little bit different meaning to as seen in Flags.
 
-"""
-class Option:
+class Option(CommandComponent):
     def __init__(self, prefix: str, delim: str=' ', splittable: bool=True):
+        super().__init__()
         self.prefix: str = prefix
         self.delim: str = delim
         self.splittable: bool = splittable
         self.pos: int = 0
-        self.values: set[str] = set()
-        self.sources: set[Token] = set()
-        self.galaxy_param: Optional[DataToolParameter] = None
 
 
-    def merge(self, incoming: Positional) -> None:
+    def merge(self, incoming: Option) -> None:
         # after options
         if incoming.splittable == False:
             self.splittable = False
 
         # galaxy param reference        
-        if incoming.galaxy_param is not None:
+        if incoming.galaxy_object is not None:
             # check the params do not clash
-            if self.galaxy_param is not None:
-                if not incoming.galaxy_param == self.galaxy_param:
+            if self.galaxy_object is not None:
+                if not incoming.galaxy_object == self.galaxy_object:
                     raise Exception('two different galaxy params for one component')
             
-            self.galaxy_param = incoming.galaxy_param
+            self.galaxy_object = incoming.galaxy_object
 
         # sources
         for token in incoming.sources:
             self.add_token(token)
 
 
-    def add_token(self, the_token: Token) -> None:
-        self.values.add(the_token.text)
-        self.sources.add(the_token)
-
-
-    def get_values(self) -> list[str]:
-        return list(self.values)
-
-    
-    def get_sources(self) -> list[Token]:
-        return list(self.sources)
-
-
-    def is_optional(self) -> bool:
-        for source in self.sources:
-            if not source.in_conditional:
-                return False
-        return True
-
-
     def __str__(self) -> str:
         values = ';'.join(self.get_values())
-        gx_param_name = self.galaxy_param.name if self.galaxy_param else ''
-        return f'{self.pos:<10}{self.prefix[:19]:20}{values[:39]:40}{gx_param_name[:19]:20}'
+        has_gx_ref = True if self.galaxy_object is not None else False
+        return f'{self.pos:<10}{self.prefix[:19]:20}{values[:39]:40}{has_gx_ref:10}'
 
 
-class Stdout:
+
+class Stdout(CommandComponent):
     def __init__(self):
-        self.sources: set[Token] = set()
-        self.galaxy_param: Optional[DataToolParameter] = None
-        #self.datatypes: list[dict[str, str]] = []
-
-
-    def add_token(self, the_token: Token) -> None:
-        self.sources.add(the_token)
-
-
-    def get_sources(self) -> list[Token]:
-        return list(self.sources)
-
-
+        super().__init__()
+  
+    
     def __str__(self) -> str:
         the_str = ''
 

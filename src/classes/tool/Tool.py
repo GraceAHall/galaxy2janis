@@ -30,6 +30,11 @@ class Tool:
 
 
     def update_metadata(self, meta: Metadata) -> None:
+        self.transfer_attributes(meta)
+        self.version = self.version.rsplit('+galaxy', 1)[0]
+
+
+    def transfer_attributes(self, meta: Metadata) -> None:
         for k, v in meta.__dict__.items():
             self.__dict__[k] = v
 

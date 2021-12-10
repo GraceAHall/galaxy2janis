@@ -6,17 +6,10 @@ TODO v0.1
 
 
 TODO:
-    - 
-
-
-
-    - add CitationManager class from galaxy source 
-    - add support for repeat elements in tests
-    - test runner
-    - configfiles
+    - write to janis
+    - janis test runner
     - add code test suite (pytest)
     
-
     - high priority bugs
         base_command=["samtools", "faidx", "artic", "minion"] (artic_minion.xml) 
 
@@ -30,7 +23,13 @@ TODO:
     
 
 
+Desirable
 
+    - bug: --labels option in_inputs being linked to galaxy output var not an input (quast)
+    - add support for repeat elements in tests
+    - configfiles
+    - add CitationManager class from galaxy source 
+    - more robust allocation of CommandComponents for galaxy params (some can't be flags, some much more likely to be one rather than another etc)
 
 
 - tool tests

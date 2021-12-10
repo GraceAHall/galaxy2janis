@@ -3,24 +3,16 @@
 from copy import deepcopy
 import json
 import tempfile
-from typing import Union, Optional, Any
+from typing import Optional, Any
 
-from classes.templating.MockClasses import MockApp, ComputeEnvironment
-from classes.tool.Tool import Tool
 from galaxy.tools import Tool as GalaxyTool
-from classes.logging.Logger import Logger
-from classes.error_handling.Exceptions import ParamExistsException
+from galaxy.model import Job, JobParameter
 
-from galaxy.tool_util.verify.interactor import ToolTestDescription
-from galaxy.model import (
-    Job,
-    JobParameter,
-    Dataset,
-    HistoryDatasetAssociation,
-    JobToInputDatasetAssociation,
-    JobToOutputDatasetAssociation,
-)
-from galaxy.tools.evaluation import ToolEvaluator
+from classes.templating.MockClasses import MockApp
+from classes.tool.Tool import Tool
+from classes.logging.Logger import Logger
+
+from utils.galaxy_utils import generate_dataset, setup_evaluator
 
 
 class WorkflowStepCommandLoader:
@@ -49,7 +41,7 @@ class WorkflowStepCommandLoader:
         if job is None:
             return None
 
-        evaluator = self.setup_evaluator(job)
+        evaluator = setup_evaluator(self.app, self.gxtool, job, self.test_directory)
         command_line, _, __ = evaluator.build()
         return [command_line]
 
@@ -103,7 +95,7 @@ class WorkflowStepCommandLoader:
                 varname, param = self.tool.param_register.get(query_key)
                 
                 if param.type == 'data':
-                    job_input = self.generate_dataset(query_key, 'input')
+                    job_input = generate_dataset(self.app, query_key, 'input')
                     job.input_datasets.append(job_input)
                     return str(job_input.dataset.dataset_id)
 
@@ -123,38 +115,6 @@ class WorkflowStepCommandLoader:
 
     def update_job_outputs(self, label: str, job: Job) -> None:
         output_var = label.replace('|', '.')
-        job_output = self.generate_dataset(output_var, 'output')
+        job_output = generate_dataset(self.app, output_var, 'output')
         job.output_datasets.append(job_output)
 
-
-    def generate_dataset(self, fname: str, iotype: str) -> Union[JobToInputDatasetAssociation, JobToOutputDatasetAssociation]:
-        """
-        creates a dataset association. 
-        this process creates a dataset and updates the sql database model.
-        """
-        i, path = self.app.dataset_counter, fname
-        self.app.dataset_counter += 1
-
-        if iotype == 'input':
-            return JobToInputDatasetAssociation(name=fname, dataset=self.generate_hda(i, fname, path))
-        elif iotype == 'output':
-            return JobToOutputDatasetAssociation(name=fname, dataset=self.generate_hda(i, fname, path))
-
-
-    def generate_hda(self, id, name, path) -> HistoryDatasetAssociation:
-        hda = HistoryDatasetAssociation(name=name, metadata=dict())
-        hda.dataset = Dataset(id=id, external_filename=path)
-        hda.dataset.metadata = dict()
-        hda.children = []
-        self.app.model.context.add(hda)
-        self.app.model.context.flush()
-        return hda
-    
-
-    def setup_evaluator(self, job: Job) -> ToolEvaluator:
-        evaluator = ToolEvaluator(self.app, self.gxtool, job, self.test_directory)
-        kwds = {}
-        kwds["working_directory"] = self.test_directory
-        kwds["new_file_path"] = self.app.config.new_file_path
-        evaluator.set_compute_environment(ComputeEnvironment(**kwds))
-        return evaluator

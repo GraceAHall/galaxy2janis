@@ -21,15 +21,27 @@ def main():
         out_log, out_def = init_out_files(args.toolxml, args.tooldir)
 
         # parse tool 
-        tp = ToolParser(args.toolxml, args.tooldir, out_log, out_def, debug=args.debug)
+        tp = ToolParser(args, out_log, out_def)
         tp.parse()
     
 
 def handle_program_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("toolxml", help="tool xml file")
-    parser.add_argument("tooldir", help="tool directory")
-    parser.add_argument( "--debug", help="run in debug mode (writes many lines to stdout)", action="store_true")
+    parser.add_argument("toolxml", 
+                        help="tool xml file", 
+                        type=str)
+    parser.add_argument("tooldir", 
+                        help="tool directory", 
+                        type=str)
+    parser.add_argument("--wflow", 
+                        type=str,
+                        help="Must be used with --wstep. workflow_file[str]. parses the provided .ga workflow  during runtime to help understand tool.")
+    parser.add_argument("--wstep", 
+                        type=int,
+                        help="Must be used with --wflow. workflow_step[int]. parses the provided step from the .ga workflow given in --wflow.")
+    parser.add_argument("--debug",
+                        help="run in debug mode (writes many lines to stdout)", 
+                        action="store_true")
     args = parser.parse_args()
 
     if args.debug:

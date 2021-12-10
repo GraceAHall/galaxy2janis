@@ -5,33 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "quast",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "quast.xml", "tools/quast", "--debug"
-            ]
-        },
-        {
-            "name": "abricate",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "abricate.xml", "tools/abricate", "--debug"
-            ]
-        },
-        {
-            "name": "GTE",
-            "type": "python",
-            "request": "launch",
-            "program": "src/classes/templating/template.py",
-            "console": "integratedTerminal"
-        },
-        {
             "name": "rip galaxy types",
             "type": "python",
             "request": "launch",
@@ -52,63 +25,33 @@
             ]
         },
         {
-            "name": "read_inputs",
-            "type": "python",
-            "request": "launch",
-            "program": "io/read_inputs.py",
-            "console": "integratedTerminal",
-
-        },
-        {
-            "name": "read_metadata",
-            "type": "python",
-            "request": "launch",
-            "program": "io/read_metadata.py",
-            "console": "integratedTerminal",
-        },
-        {
-            "name": "expand_macros",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "tools/fastp", "fastp.xml"
-            ]
-        },
-        {
             "name": "test",
             "type": "python",
             "request": "launch",
             "program": "test.py",
             "console": "integratedTerminal",
-
         },
         {
-            "name": "XMLParser",
+            "name": "quast",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "busco.xml", "tools/busco"
+                "quast.xml", "tools/quast", 
+                "--wflow", "test/test-data/assembly_qc.ga", 
+                "--wstep", "3", 
+                "--debug"
             ]
         },
         {
-            "name": "macrotest",
-            "type": "python",
-            "request": "launch",
-            "program": "classes/MacroExpander.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "bwa-mem",
+            "name": "abricate",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "bwa-mem.xml", "tools/bwa", "--debug"
+                "abricate.xml", "tools/abricate", "--debug"
             ]
         },
         {
@@ -118,7 +61,20 @@
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "busco.xml", "tools/busco", "--debug"
+                "busco.xml", "tools/busco", 
+                "--wflow", "test/test-data/assembly_qc.ga", 
+                "--wstep", "2", 
+                "--debug"
+            ]
+        },
+        {
+            "name": "bwa-mem",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "bwa-mem.xml", "tools/bwa", "--debug"
             ]
         },
         {
@@ -562,51 +518,6 @@
             "args": [
                 "cat_bins.xml", "tools/cat", "--debug"
             ]
-        },
-        {
-            "name": "pyPEG sketchpad",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/pyPEG2.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "pyPEG busco",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/command_parser.py",
-            "console": "integratedTerminal",
-            "args": [
-                "command_parsing/data/busco.txt", "--debug"
-            ]
-        },
-        {
-            "name": "LARK sketchpad",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/LARK.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "LARK parameters",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/parameters/parameters.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "LARK bash conditional",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/bash_conditional/b_conditional.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "LARK cheetah conditional",
-            "type": "python",
-            "request": "launch",
-            "program": "command_parsing/cheetah_conditional/ch_conditional.py",
-            "console": "integratedTerminal"
         },
         {
             "name": "parse tools",
