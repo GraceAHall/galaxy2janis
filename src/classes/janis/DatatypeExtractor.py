@@ -20,34 +20,34 @@ class DatatypeExtractor:
         self.init_datastructures()
         
         # fallback types
-        self.string_t = [{
+        self.string_t = {
             'format': 'string',
             'source': 'janis',
             'classname': 'String',
             'extensions': None,
             'import_path': 'janis_core.types.common_data_types'
-        }] 
-        self.integer_t = [{
+        } 
+        self.integer_t = {
             'format': 'integer',
             'source': 'janis',
             'classname': 'Int',
             'extensions': None,
             'import_path': 'janis_core.types.common_data_types'
-        }]
-        self.float_t = [{
+        }
+        self.float_t = {
             'format': 'float',
             'source': 'janis',
             'classname': 'Float',
             'extensions': None,
             'import_path': 'janis_core.types.common_data_types'
-        }]
-        self.file_t = [{
+        }
+        self.file_t = {
             'format': 'file',
             'source': 'janis',
             'classname': 'File',
             'extensions': None,
             'import_path': 'janis_core.types.common_data_types'
-        }]
+        }
 
 
     def init_datastructures(self) -> None:
@@ -127,6 +127,9 @@ class DatatypeExtractor:
 
     def extract_types_from_gx(self, component: CommandComponent) -> list[dict]:
         pass
+        obj = component.galaxy_object
+
+
 
 
     def extract_types_from_numeric(self, component: CommandComponent) -> list[dict]:
@@ -151,6 +154,10 @@ class DatatypeExtractor:
             if ext_datatype is not None:
                 out_types.append(ext_datatype)
         
+        # extensions didn't help, return fallback
+        if len(out_types) == 0:
+            out_types.append(self.string_t)
+
         return out_types
 
 

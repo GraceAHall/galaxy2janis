@@ -169,17 +169,19 @@ class JanisFormatter:
             - default 
             - doc
         """
-        tag, datatype, default, docstring = self.extract_positional_details(positional)
+        tag, datatypes, default, docstring = self.extract_positional_details(positional)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
+        typestring = self.format_typestring(datatypes)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{datatype},\n'
+        out_str += f'\t\t{typestring},\n'
         out_str += f'\t\tposition={positional.pos},\n'
 
+        # pure jank
         if default is not None:
-            if len(positional.datatypes) == 1 and positional.datatypes[0] in ['Float', 'Integer']:
+            if len(datatypes) == 1 and datatypes[0]['classname'] in ['Float', 'Integer']:
                 out_str += f'\t\tdefault={default},\n'
             else:
                 out_str += f'\t\tdefault="{default}",\n'
@@ -192,17 +194,15 @@ class JanisFormatter:
 
     def extract_positional_details(self, posit: Positional) -> Tuple[str, str, str, str]:       
         if posit.galaxy_object is not None:
-            # TODO
-            print()
+            tag = posit.name
         else:
             tag = '_'.join(posit.get_values(as_list=True))
-            default = posit.get_primary_value()
-            
+        
+        default = posit.get_default()    
         docstring = self.get_docstring(posit)
-        datatype = self.dtype_extractor.extract(posit)        
-        typestring = self.format_typestring(datatype)
+        datatypes = self.dtype_extractor.extract(posit)        
 
-        return tag, typestring, default, docstring
+        return tag, datatypes, default, docstring
 
 
     def validate_tag(self, tag: str) -> str:
@@ -242,13 +242,13 @@ class JanisFormatter:
             prefix="--cs_string",
             doc=""
         """
-        tag, datatype, prefix, position, docstring = self.extract_flag_details(flag)
+        tag, typestring, prefix, position, docstring = self.extract_flag_details(flag)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{datatype},\n'
+        out_str += f'\t\t{typestring},\n'
         out_str += f'\t\tprefix="{prefix}",\n'
         out_str += f'\t\tposition={position},\n'
         out_str += f'\t\tdoc="{docstring}"\n'
@@ -259,22 +259,21 @@ class JanisFormatter:
 
     def extract_flag_details(self, flag: Flag) -> Tuple[str, str, str, str]:
         tag = flag.prefix.lstrip('-')
-        datatype = 'Boolean'
+        typestring = 'Boolean'
 
         if flag.is_optional():
-            datatype += "(optional=True)"
+            typestring += "(optional=True)"
 
         prefix = flag.prefix
         position = flag.pos
-        # get from galaxy param otherwise blank
-        docstring = self.get_docstring(flag.sources) 
+        docstring = self.get_docstring(flag) 
         
-        return tag, datatype, prefix, position, docstring
+        return tag, typestring, prefix, position, docstring
         
 
     def get_docstring(self, component: CommandComponent) -> str:
         if component.galaxy_object is not None:
-            docstring = component.galaxy_object.help
+            docstring = component.galaxy_object.label + ' ' + component.galaxy_object.help
         elif type(component) in [Positional, Option]:
             values = component.get_values(as_list=True)
             docstring = f'possible values: {", ".join(values[:5])}'
@@ -292,13 +291,14 @@ class JanisFormatter:
             prefix='--max_len1',
             doc="[Optional] Max read length",
         """
-        tag, datatype, prefix, default, position, docstring = self.extract_option_details(opt)
+        tag, datatypes, prefix, default, position, docstring = self.extract_option_details(opt)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
+        typestring = self.format_typestring(opt, datatypes)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{datatype},\n'
+        out_str += f'\t\t{typestring},\n'
 
         if opt.delim != ' ':
             out_str += f'\t\tprefix="{prefix + opt.delim}",\n'
@@ -309,7 +309,7 @@ class JanisFormatter:
         out_str += f'\t\tposition={position},\n'
         
         if default is not None:
-            if len(opt.datatypes) == 1 and opt.datatypes[0]['classname'] in ['Float', 'Int']:
+            if len(datatypes) == 1 and datatypes[0]['classname'] in ['Float', 'Integer']:
                 out_str += f'\t\tdefault={default},\n'
             else:
                 out_str += f'\t\tdefault="{default}",\n'
@@ -320,38 +320,28 @@ class JanisFormatter:
         return out_str
 
 
-    def extract_option_details(self, opt: Option) -> Tuple[str, str, str, str, str]:
+    def extract_option_details(self, opt: Option) -> Tuple[str, list[dict], str, str, str]:
         tag = opt.prefix.lstrip('-')
-        datatype = self.format_typestring(opt.datatypes)        
+        datatypes = self.dtype_extractor.extract(opt)  
         prefix = opt.prefix
-        position = opt.pos
+        default = opt.get_default()
+        position = opt.pos          
+        docstring = self.get_docstring(opt)
+        return tag, datatypes, prefix, default, position, docstring
+            
 
-        default = self.get_default(opt.sources)
-        if default == '':
-            default = None
-        docstring = self.get_docstring(opt.sources)
-
-        return tag, datatype, prefix, default, position, docstring
-    
-
-    def get_default(self, tokens: list[Token]) -> str:
-        # try from galaxy token first
-        for token in tokens:
-            if token.gx_ref != '':
-                gx_obj = self.get_gx_obj(token.gx_ref)
-                return gx_obj.get_default()
-        
-        # if not
-        return tokens[0].text
-        
-
-    def format_typestring(self, datatypes: list[str], is_array=False, is_optional=False) -> str:
+    def format_typestring(self, component: CommandComponent, datatypes: list[dict], is_array=False, is_optional=False) -> str:
         """
         String
         String(optional=True)
         Array(String(), optional=True)
         etc
         """
+        if component.galaxy_object is not None:
+            component.galaxy_object.optional
+            component.galaxy_object.multiple
+
+
 
         self.update_datatype_imports(datatypes)
 

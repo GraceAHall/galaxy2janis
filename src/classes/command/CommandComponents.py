@@ -2,18 +2,17 @@
 # pyright: strict
 
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Optional, Union, Any
 from collections import Counter
 
 from classes.command.Tokens import Token, TokenType
-from galaxy.tools.parameters.basic import DataToolParameter
-
+from galaxy.tools.parameters.basic import ToolParameter
 
 
 class CommandComponent:
     def __init__(self) -> None:
         self.sources: set[Token] = set()
-        self.galaxy_object: Optional[DataToolParameter] = None
+        self.galaxy_object: Optional[ToolParameter] = None
 
     
     def add_token(self, the_token: Token) -> None:
@@ -33,8 +32,34 @@ class CommandComponent:
             values = list(values)
         return values
 
-    
-    def get_primary_value(self) -> str:
+
+    def get_default(self) -> Any:
+        """
+        gets the default value for this component.
+        if a galaxy object it attached, gets defaut from this source
+        else, uses the list of sources (witnessed occurances) to decide 
+        what the default should be.
+        """
+        if self.galaxy_object is not None:
+            return self.get_galaxy_default()
+        return self.get_primary_value()
+
+
+    def get_galaxy_default(self) -> Any:
+        if self.galaxy_object.type in ['data', 'data_collection']:
+            # use static options
+            pass
+        elif self.galaxy_object.type == 'select':
+            pass
+        else:
+            # TODO HERE 
+            return ''
+
+
+    def get_main_select_option(self)
+
+
+    def get_primary_value(self) -> Any:
         """
         gets most commonly occuring text string among source tokens
         prioritises the first witnessed token if equal occurances
