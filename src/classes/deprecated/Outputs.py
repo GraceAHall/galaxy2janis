@@ -227,34 +227,7 @@ class DiscoverDatasetsOutput(Output):
         return pattern
 
 
-    def transform_pattern(self, pattern: str) -> str:
-        transformer = {
-            '__designation__': '*',
-            '.*?': '*',
-            '\\.': '.',
-        }
 
-        # # remove anything in brackets
-        # pattern_list = pattern.split('(?P<designation>')
-        # if len(pattern_list) == 2:
-        #     pattern_list[1] = pattern_list[1].split(')', 1)[-1]
-
-        # find anything in between brackets
-        bracket_strings = re.findall("\\((.*?)\\)", pattern)
-
-        # remove brackets & anything previously found (lazy)
-        pattern = pattern.replace('(', '').replace(')', '')
-        for the_string in bracket_strings:
-            if '<ext>' in the_string:
-                pattern = pattern.replace(the_string, '') # lazy and bad
-            pattern = pattern.replace(the_string, '*')
-
-        for key, val in transformer.items():
-            pattern = pattern.replace(key, val)
-
-        # remove regex start and end patterns
-        pattern = pattern.rstrip('$').lstrip('^')
-        return pattern
 
 
 

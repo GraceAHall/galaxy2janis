@@ -103,7 +103,60 @@ class DatatypeExtractor:
         return ext_format_map
 
 
-    def extract(self, component: CommandComponent) -> list[dict]:
+    def extract(self, incoming: Union[CommandComponent, ToolOutput]) -> list[dict]:
+        """
+        delegates whether the incoming is a CommandComponent or ToolOutput. 
+        datatype extraction logic is different for these two classes. 
+        """
+        if type(incoming) == ToolOutput:
+            return self.extract_from_output(incoming)
+        else:
+            return self.extract_from_component(incoming)
+
+
+    def extract_from_output(self, output: ToolOutput) -> list[dict]:
+        types = []
+
+        galaxy_formats = self.get_output_gxformat(output)
+        for gxformat in galaxy_formats:
+            types += self.cast_gxformat_to_datatypes(gxformat)
+
+        # fallback 
+        if len(types) == 0:
+            types.append(self.file_t)
+
+        return types
+
+
+    def get_output_gxformat(self, output: ToolOutput) -> list[str]:
+        # easiest & most common option
+        if output.format is not None:
+            return output.format.split(',')
+
+        print()
+
+
+        # # get datatype from referenced paramd
+        # elif format_source != '':
+        #     varname, param = param_register.get(format_source)
+        #     if param is not None:
+        #         self.galaxy_type = param.galaxy_type
+
+        # else:
+        #     dd_node = self.node.find('discover_datasets')
+        #     dd_format = get_attribute_value(dd_node, 'format') # type: ignore
+        #     dd_ext = get_attribute_value(dd_node, 'ext') # type: ignore
+
+        #     if dd_format != '':
+        #         self.galaxy_type = dd_format
+
+        #     elif dd_ext != '':
+        #         self.galaxy_type = dd_ext
+        
+        # self.galaxy_type = 'file'
+    
+
+    def extract_from_component(self, component: CommandComponent) -> list[dict]:
         """
         delegates what method to use for datatype inference.
         """
@@ -145,27 +198,6 @@ class DatatypeExtractor:
             return self.extract_types_from_gx_format(component)
         elif g_obj.type == 'select':
             return self.extract_types_from_gx_select(component)
-
-
-    def cast_list(self, the_list: list[str]) -> str:
-        """
-        identifies whether all list items can be cast to a common datatype.
-        currently just float and int
-        """
-        castable_types = []
-
-        if can_cast_to_float(the_list):
-            castable_types.append('Float')
-        elif can_cast_to_int(the_list):
-            castable_types.append('Integer')
-
-        if 'Float' in castable_types:
-            if 'Integer' in castable_types:
-                return 'Integer'
-            else:
-                return 'Float'
-
-        return ''
 
 
     def extract_types_from_numeric(self, component: CommandComponent) -> list[dict]:
@@ -255,7 +287,7 @@ class DatatypeExtractor:
 
     
 
-    def cast_gxformat_to_datatypes(self, gxformat: str) -> dict[str, str]:
+    def cast_gxformat_to_datatypes(self, gxformat: str) -> list[dict[str, str]]:
         # get all the datatypes which map to the gxformat
         if gxformat in self.format_datatype_map:
             formatted_types = self.format_datatype_map[gxformat]

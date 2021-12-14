@@ -2,6 +2,7 @@
 
 from typing import Tuple, Union
 from datetime import date
+import regex as re 
 
 from sqlalchemy.orm import base
 from classes.janis.DatatypeExtractor import DatatypeExtractor
@@ -53,7 +54,6 @@ class JanisFormatter:
     def format(self) -> None:
         self.commandtool = self.gen_commandtool()
         self.inputs = self.gen_inputs()
-        # TODO HERE
         self.outputs = self.gen_outputs()
         self.imports = self.gen_imports()
         self.main_call = self.gen_main_call()
@@ -171,9 +171,10 @@ class JanisFormatter:
             - doc
         """
         tag, datatypes, default, docstring = self.extract_positional_details(positional)
+        self.update_datatype_imports(datatypes)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
-        typestring = self.format_typestring(positional, datatypes)
+        typestring = self.format_typestring(datatypes, positional.is_array(), positional.is_optional())
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -293,9 +294,10 @@ class JanisFormatter:
             doc="[Optional] Max read length",
         """
         tag, datatypes, prefix, default, position, docstring = self.extract_option_details(opt)
+        self.update_datatype_imports(datatypes)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
-        typestring = self.format_typestring(opt, datatypes)
+        typestring = self.format_typestring(datatypes, opt.is_array(), opt.is_optional())
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -331,7 +333,7 @@ class JanisFormatter:
         return tag, datatypes, prefix, default, position, docstring
             
 
-    def format_typestring(self, component: CommandComponent, datatypes: list[dict]) -> str:
+    def format_typestring(self, datatypes: list[dict], is_array, is_optional) -> str:
         """
         turns a component and datatype dict into a formatted string for janis definition.
         the component is used to help detect array / optionality. 
@@ -340,8 +342,6 @@ class JanisFormatter:
             Array(String(), optional=True)
             etc
         """
-
-        self.update_datatype_imports(datatypes)
         
         # just work with the classname for now
         datatypes = [d['classname'] for d in datatypes]
@@ -354,19 +354,19 @@ class JanisFormatter:
             dtype = datatypes[0]
         
         # not array not optional
-        if not component.is_optional() and not component.is_array():
+        if not is_optional and not is_array:
             out_str = f'{dtype}'
 
         # array and not optional
-        elif not component.is_optional() and component.is_array():
+        elif not is_optional and is_array:
             out_str = f'Array({dtype})'
         
         # not array and optional
-        elif component.is_optional() and not component.is_array():
+        elif is_optional and not is_array:
             out_str = f'{dtype}(optional=True)'
         
         # array and optional
-        elif component.is_optional() and component.is_array():
+        elif is_optional and is_array:
             out_str = f'Array({dtype}(), optional=True)'
 
         return out_str
@@ -383,55 +383,78 @@ class JanisFormatter:
 
     def gen_outputs(self) -> list[str]:
         """
-        each str elem in out list is tool output
+        each str elem in 'outputs' is tool output
         """
         outputs = []
+        stdout = self.tool.command.stdout
 
+        # NOTE: stdout may be none or a Stdout CommandComponent
+        # it almost certainly will be in the list of galaxy outputs
+        # for that one, we essentially just want to mark that it is stdout.
+
+        # galaxy output objects
         for output in self.tool.out_register.get_outputs():
-            self.update_component_imports(output)
-            output_string = self.format_output_to_string(output) 
+            selector, selector_contents = self.configure_selector(output)
+            output_string = self.format_gxoutput_to_string(output, selector, selector_contents) 
             outputs.append(output_string)
+        
+        # Stdout Component
+        if self.tool.command.stdout is not None:
+            stdout = self.tool.command.stdout
+
+            if stdout.galaxy_object is not None:
+                selector, selector_contents = self.configure_selector(output)
+                output_string = self.format_gxoutput_to_string(output, selector, selector_contents) 
+                outputs.append(output_string)
 
         return outputs
 
 
-    def update_component_imports(self, output: ToolOutput) -> None:
-        """
-        need to add the selector type to imports too!
-        """
-        self.default_imports['janis_core'].add(output.selector)
-        
+    def configure_selector(self, output: ToolOutput) -> None:
+        selector = self.select_selector(output)
+        selector_contents = self.generate_selector_contents(output)
+        self.default_imports['janis_core'].add(selector)
+        return selector, selector_contents
+    
 
-    def format_output_to_string(self, output: ToolOutput) -> str:
-        """
-        formats outputs into janis tooldef string
-        """
-        self.update_output_selector_from_command(output)
-        datatype = self.format_typestring(output.datatypes)
-        tag = self.validate_tag(output.name)
-        docstring = self.validate_docstring(output.help_text)
-        selector = output.selector
-        selector_contents = output.selector_contents
+    def select_selector(self, output: ToolOutput) -> str:
+        if output.from_work_dir is not None:
+            return 'WildcardSelector'
+        print()
+    
 
-        # if selector is InputSelector, its referencing an input
-        # that input tag will have been converted to a janis-friendly tag
-        # same must be done to the selector contents
-        if selector == 'InputSelector':
-            selector_contents = self.validate_tag(selector_contents)        
+    def generate_selector_contents(self, output: ToolOutput) -> str:
+        return ''
 
-        out_str = '\tToolToolOutput(\n'
-        out_str += f'\t\t"{tag}",\n'
 
-        if output.is_stdout:
-            out_str += f'\t\tStdout({datatype}),\n'
-        else:
-            out_str += f'\t\t{datatype},\n'
-            out_str += f'\t\tselector={selector}("{selector_contents}"),\n'
-        
-        out_str += f'\t\tdoc="{docstring}"\n'
-        out_str += '\t),\n'
+    def transform_pattern(self, pattern: str) -> str:
+        transformer = {
+            '__designation__': '*',
+            '.*?': '*',
+            '\\.': '.',
+        }
 
-        return out_str
+        # # remove anything in brackets
+        # pattern_list = pattern.split('(?P<designation>')
+        # if len(pattern_list) == 2:
+        #     pattern_list[1] = pattern_list[1].split(')', 1)[-1]
+
+        # find anything in between brackets
+        bracket_strings = re.findall("\\((.*?)\\)", pattern)
+
+        # remove brackets & anything previously found (lazy)
+        pattern = pattern.replace('(', '').replace(')', '')
+        for the_string in bracket_strings:
+            if '<ext>' in the_string:
+                pattern = pattern.replace(the_string, '') # lazy and bad
+            pattern = pattern.replace(the_string, '*')
+
+        for key, val in transformer.items():
+            pattern = pattern.replace(key, val)
+
+        # remove regex start and end patterns
+        pattern = pattern.rstrip('$').lstrip('^')
+        return pattern
 
 
     def update_output_selector_from_command(self, output: ToolOutput) -> None:
@@ -449,16 +472,81 @@ class JanisFormatter:
                         output.selector = 'InputSelector'
                         output.selector_contents = option.prefix.lstrip('-')
 
+        
+    def format_gxoutput_to_string(self, output: ToolOutput, selector: str, selector_contents: str) -> str:
+        """
+        formats outputs into janis tooldef string
+        this is not as nice as CommandComponents. 
+        a lot of methods to get is_array, optionality, datatypes is contained below 
+        rather than appearing in a designated Output class.
+
+        """
+        tag, datatypes, is_array, is_optional, docstring = self.extract_output_details(output)
+        self.update_datatype_imports(datatypes)
+
+        typestring = self.format_typestring(datatypes, is_array, is_optional)
+        tag = self.validate_tag(tag)
+        docstring = self.validate_docstring(docstring)
+
+        # if selector is InputSelector, its referencing an input
+        # that input tag will have been converted to a janis-friendly tag
+        # same must be done to the selector contents, hence the next 2 lines:
+        if selector == 'InputSelector':
+            selector_contents = self.validate_tag(selector_contents)        
+
+        out_str = '\tToolToolOutput(\n'
+        out_str += f'\t\t"{tag}",\n'
+
+        if output.is_stdout:
+            out_str += f'\t\tStdout({typestring}),\n'
+        else:
+            out_str += f'\t\t{typestring},\n'
+            out_str += f'\t\tselector={selector}("{selector_contents}"),\n'
+        
+        out_str += f'\t\tdoc="{docstring}"\n'
+        out_str += '\t),\n'
+
+        return out_str
+
+
+    def extract_output_details(self, output: ToolOutput) -> Tuple[str, list[dict[str, str]], str]:
+        tag = output.name
+        datatypes = self.dtype_extractor.extract(output)
+        is_array = self.output_is_array(output)
+        is_optional = self.output_is_optional(output)
+        docstring = output.label.rsplit('${tool.name} on ${on_string}:', 1)[-1].strip()
+        return tag, datatypes, is_array, is_optional, docstring
+
+
+    def output_is_array(self, output: ToolOutput) -> bool:
+        # has * in WildcardSelector
+        if output.from_work_dir is not None:
+            if '*' in output.from_work_dir:
+                return True
+        
+        # root is <data>, but has <discover_datasets> child
+        elif self.node.tag == 'data':
+            if self.node.find('discover_datasets') is not None:
+                return True
+
+        # root is <collection>
+        elif self.node.tag == 'collection':
+            return True   
+        
+        return False
+
+
+    def output_is_optional(self, output: ToolOutput) -> bool:
+        return False
 
 
     def gen_imports(self) -> list[str]:
         out_str = ''
-
         out_str += 'import sys\n'
         out_str += 'import os\n'
         out_str += 'sys.path.append(os.getcwd() + "\\src")\n'
+        
         # default imports from janis core
-
         if len(self.default_imports['janis_core']) > 0:
             modules = ', '.join(self.default_imports['janis_core'])
             out_str += f'\nfrom janis_core import {modules}\n'
