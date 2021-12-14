@@ -12,7 +12,7 @@ from classes.logging.Logger import Logger
 from classes.command.Tokens import Token, TokenType
 
 from utils.regex_utils import find_unquoted, get_simple_strings
-from utils.token_utils import get_best_token
+from utils.token_utils import tokenify
 
 
 class Alias:
@@ -109,7 +109,7 @@ class AliasRegister:
 
 
     def init_token_from_text(self, text: str) -> Token:
-        token = get_best_token(text, self.tool.param_register, self.tool.out_register, prioritise_tokens=False)
+        token = tokenify(text, param_register=self.tool.param_register, out_register=self.tool.out_register, prioritise_tokens=False)
         if token == None:
             self.logger.log(1, f'can resolve token {text}')
         return token

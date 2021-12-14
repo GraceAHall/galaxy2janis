@@ -53,6 +53,7 @@ class JanisFormatter:
     def format(self) -> None:
         self.commandtool = self.gen_commandtool()
         self.inputs = self.gen_inputs()
+        # TODO HERE
         self.outputs = self.gen_outputs()
         self.imports = self.gen_imports()
         self.main_call = self.gen_main_call()
@@ -172,7 +173,7 @@ class JanisFormatter:
         tag, datatypes, default, docstring = self.extract_positional_details(positional)
         tag = self.validate_tag(tag)
         docstring = self.validate_docstring(docstring)
-        typestring = self.format_typestring(datatypes)
+        typestring = self.format_typestring(positional, datatypes)
 
         out_str = '\tToolInput(\n'
         out_str += f'\t\t"{tag}",\n'
@@ -330,22 +331,19 @@ class JanisFormatter:
         return tag, datatypes, prefix, default, position, docstring
             
 
-    def format_typestring(self, component: CommandComponent, datatypes: list[dict], is_array=False, is_optional=False) -> str:
+    def format_typestring(self, component: CommandComponent, datatypes: list[dict]) -> str:
         """
-        String
-        String(optional=True)
-        Array(String(), optional=True)
-        etc
+        turns a component and datatype dict into a formatted string for janis definition.
+        the component is used to help detect array / optionality. 
+            String
+            String(optional=True)
+            Array(String(), optional=True)
+            etc
         """
-        if component.galaxy_object is not None:
-            component.galaxy_object.optional
-            component.galaxy_object.multiple
-
-
 
         self.update_datatype_imports(datatypes)
-
-        # just work with the classname now
+        
+        # just work with the classname for now
         datatypes = [d['classname'] for d in datatypes]
         
         # handle union type
@@ -354,21 +352,21 @@ class JanisFormatter:
             dtype = "UnionType(" + dtype + ")"
         else:
             dtype = datatypes[0]
-
+        
         # not array not optional
-        if not is_optional and not is_array:
+        if not component.is_optional() and not component.is_array():
             out_str = f'{dtype}'
 
         # array and not optional
-        elif not is_optional and is_array:
+        elif not component.is_optional() and component.is_array():
             out_str = f'Array({dtype})'
         
         # not array and optional
-        elif is_optional and not is_array:
+        elif component.is_optional() and not component.is_array():
             out_str = f'{dtype}(optional=True)'
         
         # array and optional
-        elif is_optional and is_array:
+        elif component.is_optional() and component.is_array():
             out_str = f'Array({dtype}(), optional=True)'
 
         return out_str

@@ -10,7 +10,7 @@ from classes.outputs.OutputRegister import OutputRegister
 from classes.logging.Logger import Logger
 from utils.general_utils import global_align
 
-from utils.token_utils import get_best_token
+from utils.token_utils import tokenify
 
 
 
@@ -41,7 +41,7 @@ class CommandBlock:
 
     
     def init_tokens(self, word: str) -> Token:
-        token = get_best_token(word, self.param_register, self.out_register)
+        token = tokenify(word, param_register=self.param_register, out_register=self.out_register)
         
         # possibly split token if GX_PARAM is hiding flags or options
         if token.type == TokenType.GX_PARAM:
@@ -110,7 +110,7 @@ class CommandBlock:
 
                 # else its a single word or a quoted phrase TODO CHECK THIS
                 else:
-                    new_token = get_best_token(val, self.param_register, self.out_register)
+                    new_token = tokenify(val, param_register=self.param_register, out_register=self.out_register)
                 
                 # transfer properties
                 new_token.in_conditional = token.in_conditional

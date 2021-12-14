@@ -13,7 +13,7 @@ from classes.command.Alias import AliasRegister
 from classes.command.Tokens import Token, TokenType
 
 from utils.regex_utils import find_unquoted, get_simple_strings
-from utils.token_utils import get_best_token, split_line_by_ands
+from utils.token_utils import tokenify, split_line_by_ands
 
 
 """
@@ -95,7 +95,7 @@ class AliasExtractor:
 
 
     def init_token_from_text(self, text: str) -> Token:
-        token = get_best_token(text, self.tool.param_register, self.tool.out_register)
+        token = tokenify(text, param_register=self.tool.param_register, out_register=self.tool.out_register)
         if token == None:
             self.logger.log(1, f'can resolve token {text}')
         return token

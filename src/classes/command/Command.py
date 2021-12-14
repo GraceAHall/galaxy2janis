@@ -33,6 +33,7 @@ class Command:
         self.step_size: int = 2
         self.opts_encountered: bool = False
         self.positional_count: int = 0
+        self.ingested_cmdstr_count: int = 0
 
 
     def update(self, command_string: CommandString, source: str='test') -> None:
@@ -43,19 +44,34 @@ class Command:
         this function just delegates what strategy to use to update command knowledge.
         """
         print(command_string.best_block)
-        
-        # reset attributes
-        self.cmd_source = source
-        self.opts_encountered = False
-        
-        # update options
+
+        # update
+        self.reset_attributes(source)
         self.parse_flags_options_stdout(command_string)
         
         # update positionals
         if self.cmd_source != 'xml':
             self.positional_count = 0
             self.parse_positionals(command_string)
+        
+        self.update_components_presence_array()
+
+
+    def reset_attributes(self, source: str) -> None:
+        # reset attributes
+        self.cmd_source = source
+        self.opts_encountered = False
+        for component in list(self.flags.values()) + list(self.options.values()):
+            component.set_presence(False)
+
+        # update cmdstr count
+        self.ingested_cmdstr_count += 1
+
     
+    def update_components_presence_array(self) -> None:
+        for component in list(self.flags.values()) + list(self.options.values()):
+            component.update_presence_array(self.ingested_cmdstr_count)
+        
     
     def parse_flags_options_stdout(self, command_string: CommandString) -> None:
         """
@@ -331,6 +347,8 @@ class Command:
             self.flags[key] = incoming
         else:
             self.flags[key].merge(incoming)
+        
+        self.flags[key].set_presence(True)
 
 
     def update_options(self, incoming: Option) -> None:
@@ -339,6 +357,8 @@ class Command:
             self.options[key] = incoming
         else:
             self.options[key].merge(incoming)
+        
+        self.options[key].set_presence(True)
 
 
     def is_flag(self, ctoken: Token, ntoken: Token) -> bool:

@@ -24,10 +24,10 @@ def split_keyval_to_best_tokens(kv_token: Token, param_register: ParamRegister, 
     """
     curr_word, next_word, delim = split_keyval_to_text(kv_token)
 
-    curr_token = get_best_token(curr_word, param_register, out_register)
+    curr_token = tokenify(curr_word, param_register=param_register, out_register=out_register)
     curr_token = transfer_token_attributes(kv_token, curr_token)
         
-    next_token = get_best_token(next_word, param_register, out_register)
+    next_token = tokenify(next_word, param_register=param_register, out_register=out_register)
     next_token = transfer_token_attributes(kv_token, next_token)
 
     return curr_token, next_token, delim
@@ -50,67 +50,66 @@ def split_keyval_to_text(kv_token: Token) -> list[str]:
     return left_text, right_text, delim
 
 
-def get_best_token(word: str, param_register: ParamRegister, out_register: OutputRegister, prioritise_tokens: bool=True) -> Token:
-    # get best-fit token for word 
-    temp_tokens = get_all_tokens(word, param_register, out_register)
+def tokenify(word: str, param_register: ParamRegister=None, out_register: OutputRegister=None, prioritise_tokens: bool=True) -> Token:
+    """
+    generates a token from word. 
+    where multiple token types are possible, selects the most appropriate. 
+    """
+    temp_tokens = get_all_tokens(word, param_register=param_register, out_register=out_register)
     best_token = select_highest_priority_token(temp_tokens, prioritise_tokens)
     return best_token
 
 
-def get_all_tokens(text: str, param_register: ParamRegister, out_register: OutputRegister) -> list[Token]:
+def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_register: OutputRegister=None) -> list[Token]:
     """
-    detects the type of object being dealt with.
-    first task is to resolve any aliases or env_variables. 
-
-    can be:
-        literal
-            - starts with alphanumeric
-        literal flag 
-            - starts with '-'
-        GX_PARAM
-            - has galaxy var in the word
+    gets all the possible token interpretations of the_string
     """  
+    # early exits
+    if the_string == '__END_COMMAND__':
+        return [Token('', TokenType.END_COMMAND)]
+    elif the_string == '':
+        raise Exception('cannot tokenify blank string')
 
     tokens = []
 
-    if text == '__END_COMMAND__':
-        return [Token('', TokenType.END_COMMAND)]
+    # galaxy inputs / outputs
+    # quoted or not doesn't matter. just linking. can resolve its datatype later. 
+    ch_vars = get_cheetah_vars(the_string) # get cheetah vars
+    if param_register is not None:
+        gx_params = [x for x in ch_vars if param_register.get(x)[0] is not None]
+        tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
+    
+    if out_register is not None:
+        gx_outs = [x for x in ch_vars if out_register.get(x) is not None]  
+        tokens += [Token(out, TokenType.GX_OUT) for out in gx_outs]  
 
-    # find quoted numbers and strings. quotes are removed
-    quoted_num_lits = get_quoted_numbers(text)
+    # quoted numbers / strings
+    quoted_num_lits = get_quoted_numbers(the_string)
     quoted_num_lits = [m.strip('\'"') for m in quoted_num_lits]
     tokens += [Token(m, TokenType.QUOTED_NUM) for m in quoted_num_lits]
 
-    quoted_str_lits = get_quoted_strings(text)
+    quoted_str_lits = get_quoted_strings(the_string)
     quoted_str_lits = [m.strip('\'"') for m in quoted_str_lits]
     tokens += [Token(m, TokenType.QUOTED_STRING) for m in quoted_str_lits]
     
-    raw_num_lits = get_raw_numbers(text)
+    # raw numbers / strings
+    raw_num_lits = get_raw_numbers(the_string)
     tokens += [Token(m, TokenType.RAW_NUM) for m in raw_num_lits]
     
-    raw_str_lits = get_raw_strings(text)
+    raw_str_lits = get_raw_strings(the_string)
     tokens += [Token(m, TokenType.RAW_STRING) for m in raw_str_lits]
     
-    # galaxy inputs / outputs
-    # quoted or not doesn't matter. just linking. can resolve its datatype later. 
-    ch_vars = get_cheetah_vars(text) # get cheetah vars
-
-    gx_params = [x for x in ch_vars if param_register.get(x)[0] is not None]
-    tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
-    gx_outs = [x for x in ch_vars if out_register.get(x) is not None]  
-    tokens += [Token(out, TokenType.GX_OUT) for out in gx_outs]  
-
     # TODO this is pretty weak. actually want to search for 
     # unquoted operator in word. split if necessary. 
-    linux_operators = get_linux_operators(text)
+    linux_operators = get_linux_operators(the_string)
     tokens += [Token(op, TokenType.LINUX_OP) for op in linux_operators]
 
-    kv_pairs = get_keyval_pairs(text)
+    kv_pairs = get_keyval_pairs(the_string)
     tokens += [Token(kv, TokenType.KV_PAIR) for kv in kv_pairs]
 
     # fallback
     if len(tokens) == 0:
-        tokens += [Token(text, TokenType.RAW_STRING)]
+        tokens += [Token(the_string, TokenType.RAW_STRING)]
 
     return tokens
 

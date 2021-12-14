@@ -1,5 +1,5 @@
 
-# pyright: strict
+# pyright: basic
 
 from __future__ import annotations
 from typing import Optional, Union, Any
@@ -8,15 +8,32 @@ from collections import Counter
 from classes.command.Tokens import Token, TokenType
 from galaxy.tools.parameters.basic import ToolParameter
 
+from utils.token_utils import tokenify
+
 
 class CommandComponent:
     def __init__(self) -> None:
         self.sources: set[Token] = set()
         self.galaxy_object: Optional[ToolParameter] = None
+        self.this_cmdstr_presence: bool = False
+        self.presence_array: list[bool] = []
 
     
     def add_token(self, the_token: Token) -> None:
         self.sources.add(the_token)
+
+
+    def set_presence(self, presence: bool) -> None:
+        self.this_cmdstr_presence = presence
+
+
+    def update_presence_array(self, cmdstr_count: int) -> None:
+        # newly discovered components
+        while len(self.presence_array) < cmdstr_count - 1:
+            self.presence_array.append(False)
+
+        # now that component is up to date
+        self.presence_array.append(self.this_cmdstr_presence)
 
 
     def get_token_types(self, as_list: bool=False) -> Union[list[TokenType], set[TokenType]]:
@@ -33,10 +50,10 @@ class CommandComponent:
         return values
 
 
-    def get_default(self) -> Any:
+    def get_default(self) -> Optional[str]:
         """
         gets the default value for this component.
-        if a galaxy object it attached, gets defaut from this source
+        if a galaxy object is attached, gets defaut from this source
         else, uses the list of sources (witnessed occurances) to decide 
         what the default should be.
         """
@@ -45,18 +62,40 @@ class CommandComponent:
         return self.get_primary_value()
 
 
-    def get_galaxy_default(self) -> Any:
-        if self.galaxy_object.type in ['data', 'data_collection']:
-            # use static options
-            pass
-        elif self.galaxy_object.type == 'select':
-            pass
-        else:
-            # TODO HERE 
-            return ''
+    def get_galaxy_default(self) -> Optional[str]:
+        """
+        gets the default value for a galaxy param
+        """
+        if self.galaxy_object is not None:
+            if self.galaxy_object.type == 'select':
+                return self.get_galaxy_primary_option()
+            elif self.galaxy_object.type not in ['data', 'data_collection']:
+                if self.galaxy_object.value is not None:
+                    return self.galaxy_object.value
+
+        return None
 
 
-    def get_main_select_option(self)
+    def get_galaxy_primary_option(self) -> Optional[str]:
+        if self.galaxy_object is not None and self.galaxy_object.type == 'select':
+            for opt in self.galaxy_object.static_options:
+                if opt[2] == True:
+                    return opt[1]
+            
+            return self.galaxy_object.static_options[0][1]
+        
+        return None
+    
+    
+    def get_galaxy_options(self, as_tokens: bool=False) -> Union[list[TokenType], list[str]]:
+        opts = []
+        if self.galaxy_object is not None and self.galaxy_object.type == 'select':
+            opts = self.galaxy_object.legal_values
+            
+        if as_tokens:
+            opts = [tokenify(opt) for opt in opts]
+        
+        return opts
 
 
     def get_primary_value(self) -> Any:
@@ -71,14 +110,58 @@ class CommandComponent:
 
 
     def is_optional(self) -> bool:
+        """
+        goes through each possible reason why component would be optional
+        if no condition is met, returns False
+        """
+        # positionals aren't optional
         if type(self) == Positional:
             return False
 
-        for source in self.sources:
-            if not source.in_conditional:
-                return False
+        # has galaxy object
+        if self.galaxy_object is not None:
+            # optionality explicitly set as true in galaxy object
+            if self.galaxy_object.optional == True:
+                return True
+            # galaxy values include a blank string
+            if '' in self.get_galaxy_values():
+                return True
+        
+        # component doesn't appear in each supplied command string
+        if not all(self.presence_array):
+            return True
+        
+        # component appears in each supplied command string, but is always in conditional logic
+        if all(self.presence_array):
+            if all([t.in_conditional for t in self.sources]):
+                return True
 
-        return True
+        return False
+
+
+    def get_galaxy_values(self) -> list[str]:
+        if self.galaxy_object is not None:
+            if self.galaxy_object.type in ['select', 'boolean']:
+                return self.galaxy_object.legal_values
+            elif self.galaxy_object.type not in ['data', 'data_collection']:
+                if self.galaxy_object.value is not None:
+                    return [self.galaxy_object.value]
+        
+        return []
+
+
+    def is_array(self) -> bool:
+        # defined in galaxy object
+        g_obj = self.galaxy_object
+        if g_obj is not None:
+            if g_obj.type == 'data_collection':
+                return True
+            elif g_obj.type == 'data' and g_obj.multiple == True:
+                return True
+        
+        # NOTE: it may be possible to detect arrays from components without 
+        # galaxy objects. Eg strings which can be interpreted as comma-delimited list
+        return False
 
 
 

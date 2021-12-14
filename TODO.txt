@@ -6,6 +6,9 @@ TODO v0.1
 
 
 TODO:
+    - current at JanisFormatter.format() gen_outputs()
+    - ensure outputs are being transferred to CommandComponents as galaxy_objects
+
     - write to janis
     - janis test runner
     - add code test suite (pytest)

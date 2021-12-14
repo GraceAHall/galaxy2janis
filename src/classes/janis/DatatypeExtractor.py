@@ -105,31 +105,67 @@ class DatatypeExtractor:
 
     def extract(self, component: CommandComponent) -> list[dict]:
         """
-        function delegates what method to use for datatype inference.
+        delegates what method to use for datatype inference.
         """
         # galaxy 
         if component.galaxy_object is not None:
+            #types = self.extract_types_from_gx(component)
+            #return types
             return self.extract_types_from_gx(component)
         
         # int or float
         numbers_set = set([TokenType.RAW_NUM, TokenType.QUOTED_NUM])
         component_set = component.get_token_types()
         if component_set.issubset(numbers_set):
+            #types = self.extract_types_from_numeric(component)
+            #return types
             return self.extract_types_from_numeric(component)
 
         # from string
         elif TokenType.RAW_STRING in component_set or TokenType.QUOTED_STRING in component_set:
+            #types = self.extract_types_from_strings(component)
+            #return types
             return self.extract_types_from_strings(component)
 
         # fallback
-        return self.string_t
+        return [self.string_t]
 
 
     def extract_types_from_gx(self, component: CommandComponent) -> list[dict]:
-        pass
-        obj = component.galaxy_object
+        g_obj = component.galaxy_object
+        assert(type(component)) != Flag  # flags are always boolean
+
+        if g_obj.type == 'integer':
+            return [self.integer_t]
+        elif g_obj.type == 'float':
+            return [self.float_t]
+        elif g_obj.type in ['text', 'color']:
+            return [self.string_t]
+        elif g_obj.type in ['data', 'data_collection']:
+            return self.extract_types_from_gx_format(component)
+        elif g_obj.type == 'select':
+            return self.extract_types_from_gx_select(component)
 
 
+    def cast_list(self, the_list: list[str]) -> str:
+        """
+        identifies whether all list items can be cast to a common datatype.
+        currently just float and int
+        """
+        castable_types = []
+
+        if can_cast_to_float(the_list):
+            castable_types.append('Float')
+        elif can_cast_to_int(the_list):
+            castable_types.append('Integer')
+
+        if 'Float' in castable_types:
+            if 'Integer' in castable_types:
+                return 'Integer'
+            else:
+                return 'Float'
+
+        return ''
 
 
     def extract_types_from_numeric(self, component: CommandComponent) -> list[dict]:
@@ -138,17 +174,16 @@ class DatatypeExtractor:
         if any of the sources are floats, return float, else int
         """
         for value in component.get_values(as_list=True):
-            pass
+            if '.' in value:
+                return [self.float_t]
 
-        if '.' in the_string:
-            return self.float_t
-
-        return self.integer_t
+        return [self.integer_t]
 
 
     def extract_types_from_strings(self, component: CommandComponent) -> list[dict]:
         out_types = []
 
+        # guess type from file extensions if present
         for value in component.get_values(as_list=True):
             ext_datatype = self.get_extension_datatype(value)
             if ext_datatype is not None:
@@ -177,7 +212,7 @@ class DatatypeExtractor:
 
         # for the final chosen gxformat, convert to janis datatype if exists
         if gxformat != '':
-            dtype = self.get_datatype_by_format(gxformat)
+            dtype = self.cast_gxformat_to_datatypes(gxformat)
             if dtype is not None:
                 return dtype
 
@@ -186,22 +221,53 @@ class DatatypeExtractor:
 
     # now the datastructures are initialised, here are some methods
     # to access types given gxformat or extension
-    def get_datatype_by_format(self, gxformat: str) -> Optional[dict[str, str]]:
-        if gxformat in self.format_datatype_map:
-            datatypes = self.format_datatype_map[gxformat]
-
-            if len(datatypes) == 0:
-                return None
-            
-            if len(datatypes) > 1:            
-                for dtype in datatypes:
-                    if dtype['source'] == 'janis':
-                        return dtype
-
-            return datatypes[0]
+    def extract_types_from_gx_format(self, component: CommandComponent) -> list[dict[str, str]]:
+        types = []
         
-        return None
+        if component.galaxy_object is not None:          
+            for gxformat in component.galaxy_object.formats:
+                types += self.cast_gxformat_to_datatypes(gxformat.file_ext)
+
+        if len(types) == 0:
+            types.append(self.file_t)
+
+        return types
+
+
+    # now the datastructures are initialised, here are some methods
+    # to access types given gxformat or extension
+    def extract_types_from_gx_select(self, component: CommandComponent) -> list[dict[str, str]]:       
+        if component.galaxy_object is not None and component.galaxy_object.type == 'select':
+            component_tokens = component.get_galaxy_options(as_tokens=True)
+            # all tokens are numeric
+            out = [t.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM] for t in component_tokens]
+            if all([t.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM] for t in component_tokens]):
+                # at least 1 is a float
+                if any(['.' in t.text for t in component_tokens]):
+                    return [self.float_t]
+                else:
+                    return [self.int_t]
+
+        # potentially add type sniffing from common extension
+        
+        # fallback
+        return [self.string_t]
+
     
+
+    def cast_gxformat_to_datatypes(self, gxformat: str) -> dict[str, str]:
+        # get all the datatypes which map to the gxformat
+        if gxformat in self.format_datatype_map:
+            formatted_types = self.format_datatype_map[gxformat]
+
+            if len(formatted_types) > 1:            
+                for dtype in formatted_types:
+                    if dtype['source'] == 'janis':
+                        return [dtype]
+            elif len(formatted_types) == 1:
+                return [formatted_types[0]]
+
+        return []
 
 
     def assert_has_datatype(self, obj):
@@ -273,7 +339,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
         
         datatypes = []
         for gxformat in gxformat_list:
-            dtype = self.get_datatype_by_format(gxformat)
+            dtype = self.extract_types_from_gx_format(gxformat)
             if dtype is not None:
                 datatypes.append(dtype)
         
@@ -305,7 +371,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
                     break
 
         if gxformat != '':
-            dtype = self.get_datatype_by_format(gxformat)
+            dtype = self.extract_types_from_gx_format(gxformat)
             if dtype is not None:
                 return [dtype]
 
@@ -353,7 +419,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
         if the_output.galaxy_type != '':    
             gxformat_list = the_output.galaxy_type.split(',')
             for gxformat in gxformat_list:
-                dtype = self.get_datatype_by_format(gxformat)
+                dtype = self.extract_types_from_gx_format(gxformat)
                 if dtype is not None:
                     datatypes.append(dtype)
 
