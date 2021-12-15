@@ -55,6 +55,16 @@
             ]
         },
         {
+            "name": "metaphlan",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "metaphlan.xml", "tools/metaphlan", "--debug"
+            ]
+        },
+        {
             "name": "busco",
             "type": "python",
             "request": "launch",

@@ -2,13 +2,13 @@
 
 # pyright: basic 
 
-from re import L
+from re import L, split
 from typing import Union, Optional
 
 from classes.command.CommandString import CommandString
 from classes.outputs.OutputRegister import OutputRegister
 from classes.params.ParamRegister import ParamRegister
-from classes.command.CommandComponents import Positional, Flag, Option, Stdout
+from classes.command.CommandComponents import Positional, Flag, Option, Output
 from classes.command.Tokens import Token, TokenType
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tools.parameters.basic import ToolParameter
@@ -25,7 +25,7 @@ class Command:
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
-        self.stdout: Stdout = Stdout()
+        self.outputs: list[Output] = self.init_outputs()
         self.base_command: list[str] = []
 
         # iteration attributes
@@ -34,6 +34,14 @@ class Command:
         self.opts_encountered: bool = False
         self.positional_count: int = 0
         self.ingested_cmdstr_count: int = 0
+
+
+    def init_outputs(self) -> list[ToolOutput]:
+        outputs = []
+        for gx_out in self.out_register.get_outputs():
+            new_output = Output(gx_out)
+            outputs.append(new_output)
+        return outputs
 
 
     def update(self, command_string: CommandString, source: str='test') -> None:
@@ -169,7 +177,18 @@ class Command:
 
 
     def update_stdout(self, token: Token) -> None:
-        self.stdout.add_token(token)
+        if token.gx_ref != '' and not self.stdout_is_set():
+            for output in self.outputs:
+                if output.galaxy_object.name == token.gx_ref:
+                    output.set_stdout()
+                    break
+
+
+    def stdout_is_set(self) -> bool:
+        for output in self.outputs:
+            if output.is_stdout:
+                return True
+        return False
 
 
     def make_component(self, ctoken: Token, ntoken: Token) -> CommandComponent:
@@ -202,8 +221,8 @@ class Command:
         return gx_object
 
 
-    def make_option(self, ctoken: Token, ntoken: Token) -> Option:
-        opt = Option(ctoken.text)
+    def make_option(self, ctoken: Token, ntoken: Token, delim: str=' ', splittable: bool=True) -> Option:
+        opt = Option(ctoken.text, delim=delim, splittable=splittable)
         opt.add_token(ntoken)
         if ntoken.gx_ref != '':
             opt.galaxy_object = self.get_gx_object(ntoken)
@@ -452,12 +471,12 @@ class Command:
     def get_options_position(self) -> int:
         # positionals will be sorted list in order of position
         # can loop through and find the first which is 
-        # 'after_options' and store that int
+        # 'is_after_options' and store that int
         positionals = self.get_positionals()
 
         options_start = len(positionals)
         for positional in positionals:
-            if positional.after_options:
+            if positional.is_after_options:
                 options_start = positional.pos
                 break
         

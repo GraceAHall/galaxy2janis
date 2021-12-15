@@ -5,18 +5,24 @@
 
 import yaml
 from typing import Optional, Union
+from classes.outputs.OutputRegister import OutputRegister
+from classes.params.ParamRegister import ParamRegister
 
 from galaxy.tool_util.parser.output_objects import ToolOutput
 
-from classes.command.Command import Positional, Flag, Option, TokenType, Token
+from classes.command.CommandComponents import Positional, Flag, Option, Output
+from classes.command.Command import TokenType
 from classes.logging.Logger import Logger
+from galaxy.tools.parameters.basic import ToolParameter
 
 CommandComponent = Union[Positional, Flag, Option]
 
 
 class DatatypeExtractor:
-    def __init__(self, logger: Logger):
+    def __init__(self, param_register: ParamRegister, out_register: OutputRegister, logger: Logger):
         self.logger = logger
+        self.param_register = param_register
+        self.out_register = out_register
         self.init_datastructures()
         
         # fallback types
@@ -103,21 +109,21 @@ class DatatypeExtractor:
         return ext_format_map
 
 
-    def extract(self, incoming: Union[CommandComponent, ToolOutput]) -> list[dict]:
+    def extract(self, incoming: Union[CommandComponent, Output]) -> list[dict]:
         """
         delegates whether the incoming is a CommandComponent or ToolOutput. 
         datatype extraction logic is different for these two classes. 
         """
-        if type(incoming) == ToolOutput:
+        if type(incoming) == Output:
             return self.extract_from_output(incoming)
         else:
             return self.extract_from_component(incoming)
 
 
-    def extract_from_output(self, output: ToolOutput) -> list[dict]:
+    def extract_from_output(self, output: Output) -> list[dict]:
         types = []
 
-        galaxy_formats = self.get_output_gxformat(output)
+        galaxy_formats = self.get_galaxy_output_formats(output)
         for gxformat in galaxy_formats:
             types += self.cast_gxformat_to_datatypes(gxformat)
 
@@ -128,33 +134,29 @@ class DatatypeExtractor:
         return types
 
 
-    def get_output_gxformat(self, output: ToolOutput) -> list[str]:
-        # easiest & most common option
-        if output.format is not None:
-            return output.format.split(',')
+    def get_galaxy_output_formats(self, output: Output) -> list[str]:
+        """
+        DATATYPE ATTRIBUTES
+        data|collection.discover_datasets.format
+        data|collection.discover_datasets.ext
+        """
+        gxobj = output.galaxy_object
+        if hasattr(gxobj, 'auto_format') and gxobj.auto_format:
+            return ['file']
+        
+        elif gxobj.format is not None:
+            return gxobj.format.split(',')
+        
+        elif gxobj.format_source is not None:
+            __, source_param = self.param_register.get(gxobj.format_source, allow_lca=True)
+            return self.get_format_from_gxparam(source_param)
 
         print()
 
 
-        # # get datatype from referenced paramd
-        # elif format_source != '':
-        #     varname, param = param_register.get(format_source)
-        #     if param is not None:
-        #         self.galaxy_type = param.galaxy_type
-
-        # else:
-        #     dd_node = self.node.find('discover_datasets')
-        #     dd_format = get_attribute_value(dd_node, 'format') # type: ignore
-        #     dd_ext = get_attribute_value(dd_node, 'ext') # type: ignore
-
-        #     if dd_format != '':
-        #         self.galaxy_type = dd_format
-
-        #     elif dd_ext != '':
-        #         self.galaxy_type = dd_ext
+    def get_format_from_gxparam(self, param: ToolParameter) -> list[str]:
+        pass
         
-        # self.galaxy_type = 'file'
-    
 
     def extract_from_component(self, component: CommandComponent) -> list[dict]:
         """

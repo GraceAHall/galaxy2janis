@@ -6,7 +6,10 @@ TODO v0.1
 
 
 TODO:
-    - current at JanisFormatter.format() gen_outputs()
+    - move some of the get_galaxy_datatypes logic to CommandComponents. 
+        - if the CommandComponent (incl Output) has a galaxy_object, should be able to return its galaxy datatype. 
+        - if not, DatatypeExtractor handles it. 
+        - DatatypeExtractor converts final sniffed types into janis
     - ensure outputs are being transferred to CommandComponents as galaxy_objects
 
     - write to janis

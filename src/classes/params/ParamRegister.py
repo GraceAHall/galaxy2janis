@@ -85,35 +85,6 @@ class ParamRegister:
         return job_dict
 
 
-    # def to_job_dict_old(self, value_overrides: Optional[dict]=None) -> dict:
-    #     out_dict = {}
-
-    #     for varname, param in self.params.items():
-    #         varpath = varname.split('.')
-    #         node = out_dict
-            
-    #         for i, text in enumerate(varpath):
-    #             if text not in node:
-    #                 if i == len(varpath) - 1:
-    #                     # terminal path, add param to node
-    #                     if value_overrides is not None and varname in value_overrides:
-    #                         node[text] = value_overrides[varname]
-    #                     else:
-    #                         node[text] = self.get_param_default_value(param)
-    #                     break
-    #                 else:
-    #                     # create new node for section
-    #                     node[text] = {}
-
-    #             node = node[text]    
-
-    #     for key, val in out_dict.items():
-    #         if type(val) == dict:
-    #             out_dict[key] = json.dumps(val)            
-        
-    #     return out_dict
-
-
     def get_param_default_value(self, param: ToolParameter) -> Any:
         # param has value
         if hasattr(param, 'value'):
@@ -121,6 +92,10 @@ class ParamRegister:
         
         # selected option
         elif param.type == 'select':
+            # dynamically loaded options from database keys etc wont appear as
+            if not hasattr(param, 'static_options'):
+                raise Exception('dynamic options from database keys not supported')
+
             for opt in param.static_options:
                 if opt[2] == True:
                     return opt[1]
@@ -162,11 +137,11 @@ class ParamRegister:
 
 
     def get(self, query_key: str, allow_lca=False) -> Tuple[Optional[str], Optional[ToolParameter]]:
-        # quick check if the full key is present
+        # check if the full key is present
         if query_key in self.params:
             return (query_key, self.params[query_key])
 
-        # otherwise, get the param with best match (LCA)
+        # if not already returned, get the param with best match (LCA) if set True
         if allow_lca:
             return self.get_lca(query_key)
 
@@ -214,7 +189,6 @@ class ParamRegister:
         if param_scores[0][0] >= 1:
             return param_scores[0][1:]
         return (None, None)
-
 
 
     def get_realised_values(self, query_key: str) -> list[str]:

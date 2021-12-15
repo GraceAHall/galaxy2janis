@@ -16,22 +16,26 @@ from copy import deepcopy
 class OutputRegister:
     def __init__(self, outputs: dict) -> None:
         self.outputs: dict[str, str] = {}
-        self.add_from_dict(outputs, [])
+        self.add_from_dict(outputs)
 
 
-    def add_from_dict(self, outputs: dict, levels: list[str]) -> None:
-        for label, obj in outputs.items():
-            if hasattr(obj, 'outputs'):
-                next_levels = deepcopy(levels)
-                next_levels.append(obj.name)
-                self.add_from_dict(obj.outputs, next_levels)
-            else:
-                if len(levels) == 0:
-                    key = label
-                else:
-                    key = '.'.join(levels) + '.' + label
-                if key not in self.outputs:
-                    self.outputs[key] = obj
+    def add_from_dict(self, incoming: dict) -> None:
+        self.outputs = self.outputs | incoming
+
+
+    # def add_from_dict(self, outputs: dict, levels: list[str]) -> None:
+    #     for label, obj in outputs.items():
+    #         if hasattr(obj, 'outputs'):
+    #             next_levels = deepcopy(levels)
+    #             next_levels.append(obj.name)
+    #             self.add_from_dict(obj.outputs, next_levels)
+    #         else:
+    #             if len(levels) == 0:
+    #                 key = label
+    #             else:
+    #                 key = '.'.join(levels) + '.' + label
+    #             if key not in self.outputs:
+    #                 self.outputs[key] = obj
 
 
     def get_outputs(self) -> list[ToolOutput]:
