@@ -5,15 +5,18 @@
 
 import yaml
 from typing import Optional, Union
-from classes.outputs.OutputRegister import OutputRegister
-from classes.params.ParamRegister import ParamRegister
 
+from galaxy.tool_util.parser.output_collection_def import FilePatternDatasetCollectionDescription
+from galaxy.tools.parameters.basic import ToolParameter
 from galaxy.tool_util.parser.output_objects import ToolOutput
 
+from classes.params.ParamRegister import ParamRegister
+from classes.outputs.OutputRegister import OutputRegister
 from classes.command.CommandComponents import Positional, Flag, Option, Output
 from classes.command.Command import TokenType
 from classes.logging.Logger import Logger
-from galaxy.tools.parameters.basic import ToolParameter
+
+from utils.galaxy_utils import get_param_formats, get_output_formats
 
 CommandComponent = Union[Positional, Flag, Option]
 
@@ -123,7 +126,7 @@ class DatatypeExtractor:
     def extract_from_output(self, output: Output) -> list[dict]:
         types = []
 
-        galaxy_formats = self.get_galaxy_output_formats(output)
+        galaxy_formats = get_output_formats(output.galaxy_object, self.param_register)
         for gxformat in galaxy_formats:
             types += self.cast_gxformat_to_datatypes(gxformat)
 
@@ -132,31 +135,7 @@ class DatatypeExtractor:
             types.append(self.file_t)
 
         return types
-
-
-    def get_galaxy_output_formats(self, output: Output) -> list[str]:
-        """
-        DATATYPE ATTRIBUTES
-        data|collection.discover_datasets.format
-        data|collection.discover_datasets.ext
-        """
-        gxobj = output.galaxy_object
-        if hasattr(gxobj, 'auto_format') and gxobj.auto_format:
-            return ['file']
-        
-        elif gxobj.format is not None:
-            return gxobj.format.split(',')
-        
-        elif gxobj.format_source is not None:
-            __, source_param = self.param_register.get(gxobj.format_source, allow_lca=True)
-            return self.get_format_from_gxparam(source_param)
-
-        print()
-
-
-    def get_format_from_gxparam(self, param: ToolParameter) -> list[str]:
-        pass
-        
+                
 
     def extract_from_component(self, component: CommandComponent) -> list[dict]:
         """
@@ -207,7 +186,7 @@ class DatatypeExtractor:
         all occurances of the CommandComponent were numeric.
         if any of the sources are floats, return float, else int
         """
-        for value in component.get_values(as_list=True):
+        for value in component.get_token_values(as_list=True):
             if '.' in value:
                 return [self.float_t]
 
@@ -218,7 +197,7 @@ class DatatypeExtractor:
         out_types = []
 
         # guess type from file extensions if present
-        for value in component.get_values(as_list=True):
+        for value in component.get_token_values(as_list=True):
             ext_datatype = self.get_extension_datatype(value)
             if ext_datatype is not None:
                 out_types.append(ext_datatype)
@@ -258,9 +237,9 @@ class DatatypeExtractor:
     def extract_types_from_gx_format(self, component: CommandComponent) -> list[dict[str, str]]:
         types = []
         
-        if component.galaxy_object is not None:          
-            for gxformat in component.galaxy_object.formats:
-                types += self.cast_gxformat_to_datatypes(gxformat.file_ext)
+        if component.galaxy_object is not None:   
+            for gxformat in get_param_formats(component.galaxy_object):
+                types += self.cast_gxformat_to_datatypes(gxformat)
 
         if len(types) == 0:
             types.append(self.file_t)
@@ -288,7 +267,6 @@ class DatatypeExtractor:
         return [self.string_t]
 
     
-
     def cast_gxformat_to_datatypes(self, gxformat: str) -> list[dict[str, str]]:
         # get all the datatypes which map to the gxformat
         if gxformat in self.format_datatype_map:

@@ -78,6 +78,28 @@
             ]
         },
         {
+            "name": "fastq_dump",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "fastq_dump.xml", "tools/sra-tools", 
+                "--debug"
+            ]
+        },
+        {
+            "name": "fasplit",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "fasplit.xml", "tools/ucsc_tools/fasplit", 
+                "--debug"
+            ]
+        },
+        {
             "name": "bwa-mem",
             "type": "python",
             "request": "launch",

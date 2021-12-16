@@ -5,11 +5,11 @@ from datetime import date
 
 
 from sqlalchemy.orm import base
+from classes.command.CommandComponents import Output
 from classes.janis.DatatypeExtractor import DatatypeExtractor
 
 from classes.logging.Logger import Logger
-from classes.command.Command import Flag, Option, Positional, TokenType, Token
-from galaxy.tool_util.parser.output_objects import ToolOutput
+from classes.command.Command import Flag, Option, Positional, TokenType
 
 CommandComponent = Union[Positional, Flag, Option]
 
@@ -26,7 +26,7 @@ class JanisFormatter:
         self.inputs: list[str] = []
         self.outputs: list[str] = []
         self.metadata: list[str] = []
-        self.datatype_imports: set[str] = set()      
+        self.datatype_imports: set[str] = set()   
         self.default_imports: dict[str, set[str]] = {
             'janis_core': {
                 'CommandToolBuilder', 
@@ -116,7 +116,7 @@ class JanisFormatter:
             self.tool.command.remove_positional(p.pos)
 
         # format to string
-        base_command = [p.get_values(as_list=True)[0] for p in base_positionals]
+        base_command = [p.get_token_values(as_list=True)[0] for p in base_positionals]
         base_command = ['"' + cmd + '"' for cmd in base_command]
         base_command = ', '.join(base_command)
         base_command = '[' + base_command + ']'
@@ -196,11 +196,11 @@ class JanisFormatter:
 
     def extract_positional_details(self, posit: Positional) -> Tuple[str, str, str, str]:       
         if posit.galaxy_object is not None:
-            tag = posit.name
+            tag = posit.galaxy_object.name
         else:
-            tag = '_'.join(posit.get_values(as_list=True))
+            tag = '_'.join(posit.get_token_values(as_list=True))
         
-        default = posit.get_default()    
+        default = posit.get_default_value()    
         docstring = self.get_docstring(posit)
         datatypes = self.dtype_extractor.extract(posit)        
 
@@ -212,7 +212,10 @@ class JanisFormatter:
         to satisfy janis tag requirements
         to avoid janis reserved keywords
         """
+        tag = tag.strip('\\/')
         tag = tag.replace('-', '_')
+        tag = tag.replace('/', '_')
+        tag = tag.replace('\\', '_')
         if tag in self.extra_prohibited_keys or len(tag) == 1:
             tag += '_janis'
 
@@ -277,7 +280,7 @@ class JanisFormatter:
         if component.galaxy_object is not None:
             docstring = component.galaxy_object.label + ' ' + component.galaxy_object.help
         elif type(component) in [Positional, Option]:
-            values = component.get_values(as_list=True)
+            values = component.get_token_values(as_list=True)
             docstring = f'possible values: {", ".join(values[:5])}'
         else:
             docstring = ''
@@ -327,7 +330,7 @@ class JanisFormatter:
         tag = opt.prefix.lstrip('-')
         datatypes = self.dtype_extractor.extract(opt)  
         prefix = opt.prefix
-        default = opt.get_default()
+        default = opt.get_default_value()
         position = opt.pos          
         docstring = self.get_docstring(opt)
         return tag, datatypes, prefix, default, position, docstring
@@ -396,15 +399,17 @@ class JanisFormatter:
         return outputs
 
         
-    def format_gxoutput_to_string(self, output: ToolOutput) -> str:
+    def format_gxoutput_to_string(self, output: Output) -> str:
         """
         formats galaxy output into janis output string for tool definition 
         """
         tag = self.validate_tag(output.get_name())
         
-        # datatypes
+        # datatype
         datatypes = self.dtype_extractor.extract(output)
-        typestring = self.format_typestring(datatypes, output.is_array(), output.is_optional())
+        is_array = output.is_array()
+        is_optional = output.is_optional()
+        typestring = self.format_typestring(datatypes, is_array, is_optional)
         self.update_datatype_imports(datatypes)
         
         # selector
@@ -419,11 +424,12 @@ class JanisFormatter:
             selector_contents = self.validate_tag(selector_contents)  
         
         # docstring
-        docstring = output.label.rsplit('${tool.name} on ${on_string}:', 1)[-1].strip()
+        docstring = output.galaxy_object.label
+        docstring = docstring.replace('${tool.name} on ${on_string}', '').strip(': ')
         docstring = self.validate_docstring(docstring)
 
         # string formatting
-        out_str = '\tToolToolOutput(\n'
+        out_str = '\tToolOutput(\n'
         out_str += f'\t\t"{tag}",\n'
 
         if output.is_stdout:
@@ -438,15 +444,6 @@ class JanisFormatter:
         return out_str
 
 
-    # def extract_output_details(self, output: ToolOutput) -> Tuple[str, list[dict[str, str]], str, str, str]:
-    #     tag = output.name
-    #     selector = output.get_selector()
-    #     selector_contents = output.get_selector_contents(self.tool.command)
-    #     datatypes = self.dtype_extractor.extract(output)
-    #     docstring = output.label.rsplit('${tool.name} on ${on_string}:', 1)[-1].strip()
-    #     return tag, datatypes, selector, selector_contents, docstring
-
-
     def gen_imports(self) -> list[str]:
         out_str = ''
         out_str += 'import sys\n'
@@ -458,9 +455,12 @@ class JanisFormatter:
             modules = ', '.join(self.default_imports['janis_core'])
             out_str += f'\nfrom janis_core import {modules}\n'
 
+        # at least 1 boolean flag present
+        if len(self.tool.command.get_flags()) > 0:
+            import_str = 'from janis_core.types.common_data_types import Boolean'
+            out_str += f'{import_str}\n'
+
         # all the other datatypes we found
-        if len(self.tool.out_register.get_outputs()) > 0:
-            self.datatype_imports.add('from janis_core.types.common_data_types import Boolean')
         for import_str in list(self.datatype_imports):
             out_str += f'{import_str}\n'
 

@@ -34,7 +34,7 @@ class Param:
 
 
     # override method
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return ''
 
 
@@ -136,7 +136,7 @@ class TextParam(Param):
         self.parse_common_features()
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return self.value
 
 
@@ -149,7 +149,7 @@ class IntParam(Param):
         self.parse_common_features()
 
     
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return self.value
 
 
@@ -162,7 +162,7 @@ class FloatParam(Param):
         self.parse_common_features()
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return self.value
 
 
@@ -174,7 +174,7 @@ class DataParam(Param):
         self.parse_common_features()
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return ''
 
 
@@ -188,7 +188,7 @@ class BoolParam(Param):
         self.parse_common_features()
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         if self.truevalue != '':
             return self.truevalue
         return self.falsevalue
@@ -227,7 +227,7 @@ class SelectParam(Param):
         self.add_options_to_helptext()
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         if len(self.options) > 0:
             return self.options[0]
         return ''
@@ -345,7 +345,7 @@ class DataCollectionParam(Param):
         self.is_array: bool = True
 
 
-    def get_default(self) -> str:
+    def get_default_value(self) -> str:
         return ''
 
 

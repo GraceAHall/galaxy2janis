@@ -40,7 +40,7 @@ class CommandParser:
         for i, test in enumerate(self.tool.tests):
             cmd_txt = loader.load(test)
             if cmd_txt is not None:
-                print(cmd_txt)
+                print('\n', cmd_txt)
                 cmd_str = CommandString(cmd_txt, self.tool, self.logger)
                 #print('\nTEST\n', cmd_str)
                 self.command.update(cmd_str, source='test')

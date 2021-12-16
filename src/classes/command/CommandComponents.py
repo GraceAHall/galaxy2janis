@@ -8,13 +8,20 @@ if TYPE_CHECKING:
     
 from typing import Optional, Union, Any
 from collections import Counter
-import regex as re
 
-from classes.command.Tokens import Token, TokenType
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tools.parameters.basic import ToolParameter
+from classes.command.Tokens import Token, TokenType
 
 from utils.token_utils import tokenify
+from utils.galaxy_utils import (
+    get_param_default_value, 
+    get_output_files_path,
+    get_output_selector,
+    get_param_options, 
+    param_is_optional, 
+    param_is_array
+)
 
 
 class CommandComponent:
@@ -49,14 +56,14 @@ class CommandComponent:
         return values
     
     
-    def get_values(self, as_list: bool=False) -> Union[list[str], set[str]]:
+    def get_token_values(self, as_list: bool=False) -> Union[list[str], set[str]]:
         values = set([t.text for t in self.sources])
         if as_list:
             values = list(values)
         return values
 
 
-    def get_default(self) -> Optional[str]:
+    def get_default_value(self) -> Optional[str]:
         """
         gets the default value for this component.
         if a galaxy object is attached, gets defaut from this source
@@ -64,48 +71,20 @@ class CommandComponent:
         what the default should be.
         """
         if self.galaxy_object is not None:
-            return self.get_galaxy_default()
-        return self.get_primary_value()
+            return self.get_galaxy_default_value()
+        return self.get_most_common_token_text()
 
 
-    def get_galaxy_default(self) -> Optional[str]:
+    def get_galaxy_default_value(self) -> Optional[str]:
         """
         gets the default value for a galaxy param
         """
-        if self.galaxy_object is not None:
-            if self.galaxy_object.type == 'select':
-                return self.get_galaxy_primary_option()
-
-            elif self.galaxy_object.type not in ['data', 'data_collection']:
-                if self.galaxy_object.value is not None:
-                    return self.galaxy_object.value
-
+        if self.galaxy_object:
+            return get_param_default_value(self.galaxy_object)
         return None
 
-
-    def get_galaxy_primary_option(self) -> Optional[str]:
-        if self.galaxy_object is not None and self.galaxy_object.type == 'select':
-            for opt in self.galaxy_object.static_options:
-                if opt[2] == True:
-                    return opt[1]
-            
-            return self.galaxy_object.static_options[0][1]
-        
-        return None
     
-    
-    def get_galaxy_options(self, as_tokens: bool=False) -> Union[list[TokenType], list[str]]:
-        opts = []
-        if self.galaxy_object is not None and self.galaxy_object.type == 'select':
-            opts = self.galaxy_object.legal_values
-            
-        if as_tokens:
-            opts = [tokenify(opt) for opt in opts]
-        
-        return opts
-
-
-    def get_primary_value(self) -> Any:
+    def get_most_common_token_text(self) -> Any:
         """
         gets most commonly occuring text string among source tokens
         prioritises the first witnessed token if equal occurances
@@ -114,6 +93,17 @@ class CommandComponent:
         max_c = counter.most_common(1)[0][1]
         values = [t.text for t in self.sources if counter[t.text] == max_c]
         return values[0]
+
+    
+    def get_galaxy_options(self, as_tokens: bool=False) -> Optional[Union[list[TokenType], list[str]]]:
+        if self.galaxy_object and self.galaxy_object.type in ['select', 'boolean']:
+            
+            opts = get_param_options(self.galaxy_object)
+            if as_tokens:
+                opts = [tokenify(opt) for opt in opts]
+            return opts
+        
+        return None
 
 
     def is_optional(self) -> bool:
@@ -126,13 +116,8 @@ class CommandComponent:
             return False
 
         # has galaxy object
-        if self.galaxy_object is not None:
-            # optionality explicitly set as true in galaxy object
-            if self.galaxy_object.optional:
-                return True
-            # galaxy values include a blank string
-            if '' in self.get_galaxy_values():
-                return True
+        if self.galaxy_object:
+            return param_is_optional(self.galaxy_object)
         
         # component doesn't appear in each supplied command string
         if not all(self.presence_array):
@@ -146,26 +131,11 @@ class CommandComponent:
         return False
 
 
-    def get_galaxy_values(self) -> list[str]:
-        if self.galaxy_object is not None:
-            if self.galaxy_object.type in ['select', 'boolean']:
-                return self.galaxy_object.legal_values
-            elif self.galaxy_object.type not in ['data', 'data_collection']:
-                if self.galaxy_object.value is not None:
-                    return [self.galaxy_object.value]
-        
-        return []
-
-
     def is_array(self) -> bool:
-        # defined in galaxy object
-        g_obj = self.galaxy_object
-        if g_obj is not None:
-            if g_obj.type == 'data_collection':
-                return True
-            elif g_obj.type == 'data' and g_obj.multiple:
-                return True
-        
+        # has galaxy object
+        if self.galaxy_object:
+            return param_is_array(self.galaxy_object)
+          
         # NOTE: it may be possible to detect arrays from components without 
         # galaxy objects. Eg strings which can be interpreted as comma-delimited list
         return False
@@ -203,17 +173,16 @@ class Positional(CommandComponent):
 
     
     def has_unique_value(self) -> bool:
-        values = self.get_values()
+        values = self.get_token_values()
         if len(values) == 1:
             return True
         return False
  
 
     def __str__(self) -> str:
-        values = ';'.join(self.get_values())
+        values = ';'.join(self.get_token_values())
         has_gx_ref = True if self.galaxy_object is not None else False
         return f'{self.pos:<10}{values[:39]:40}{has_gx_ref:10}{self.is_after_options:>5}'
-
 
 
 
@@ -250,7 +219,6 @@ class Flag(CommandComponent):
 
 
 
-
 class Option(CommandComponent):
     def __init__(self, prefix: str, delim: str=' ', splittable: bool=True):
         super().__init__()
@@ -284,7 +252,7 @@ class Option(CommandComponent):
 
 
     def __str__(self) -> str:
-        values = ';'.join(self.get_values())
+        values = ';'.join(self.get_token_values())
         has_gx_ref = True if self.galaxy_object is not None else False
         return f'{self.pos:<10}{self.prefix[:19]:20}{values[:39]:40}{has_gx_ref:10}'
 
@@ -296,19 +264,14 @@ class Output:
         self.is_stdout: bool = False
         self.selector: str = self.get_selector()
 
-        """
-        SELECTOR
-        pass        
-
-        SELECTOR CONTENTS
-        data|collection.discover_datasets.pattern
-        data|collection.discover_datasets.directory
-        data|collection.discover_datasets.match_relative_path
-        
-        """
 
     def set_stdout(self) -> None:
         self.is_stdout = True
+
+
+    def is_optional(self) -> bool:
+        # NOTE - janis does not allow optional outputs
+        return False
 
 
     def is_array(self) -> bool:
@@ -316,14 +279,9 @@ class Output:
         if gxobj.output_type == 'collection':
             return True
 
-        elif gxobj.output_type == 'data' and len(gxobj.output_discover_patterns) != 0:
+        elif gxobj.output_type == 'data' and len(gxobj.output_discover_patterns) > 0:
             return True
         
-        return False
-
-
-    def is_optional(self) -> bool:
-        # NOTE - janis does not allow optional outputs
         return False
 
 
@@ -335,92 +293,24 @@ class Output:
         """gets the selector type for janis output detection"""
         if hasattr(self, 'selector'):
             return self.selector
-        elif self.is_wildcard_selector():
-            return 'WildcardSelector'
-        return 'InputSelector'
-        
 
-    def is_wildcard_selector(self) -> bool:
-        gobj = self.galaxy_object
+        if self.galaxy_object:
+            return get_output_selector(self.galaxy_object)
         
-        # data output
-        if gobj.output_type == 'data':
-            if gobj.from_work_dir is not None:
-                return True
-        
-            elif len(gobj.output_discover_patterns) != 0:
-                return True
-        
-        # collection output
-        elif gobj.output_type == 'collection':
-            return True
-            # NOTE - add support for the following later:
-            # defined output elems in collection
-            # structured_like=""
-
-        return False
-
-
+      
     def get_selector_contents(self, command: Command) -> str:
-        if self.selector == 'WildcardSelector':
-            self.get_files_path()
+        selector = self.get_selector()
+        if selector == 'WildcardSelector':
+            return get_output_files_path(self.galaxy_object)
         
-        elif self.selector == 'InputSelector':
-            component = command.get_component_with_gxout_reference(self.galaxy_object.name)
+        elif selector == 'InputSelector':
+            components = command.get_components_possessing_gxobj(self.galaxy_object, valid_types=[Output])
+            assert len(components) == 1
+            return components[0].get_name()
             
-
         # weird fallback
         return ''
-
-
-
-    def transform_pattern(self, pattern: str) -> str:
-        transformer = {
-            '__designation__': '*',
-            '.*?': '*',
-            '\\.': '.',
-        }
-
-        # # remove anything in brackets
-        # pattern_list = pattern.split('(?P<designation>')
-        # if len(pattern_list) == 2:
-        #     pattern_list[1] = pattern_list[1].split(')', 1)[-1]
-
-        # find anything in between brackets
-        bracket_strings = re.findall("\\((.*?)\\)", pattern)
-
-        # remove brackets & anything previously found (lazy)
-        pattern = pattern.replace('(', '').replace(')', '')
-        for the_string in bracket_strings:
-            if '<ext>' in the_string:
-                pattern = pattern.replace(the_string, '') # lazy and bad
-            pattern = pattern.replace(the_string, '*')
-
-        for key, val in transformer.items():
-            pattern = pattern.replace(key, val)
-
-        # remove regex start and end patterns
-        pattern = pattern.rstrip('$').lstrip('^')
-        return pattern
-
-
-    def update_output_selector_from_command(self) -> None:
-        command = self.tool.command
-
-        # is this a TODO? add logic incase of positional output? 
-        # would be pretty weird 
-        for positional in command.get_positionals():
-            pass
-        
-        for option in command.get_options():
-            for source in option.sources:
-                if source.type == TokenType.GX_OUT:
-                    if '$' + output.gx_var == source.gx_ref:
-                        output.selector = 'InputSelector'
-                        output.selector_contents = option.prefix.lstrip('-')
-
-    
-  
+ 
     
     def __str__(self) -> str:
         out_str = ''

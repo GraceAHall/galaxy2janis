@@ -149,7 +149,7 @@ class Output:
         return filepath
 
 
-    def get_default(self):
+    def get_default_value(self):
         return ''
 
 

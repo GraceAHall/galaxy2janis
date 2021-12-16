@@ -292,6 +292,22 @@ class Command:
         return None
 
 
+    def get_components_possessing_gxobj(self, 
+            gxobj: Union[ToolParameter, ToolOutput], 
+            valid_types: list[Union[CommandComponent, Output]] = None
+        ) -> Union[CommandComponent, Output]:
+        """
+        function signature looks a little whack but better than a long line
+        gets any component which has the provided gxobj attached.
+        can restrict to specific type using restrict_type
+        """
+        all_components = self.get_all_components()
+        valid_components = [c for c in all_components if c.galaxy_object == gxobj]
+        if valid_types:
+            valid_components = [c for c in valid_components if type(c) in valid_types]
+        return valid_components
+
+
     def refine_component_using_reference(self, incoming: CommandComponent, ref_comp: Optional[CommandComponent]) -> CommandComponent:
         """
         allows us to change guess of the command component using cached components
@@ -419,6 +435,15 @@ class Command:
             return True
                 
         return False
+
+    
+    def get_all_components(self) -> list[Union[CommandComponent, Output]]:
+        out = []
+        out += self.get_positionals()
+        out += self.get_flags()
+        out += self.get_options()
+        out += self.get_outputs()
+        return out
       
 
     def get_positionals(self) -> list[Positional]:
@@ -440,7 +465,7 @@ class Command:
         self.shift_input_positions(startpos=query_pos, amount=-1)
 
 
-    def get_flags(self) -> list[Positional]:
+    def get_flags(self) -> list[Flag]:
         """
         returns list of flags in alphabetical order
         """
@@ -449,13 +474,22 @@ class Command:
         return flags
 
 
-    def get_options(self) -> list[Positional]:
+    def get_options(self) -> list[Option]:
         """
         returns list of positionals in order
         """
         options = list(self.options.values())
         options.sort(key=lambda x: x.prefix.lstrip('-'))
         return options
+
+    
+    def get_outputs(self) -> list[Output]:
+        """
+        returns list of outputs in order
+        """
+        outputs = self.outputs
+        outputs.sort(key=lambda x: x.name)
+        return outputs
 
 
     def set_component_positions(self) -> None:
