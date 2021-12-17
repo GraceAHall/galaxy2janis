@@ -39,7 +39,7 @@ class CommandParser:
         loader = TestCommandLoader(self.app, self.gxtool, self.tool, self.logger)
         for i, test in enumerate(self.tool.tests):
             cmd_txt = loader.load(test)
-            if cmd_txt is not None:
+            if cmd_txt:
                 print('\n', cmd_txt)
                 cmd_str = CommandString(cmd_txt, self.tool, self.logger)
                 #print('\nTEST\n', cmd_str)
@@ -49,7 +49,7 @@ class CommandParser:
 
     def update_command_from_workflowstep(self, workflow: Optional[dict[str, Any]]=None, workflow_step: int=0) -> None:
         loader = WorkflowStepCommandLoader(self.app, self.gxtool, self.tool, self.logger)
-        if workflow_step is not None:
+        if workflow_step:
             cmd_txt = loader.load(workflow, workflow_step)
             cmd_str = CommandString(cmd_txt, self.tool, self.logger)
             #print('\nWORKFLOW STEP\n', cmd_str)

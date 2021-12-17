@@ -58,7 +58,8 @@ class Command:
         self.parse_flags_options_stdout(command_string)
         
         # update positionals
-        if self.cmd_source != 'xml':
+        no_tests_wsteps = self.cmd_source == 'xml' and self.ingested_cmdstr_count == 1
+        if self.cmd_source != 'xml' or no_tests_wsteps:
             self.positional_count = 0
             self.parse_positionals(command_string)
         
@@ -173,7 +174,7 @@ class Command:
         if ctoken.type == TokenType.LINUX_OP:
             if ntoken.type in [TokenType.RAW_STRING, TokenType.GX_OUT]:
                 return True
-        return False   
+        return False
 
 
     def update_stdout(self, token: Token) -> None:
@@ -293,7 +294,7 @@ class Command:
 
 
     def get_components_possessing_gxobj(self, 
-            gxobj: Union[ToolParameter, ToolOutput], 
+            query_name: str, 
             valid_types: list[Union[CommandComponent, Output]] = None
         ) -> Union[CommandComponent, Output]:
         """
@@ -302,7 +303,7 @@ class Command:
         can restrict to specific type using restrict_type
         """
         all_components = self.get_all_components()
-        valid_components = [c for c in all_components if c.galaxy_object == gxobj]
+        valid_components = [c for c in all_components if c.galaxy_object.name == query_name]
         if valid_types:
             valid_components = [c for c in valid_components if type(c) in valid_types]
         return valid_components
@@ -488,7 +489,7 @@ class Command:
         returns list of outputs in order
         """
         outputs = self.outputs
-        outputs.sort(key=lambda x: x.name)
+        outputs.sort(key=lambda x: x.galaxy_object.name)
         return outputs
 
 

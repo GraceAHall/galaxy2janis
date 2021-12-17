@@ -69,15 +69,16 @@ class CommandString:
                             self.keywords['ch_close_loop']
                          
         for line in self.command_lines:
-            # update conditional / loop depth levels 
-            self.update_cheetah_levels(line)
-
-            if any ([line.startswith(kw) for kw in cheetah_cond]):
-                continue
-            elif any ([line.startswith(kw) for kw in self.keywords['alias']]):
-                self.alias_register.update(line)
-            elif not any ([line.startswith(kw) for kw in self.keywords['cheetah_misc']]):
-                active_block = self.handle_new_line(line, active_block)
+            sublines = split_line_by_ands(line)
+            for sline in sublines:
+                # update conditional / loop depth levels 
+                self.update_cheetah_levels(sline)
+                if any ([sline.startswith(kw) for kw in cheetah_cond]):
+                    continue
+                elif any ([sline.startswith(kw) for kw in self.keywords['alias']]):
+                    self.alias_register.update(sline)
+                elif not any ([sline.startswith(kw) for kw in self.keywords['cheetah_misc']]):
+                    active_block = self.handle_new_line(sline, active_block)
 
         # add final active block to command_blocks
         self.command_blocks.append(active_block)

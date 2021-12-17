@@ -2,7 +2,7 @@
 
 
 from collections import Counter
-from typing import Optional, Union
+from typing import Optional, Union, Any
 import regex as re
 from classes.params.ParamRegister import ParamRegister 
 
@@ -60,6 +60,27 @@ def setup_evaluator(app: MockApp, gxtool: GalaxyTool, job: Job, test_directory: 
 
 
 
+
+### CLASS STUFF
+
+
+def is_tool_parameter(gxobj: Any) -> bool:
+    if type(gxobj) == ToolParameter:
+        return True
+    elif issubclass(type(gxobj), ToolParameter):
+        return True
+    return False
+
+
+def is_tool_output(gxobj: Any) -> bool:
+    if type(gxobj) == ToolOutput:
+        return True
+    elif issubclass(type(gxobj), ToolOutput):
+        return True
+    return False
+
+
+
 ### PARAM FUNCTIONS 
 
 def get_param_formats(param: ToolParameter) -> list[str]:
@@ -86,12 +107,22 @@ def get_param_options(param: ToolParameter) -> list[str]:
 
 
 def get_param_default_value(param: ToolParameter) -> Optional[str]:
-    if param.type == 'select':
+    if hasattr(param, 'value') and param.value is not None:
+        return param.value
+    
+    elif param.type in ['select', 'boolean']:
         return get_param_primary_option(param)
 
-    elif param.type not in ['data', 'data_collection']:
-        if param.value:
-            return param.value
+    elif param.type in ['data', 'data_collection']:
+        if len(param.formats) > 0:
+            ext = param.formats[0].file_ext
+            return param.name + '.' + ext
+
+    elif param.type in ['integer', 'float']:
+        if param.min:
+            return param.min
+        elif param.max:
+            return param.max
 
     return None
 
@@ -106,10 +137,15 @@ def get_param_primary_option(param: ToolParameter) -> Optional[str]:
     
     # boolean params
     elif param.type == 'boolean':
-        if param.truevalue and param.truevalue != '':
+        if hasattr(param, 'checked'):
+            if param.checked == 'false':
+                return param.falsevalue
             return param.truevalue
-        elif param.falsevalue and param.falsevalue != '':
-            return param.falsevalue
+        
+        else:
+            if param.truevalue and param.truevalue != '':
+                return param.falsevalue
+            return param.truevalue
 
     return None
 
@@ -242,6 +278,11 @@ def transform_discover_pattern(pattern: str) -> str:
     # remove regex start and end patterns
     pattern = pattern.rstrip('$').lstrip('^')
     return pattern
+
+
+def get_output_default_value(output: ToolOutput) -> str:
+    ext = output.format.split(',')[0]
+    return output.name + '.' + ext
 
 
 

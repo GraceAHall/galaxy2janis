@@ -15,11 +15,18 @@ from classes.command.Tokens import Token, TokenType
 
 from utils.token_utils import tokenify
 from utils.galaxy_utils import (
+    get_output_default_value,
     get_param_default_value, 
     get_output_files_path,
     get_output_selector,
     get_param_options, 
+    
+    is_tool_parameter,
+    is_tool_output,
+
+    output_is_optional, 
     param_is_optional, 
+    output_is_array,
     param_is_array
 )
 
@@ -70,18 +77,21 @@ class CommandComponent:
         else, uses the list of sources (witnessed occurances) to decide 
         what the default should be.
         """
-        if self.galaxy_object is not None:
+        if self.galaxy_object:
             return self.get_galaxy_default_value()
         return self.get_most_common_token_text()
 
 
-    def get_galaxy_default_value(self) -> Optional[str]:
+    def get_galaxy_default_value(self) -> str:
         """
         gets the default value for a galaxy param
         """
-        if self.galaxy_object:
-            return get_param_default_value(self.galaxy_object)
-        return None
+        gxobj = self.galaxy_object
+        if gxobj:
+            if is_tool_parameter(gxobj):
+                return get_param_default_value(gxobj)
+            elif is_tool_output(gxobj):
+                return get_output_default_value(gxobj)
 
     
     def get_most_common_token_text(self) -> Any:
@@ -115,10 +125,6 @@ class CommandComponent:
         if type(self) == Positional:
             return False
 
-        # has galaxy object
-        if self.galaxy_object:
-            return param_is_optional(self.galaxy_object)
-        
         # component doesn't appear in each supplied command string
         if not all(self.presence_array):
             return True
@@ -127,14 +133,26 @@ class CommandComponent:
         if all(self.presence_array):
             if all([t.in_conditional for t in self.sources]):
                 return True
-
+        
+        # has galaxy object
+        gxobj = self.galaxy_object
+        if gxobj:
+            if is_tool_parameter(gxobj):
+                return param_is_optional(gxobj)
+            elif is_tool_output(gxobj):
+                return output_is_optional(gxobj)              
+    
         return False
 
 
     def is_array(self) -> bool:
         # has galaxy object
-        if self.galaxy_object:
-            return param_is_array(self.galaxy_object)
+        gxobj = self.galaxy_object
+        if gxobj:
+            if is_tool_parameter(gxobj):
+                return param_is_array(gxobj)
+            elif is_tool_output(gxobj):
+                return output_is_array(gxobj)    
           
         # NOTE: it may be possible to detect arrays from components without 
         # galaxy objects. Eg strings which can be interpreted as comma-delimited list
@@ -304,13 +322,10 @@ class Output:
             return get_output_files_path(self.galaxy_object)
         
         elif selector == 'InputSelector':
-            components = command.get_components_possessing_gxobj(self.galaxy_object, valid_types=[Output])
+            components = command.get_components_possessing_gxobj(self.galaxy_object.name, valid_types=[Positional, Option])
             assert len(components) == 1
             return components[0].get_name()
-            
-        # weird fallback
-        return ''
- 
+             
     
     def __str__(self) -> str:
         out_str = ''

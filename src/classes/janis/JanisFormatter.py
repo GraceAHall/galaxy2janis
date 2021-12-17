@@ -10,6 +10,11 @@ from classes.janis.DatatypeExtractor import DatatypeExtractor
 
 from classes.logging.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType
+from janis_core.utils.metadata import ToolMetadata
+from galaxy.tool_util.parser.output_objects import ToolOutput
+from galaxy.tools.parameters.basic import ToolParameter
+
+from utils.galaxy_utils import is_tool_parameter, is_tool_output
 
 CommandComponent = Union[Positional, Flag, Option]
 
@@ -66,11 +71,13 @@ class JanisFormatter:
         - dateCreated
         - dateUpdated
         """
+        metadata = self.get_tool_metadata()
 
         base_command = self.infer_base_command()
         toolname = self.tool.id.replace('-', '_').lower()
         version = self.tool.version
         container = self.tool.container
+        
         citation = "NOT NOW ILL DO IT LATER"
         # citaiton = self.tool.get_main_citation()
         
@@ -85,14 +92,37 @@ class JanisFormatter:
 
         out_str += f'\tcontainer="{container["url"]}",\n'
         out_str += f'\tversion="{version}",\n'
+        #out_str += f'\tfriendly_name="{friendly_name}",\n'
+        #out_str += f'\targuments="{arguments}",\n'
+        #out_str += f'\tenv_vars="{env_vars}",\n'
+        #out_str += f'\ttool_module="{tool_module}",\n'
         out_str += f'\ttool_provider="{citation}",\n'
-        out_str += f'\tcontributors="janis",\n'
-        out_str += f'\tdateCreated="{date.today()}",\n'
-        out_str += f'\tdateUpdated="{date.today()}",\n'
-        out_str += f'\tdocumentation="""{self.tool.help}""",\n'
+        #out_str += f'\tmetadata="{metadata}",\n'
+        #out_str += f'\tcpus="{cpus}",\n'
+        #out_str += f'\tmemory="{memory}",\n'
+        #out_str += f'\ttime="{time}",\n'
+        #out_str += f'\tdisk="{disk}",\n'
+        #out_str += f'\tdirectories_to_create="{directories_to_create}",\n'
+        #out_str += f'\tfiles_to_create="{files_to_create}",\n'
+        out_str += f'\tdoc="""{self.tool.help}""",\n'
         out_str += ')\n'
 
         return out_str
+
+
+    def get_tool_metadata(self) -> ToolMetadata:
+        return ToolMetadata(
+            contributors=["janis"],
+            dateCreated=date.today(),
+            dateUpdated=date.today(),
+            institution="<who produces the tool>",
+            keywords=["list", "of", "keywords"],
+            documentationUrl="<url to original documentation>",
+            short_documentation="Short subtitle of tool",
+            documentation="""Extensive tool documentation here """.strip(),
+            doi=None,
+            citation=None,
+    )
 
 
     def infer_base_command(self) -> str:
@@ -144,67 +174,60 @@ class JanisFormatter:
 
         inputs.append('\n\t# positionals\n')
         for posit in command.get_positionals():
-            new_input = self.format_positional_to_string(posit)
+            new_input = self.gen_positional_toolinput(posit)
             inputs.append(new_input)
 
         inputs.append('\n\t# flags\n')
         for flag in command.get_flags():
-            new_input = self.format_flag_to_string(flag)
+            new_input = self.gen_flag_toolinput(flag)
             inputs.append(new_input)
 
         inputs.append('\n\t# options\n')
         for opt in command.get_options():
-            new_input = self.format_option_to_string(opt)
+            new_input = self.gen_option_toolinput(opt)
             inputs.append(new_input)
 
         return inputs
         
 
-    def format_positional_to_string(self, positional: Positional) -> str:
+    def gen_positional_toolinput(self, positional: Positional) -> str:
         """
-        positional example
-            - tag
-            - input_type 
-            - position
-            - presents_as (opt) (leave out for now, but may be useful for galaxy wrangling)
-            - default 
-            - doc
+        creates a janis ToolInput string from a Positional. 
         """
-        tag, datatypes, default, docstring = self.extract_positional_details(positional)
-        self.update_datatype_imports(datatypes)
-        tag = self.validate_tag(tag)
-        docstring = self.validate_docstring(docstring)
-        typestring = self.format_typestring(datatypes, positional.is_array(), positional.is_optional())
+        c_data = self.extract_janis_positional(positional)
 
-        out_str = '\tToolInput(\n'
-        out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{typestring},\n'
-        out_str += f'\t\tposition={positional.pos},\n'
+        if not self.is_valid_positional(c_data):
+            raise Exception('invalid positional')
 
-        # pure jank
-        if default is not None:
-            if len(datatypes) == 1 and datatypes[0]['classname'] in ['Float', 'Integer']:
-                out_str += f'\t\tdefault={default},\n'
-            else:
-                out_str += f'\t\tdefault="{default}",\n'
-        
-        out_str += f'\t\tdoc="{docstring}"\n'
-        out_str += '\t),\n'
-
-        return out_str
+        self.update_datatype_imports(c_data['datatypes'])
+        positional_str = self.format_positional_to_string(c_data)
+        return positional_str
 
 
-    def extract_positional_details(self, posit: Positional) -> Tuple[str, str, str, str]:       
+    def extract_janis_positional(self, posit: Positional) -> dict[str, str]:       
+        c_data = {}
+
         if posit.galaxy_object is not None:
             tag = posit.galaxy_object.name
         else:
             tag = '_'.join(posit.get_token_values(as_list=True))
         
-        default = posit.get_default_value()    
+        c_data['tag'] = self.validate_tag(tag)
+        c_data['pos'] = posit.pos
         docstring = self.get_docstring(posit)
-        datatypes = self.dtype_extractor.extract(posit)        
+        c_data['docstring'] = self.validate_docstring(docstring)
+        
+        c_data['default'] = posit.get_default_value()
+        # if not c_data['default'] or c_data['default'] == '':
+        #     ext = c_data['datatypes'][0].split(',')[0]
+        #     c_data['default'] = c_data['tag'] + '.' + ext
 
-        return tag, datatypes, default, docstring
+        c_data['datatypes'] = self.dtype_extractor.extract(posit)    
+        c_data['is_array'] = posit.is_array()
+        c_data['is_optional'] = posit.is_optional() 
+        c_data['typestring'] = self.format_typestring(c_data['datatypes'], c_data['is_array'], c_data['is_optional']) 
+
+        return c_data
 
 
     def validate_tag(self, tag: str) -> str:
@@ -220,6 +243,25 @@ class JanisFormatter:
             tag += '_janis'
 
         return tag
+
+
+    def get_docstring(self, component: CommandComponent) -> str:
+        gxobj = component.galaxy_object
+        if gxobj:
+            if is_tool_parameter(gxobj):
+                docstring = gxobj.label + ' ' + gxobj.help
+            elif is_tool_output(gxobj):
+                docstring = gxobj.label
+                docstring = docstring.replace('${tool.name} on ${on_string}', '').strip(': ')
+        
+        elif type(component) in [Positional, Option]:
+            values = component.get_token_values(as_list=True)
+            docstring = f'possible values: {", ".join(values[:5])}'
+        
+        else:
+            docstring = ''
+
+        return docstring
     
     
     def validate_docstring(self, docstring: str) -> str:
@@ -231,111 +273,7 @@ class JanisFormatter:
 
         return docstring
 
-
-    def get_gx_obj(self, query_ref: str):
-        varname, obj = self.tool.param_register.get(query_ref)
-        if obj is None:
-            varname, obj = self.tool.out_register.get(query_ref) 
-        return varname, obj
-
-
-    def format_flag_to_string(self, flag: Flag) -> str:
-        """
-        flag example
-            'cs_string',
-            Boolean(optional=True/False),
-            prefix="--cs_string",
-            doc=""
-        """
-        tag, typestring, prefix, position, docstring = self.extract_flag_details(flag)
-        tag = self.validate_tag(tag)
-        docstring = self.validate_docstring(docstring)
-
-        out_str = '\tToolInput(\n'
-        out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{typestring},\n'
-        out_str += f'\t\tprefix="{prefix}",\n'
-        out_str += f'\t\tposition={position},\n'
-        out_str += f'\t\tdoc="{docstring}"\n'
-        out_str += '\t),\n'
-
-        return out_str
-        
-
-    def extract_flag_details(self, flag: Flag) -> Tuple[str, str, str, str]:
-        tag = flag.prefix.lstrip('-')
-        typestring = 'Boolean'
-
-        if flag.is_optional():
-            typestring += "(optional=True)"
-
-        prefix = flag.prefix
-        position = flag.pos
-        docstring = self.get_docstring(flag) 
-        
-        return tag, typestring, prefix, position, docstring
-        
-
-    def get_docstring(self, component: CommandComponent) -> str:
-        if component.galaxy_object is not None:
-            docstring = component.galaxy_object.label + ' ' + component.galaxy_object.help
-        elif type(component) in [Positional, Option]:
-            values = component.get_token_values(as_list=True)
-            docstring = f'possible values: {", ".join(values[:5])}'
-        else:
-            docstring = ''
-
-        return docstring
-
-
-    def format_option_to_string(self, opt: Option) -> str:
-        """
-        option example
-            'max_len',
-            Int(optional=True/False),
-            prefix='--max_len1',
-            doc="[Optional] Max read length",
-        """
-        tag, datatypes, prefix, default, position, docstring = self.extract_option_details(opt)
-        self.update_datatype_imports(datatypes)
-        tag = self.validate_tag(tag)
-        docstring = self.validate_docstring(docstring)
-        typestring = self.format_typestring(datatypes, opt.is_array(), opt.is_optional())
-
-        out_str = '\tToolInput(\n'
-        out_str += f'\t\t"{tag}",\n'
-        out_str += f'\t\t{typestring},\n'
-
-        if opt.delim != ' ':
-            out_str += f'\t\tprefix="{prefix + opt.delim}",\n'
-            out_str += f'\t\tseparate_value_from_prefix=False,\n'
-        else:
-            out_str += f'\t\tprefix="{prefix}",\n'
-
-        out_str += f'\t\tposition={position},\n'
-        
-        if default is not None:
-            if len(datatypes) == 1 and datatypes[0]['classname'] in ['Float', 'Integer']:
-                out_str += f'\t\tdefault={default},\n'
-            else:
-                out_str += f'\t\tdefault="{default}",\n'
-        
-        out_str += f'\t\tdoc="{docstring}"\n'
-        out_str += '\t),\n'
-
-        return out_str
-
-
-    def extract_option_details(self, opt: Option) -> Tuple[str, list[dict], str, str, str]:
-        tag = opt.prefix.lstrip('-')
-        datatypes = self.dtype_extractor.extract(opt)  
-        prefix = opt.prefix
-        default = opt.get_default_value()
-        position = opt.pos          
-        docstring = self.get_docstring(opt)
-        return tag, datatypes, prefix, default, position, docstring
-            
-
+    
     def format_typestring(self, datatypes: list[dict], is_array, is_optional) -> str:
         """
         turns a component and datatype dict into a formatted string for janis definition.
@@ -374,6 +312,19 @@ class JanisFormatter:
 
         return out_str
 
+
+    def is_valid_positional(self, c_data: dict[str, str]) -> bool:
+        # needs default if not optional
+        if not c_data['is_optional']:
+            if not c_data['default'] or c_data['default'] == '':
+                return False
+
+        # at least 1 datatype needs to be supplied 
+        elif len(c_data['datatypes']) == 0:
+            return False
+
+        return True
+ 
     
     def update_datatype_imports(self, datatypes: list[dict[str, str]]) -> None:
         """
@@ -382,6 +333,165 @@ class JanisFormatter:
         for dtype in datatypes:
             import_str = f'from {dtype["import_path"]} import {dtype["classname"]}'
             self.datatype_imports.add(import_str)
+
+
+    def format_positional_to_string(self, c_data: dict[str, str]) -> str:
+        out_str = '\tToolInput(\n'
+        out_str += f'\t\t"{c_data["tag"]}",\n'
+        out_str += f'\t\t{c_data["typestring"]},\n'
+        out_str += f'\t\tposition={c_data["pos"]},\n'
+
+        # pure jank
+        if c_data['default']:
+            if len(c_data['datatypes']) == 1 and c_data['datatypes'][0]['classname'] in ['Float', 'Integer']:
+                out_str += f'\t\tdefault={c_data["default"]},\n'
+            else:
+                out_str += f'\t\tdefault="{c_data["default"]}",\n'
+        
+        out_str += f'\t\tdoc="{c_data["docstring"]}"\n'
+        out_str += '\t),\n'
+
+        return out_str
+
+
+    # def get_gx_obj(self, query_ref: str):
+    #     varname, obj = self.tool.param_register.get(query_ref)
+    #     if obj is None:
+    #         varname, obj = self.tool.out_register.get(query_ref) 
+    #     return varname, obj
+
+
+    def gen_flag_toolinput(self, flag: Flag) -> str:
+        """
+        creates a janis ToolInput string from a Flag. 
+        """
+        c_data = self.extract_janis_flag(flag)
+
+        if not self.is_valid_flag(c_data):
+            raise Exception('invalid flag')
+
+        flag_str = self.format_flag_to_string(c_data)
+        return flag_str
+
+    
+    def extract_janis_flag(self, flag: Flag) -> dict[str, str]:
+        c_data = {}
+
+        tag = flag.prefix.lstrip('-')
+        c_data['tag'] = self.validate_tag(tag)
+        c_data['prefix'] = flag.prefix
+        c_data['pos'] = flag.pos
+
+        default = flag.get_default_value()
+        if not default or default == '':
+            c_data['default'] = False
+        else:
+            c_data['default'] = True
+            
+        docstring = self.get_docstring(flag) 
+        c_data['docstring'] = self.validate_docstring(docstring)
+        c_data['is_optional'] = flag.is_optional()
+
+        typestring = 'Boolean'
+        if c_data['is_optional']:
+            typestring += "(optional=True)"
+        c_data['typestring'] = typestring
+
+        return c_data
+
+
+    def is_valid_flag(self, c_data: dict[str, str]) -> bool:
+        return True
+
+
+    def format_flag_to_string(self, c_data: dict[str, str]) -> str:
+        """
+        flag example
+            'cs_string',
+            Boolean(optional=True/False),
+            prefix="--cs_string",
+            doc=""
+        """
+        out_str = '\tToolInput(\n'
+        out_str += f'\t\t"{c_data["tag"]}",\n'
+        out_str += f'\t\t{c_data["typestring"]},\n'
+        out_str += f'\t\tprefix="{c_data["prefix"]}",\n'
+        out_str += f'\t\tposition={c_data["pos"]},\n'
+        out_str += f'\t\tdefault={c_data["default"]},\n'
+        out_str += f'\t\tdoc="{c_data["docstring"]}"\n'
+        out_str += '\t),\n'
+
+        return out_str
+        
+
+    def gen_option_toolinput(self, opt: Option) -> str:
+        """
+        creates a janis ToolInput string from an Option. 
+        """
+        c_data = self.extract_janis_option(opt)
+        if not self.is_valid_option(c_data):
+            raise Exception('invalid option')
+
+        self.update_datatype_imports(c_data['datatypes'])
+        option_str = self.format_option_to_string(c_data)
+        return option_str
+
+
+    def extract_janis_option(self, opt: Option) -> dict[str, str]:
+        c_data = {}
+
+        tag = opt.prefix.lstrip('-')
+        c_data['tag'] = self.validate_tag(tag)
+        c_data['prefix'] = opt.prefix
+        c_data['pos'] = opt.pos
+        c_data['default'] = opt.get_default_value()
+        c_data['delim'] = opt.delim
+        
+        c_data['datatypes'] = self.dtype_extractor.extract(opt)    
+        c_data['is_array'] = opt.is_array()
+        c_data['is_optional'] = opt.is_optional() 
+        c_data['typestring'] = self.format_typestring(c_data['datatypes'], c_data['is_array'], c_data['is_optional']) 
+        
+        docstring = self.get_docstring(opt)
+        c_data['docstring'] = self.validate_docstring(docstring)
+
+        return c_data
+
+
+    def is_valid_option(self, c_data: dict[str, str]) -> bool:
+        return True
+    
+
+    def format_option_to_string(self, c_data: dict[str, str]) -> str:
+        """
+        option example
+            'max_len',
+            Int(optional=True/False),
+            prefix='--max_len1',
+            doc="[Optional] Max read length",
+        """
+        out_str = '\tToolInput(\n'
+        out_str += f'\t\t"{c_data["tag"]}",\n'
+        out_str += f'\t\t{c_data["typestring"]},\n'
+
+        if c_data['delim'] != ' ':
+            out_str += f'\t\tprefix="{c_data["prefix"] + c_data["delim"]}",\n'
+            out_str += f'\t\tseparate_value_from_prefix=False,\n'
+        else:
+            out_str += f'\t\tprefix="{c_data["prefix"]}",\n'
+
+        out_str += f'\t\tposition={c_data["pos"]},\n'
+        
+        if c_data["default"]:
+            if all(dtype['classname'] in ['Float', 'Int'] for dtype in c_data["datatypes"]):
+                out_str += f'\t\tdefault={c_data["default"]},\n'
+            else:
+                out_str += f'\t\tdefault="{c_data["default"]}",\n'
+        
+        out_str += f'\t\tdoc="{c_data["docstring"]}"\n'
+        out_str += '\t),\n'
+
+        return out_str
 
 
     def gen_outputs(self) -> list[str]:
@@ -393,52 +503,76 @@ class JanisFormatter:
         # galaxy output objects
         command = self.tool.command
         for output in command.outputs:           
-            output_string = self.format_gxoutput_to_string(output) 
+            output_string = self.gen_janis_output(output) 
             outputs.append(output_string)
         
         return outputs
 
         
-    def format_gxoutput_to_string(self, output: Output) -> str:
+    def gen_janis_output(self, output: Output) -> str:
         """
-        formats galaxy output into janis output string for tool definition 
+        creates a janis ToolInput string from an Option. 
         """
-        tag = self.validate_tag(output.get_name())
+        c_data = self.extract_janis_output(output)
+        if not self.is_valid_output(c_data):
+            raise Exception('invalid option')
+
+        if c_data['selector']:
+            self.default_imports['janis_core'].add(c_data['selector'])
+        
+        self.update_datatype_imports(c_data['datatypes'])
+        output_str = self.format_output_to_string(c_data)
+        return output_str
+
+
+    def extract_janis_output(self, output: Output) -> dict[str, str]:
+        c_data = {}
+
+        c_data['tag'] = self.validate_tag(output.get_name())
+        c_data['is_stdout'] = output.is_stdout
         
         # datatype
-        datatypes = self.dtype_extractor.extract(output)
-        is_array = output.is_array()
-        is_optional = output.is_optional()
-        typestring = self.format_typestring(datatypes, is_array, is_optional)
-        self.update_datatype_imports(datatypes)
-        
-        # selector
-        selector = output.get_selector()
-        selector_contents = output.get_selector_contents(self.tool.command)
-        self.default_imports['janis_core'].add(selector)
+        c_data['datatypes'] = self.dtype_extractor.extract(output)
+        c_data['is_array'] = output.is_array()
+        c_data['is_optional'] = output.is_optional()
+        c_data['typestring'] = self.format_typestring(c_data['datatypes'], c_data['is_array'], c_data['is_optional'])
 
-        # if selector is InputSelector, its referencing an input
-        # that input tag will have been converted to a janis-friendly tag
-        # same must be done to the selector contents, hence the next 2 lines:
-        if selector == 'InputSelector':
-            selector_contents = self.validate_tag(selector_contents)  
+        c_data['selector'] = None
+        c_data['selector_contents'] = None
+
+        if not c_data['is_stdout']:
+            c_data['selector'] = output.get_selector()
+            c_data['selector_contents'] = output.get_selector_contents(self.tool.command)
+
+            # if selector is InputSelector, its referencing an input
+            # that input tag will have been converted to a janis-friendly tag
+            # same must be done to the selector contents, hence the next 2 lines:
+            if c_data['selector'] == 'InputSelector':
+                c_data['selector_contents'] = self.validate_tag(c_data['selector_contents'])  
         
         # docstring
-        docstring = output.galaxy_object.label
-        docstring = docstring.replace('${tool.name} on ${on_string}', '').strip(': ')
-        docstring = self.validate_docstring(docstring)
+        docstring = self.get_docstring(output)
+        c_data['docstring'] = self.validate_docstring(docstring)
 
+        return c_data
+
+
+    def is_valid_output(self, c_data: dict[str, str]) -> bool:
+        return True
+
+
+    def format_output_to_string(self, c_data: dict[str, str]) -> str:
         # string formatting
         out_str = '\tToolOutput(\n'
-        out_str += f'\t\t"{tag}",\n'
+        out_str += f'\t\t"{c_data["tag"]}",\n'
 
-        if output.is_stdout:
-            out_str += f'\t\tStdout({typestring}),\n'
+        if c_data['is_stdout']:
+            out_str += f'\t\tStdout({c_data["typestring"]}),\n'
         else:
-            out_str += f'\t\t{typestring},\n'
-            out_str += f'\t\tselector={selector}("{selector_contents}"),\n'
+            out_str += f'\t\t{c_data["typestring"]},\n'
+            out_str += f'\t\tselector={c_data["selector"]}("{c_data["selector_contents"]}"),\n'
         
-        out_str += f'\t\tdoc="{docstring}"\n'
+        out_str += f'\t\tdoc="{c_data["docstring"]}"\n'
         out_str += '\t),\n'
 
         return out_str
@@ -490,7 +624,7 @@ class JanisFormatter:
         with open(self.janis_out_path, 'w', encoding="utf-8") as fp:
             fp.write(self.imports + '\n\n')
 
-            fp.write('inputs = [\n')
+            fp.write('inputs = [')
             for inp in self.inputs:
                 fp.write(inp)
             fp.write(']\n\n')

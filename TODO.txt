@@ -6,10 +6,8 @@ TODO v0.1
 
 
 TODO:
-    - move some of the get_galaxy_datatypes logic to CommandComponents. 
-        - if the CommandComponent (incl Output) has a galaxy_object, should be able to return its galaxy datatype. 
-        - if not, DatatypeExtractor handles it. 
-        - DatatypeExtractor converts final sniffed types into janis
+    - get output collection working properly
+    - galaxy select & bool params are not being expanded incase of multiple flags etc
     - ensure outputs are being transferred to CommandComponents as galaxy_objects
 
     - write to janis
@@ -27,6 +25,10 @@ TODO:
         - missing datatype for positional '>' (bcftools)
         - augustus default for kvpairs (--singlestrand=true)
     
+
+Janis tool library
+    - parse more successful job invokations (--gene-thresholds in quast.xml)
+
 
 
 Desirable

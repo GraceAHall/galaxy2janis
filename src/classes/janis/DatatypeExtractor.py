@@ -16,7 +16,12 @@ from classes.command.CommandComponents import Positional, Flag, Option, Output
 from classes.command.Command import TokenType
 from classes.logging.Logger import Logger
 
-from utils.galaxy_utils import get_param_formats, get_output_formats
+from utils.galaxy_utils import (
+    get_param_formats, 
+    get_output_formats, 
+    is_tool_parameter, 
+    is_tool_output
+)
 
 CommandComponent = Union[Positional, Flag, Option]
 
@@ -142,10 +147,12 @@ class DatatypeExtractor:
         delegates what method to use for datatype inference.
         """
         # galaxy 
-        if component.galaxy_object is not None:
-            #types = self.extract_types_from_gx(component)
-            #return types
-            return self.extract_types_from_gx(component)
+        gxobj = component.galaxy_object
+        if gxobj:
+            if is_tool_parameter(gxobj):
+                return self.extract_types_from_galaxy_param(component)
+            elif is_tool_output(gxobj):
+                return self.extract_types_from_galaxy_output(gxobj)
         
         # int or float
         numbers_set = set([TokenType.RAW_NUM, TokenType.QUOTED_NUM])
@@ -165,20 +172,31 @@ class DatatypeExtractor:
         return [self.string_t]
 
 
-    def extract_types_from_gx(self, component: CommandComponent) -> list[dict]:
-        g_obj = component.galaxy_object
-        assert(type(component)) != Flag  # flags are always boolean
-
-        if g_obj.type == 'integer':
+    def extract_types_from_galaxy_param(self, component: CommandComponent) -> list[dict]:
+        gxobj = component.galaxy_object
+        if gxobj.type == 'integer':
             return [self.integer_t]
-        elif g_obj.type == 'float':
+        elif gxobj.type == 'float':
             return [self.float_t]
-        elif g_obj.type in ['text', 'color']:
+        elif gxobj.type in ['text', 'color']:
             return [self.string_t]
-        elif g_obj.type in ['data', 'data_collection']:
-            return self.extract_types_from_gx_format(component)
-        elif g_obj.type == 'select':
+        elif gxobj.type in ['data', 'data_collection']:
+            return self.extract_types_from_gx_format(gxobj)
+        elif gxobj.type == 'select':
             return self.extract_types_from_gx_select(component)
+
+    
+    def extract_types_from_galaxy_output(self, gxobj: ToolOutput) -> list[dict]:
+        types = []
+        
+        if gxobj:   
+            for gxformat in get_output_formats(gxobj, self.param_register):
+                types += self.cast_gxformat_to_datatypes(gxformat)
+
+        if len(types) == 0:
+            types.append(self.file_t)
+
+        return types
 
 
     def extract_types_from_numeric(self, component: CommandComponent) -> list[dict]:
@@ -234,11 +252,11 @@ class DatatypeExtractor:
 
     # now the datastructures are initialised, here are some methods
     # to access types given gxformat or extension
-    def extract_types_from_gx_format(self, component: CommandComponent) -> list[dict[str, str]]:
+    def extract_types_from_gx_format(self, gxobj: ToolParameter) -> list[dict[str, str]]:
         types = []
         
-        if component.galaxy_object is not None:   
-            for gxformat in get_param_formats(component.galaxy_object):
+        if gxobj is not None:   
+            for gxformat in get_param_formats(gxobj):
                 types += self.cast_gxformat_to_datatypes(gxformat)
 
         if len(types) == 0:

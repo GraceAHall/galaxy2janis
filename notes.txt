@@ -5,6 +5,24 @@
 search for 'def verify_tool(' to find use cases of galaxy tool loading
 
 
+output collection
+
+
+
+InputSelector outputs
+- positionals and options with gx_out as galaxy_object 
+- for each output, if selector == InputSelector, go through the Positionals and Options to find which input to link to
+
+
+
+WildcardSelector outputs
+- everything else
+- should have a method to collect files 
+- either from_work_dir or discover_datasets
+
+
+
+
 
 
 commands
