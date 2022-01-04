@@ -5,6 +5,20 @@ NOTE check janis-patterns github for tricky situations
 TODO v0.1
 
 
+2022
+TODO:
+ - create ExecutionSettings
+ - Write tests for the above
+ - command parsing 
+    - process command 3 tokens at a time as TokenThruples
+    - prev, curr, next 
+    - write tests
+ - tokenisation
+    - refactor? 
+    - write tests
+
+
+
 TODO:
     - get output collection working properly
     - galaxy select & bool params are not being expanded incase of multiple flags etc

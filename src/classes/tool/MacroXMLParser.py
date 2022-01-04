@@ -1,6 +1,5 @@
 
 
-# pyright: strict
 
 import xml.etree.ElementTree as et
 import os
@@ -17,7 +16,7 @@ class MacroXMLParser:
         self.tokens: dict[str, str] = {}
         self.macros: dict[str, et.Element] = {}
 
-
+ 
     def set_tree(self) -> None:
         filepath = ''
         if os.path.exists(f'{self.workdir}/{self.filename}'):

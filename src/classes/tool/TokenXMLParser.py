@@ -14,7 +14,7 @@ class TokenXMLParser:
         self.tokens = existing_tokens
         self.logger = logger 
 
-
+ 
     def parse(self):
         root = self.tree.getroot()
         self.gather_tokens(root)

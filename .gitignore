@@ -1,10 +1,11 @@
 tools
 *.pyc
 __pycache__
-parsed_tools
-parsed_tools/*
-parsed_tools/*/*.py
-parsed_tools/*/*.log
+parsed
+parsed/*
+parsed/*/*.py
+parsed/*/*.log
 galaxy_types
 venv
 src/galaxy
+test/test-data

@@ -1,20 +1,20 @@
 
 
 
-from enum import Enum
+from enum import Enum, auto
 
 
 class TokenType(Enum):
-    GX_PARAM        = 0
-    GX_OUT          = 1
-    QUOTED_STRING   = 2
-    RAW_STRING      = 3
-    QUOTED_NUM      = 4
-    RAW_NUM         = 5
-    LINUX_OP        = 6
-    GX_KEYWORD      = 7
-    KV_PAIR         = 8
-    END_COMMAND     = 9
+    GX_PARAM        = auto()
+    GX_OUT          = auto()
+    QUOTED_STRING   = auto()
+    RAW_STRING      = auto()
+    QUOTED_NUM      = auto()
+    RAW_NUM         = auto()
+    LINUX_OP        = auto()
+    GX_KEYWORD      = auto()
+    KV_PAIR         = auto()
+    END_COMMAND     = auto()
 
 
 

@@ -1,5 +1,6 @@
 
 
+import dataclasses
 from typing import Union, Optional
 
 
@@ -7,6 +8,8 @@ from classes.command.Command import Command
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
 from classes.metadata.Metadata import Metadata
+from dataclasses import dataclass
+
 
 
 class Tool:

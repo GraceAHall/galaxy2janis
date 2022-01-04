@@ -13,9 +13,7 @@ from galaxy import (
     quota,
 )
 from galaxy.tools.parameters.basic import (
-    DataToolParameter,
     IntegerToolParameter,
-    SelectToolParameter
 )
 from galaxy.auth import AuthManager
 from galaxy.datatypes import registry
@@ -36,77 +34,6 @@ from galaxy.util import XML
 from galaxy.tools.parameters import params_from_strings # for MockTool
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tool_util.biotools import BiotoolsMetadataSource
-
-
-class MockTool:
-    def __init__(self, app):
-        self.profile = 16.01
-        self.python_template_version = '2.7'
-        self.app = app
-        self.hooks_called = []
-        self.environment_variables = []
-        self._config_files = []
-        self._command_line = "bwa --thresh=$thresh --in1=$input1 --in2=$input2 --out=$output1"
-        self._params = {"thresh": self.test_thresh_param()}
-        self.options = Bunch(sanitize=False)
-        self.check_values = True
-
-    def test_thresh_param(self):
-        elem = XML('<param name="thresh" type="integer" value="5" />')
-        return IntegerToolParameter(self, elem)
-
-    def params_from_strings(self, params, app, ignore_errors=False):
-        return params_from_strings(self.inputs, params, app, ignore_errors)
-
-    @property
-    def config_file(self):
-        return "<fake tool>"
-
-    @property
-    def template_macro_params(self):
-        return {}
-
-    @property
-    def inputs(self):
-        return self._params
-
-    def set_params(self, params):
-        self._params = params
-
-    @property
-    def outputs(self):
-        return dict(
-            output1=ToolOutput("output1"),
-        )
-
-    @property
-    def tmp_directory_vars(self):
-        return ["TMP"]
-
-    @property
-    def config_files(self):
-        return self._config_files
-
-    @property
-    def command(self):
-        return self._command_line
-
-    @property
-    def interpreter(self):
-        return None
-
-    def handle_unvalidated_param_values(self, input_values, app):
-        pass
-
-    def build_param_dict(self, incoming, *args, **kwds):
-        return incoming
-
-    def call_hook(self, hook_name, *args, **kwargs):
-        self.hooks_called.append(hook_name)
-
-    def exec_before_job(self, *args, **kwargs):
-        pass
-
 
 
 class MockApp(di.Container):
@@ -342,3 +269,74 @@ class ComputeEnvironment(SimpleComputeEnvironment):
 
     def galaxy_url(self):
         return 'http://localhost:9090/'
+
+
+# not used?
+class MockTool:
+    def __init__(self, app: MockApp):
+        self.profile = 16.01
+        self.python_template_version = '2.7'
+        self.app = app
+        self.hooks_called = []
+        self.environment_variables = []
+        self._config_files = []
+        self._command_line = "bwa --thresh=$thresh --in1=$input1 --in2=$input2 --out=$output1"
+        self._params = {"thresh": self.test_thresh_param()}
+        self.options = Bunch(sanitize=False)
+        self.check_values = True
+
+    def test_thresh_param(self):
+        elem = XML('<param name="thresh" type="integer" value="5" />')
+        return IntegerToolParameter(self, elem)
+
+    def params_from_strings(self, params, app, ignore_errors=False):
+        return params_from_strings(self.inputs, params, app, ignore_errors)
+
+    @property
+    def config_file(self):
+        return "<fake tool>"
+
+    @property
+    def template_macro_params(self):
+        return {}
+
+    @property
+    def inputs(self):
+        return self._params
+
+    def set_params(self, params):
+        self._params = params
+
+    @property
+    def outputs(self):
+        return dict(
+            output1=ToolOutput("output1"),
+        )
+
+    @property
+    def tmp_directory_vars(self):
+        return ["TMP"]
+
+    @property
+    def config_files(self):
+        return self._config_files
+
+    @property
+    def command(self):
+        return self._command_line
+
+    @property
+    def interpreter(self):
+        return None
+
+    def handle_unvalidated_param_values(self, input_values, app):
+        pass
+
+    def build_param_dict(self, incoming, *args, **kwds):
+        return incoming
+
+    def call_hook(self, hook_name, *args, **kwargs):
+        self.hooks_called.append(hook_name)
+
+    def exec_before_job(self, *args, **kwargs):
+        pass

@@ -1,18 +1,19 @@
 
 
-from typing import Tuple, Union
+
+
+
+from typing import Union
 from datetime import date
 
 
-from sqlalchemy.orm import base
+from classes.tool.Tool import Tool
 from classes.command.CommandComponents import Output
 from classes.janis.DatatypeExtractor import DatatypeExtractor
 
 from classes.logging.Logger import Logger
 from classes.command.Command import Flag, Option, Positional, TokenType
 from janis_core.utils.metadata import ToolMetadata
-from galaxy.tool_util.parser.output_objects import ToolOutput
-from galaxy.tools.parameters.basic import ToolParameter
 
 from utils.galaxy_utils import is_tool_parameter, is_tool_output
 
@@ -20,7 +21,7 @@ CommandComponent = Union[Positional, Flag, Option]
 
 
 class JanisFormatter:
-    def __init__(self, tool, janis_out_path: str, logger: Logger) -> None:
+    def __init__(self, tool: Tool, janis_out_path: str, logger: Logger) -> None:
         self.tool = tool
         self.janis_out_path = janis_out_path
         self.logger = logger
@@ -64,14 +65,14 @@ class JanisFormatter:
         self.main_call = self.gen_main_call()
         
 
-    def gen_commandtool(self) -> list[str]:
+    def gen_commandtool(self) -> str:
         """
         each str elem in out list is tool output
         - contributors
         - dateCreated
         - dateUpdated
         """
-        metadata = self.get_tool_metadata()
+        #metadata = self.get_tool_metadata()
 
         base_command = self.infer_base_command()
         toolname = self.tool.id.replace('-', '_').lower()
