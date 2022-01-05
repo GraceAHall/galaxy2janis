@@ -12,6 +12,23 @@ from galaxy.tools.parameters.basic import (
 )
 
 
+
+from .ParamRegister import ParamRegister
+
+
+class InputRegister(ParamRegister):
+    pass
+
+
+
+
+
+class JobDictifier:
+    pass
+
+
+
+
 class ParamRegister:
     def __init__(self, inputs: dict) -> None:
         self.params: dict[str, ToolParameter] = {}

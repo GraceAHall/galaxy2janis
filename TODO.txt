@@ -7,8 +7,6 @@ TODO v0.1
 
 2022
 TODO:
- - create ExecutionSettings
- - Write tests for the above
  - command parsing 
     - process command 3 tokens at a time as TokenThruples
     - prev, curr, next 
