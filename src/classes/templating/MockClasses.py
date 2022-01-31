@@ -36,6 +36,9 @@ from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tool_util.biotools import BiotoolsMetadataSource
 
 
+
+# terrible stuff from galaxy. not planning on a refactor.
+
 class MockApp(di.Container):
     def __init__(self, config=None, **kwargs):
         super().__init__()

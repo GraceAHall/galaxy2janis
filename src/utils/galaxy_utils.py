@@ -1,10 +1,9 @@
 
 
 
-from collections import Counter
 from typing import Optional, Union, Any
 import regex as re
-from classes.params.ParamRegister import ParamRegister 
+from classes.param_register.ParamRegister import ParamRegister 
 
 from classes.templating.MockClasses import MockApp, ComputeEnvironment
 from galaxy.tool_util.parser.output_collection_def import FilePatternDatasetCollectionDescription

@@ -3,10 +3,10 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from classes.param.ToolParam import ToolParam
+from classes.tool.Param import Param
 
 
-def generic_get_docstring(param: ToolParam) -> str:
+def generic_get_docstring(param: Param) -> str:
     if param.helptext and param.label:
         return param.label + ' ' + param.helptext
     elif param.helptext:
@@ -15,12 +15,11 @@ def generic_get_docstring(param: ToolParam) -> str:
         return param.label
     return ''
 
-def generic_get_varname(param: ToolParam) -> str:
+def generic_get_varname(param: Param) -> str:
     return f'{".".join(param.heirarchy)}.{param.name}'
 
 
-
-class GenericToolParam(ToolParam):
+class GenericInputParam(Param):
     def get_var_name(self) -> str:
         return generic_get_varname(self)
       
@@ -37,9 +36,7 @@ class GenericToolParam(ToolParam):
         return False
 
 
-
-
-class TextToolParam(GenericToolParam):
+class TextParam(GenericInputParam):
     value: Optional[str] = None
 
     def get_default(self) -> Optional[str]:
@@ -48,7 +45,7 @@ class TextToolParam(GenericToolParam):
         return None
     
 
-class IntegerToolParam(GenericToolParam):
+class IntegerParam(GenericInputParam):
     value: Optional[str] = None
     min: Optional[str] = None
     max: Optional[str] = None
@@ -63,8 +60,8 @@ class IntegerToolParam(GenericToolParam):
         return None
 
 
-# YES I KNOW THIS IS ESSENTIALLY DUPLICATED FROM INTEGERTOOLPARAM SUE ME
-class FloatToolParam(ToolParam):
+# YES I KNOW THIS IS ESSENTIALLY DUPLICATED FROM INTEGERParam SUE ME
+class FloatParam(GenericInputParam):
     value: Optional[str] = None
     min: Optional[str] = None
     max: Optional[str] = None
@@ -79,7 +76,7 @@ class FloatToolParam(ToolParam):
         return None
 
 
-class BoolToolParam(ToolParam):
+class BoolParam(GenericInputParam):
     def __init__(self, name: str, heirarchy: list[str]):
         super().__init__(name, heirarchy)
         self.checked: bool = False
@@ -108,7 +105,7 @@ class SelectOption:
     selected: bool
     ui_text: str
 
-class SelectToolParam(ToolParam):
+class SelectParam(GenericInputParam):
     def __init__(self, name: str, heirarchy: list[str], options: list[SelectOption], multiple: bool):
         super().__init__(name, heirarchy)
         self.options = options
@@ -137,7 +134,7 @@ class SelectToolParam(ToolParam):
         return False
 
 
-class DataToolParam(ToolParam):
+class DataParam(GenericInputParam):
     def __init__(self, name: str, heirarchy: list[str], format: str, multiple: bool):
         super().__init__(name, heirarchy)
         self.format = format
@@ -147,7 +144,7 @@ class DataToolParam(ToolParam):
         return self.multiple
 
 
-class DataCollectionToolParam(ToolParam):
+class DataCollectionParam(GenericInputParam):
     def __init__(self, name: str, heirarchy: list[str], format: str):
         super().__init__(name, heirarchy)
         self.format = format

@@ -2,13 +2,13 @@
 
 import unittest
 
-from classes.tool.OutputRegister import OutputRegister
+from classes.param_register.OutputRegister import OutputRegister
 from classes.param.InputParam import (
-    BoolToolParam,
-    IntegerToolParam, 
-    TextToolParam, 
-    FloatToolParam,
-    DataToolParam
+    BoolParam,
+    IntegerParam, 
+    TextParam, 
+    FloatParam,
+    DataParam
 )
 
 
@@ -19,22 +19,22 @@ class TestRegister(unittest.TestCase):
     """
     def setUp(self) -> None:
         self.register = OutputRegister()
-        self.register.add(TextToolParam('param1'))
-        self.register.add(IntegerToolParam('param2'))
-        self.register.add(FloatToolParam('param3.has.extra.path'))
-        self.register.add(BoolToolParam('param4'))
-        self.register.add(DataToolParam('param5', 'fasta'))
+        self.register.add(TextParam('param1'))
+        self.register.add(IntegerParam('param2'))
+        self.register.add(FloatParam('param3.has.extra.path'))
+        self.register.add(BoolParam('param4'))
+        self.register.add(DataParam('param5', 'fasta'))
 
     def test_list(self) -> None:
         self.assertEquals(len(self.register.list()), 6)
 
     def test_add_param(self) -> None:
-        self.register.add(TextToolParam('param6'))
+        self.register.add(TextParam('param6'))
         param_list = self.register.list()
         self.assertEquals(len(param_list), 6)
     
     def test_add_existing_param(self) -> None:
-        self.register.add(TextToolParam('param1'))
+        self.register.add(TextParam('param1'))
         param_list = self.register.list()
         self.assertEquals(len(param_list), 5)
 

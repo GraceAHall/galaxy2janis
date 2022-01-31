@@ -6,7 +6,7 @@ from xml.etree import ElementTree as et
 
 from classes.logging.Logger import Logger
 from classes.outputs.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
-from classes.params.ParamRegister import ParamRegister
+from classes.param_register.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 
 

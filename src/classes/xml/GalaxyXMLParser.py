@@ -2,24 +2,23 @@
 
 import os
 import tempfile
-from classes.execution.settings import ExecutionSettings
+
+from classes.templating.MockClasses import MockApp, MockObjectStore
 
 from galaxy.tools import Tool as GalaxyTool
 from galaxy.tool_util.parser import get_tool_source
 from galaxy.tools import create_tool_from_source
-from classes.templating.MockClasses import MockApp, MockObjectStore
 from galaxy.model import History
 
 
-class GalaxyLoader:
-    def __init__(self, esettings: ExecutionSettings) -> None:
-        self.esettings = esettings
+class GalaxyXMLParser:
+    def __init__(self) -> None:
         self.test_directory = tempfile.mkdtemp()  
         self.history = History()
         
-    def load(self) -> GalaxyTool:
+    def parse(self, xml_path: str) -> GalaxyTool:
         self.init_app()
-        self.init_tool()
+        self.init_tool(xml_path)
         return self.tool
 
     def init_app(self) -> None:
@@ -38,12 +37,14 @@ class GalaxyLoader:
         self.app.config.len_file_path = "moocow"
 
     def update_app_database(self) -> None:
-        app.model.context.add(self.history)
-        app.model.context.flush()
+        self.app.model.context.add(self.history)
+        self.app.model.context.flush()
 
-    def init_tool(self) -> GalaxyTool:
-        tool_path = self.esettings.get_xml_path()
-        tool_source = get_tool_source(tool_path)
-        tool = create_tool_from_source(self.app, tool_source, config_file=tool_path)
+    def init_tool(self, xml_path: str) -> GalaxyTool:
+        tool_source = get_tool_source(xml_path)
+        tool = create_tool_from_source(self.app, tool_source, config_file=xml_path)
         tool.assert_finalized()
         self.tool = tool
+
+
+

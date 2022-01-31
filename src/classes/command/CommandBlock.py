@@ -5,8 +5,8 @@
 
 from classes.command.Alias import AliasRegister
 from classes.command.Tokens import Token, TokenType
-from classes.params.ParamRegister import ParamRegister
-from classes.outputs.OutputRegister import OutputRegister
+from classes.param_register.ParamRegister import ParamRegister
+from classes.param_register.OutputRegister import OutputRegister
 from classes.logging.Logger import Logger
 from utils import general_utils
 

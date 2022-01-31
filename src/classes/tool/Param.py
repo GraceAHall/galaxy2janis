@@ -3,22 +3,10 @@
 
 
 from abc import ABC, abstractmethod
-#from dataclasses import dataclass
-#from enum import Enum, auto
 from typing import Optional
 
 
-# class ParamType(Enum):
-#     TEXT = auto()
-#     INTEGER = auto()
-#     FLOAT = auto()
-#     BOOLEAN = auto()
-#     DATA = auto()
-#     FLOAT = auto()
-
-
-
-class ToolParam(ABC):
+class Param(ABC):
     def __init__(self, name: str, heirarchy: list[str]):
         self.name: str = name
         self.heirarchy: list[str] = []

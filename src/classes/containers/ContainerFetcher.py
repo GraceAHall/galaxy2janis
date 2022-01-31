@@ -9,15 +9,8 @@ from classes.tool.Tool import Tool
 
 from classes.logging.Logger import Logger
 from utils.general_utils import global_align
+from Container import Container
 
-
-class Container: 
-    def __init__(self):
-        self.tool: str = ''
-        self.version: str = ''
-        self.url: str = ''
-        self.image_type: str = ''
-        self.registry_host: str = ''
 
 
 class ContainerFetcher:

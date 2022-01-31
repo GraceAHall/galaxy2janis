@@ -4,19 +4,19 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from dataclasses import dataclass
 
-from classes.param.ToolParam import ToolParam
+from classes.tool.Param import Param 
 
 # TODO i dont have a very good solution for the get() method.
 # chose ABC but could use protocol instead
 
 class SearchStrategy(ABC):    
     @abstractmethod
-    def search(self, query: str, params: dict[str, ToolParam]) -> Optional[ToolParam]:
+    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
         """searches for a param using some concrete strategy"""
         ...
 
 class DefaultSearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, ToolParam]) -> Optional[ToolParam]:
+    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
         """searches for a param using param name"""
         try:
             return params[query]
@@ -26,10 +26,10 @@ class DefaultSearchStrategy(SearchStrategy):
 @dataclass
 class LCAParam:
     split_name: list[str]
-    param: ToolParam
+    param: Param
 
 class LCASearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, ToolParam]) -> Optional[ToolParam]:
+    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
         """searches for a param using LCA"""
         split_query = query.split('.')
         remaining_params = self.init_datastructure(params)
@@ -40,7 +40,7 @@ class LCASearchStrategy(SearchStrategy):
         if len(remaining_params) > 0:
             return remaining_params[0].param
 
-    def init_datastructure(self, params: dict[str, ToolParam]):
+    def init_datastructure(self, params: dict[str, Param]):
         out: list[LCAParam] = []
         for param in params.values():
             out.append(LCAParam(param.name.split('.'), param))
@@ -48,7 +48,7 @@ class LCASearchStrategy(SearchStrategy):
         
 
 class FilepathSearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, ToolParam]) -> Optional[ToolParam]:
+    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
         """
         searches for a param by matching the specified 
         from_work_dir path to a given filepath
@@ -60,18 +60,18 @@ class FilepathSearchStrategy(SearchStrategy):
 
 
 class ParamRegister(ABC):
-    params: dict[str, ToolParam] = dict()
+    params: dict[str, Param] = dict()
 
     @abstractmethod
-    def list(self) -> list[ToolParam]:
+    def list(self) -> list[Param]:
         ...
     
     @abstractmethod
-    def add(self, param: ToolParam) -> None:
+    def add(self, param: Param) -> None:
         ...
     
     @abstractmethod
-    def get(self, strategy: str, query: str) -> Optional[ToolParam]:
+    def get(self, strategy: str, query: str) -> Optional[Param]:
         ...
     
 

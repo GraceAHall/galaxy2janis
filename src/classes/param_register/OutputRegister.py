@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from classes.param.ToolParam import ToolParam
+from classes.tool.Param import Param 
 from .ParamRegister import (
     ParamRegister,
     DefaultSearchStrategy,
@@ -17,15 +17,15 @@ from .ParamRegister import (
 
 class OutputRegister(ParamRegister):
 
-    def list(self) -> list[ToolParam]:
+    def list(self) -> list[Param]:
         return list(self.params.values())
     
-    def add(self, param: ToolParam) -> None:
+    def add(self, param: Param) -> None:
         """adds a param to register. enforces unique param var names"""
         if param.name not in self.params:
             self.params[param.name] = param            
 
-    def get(self, strategy: str, query: str) -> Optional[ToolParam]:
+    def get(self, strategy: str, query: str) -> Optional[Param]:
         """performs search using the specified search strategy"""
         strategy_map = {
             'default': DefaultSearchStrategy(),
