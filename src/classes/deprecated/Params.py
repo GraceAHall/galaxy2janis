@@ -116,7 +116,7 @@ class Param:
     def __str__(self):
         temp_prefix = self.argument or ''
         datatype = self.galaxy_type
-        if type(self).__name__ == "BoolParam":
+        if isinstance(self, BoolParam):
             datatype = 'boolean'
         return f'{self.gx_var[-49:]:50}{datatype[-14:]:15}'
 

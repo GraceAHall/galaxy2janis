@@ -13,3 +13,4 @@ def global_align(pattern: str, template: str) -> int:
     else:
         score = 0
     return score # type: ignore
+

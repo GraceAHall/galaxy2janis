@@ -1,7 +1,5 @@
 
 
-
-
 from dataclasses import dataclass
 from typing import Optional
 
@@ -17,28 +15,40 @@ def generic_get_docstring(param: ToolParam) -> str:
         return param.label
     return ''
 
+def generic_get_varname(param: ToolParam) -> str:
+    return f'{".".join(param.heirarchy)}.{param.name}'
 
-class TextToolParam(ToolParam):
+
+
+class GenericToolParam(ToolParam):
+    def get_var_name(self) -> str:
+        return generic_get_varname(self)
+      
+    def get_default(self) -> Optional[str]:
+        return None
+
+    def get_docstring(self) -> str:
+        return generic_get_docstring(self)
+    
+    def is_optional(self) -> bool:
+        return self.optional
+    
+    def is_array(self) -> bool:
+        return False
+
+
+
+
+class TextToolParam(GenericToolParam):
     value: Optional[str] = None
 
     def get_default(self) -> Optional[str]:
         if self.value:
             return self.value
         return None
-
-    def get_docstring(self) -> str:
-        return generic_get_docstring(self)
-        
-    def is_optional(self) -> bool:
-        if self.optional:
-            return True
-        return False
     
-    def is_array(self) -> bool:
-        return False
 
-
-class IntegerToolParam(ToolParam):
+class IntegerToolParam(GenericToolParam):
     value: Optional[str] = None
     min: Optional[str] = None
     max: Optional[str] = None
@@ -52,16 +62,6 @@ class IntegerToolParam(ToolParam):
             return self.max
         return None
 
-    def get_docstring(self) -> str:
-        return generic_get_docstring(self)
-    
-    def is_optional(self) -> bool:
-        if self.optional:
-            return True
-        return False
-    
-    def is_array(self) -> bool:
-        return False
 
 # YES I KNOW THIS IS ESSENTIALLY DUPLICATED FROM INTEGERTOOLPARAM SUE ME
 class FloatToolParam(ToolParam):
@@ -78,22 +78,11 @@ class FloatToolParam(ToolParam):
             return self.max
         return None
 
-    def get_docstring(self) -> str:
-        return generic_get_docstring(self)
-    
-    def is_optional(self) -> bool:
-        if self.optional:
-            return True
-        return False
-    
-    def is_array(self) -> bool:
-        return False
-
 
 class BoolToolParam(ToolParam):
-    def __init__(self, name: str):
-        super().__init__(name)
-        self.checked: bool = True
+    def __init__(self, name: str, heirarchy: list[str]):
+        super().__init__(name, heirarchy)
+        self.checked: bool = False
         self.truevalue: str = ''
         self.falsevalue: str = ''
 
@@ -111,9 +100,6 @@ class BoolToolParam(ToolParam):
     
     def is_optional(self) -> bool:
         return True
-    
-    def is_array(self) -> bool:
-        return False
 
 
 @dataclass
@@ -123,8 +109,8 @@ class SelectOption:
     ui_text: str
 
 class SelectToolParam(ToolParam):
-    def __init__(self, name: str, options: list[SelectOption], multiple: bool):
-        super().__init__(name)
+    def __init__(self, name: str, heirarchy: list[str], options: list[SelectOption], multiple: bool):
+        super().__init__(name, heirarchy)
         self.options = options
         self.multiple = multiple
 
@@ -152,37 +138,19 @@ class SelectToolParam(ToolParam):
 
 
 class DataToolParam(ToolParam):
-    def __init__(self, name: str, format: str, multiple: bool):
-        super().__init__(name)
+    def __init__(self, name: str, heirarchy: list[str], format: str, multiple: bool):
+        super().__init__(name, heirarchy)
         self.format = format
         self.multiple = multiple
-      
-    def get_default(self) -> Optional[str]:
-        return None
-
-    def get_docstring(self) -> str:
-        return generic_get_docstring(self)
-    
-    def is_optional(self) -> bool:
-        return self.optional
     
     def is_array(self) -> bool:
         return self.multiple
 
 
 class DataCollectionToolParam(ToolParam):
-    def __init__(self, name: str, format: str):
-        super().__init__(name)
+    def __init__(self, name: str, heirarchy: list[str], format: str):
+        super().__init__(name, heirarchy)
         self.format = format
-      
-    def get_default(self) -> Optional[str]:
-        return None
-
-    def get_docstring(self) -> str:
-        return generic_get_docstring(self)
-    
-    def is_optional(self) -> bool:
-        return self.optional
     
     def is_array(self) -> bool:
         return True

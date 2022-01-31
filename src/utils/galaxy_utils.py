@@ -65,7 +65,7 @@ def setup_evaluator(app: MockApp, gxtool: GalaxyTool, job: Job, test_directory: 
 
 
 def is_tool_parameter(gxobj: Any) -> bool:
-    if type(gxobj) == ToolParameter:
+    if isinstance(gxobj, ToolParameter):
         return True
     elif issubclass(type(gxobj), ToolParameter):
         return True
@@ -73,7 +73,7 @@ def is_tool_parameter(gxobj: Any) -> bool:
 
 
 def is_tool_output(gxobj: Any) -> bool:
-    if type(gxobj) == ToolOutput:
+    if isinstance(gxobj, ToolOutput):
         return True
     elif issubclass(type(gxobj), ToolOutput):
         return True
@@ -131,7 +131,7 @@ def get_param_primary_option(param: ToolParameter) -> Optional[str]:
     # select params
     if param.type == 'select':
         for opt in param.static_options:
-            if opt[2] == True:
+            if opt[2] is True:
                 return opt[1]
         return param.static_options[0][1]
     

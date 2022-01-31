@@ -97,7 +97,7 @@ class ParamRegister:
 
     def jsonify_job_dict(self, job_dict: dict) -> dict:
         for key, val in job_dict.items():
-            if type(val) == dict:
+            if isinstance(val, dict):
                 job_dict[key] = json.dumps(val)  
         return job_dict
 
@@ -114,7 +114,7 @@ class ParamRegister:
                 raise Exception('dynamic options from database keys not supported')
 
             for opt in param.static_options:
-                if opt[2] == True:
+                if opt[2] is True:
                     return opt[1]
             return None
 
@@ -218,9 +218,9 @@ class ParamRegister:
         if query_key in self.params:
             param = self.params[query_key]
 
-            if type(param) == SelectToolParameter:
+            if isinstance(param, SelectToolParameter):
                 out = [opt[1] for opt in param.static_options]
-            elif type(param) == BooleanToolParameter:
+            elif isinstance(param, BooleanToolParameter):
                 out = [param.truevalue, param.falsevalue]
                 out = [o for o in out if o != '']
 

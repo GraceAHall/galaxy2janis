@@ -110,7 +110,7 @@ class AliasRegister:
 
     def init_token_from_text(self, text: str) -> Token:
         token = tokenify(text, param_register=self.tool.param_register, out_register=self.tool.out_register, prioritise_tokens=False)
-        if token == None:
+        if token is None:
             self.logger.log(1, f'can resolve token {text}')
         return token
 

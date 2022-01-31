@@ -122,7 +122,7 @@ class CommandComponent:
         if no condition is met, returns False
         """
         # positionals aren't optional
-        if type(self) == Positional:
+        if isinstance(self, Positional):
             return False
 
         # component doesn't appear in each supplied command string

@@ -74,7 +74,7 @@ class WorkflowStepCommandLoader:
         node = dict([(k, v) for k, v in node.items() if k != '__current_case__'])
         
         for pkey, pval in node.items():
-            if type(pval) == dict:
+            if isinstance(pval, dict):
                 newpath = deepcopy(treepath + [pkey])
                 newval = self.attempt_value_replacement(pval, newpath, job)
                 if newval is not None:
@@ -108,7 +108,7 @@ class WorkflowStepCommandLoader:
 
     def jsonify_job_state(self, job_state: dict) -> dict:
         for key, val in job_state.items():
-            if type(val) == dict:
+            if isinstance(val, dict):
                 job_state[key] = json.dumps(val)  
         return job_state
 

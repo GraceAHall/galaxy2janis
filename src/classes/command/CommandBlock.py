@@ -8,7 +8,7 @@ from classes.command.Tokens import Token, TokenType
 from classes.params.ParamRegister import ParamRegister
 from classes.outputs.OutputRegister import OutputRegister
 from classes.logging.Logger import Logger
-from utils.general_utils import global_align
+from utils import general_utils
 
 from utils.token_utils import tokenify
 
@@ -138,7 +138,7 @@ class CommandBlock:
 
 
     def get_first_token_similarity(self, main_req_name: str) -> float:
-        return global_align(main_req_name, self.tokens[0].text)
+        return general_utils.global_align(main_req_name, self.tokens[0].text)
 
 
     def __str__(self) -> str:

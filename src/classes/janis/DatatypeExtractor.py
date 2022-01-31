@@ -122,7 +122,7 @@ class DatatypeExtractor:
         delegates whether the incoming is a CommandComponent or ToolOutput. 
         datatype extraction logic is different for these two classes. 
         """
-        if type(incoming) == Output:
+        if isinstance(incoming, Output):
             return self.extract_from_output(incoming)
         else:
             return self.extract_from_component(incoming)

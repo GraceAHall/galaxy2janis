@@ -150,7 +150,7 @@ class Templator:
     def inputs_to_param_dict(self, inputs: dict) -> dict:
         out = {}
         for name, obj in inputs.items():
-            if type(obj) == Section:
+            if isinstance(obj, Section):
                 out[obj.name] = None
             else:
                 print()

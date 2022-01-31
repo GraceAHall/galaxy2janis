@@ -5,16 +5,32 @@ NOTE check janis-patterns github for tricky situations
 TODO v0.1
 
 
+
+Today:
+ - all about params 
+
 2022
 TODO:
+ - ABC for everything - ToolParam etc. Want zero coupling to Galaxy classes. 
+ - map galaxy toolparam to internal
  - command parsing 
     - process command 3 tokens at a time as TokenThruples
     - prev, curr, next 
-    - write tests
  - tokenisation
-    - refactor? 
-    - write tests
-
+    - refactor
+    - python structural pattern matching 
+ - use 3.10 'match' syntax instead of isinstance() 
+    - for switch statements
+    - for text processing (essential is a lexer)
+    - can match classes (object matching), lists, text, dictionary
+    - dictionary can check keyval pairs quickly
+ - shlex to handle quotes? 
+ - Factoriesssss
+    - current thinking: basically just any time we want to make a subclass of an ABC, use a factory. 
+    - TokenFactory
+    - CommandComponentFactory
+    - AliasFactory
+    - ToolParamFactory
 
 
 TODO:

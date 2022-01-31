@@ -162,7 +162,7 @@ class Command:
                     return 1
 
                 component = self.make_component(ctoken, ntoken)
-                if type(component) == Flag or type(component) == Positional:
+                if isinstance(component, Flag) or isinstance(component, Positional):
                     return 1
 
         return 2
@@ -258,29 +258,30 @@ class Command:
         the_comp = self.refine_component_using_reference(the_comp, cached_comp)
         
         # update step size for token iteration
-        if type(the_comp) in [Positional, Flag]:
+        if isinstance(the_comp, Positional) or isinstance(the_comp, Flag):
             self.step_size = 1
 
-        if type(the_comp) != Positional:
+        if not isinstance(the_comp, Positional):
             self.opts_encountered = True
         
         # update 
+        # TODO fix this is bad
         if type(the_comp) not in disallow:
-            if type(the_comp) == Positional:
+            if isinstance(the_comp, Positional):
                 self.update_positionals(the_comp)
             
-            elif type(the_comp) == Flag:
-                if type(cached_comp) == Option:
+            elif isinstance(the_comp, Flag):
+                if isinstance(cached_comp, Option):
                     the_comp = self.reassign_option_as_flag(cached_comp, the_comp)
                 else:
                     self.update_flags(the_comp)
                 
-            elif type(the_comp) == Option:
+            elif isinstance(the_comp, Option):
                 self.update_options(the_comp)  
     
 
     def get_component(self, query_comp: CommandComponent) -> Optional[CommandComponent]:
-        if type(query_comp) == Positional:
+        if isinstance(query_comp, Positional):
             pos = query_comp.pos
             if pos in self.positionals:
                 return self.positionals[pos]
@@ -329,7 +330,7 @@ class Command:
             return self.cast_component(incoming, ref_comp)
         else:
             # overrule component as Flag
-            if type(incoming) == Option and type(ref_comp) == Flag:
+            if isinstance(incoming, Option) and isinstance(ref_comp, Flag):
                 token = incoming.sources[0]
                 return self.make_flag(token)
 
@@ -349,16 +350,16 @@ class Command:
             return query
         
         # can't cast this
-        elif type(query) == Positional:
+        elif isinstance(query, Positional):
             return query
         
         # flag to option
-        elif type(query) == Flag and type(ref) == Option:
+        elif isinstance(query, Flag) and isinstance(ref, Option):
             return Option(query.prefix)
         
         # option to flag
-        elif type(query) == Option and type(ref) == Flag:
-            return Flag(query.prefix)
+        elif isinstance(query, Option) and isinstance(ref, Flag):
+            return Option(query.prefix)
 
 
     def update_positionals(self, incoming: Positional) -> None:
