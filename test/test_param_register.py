@@ -2,7 +2,7 @@
 
 import unittest
 
-from classes.param_register.OutputRegister import OutputRegister
+from tool.param.OutputRegister import OutputRegister
 from classes.param.InputParam import (
     BoolParam,
     IntegerParam, 

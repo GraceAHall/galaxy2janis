@@ -6,6 +6,11 @@ TODO v0.1
 
 
 
+
+
+
+
+
 Today:
  - all about params 
 
@@ -31,6 +36,12 @@ TODO:
     - CommandComponentFactory
     - AliasFactory
     - ToolParamFactory
+
+
+BEFORE v1.0
+- citations need to be parsed. currently its just skipped. 
+
+
 
 
 TODO:

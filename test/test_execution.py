@@ -2,7 +2,7 @@
 
 import unittest
 from classes.execution import startup
-from classes.execution.settings import ExecutionSettings, InputWorkflow
+from execution.settings import ExecutionSettings, InputWorkflow
 from classes.execution.validation import InputException, SettingsValidator
 
 
