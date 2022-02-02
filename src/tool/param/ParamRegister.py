@@ -6,8 +6,22 @@ from dataclasses import dataclass
 
 from tool.param.Param import Param 
 
-# TODO i dont have a very good solution for the get() method.
-# chose ABC but could use protocol instead
+
+class ParamRegister(ABC):
+    params: dict[str, Param] = dict()
+
+    @abstractmethod
+    def list(self) -> list[Param]:
+        ...
+    
+    @abstractmethod
+    def add(self, param: Param) -> None:
+        ...
+    
+    @abstractmethod
+    def get(self, query: str, strategy: str='default') -> Optional[Param]:
+        ...
+
 
 class SearchStrategy(ABC):    
     @abstractmethod
@@ -58,20 +72,5 @@ class FilepathSearchStrategy(SearchStrategy):
                 return param
 
 
-
-class ParamRegister(ABC):
-    params: dict[str, Param] = dict()
-
-    @abstractmethod
-    def list(self) -> list[Param]:
-        ...
-    
-    @abstractmethod
-    def add(self, param: Param) -> None:
-        ...
-    
-    @abstractmethod
-    def get(self, query: str, strategy: str='default') -> Optional[Param]:
-        ...
     
 

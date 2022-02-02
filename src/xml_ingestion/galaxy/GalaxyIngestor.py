@@ -1,15 +1,18 @@
 
 
-from tool.param.Param import Param
 from galaxy.tools import Tool as GalaxyToolRepresentation
+
 from xml_ingestion.galaxy.GalaxyToolLoader import GalaxyToolLoader
+from xml_ingestion.galaxy.InputParamFactory import InputParamFactory
+from xml_ingestion.galaxy.OutputParamFactory import OutputParamFactory
 
 from tool.param import InputRegister, OutputRegister
 from tool.test import TestRegister
 from tool.requirements import Requirement, CondaRequirement, ContainerRequirement
 from tool.metadata import Metadata
+
 import galaxy_utils
-from xml_ingestion.galaxy.mapping import map_param
+
 
 
 
@@ -53,15 +56,17 @@ class GalaxyIngestor:
         return str(self.toolrep.command) # type: ignore
     
     def get_inputs(self) -> InputRegister:
-        """returns a formatted list of params using the representation"""
+        """returns a an InputRegister by reformatting the galaxy tool representation's params."""
         gx_params = galaxy_utils.get_flattened_params(self.toolrep)
-        params = [map_param(gxp) for gxp in gx_params]
+        fac = InputParamFactory()
+        params = [fac.produce(gxp) for gxp in gx_params]
         return InputRegister(params)
-
     
     def get_outputs(self) -> OutputRegister:
         """returns a formatted list of outputs using the representation"""
-        raise NotImplementedError
+        fac = OutputParamFactory()
+        params = [fac.produce(gxp) for gxp in self.toolrep.outputs]
+        return OutputRegister(params)
     
     def get_tests(self) -> TestRegister:
         """returns a formatted list of tests using the representation"""

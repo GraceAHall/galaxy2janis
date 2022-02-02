@@ -29,7 +29,8 @@ class ParamFlattener:
         heirarchy = copy(heirarchy)
         match node:
             case ToolParameter():
-                node.name = f'{".".join(heirarchy)}.{node.name}'
+                prefix = ".".join(heirarchy) + '.' if len(heirarchy) > 0 else ''
+                node.name = f'{prefix}{node.name}'
                 self.flat_params.append(node)
 
             case Conditional():

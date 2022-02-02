@@ -5,22 +5,17 @@ from typing import Optional, Tuple, Any
 from copy import deepcopy
 import json
 
-from galaxy.tools.parameters.basic import (
-    ToolParameter,
-    BooleanToolParameter,
-    SelectToolParameter
+from tool.param.Param import Param 
+from .ParamRegister import ParamRegister
+
+from tool.param.ParamRegister import (
+    DefaultSearchStrategy,
+    LCASearchStrategy
 )
 
 
-
-from .ParamRegister import ParamRegister
-
-
-class InputRegister(ParamRegister):
+class JobDict:
     pass
-
-
-
 
 
 class JobDictifier:
@@ -28,13 +23,34 @@ class JobDictifier:
 
 
 
+class InputRegister(ParamRegister):
+    def __init__(self, params: list[Param]):
+        for param in params:
+            self.add(param)
 
-class ParamRegister:
-    def __init__(self, inputs: dict) -> None:
-        self.params: dict[str, ToolParameter] = {}
-        self.update(inputs, [])
+    def list(self) -> list[Param]:
+        return list(self.params.values())
+    
+    def add(self, param: Param) -> None:
+        if param.name not in self.params:
+            self.params[param.name] = param
+    
+    def get(self, query: str, strategy: str='default') -> Optional[Param]:
+        strategy_map = {
+            'default': DefaultSearchStrategy(),
+            'lca': LCASearchStrategy(),
+        }
+        search_strategy = strategy_map[strategy]
+        return search_strategy.search(query, self.params)
+
+    def create_job_dict(self, value_overrides: Optional[dict[str, Any]]=None) -> JobDict:
+        raise NotImplementedError
+        
 
 
+
+
+class JobDictifierOld:
     def to_job_dict(self, value_overrides: Optional[dict]=None) -> dict:
         """comment"""
         job_dict = self.get_job_dict()
@@ -102,7 +118,14 @@ class ParamRegister:
         return job_dict
 
 
-    def get_param_default_value(self, param: ToolParameter) -> Any:
+
+
+
+
+
+
+
+    def get_param_default_value(self, param: Param) -> Any:
         # param has value
         if hasattr(param, 'value'):
             return param.value
@@ -153,7 +176,7 @@ class ParamRegister:
             self.params[key] = obj
 
 
-    def get(self, query_key: str, allow_lca=False) -> Tuple[Optional[str], Optional[ToolParameter]]:
+    def get(self, query_key: str, allow_lca=False) -> Tuple[Optional[str], Optional[Param]]:
         # check if the full key is present
         if query_key in self.params:
             return (query_key, self.params[query_key])
@@ -165,7 +188,7 @@ class ParamRegister:
         return (None, None)
 
 
-    def get_lca(self, query_key: str) -> Tuple[Optional[str], Optional[ToolParameter]]:
+    def get_lca(self, query_key: str) -> Tuple[Optional[str], Optional[Param]]:
         """
         returns the parameter with best similarity to the query key
         uses a lowest-common-ancestor approach, where the param path 
@@ -185,7 +208,7 @@ class ParamRegister:
         (so is first in self.params) and will be at the top of the sorted score list. 
         """
         query_path = query_key.split('.')
-        param_scores: list[Tuple[int, str, ToolParameter]] = []
+        param_scores: list[Tuple[int, str, Param]] = []
 
         for varname, param in self.params.items():
             varpath = varname.split('.')
@@ -218,9 +241,9 @@ class ParamRegister:
         if query_key in self.params:
             param = self.params[query_key]
 
-            if isinstance(param, SelectToolParameter):
+            if isinstance(param, SelectParam):
                 out = [opt[1] for opt in param.static_options]
-            elif isinstance(param, BooleanToolParameter):
+            elif isinstance(param, BooleanParam):
                 out = [param.truevalue, param.falsevalue]
                 out = [o for o in out if o != '']
 

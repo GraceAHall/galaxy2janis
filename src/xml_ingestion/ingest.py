@@ -52,12 +52,8 @@ def ingest(xml_path: str, method: str='galaxy'):
 
 
 def init_ingestor(xml_path: str, method: str='galaxy') -> Ingestor:
-    match method:
-        case 'galaxy':
-            return GalaxyIngestor(xml_path)
-        case 'local':
-            return LocalIngestor(xml_path)
-        case _:
-            return GalaxyIngestor(xml_path)
-
-    
+    ingestors = {
+        'galaxy': GalaxyIngestor,
+        'local': LocalIngestor
+    }
+    return ingestors[method](xml_path)

@@ -6,28 +6,28 @@ from typing import Optional
 from tool.param.Param import Param
 
 
-def generic_get_docstring(param: Param) -> str:
-    if param.helptext and param.label:
-        return param.label + ' ' + param.helptext
-    elif param.helptext:
-        return param.helptext
-    elif param.label:
-        return param.label
-    return ''
+class InputParam(Param):
+    def __init__(self, name: str):
+        self.name: str = name
+        self.label: str = ''
+        self.helptext: str = ''
+        self.optional: bool = False
+        self.argument: Optional[str] = None  ## i dont know if this is needed
 
-def generic_get_varname(param: Param) -> str:
-    return param.name
-
-
-class GenericInputParam(Param):
-    def get_var_name(self) -> str:
-        return generic_get_varname(self)
-      
     def get_default(self) -> Optional[str]:
         return None
 
     def get_docstring(self) -> str:
-        return generic_get_docstring(self)
+        return self.generic_get_docstring()
+
+    def generic_get_docstring(self) -> str:
+        if self.helptext and self.label:
+            return self.label + ' ' + self.helptext
+        elif self.helptext:
+            return self.helptext
+        elif self.label:
+            return self.label
+        return ''
     
     def is_optional(self) -> bool:
         return self.optional
@@ -36,8 +36,11 @@ class GenericInputParam(Param):
         return False
 
 
-class TextParam(GenericInputParam):
-    value: Optional[str] = None
+
+class TextParam(InputParam):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.value: Optional[str] = None
 
     def get_default(self) -> Optional[str]:
         if self.value:
@@ -45,10 +48,12 @@ class TextParam(GenericInputParam):
         return None
     
 
-class IntegerParam(GenericInputParam):
-    value: Optional[str] = None
-    min: Optional[str] = None
-    max: Optional[str] = None
+class IntegerParam(InputParam):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.value: Optional[str] = None
+        self.min: Optional[str] = None
+        self.max: Optional[str] = None
 
     def get_default(self) -> Optional[str]:
         if self.value:
@@ -61,10 +66,12 @@ class IntegerParam(GenericInputParam):
 
 
 # YES I KNOW THIS IS ESSENTIALLY DUPLICATED FROM INTEGERParam SUE ME
-class FloatParam(GenericInputParam):
-    value: Optional[str] = None
-    min: Optional[str] = None
-    max: Optional[str] = None
+class FloatParam(InputParam):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.value: Optional[str] = None
+        self.min: Optional[str] = None
+        self.max: Optional[str] = None
 
     def get_default(self) -> Optional[str]:
         if self.value:
@@ -76,8 +83,8 @@ class FloatParam(GenericInputParam):
         return None
 
 
-class BoolParam(GenericInputParam):
-    def __init__(self, name: str, heirarchy: list[str]):
+class BoolParam(InputParam):
+    def __init__(self, name: str):
         super().__init__(name)
         self.checked: bool = False
         self.truevalue: str = ''
@@ -89,7 +96,7 @@ class BoolParam(GenericInputParam):
         return self.falsevalue
 
     def get_docstring(self) -> str:
-        docstring = generic_get_docstring(self)
+        docstring = self.generic_get_docstring()
         bool_values = [self.truevalue, self.falsevalue]
         bool_values = [v for v in bool_values if v != '']
         bool_str = ', '.join(bool_values)
@@ -105,20 +112,24 @@ class SelectOption:
     selected: bool
     ui_text: str
 
-class SelectParam(GenericInputParam):
-    def __init__(self, name: str, options: list[SelectOption], multiple: bool):
+class SelectParam(InputParam):
+    def __init__(self, name: str):
         super().__init__(name)
-        self.options = options
-        self.multiple = multiple
+        self.options: list[SelectOption] = []
+        self.multiple: bool = False
 
     def get_default(self) -> Optional[str]:
         for option in self.options:
             if option.selected:
                 return option.value
+        
+        if len(self.options) > 0:
+            return self.options[0].value
+
         return None        
 
     def get_docstring(self) -> str:
-        docstring = generic_get_docstring(self)
+        docstring = self.generic_get_docstring()
         option_values = [v.value for v in self.options]
         option_str = ', '.join(option_values[:5])
         return f'{docstring}. possible values: {option_str}'
@@ -134,20 +145,20 @@ class SelectParam(GenericInputParam):
         return False
 
 
-class DataParam(GenericInputParam):
-    def __init__(self, name: str, format: str, multiple: bool):
+class DataParam(InputParam):
+    def __init__(self, name: str):
         super().__init__(name)
-        self.format = format
-        self.multiple = multiple
+        self.format: list[str] = []
+        self.multiple: bool = False
     
     def is_array(self) -> bool:
         return self.multiple
 
 
-class DataCollectionParam(GenericInputParam):
-    def __init__(self, name: str, format: str):
+class DataCollectionParam(InputParam):
+    def __init__(self, name: str):
         super().__init__(name)
-        self.format = format
+        self.format: list[str] = []
     
     def is_array(self) -> bool:
         return True

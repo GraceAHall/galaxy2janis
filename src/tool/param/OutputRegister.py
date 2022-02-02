@@ -11,11 +11,10 @@ from .ParamRegister import (
 )
 
 
-# TODO i dont have a very good solution for the get() method.
-
-
-
 class OutputRegister(ParamRegister):
+    def __init__(self, params: list[Param]):
+        for param in params:
+            self.add(param)
 
     def list(self) -> list[Param]:
         return list(self.params.values())
@@ -35,6 +34,22 @@ class OutputRegister(ParamRegister):
 
         search_strategy = strategy_map[strategy]
         return search_strategy.search(query, self.params)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # def create_output_from_text(self, text: str) -> None:
     #     """
