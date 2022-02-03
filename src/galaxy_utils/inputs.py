@@ -12,6 +12,8 @@ from galaxy.tools.parameters.grouping import Conditional, ConditionalWhen, Secti
 
 from copy import copy
 
+from logger.errors import TagNotSupportedError
+
 
 XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
 
@@ -42,13 +44,16 @@ class ParamFlattener:
                 for child in node.inputs.values():
                     self.explore_node(child, heirarchy)
 
-            case Repeat() | Section():
+            case Section():
                 heirarchy.append(node.name)
                 for child in node.inputs.values():
                     self.explore_node(child, heirarchy)
 
+            case Repeat():
+                raise TagNotSupportedError()
+
             case _:
-                raise NotImplementedError
+                raise NotImplementedError()
             
 
 def get_flattened_params(toolrep: GalaxyTool) -> list[ToolParameter]:

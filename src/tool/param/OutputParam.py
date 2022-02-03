@@ -8,15 +8,17 @@ class OutputParam(Param):
     def __init__(self, name: str):
         self.name: str = name
         self.label: str = ''
-        self.format: list[str] = []
+        self.datatypes: list[str] = []
+        self.files_wildcard: Optional[str] = ''
+        #self.format_source: Optional[str] = '' TODO later
+        #self.metadata_source: Optional[str] = '' TODO later
 
     def get_default(self) -> Optional[str]:
         return None
 
     def get_docstring(self) -> str:
         if self.label:
-            label = str(self.label)
-            return label.rsplit('}', 1)[-1]
+            return str(self.label)
         return ''
     
     def is_optional(self) -> bool:
@@ -29,14 +31,18 @@ class OutputParam(Param):
 class DataOutputParam(OutputParam):
     def __init__(self, name: str):
         super().__init__(name)
-        self.files_wildcard: Optional[str] = ''
+
+    def is_array(self) -> bool:
+        if self.files_wildcard and '*' in self.files_wildcard:
+            return True
+        return False
 
 
 class CollectionOutputParam(OutputParam):
     def __init__(self, name: str):
         super().__init__(name)
-        self.files_wildcard: str = ''
-        self.collection_type: Optional[str] = ''
+        self.collection_type: str = 'list'
 
-
+    def is_array(self) -> bool:
+        return True
 

@@ -1,9 +1,13 @@
 
 
+
+
 import unittest
-from classes.execution import startup
+from execution import load_settings
 from execution.settings import ExecutionSettings, InputWorkflow
-from classes.execution.validation import InputException, SettingsValidator
+from execution.validation import InputException, SettingsValidator
+
+
 
 
 class TestStartup(unittest.TestCase):
@@ -15,15 +19,13 @@ class TestStartup(unittest.TestCase):
 
     def setUp(self) -> None:
         self.argv = [
-            "quast.xml", "test/test-data/quast", 
-            "--outdir", "test/parsed",
-            "--wflow", "test/test-data/assembly_qc.ga", 
-            "--wstep", "3"
+            "abricate.xml", "test/data/abricate", 
+            "--outdir", "test/rubbish",
         ]
     
     def test_startup(self) -> None:
         # this usually returns ExecutionSettings but dont need it
-        startup(self.argv) 
+        load_settings(self.argv) 
     
     def test_startup_fails(self) -> None:
         # this usually returns ExecutionSettings but dont need it
@@ -31,7 +33,7 @@ class TestStartup(unittest.TestCase):
             "test-data/quast/quast.xml", "test/", 
         ]
         with self.assertRaises(InputException):
-            startup(self.argv) 
+            load_settings(self.argv) 
         
 
 
@@ -41,10 +43,10 @@ class TestSettingsValidation(unittest.TestCase):
     def setUp(self) -> None:
         esettings = ExecutionSettings(
             'quast.xml', 
-            'test/test-data/quast',
+            'test/data/quast',
             'test/parsed'
         )        
-        workflow = InputWorkflow('test/test-data/assembly_qc.ga', 3)
+        workflow = InputWorkflow('test/data/assembly_qc.ga', 3)
         esettings.workflow = workflow
         self.validator = SettingsValidator(esettings) # the important bit
 
@@ -79,9 +81,9 @@ class TestSettingsValidation(unittest.TestCase):
             self.fail("validate_xml() raised unexpected exception")
 
     def test_validate_xml_fails(self) -> None:
-        """should throw InputException"""
+        """should throw FileNotFoundError"""
         self.validator.esettings.xmlfile = 'macros.xml'
-        with self.assertRaises(InputException):
+        with self.assertRaises(FileNotFoundError):
             self.validator.validate_xml()
 
 

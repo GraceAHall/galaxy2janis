@@ -6,9 +6,8 @@ from copy import deepcopy
 import json
 
 from tool.param.Param import Param 
-from .ParamRegister import ParamRegister
-
 from tool.param.ParamRegister import (
+    ParamRegister,
     DefaultSearchStrategy,
     LCASearchStrategy
 )
@@ -25,15 +24,16 @@ class JobDictifier:
 
 class InputRegister(ParamRegister):
     def __init__(self, params: list[Param]):
+        self.inputs: dict[str, Param] = dict()
         for param in params:
             self.add(param)
 
     def list(self) -> list[Param]:
-        return list(self.params.values())
+        return list(self.inputs.values())
     
     def add(self, param: Param) -> None:
-        if param.name not in self.params:
-            self.params[param.name] = param
+        if param.name not in self.inputs:
+            self.inputs[param.name] = param
     
     def get(self, query: str, strategy: str='default') -> Optional[Param]:
         strategy_map = {
@@ -41,7 +41,7 @@ class InputRegister(ParamRegister):
             'lca': LCASearchStrategy(),
         }
         search_strategy = strategy_map[strategy]
-        return search_strategy.search(query, self.params)
+        return search_strategy.search(query, self.inputs)
 
     def create_job_dict(self, value_overrides: Optional[dict[str, Any]]=None) -> JobDict:
         raise NotImplementedError

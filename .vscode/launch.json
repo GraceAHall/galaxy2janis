@@ -38,6 +38,18 @@
                 "--debug"
             ]
         },
+        {
+            "name": "abricate",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "abricate.xml", "tools/abricate/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
     
         {
             "name": "parse tools",

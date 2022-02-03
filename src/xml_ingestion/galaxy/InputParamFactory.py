@@ -83,12 +83,12 @@ class InputParamFactory:
 
     def init_data_param(self, gxparam: GalaxyParam) -> DataParam:
         param = DataParam(str(gxparam.name))
-        param.format = gxparam.extensions
+        param.datatypes = gxparam.extensions
         param.multiple = bool(gxparam.multiple)
         return param
 
     def init_data_collection_param(self, gxparam: GalaxyParam) -> DataCollectionParam:
         param = DataCollectionParam(str(gxparam.name))
-        param.format = gxparam.extensions
+        param.datatypes = gxparam.extensions
         return param
 

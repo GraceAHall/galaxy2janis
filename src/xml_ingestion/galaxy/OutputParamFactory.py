@@ -1,10 +1,12 @@
 
 
+from logger.errors import AttributeNotSupportedError, ParamNotSupportedError
 
-from typing import Optional, Protocol
-
-from logger.errors import ParamNotSupportedError
+from xml_ingestion.galaxy.GalaxyObjectProtocols import GalaxyOutput
+from xml_ingestion.galaxy.DatatypeFetcher import DatatypeFetcher
+from xml_ingestion.galaxy.WildcardFetcher import WildcardFetcher
 from tool.param.Param import Param
+
 from tool.param.OutputParam import (
     OutputParam,
     DataOutputParam,
@@ -12,45 +14,43 @@ from tool.param.OutputParam import (
 )
 
 
-class GalaxyOutput(Protocol):
-    """
-    strucutral pattern matching used in this file.
-    galaxy objects aren't always typed or well written.
-    better to just define what properties an object needs to 'pass' as
-    a GalaxyOutput
-    """
-    name: str
-    label: str
-    output_type: str
-    format_source: Optional[str] = None
 
+FACTORY = {
+    'data': DataOutputParam,
+    'collection': CollectionOutputParam
+}
 
 class OutputParamFactory:
     def produce(self, gxout: GalaxyOutput) -> Param:
-        match gxout.type: # type: ignore
-            case 'data':
-                param = self.init_data_param(gxout)
-            case 'integer':
-                param = self.init_collection_param(gxout)
-            case _:
-                raise ParamNotSupportedError(f'unknown param type: {str(gxout.type)}')
-        
-        param = self.map_common_fields(gxout, param) #type: ignore
+        self.assert_supported(gxout)
+        p_class = FACTORY[gxout.output_type]
+        param = p_class(gxout.name)
+        param = self.map_common_attrs(gxout, param)
+        param = self.map_specific_attrs(gxout, param)
+        param.datatypes = DatatypeFetcher().get(gxout)
+        param.files_wildcard = WildcardFetcher().get(gxout)
         return param 
+    
+    def map_common_attrs(self, gxout: GalaxyOutput, param: OutputParam) -> OutputParam:
+        param.label = str(gxout.label).rsplit('}', 1)[-1].strip(': ')
+        return param
+
+    def map_specific_attrs(self, gxout: GalaxyOutput, param: OutputParam) -> OutputParam:
+        match param:
+            case CollectionOutputParam():
+                if gxout.structure.collection_type != '':
+                    param.collection_type = str(gxout.structure.collection_type) 
+            case _:
+                pass
+        return param
         
-    def map_common_fields(self, gxout: GalaxyOutput, param: OutputParam) -> OutputParam:
-        param.label = str(gxout.label)
-        param.format_source = gxout.format_source
-        return param
-
-    def init_data_param(self, gxout: GalaxyOutput) -> DataOutputParam:
-        param = DataOutputParam(str(gxout.name))
-        param.format = gxout.format
-        param.from_work_dir = gxout.from_work_dir
-        return param
-
-    def init_collection_param(self, gxout: GalaxyOutput) -> CollectionOutputParam:
-        param = CollectionOutputParam(str(gxout.name))
-        return param
+    def assert_supported(self, gxout: GalaxyOutput):
+        if gxout.format_source:
+            raise AttributeNotSupportedError('<output> with format_source attr')
+        if gxout.metadata_source and gxout.metadata_source != '':
+            raise AttributeNotSupportedError('<output> with metadata_source attr')
+        if gxout.output_type not in ['data', 'collection']:
+            raise ParamNotSupportedError(f'unknown param type: {str(gxout.output_type)}')
+    
 
 

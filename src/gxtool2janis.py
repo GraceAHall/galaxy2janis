@@ -18,16 +18,13 @@ from containers.Container import Container
 # main entry point
 def main():
     esettings = load_settings(sys.argv[1:])
-    gx_tool_def = ingest_tool(esettings)
+    gx_tool_def = ingest(esettings.get_xml_path(), method='galaxy')
+
+    
     command = infer_command(esettings, gx_tool_def)
     container = fetch_container(esettings, gx_tool_def)
     write_janis(esettings, gx_tool_def, command, container)
     write_tests(esettings, gx_tool_def)
-
-
-def ingest_tool(esettings: ExecutionSettings) -> GalaxyToolDefinition:
-    xml_path = esettings.get_xml_path()
-    return ingest(xml_path, method='galaxy')
 
 
 def infer_command(esettings: ExecutionSettings, gx_tool_def: GalaxyToolDefinition) -> Command:

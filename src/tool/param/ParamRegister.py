@@ -8,8 +8,6 @@ from tool.param.Param import Param
 
 
 class ParamRegister(ABC):
-    params: dict[str, Param] = dict()
-
     @abstractmethod
     def list(self) -> list[Param]:
         ...
@@ -49,9 +47,12 @@ class LCASearchStrategy(SearchStrategy):
         remaining_params = self.init_datastructure(params)
 
         for i in range(1, len(split_query) + 1):
+            remaining_params = [p for p in remaining_params if len(p.split_name) >= i]
             remaining_params = [p for p in remaining_params if p.split_name[-i] == split_query[-i]]
 
         if len(remaining_params) > 0:
+            # return shortest param name which matches the query
+            remaining_params.sort(key=lambda x: len(x.split_name))
             return remaining_params[0].param
 
     def init_datastructure(self, params: dict[str, Param]):
@@ -67,9 +68,10 @@ class FilepathSearchStrategy(SearchStrategy):
         searches for a param by matching the specified 
         from_work_dir path to a given filepath
         """
-        for param in params.values():
-            if hasattr(param, 'from_work_dir') and param.from_work_dir == query:
-                return param
+        raise NotImplementedError
+        # for param in params.values():
+        #     if hasattr(param, 'from_work_dir') and param.from_work_dir == query:
+        #         return param
 
 
     

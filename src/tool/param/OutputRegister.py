@@ -3,7 +3,7 @@
 from typing import Optional
 
 from tool.param.Param import Param 
-from .ParamRegister import (
+from tool.param.ParamRegister import (
     ParamRegister,
     DefaultSearchStrategy,
     LCASearchStrategy,
@@ -13,16 +13,17 @@ from .ParamRegister import (
 
 class OutputRegister(ParamRegister):
     def __init__(self, params: list[Param]):
+        self.outputs: dict[str, Param] = dict()
         for param in params:
             self.add(param)
 
     def list(self) -> list[Param]:
-        return list(self.params.values())
+        return list(self.outputs.values())
     
     def add(self, param: Param) -> None:
         """adds a param to register. enforces unique param var names"""
-        if param.name not in self.params:
-            self.params[param.name] = param            
+        if param.name not in self.outputs:
+            self.outputs[param.name] = param            
 
     def get(self, query: str, strategy: str='default') -> Optional[Param]:
         """performs search using the specified search strategy"""
@@ -33,7 +34,7 @@ class OutputRegister(ParamRegister):
         }
 
         search_strategy = strategy_map[strategy]
-        return search_strategy.search(query, self.params)
+        return search_strategy.search(query, self.outputs)
 
 
 

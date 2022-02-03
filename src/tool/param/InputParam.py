@@ -148,7 +148,7 @@ class SelectParam(InputParam):
 class DataParam(InputParam):
     def __init__(self, name: str):
         super().__init__(name)
-        self.format: list[str] = []
+        self.datatypes: list[str] = []
         self.multiple: bool = False
     
     def is_array(self) -> bool:
@@ -158,7 +158,7 @@ class DataParam(InputParam):
 class DataCollectionParam(InputParam):
     def __init__(self, name: str):
         super().__init__(name)
-        self.format: list[str] = []
+        self.datatypes: list[str] = []
     
     def is_array(self) -> bool:
         return True

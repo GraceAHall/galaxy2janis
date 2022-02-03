@@ -30,7 +30,7 @@ class GalaxyToolDefinition:
         return self.inputs.get(query, strategy=strategy)
     
     def get_output(self, query: str, strategy: str='default') -> Optional[Param]:
-        return self.inputs.get(query, strategy=strategy)
+        return self.outputs.get(query, strategy=strategy)
 
     def list_inputs(self) -> list[Param]:
         return self.inputs.list()

@@ -3,6 +3,7 @@
 
 
 from dataclasses import dataclass
+from typing import Optional
 
 from tool.citations import Citation
 
@@ -15,4 +16,4 @@ class Metadata:
     description: str
     help: str
     citations: list[Citation]
-    creator: str
+    creator: Optional[str]

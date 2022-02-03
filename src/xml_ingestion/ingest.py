@@ -6,7 +6,8 @@ from typing import Protocol
 from xml_ingestion.galaxy.GalaxyIngestor import GalaxyIngestor
 from xml_ingestion.local.LocalIngestor import LocalIngestor
 
-from tool.param import InputRegister, OutputRegister
+from tool.param.InputRegister import InputRegister
+from tool.param.OutputRegister import OutputRegister
 from tool.test import TestRegister
 from tool.requirements import Requirement
 from tool.metadata import Metadata
