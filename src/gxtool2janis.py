@@ -8,7 +8,7 @@ from execution import load_settings
 from execution.settings import ExecutionSettings
 
 from xml_ingestion import ingest
-from tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.tool_definition import GalaxyToolDefinition
 
 from command.Command import Command
 from containers.Container import Container

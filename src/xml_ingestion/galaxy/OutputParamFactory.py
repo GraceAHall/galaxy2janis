@@ -5,9 +5,9 @@ from logger.errors import AttributeNotSupportedError, ParamNotSupportedError
 from xml_ingestion.galaxy.GalaxyObjectProtocols import GalaxyOutput
 from xml_ingestion.galaxy.DatatypeFetcher import DatatypeFetcher
 from xml_ingestion.galaxy.WildcardFetcher import WildcardFetcher
-from tool.param.Param import Param
+from galaxy_tool.param.Param import Param
 
-from tool.param.OutputParam import (
+from galaxy_tool.param.OutputParam import (
     OutputParam,
     DataOutputParam,
     CollectionOutputParam,

@@ -6,7 +6,7 @@ from typing import Tuple, TYPE_CHECKING
 import regex as re
 
 if TYPE_CHECKING:
-    from tool.tool_definition import GalaxyToolDefinition
+    from galaxy_tool.tool_definition import GalaxyToolDefinition
 
 from logger.Logger import Logger
 from command.tokens.Tokens import Token, TokenType

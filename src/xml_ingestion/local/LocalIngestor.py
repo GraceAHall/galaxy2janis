@@ -4,10 +4,11 @@
 import xml.etree.ElementTree as et
 import os
 
-from tool.param import InputRegister, OutputRegister
-from tool.test import TestRegister
-from tool.requirements import Requirement, CondaRequirement, ContainerRequirement
-from tool.metadata import Metadata
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.test import TestRegister
+from galaxy_tool.requirements import Requirement
+from galaxy_tool.metadata import Metadata
 from logger import Logger
 
 

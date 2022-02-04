@@ -6,11 +6,12 @@ from xml_ingestion.galaxy.GalaxyToolLoader import GalaxyToolLoader
 from xml_ingestion.galaxy.InputParamFactory import InputParamFactory
 from xml_ingestion.galaxy.OutputParamFactory import OutputParamFactory
 
-from tool.param.InputRegister import InputRegister
-from tool.param.OutputRegister import OutputRegister
-from tool.test import TestRegister
-from tool.requirements import Requirement, CondaRequirement, ContainerRequirement
-from tool.metadata import Metadata
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.test import TestRegister
+from xml_ingestion.galaxy.TestFactory import TestFactory
+from galaxy_tool.requirements import Requirement, CondaRequirement, ContainerRequirement
+from galaxy_tool.metadata import Metadata
 
 import galaxy_utils
 
@@ -71,5 +72,6 @@ class GalaxyIngestor:
     
     def get_tests(self) -> TestRegister:
         """returns a formatted list of tests using the representation"""
-        return TestRegister([])
-        #raise NotImplementedError
+        fac = TestFactory()
+        ttestcases = [fac.produce(t) for t in self.toolrep.tests]
+        return TestRegister(ttestcases)

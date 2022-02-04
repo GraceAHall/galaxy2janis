@@ -2,8 +2,8 @@
 
 from typing import Optional
 
-from tool.param.Param import Param 
-from tool.param.ParamRegister import (
+from galaxy_tool.param.Param import Param 
+from galaxy_tool.param.ParamRegister import (
     ParamRegister,
     DefaultSearchStrategy,
     LCASearchStrategy,

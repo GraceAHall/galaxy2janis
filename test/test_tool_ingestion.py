@@ -1,20 +1,26 @@
 
 
+from typing import Any
 import unittest
+
 from execution import load_settings
-from tool.param.OutputParam import DataOutputParam
 from xml_ingestion import ingest
 
-from tool.tool_definition import GalaxyToolDefinition
-from tool.metadata import Metadata
-from tool.requirements import CondaRequirement
-from tool.param.InputRegister import InputRegister
-from tool.param.OutputRegister import OutputRegister
-#from tool.test import TestRegister
+from galaxy_tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.metadata import Metadata
+from galaxy_tool.requirements import CondaRequirement
 
-from tool.param.InputParam import DataParam, FloatParam, SelectParam
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.InputParam import DataParam, FloatParam, SelectParam
 
-class TestIngestion(unittest.TestCase):
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.param.OutputParam import DataOutputParam
+
+from janis_core.tool.test_classes import TTestCase
+from galaxy_tool.test import TestRegister
+
+
+class TestGalaxyIngestion(unittest.TestCase):
     """
     tests loading of tool XML.
     Ensures xml is loaded correctly into internal representation (GalaxyToolDefinition).
@@ -84,3 +90,32 @@ class TestIngestion(unittest.TestCase):
         self.assertEquals(param.datatypes, ['tabular']) #type: ignore
 
 
+    def test_tests(self) -> None:
+        """checks tool xml <tests> ingestion"""
+        # All tests are being loaded into register
+        tool = self.tool
+        self.assertIsInstance(tool.tests, TestRegister)
+        self.assertEquals(len(tool.list_tests()), 8)
+
+        # TTestCase properly created for galaxy test case 
+        test = tool.list_tests()[0]
+        self.assertIsNotNone(test)
+        self.assertIsInstance(test, TTestCase)
+
+        # TTestCase inputs
+        self.assertIsInstance(test.input, dict[str, Any])
+        self.assertEquals(test.input['file_input'], 'Acetobacter.fna')
+        
+        # TTestCase outputs
+        self.assertIsInstance(test.output, list[TTestExpectedOutput])
+        #self.assertEquals(test.input[0], )
+        TTestExpectedOutput(
+                        "out_variants_gridss",
+                        preprocessor=TTestPreprocessor.FileContent,
+                        operator=operator.eq,
+                        expected_file=f"{chr17}/NA12878/brca1.germline.gridss.vcf",
+                    ),
+
+
+
+        

@@ -6,8 +6,8 @@ from re import L, split
 from typing import Union, Optional
 
 from command.CommandString import CommandString
-from tool.param.OutputRegister import OutputRegister
-from tool.param.ParamRegister import ParamRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.param.ParamRegister import ParamRegister
 from command.CommandComponents import Positional, Flag, Option, Output
 from command.tokens.Tokens import Token, TokenType
 from galaxy.tool_util.parser.output_objects import ToolOutput

@@ -9,7 +9,7 @@ from galaxy.tools import Tool as GalaxyTool
 from galaxy.model import Job, JobParameter
 
 from classes.templating.MockClasses import MockApp
-from tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.tool_definition import GalaxyToolDefinition
 from logger.Logger import Logger
 
 from utils.galaxy_utils import generate_dataset, setup_evaluator

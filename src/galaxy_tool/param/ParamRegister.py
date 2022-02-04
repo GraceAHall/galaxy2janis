@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from dataclasses import dataclass
 
-from tool.param.Param import Param 
+from galaxy_tool.param.Param import Param 
 
 
 class ParamRegister(ABC):

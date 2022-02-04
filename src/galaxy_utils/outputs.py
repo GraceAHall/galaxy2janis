@@ -5,7 +5,7 @@ from typing import Any
 import regex as re
 
 from galaxy.tool_util.parser.output_objects import ToolOutput
-from tool.param.ParamRegister import ParamRegister 
+from galaxy_tool.param.ParamRegister import ParamRegister 
 
 
 

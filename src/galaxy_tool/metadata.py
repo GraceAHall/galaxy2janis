@@ -5,7 +5,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from tool.citations import Citation
+from galaxy_tool.citations import Citation
 
 
 @dataclass

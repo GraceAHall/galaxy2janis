@@ -4,12 +4,13 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from tool.metadata import Metadata
-from tool.requirements import Requirement
-from tool.param.InputRegister import InputRegister
-from tool.param.OutputRegister import OutputRegister
-from tool.test import Test, TestRegister
-from tool.param.Param import Param
+from galaxy_tool.metadata import Metadata
+from galaxy_tool.requirements import Requirement
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.test import TestRegister
+from janis_core.tool.test_classes import TTestCase
+from galaxy_tool.param.Param import Param
 
 
 @dataclass
@@ -38,7 +39,7 @@ class GalaxyToolDefinition:
     def list_outputs(self) -> list[Param]:
         return self.outputs.list()
 
-    def list_tests(self) -> list[Test]:
+    def list_tests(self) -> list[TTestCase]:
         return self.tests.list()
 
 

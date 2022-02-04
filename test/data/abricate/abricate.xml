@@ -56,7 +56,14 @@
         <!-- Basic test 0 - will produce no results. -->
         <test>
             <param name="file_input" value="Acetobacter.fna"/>
-            <output name="report" ftype="tabular" file="output_noresults.txt" />
+            <!-- <output name="report" ftype="tabular" file="output_noresults.txt" /> -->
+            <output name="report" ftype="tabular" file="output_noresults.txt">
+                <assert_contents>
+                    <has_text text="ACCESSION"/>
+                    <has_n_lines n="2"/>
+                    <has_n_columns n="15"/>
+                </assert_contents>
+            </output>
         </test>
 
         <!-- Basic test 1 - will produce results. -->

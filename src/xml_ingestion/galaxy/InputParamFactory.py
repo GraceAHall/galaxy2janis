@@ -4,8 +4,8 @@
 from galaxy.tools.parameters.basic import ToolParameter as GalaxyParam
 
 from logger.errors import ParamNotSupportedError
-from tool.param.Param import Param
-from tool.param.InputParam import (
+from galaxy_tool.param.Param import Param
+from galaxy_tool.param.InputParam import (
     InputParam,
     SelectOption,
     TextParam,

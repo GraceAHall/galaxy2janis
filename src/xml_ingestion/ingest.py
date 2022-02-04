@@ -6,12 +6,12 @@ from typing import Protocol
 from xml_ingestion.galaxy.GalaxyIngestor import GalaxyIngestor
 from xml_ingestion.local.LocalIngestor import LocalIngestor
 
-from tool.param.InputRegister import InputRegister
-from tool.param.OutputRegister import OutputRegister
-from tool.test import TestRegister
-from tool.requirements import Requirement
-from tool.metadata import Metadata
-from tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.test import TestRegister
+from galaxy_tool.requirements import Requirement
+from galaxy_tool.metadata import Metadata
+from galaxy_tool.tool_definition import GalaxyToolDefinition
 
 
 class Ingestor(Protocol):

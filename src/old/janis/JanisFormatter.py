@@ -7,7 +7,7 @@ from typing import Union
 from datetime import date
 
 
-from tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.tool_definition import GalaxyToolDefinition
 from command.CommandComponents import Output
 from classes.janis.DatatypeExtractor import DatatypeExtractor
 

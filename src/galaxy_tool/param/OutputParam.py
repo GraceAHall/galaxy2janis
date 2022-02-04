@@ -1,7 +1,7 @@
 
 from typing import Optional
 
-from tool.param.Param import Param
+from galaxy_tool.param.Param import Param
 
 
 class OutputParam(Param):

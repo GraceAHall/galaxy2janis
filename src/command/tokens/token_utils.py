@@ -4,8 +4,8 @@
 from typing import Tuple
 
 from command.tokens.Tokens import Token, TokenType
-from tool.param.OutputRegister import OutputRegister
-from tool.param.ParamRegister import ParamRegister 
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.param.ParamRegister import ParamRegister 
 from command.expressions.regex_utils import (
     get_cheetah_vars, 
     get_quoted_numbers,

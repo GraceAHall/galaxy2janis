@@ -4,7 +4,7 @@ from typing import Optional, Any
 
 
 from galaxy.tools import Tool as GalaxyTool
-from tool.tool_definition import GalaxyToolDefinition
+from galaxy_tool.tool_definition import GalaxyToolDefinition
 from classes.templating.MockClasses import MockApp
 from command.CommandString import CommandString
 from command.Command import Command

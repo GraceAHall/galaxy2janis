@@ -6,7 +6,7 @@ from xml.etree import ElementTree as et
 
 from logger.Logger import Logger
 from classes.outputs.Outputs import Output, WorkdirOutput, DiscoverDatasetsOutput, TemplatedOutput
-from tool.param.ParamRegister import ParamRegister
+from galaxy_tool.param.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 
 

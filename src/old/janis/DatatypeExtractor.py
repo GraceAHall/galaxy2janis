@@ -10,8 +10,8 @@ from galaxy.tool_util.parser.output_collection_def import FilePatternDatasetColl
 from galaxy.tools.parameters.basic import ToolParameter
 from galaxy.tool_util.parser.output_objects import ToolOutput
 
-from tool.param.ParamRegister import ParamRegister
-from tool.param.OutputRegister import OutputRegister
+from galaxy_tool.param.ParamRegister import ParamRegister
+from galaxy_tool.param.OutputRegister import OutputRegister
 from command.CommandComponents import Positional, Flag, Option, Output
 from command.Command import TokenType
 from logger.Logger import Logger

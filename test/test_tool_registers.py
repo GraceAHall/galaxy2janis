@@ -2,17 +2,17 @@
 
 import unittest
 
-from tool.param.Param import Param
+from galaxy_tool.param.Param import Param
 
 
-from tool.param.OutputRegister import OutputRegister
-from tool.param.OutputParam import (
+from galaxy_tool.param.OutputRegister import OutputRegister
+from galaxy_tool.param.OutputParam import (
     DataOutputParam,
     CollectionOutputParam
 )
 
-from tool.param.InputRegister import InputRegister
-from tool.param.InputParam import (
+from galaxy_tool.param.InputRegister import InputRegister
+from galaxy_tool.param.InputParam import (
     BoolParam,
     IntegerParam, 
     TextParam, 
@@ -79,6 +79,8 @@ class TestOutputRegister(unittest.TestCase):
     
 
     
-        
+class TestTestRegister(unittest.TestCase):
+    """for the TestRegister class"""
+    pass
 
 
