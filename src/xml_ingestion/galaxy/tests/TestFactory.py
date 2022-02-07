@@ -2,17 +2,18 @@
 
 
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from logger.errors import AttributeNotSupportedError
 from galaxy.tool_util.verify.interactor import ToolTestDescription
+from xml_ingestion.galaxy.tests.checks import ValidCheck
+from xml_ingestion.galaxy.tests.mapper import map_ttestout
+
 from janis_core.tool.test_classes import (
     TTestCase,
-    TTestExpectedOutput,
-    TTestPreprocessor
+    TTestExpectedOutput
 )
+
 
 """
 for each galaxy test, need to translate into a janis TTestCase. 
@@ -21,109 +22,86 @@ for each output, need to specify the TTestExpectedOutput.
 this TTestExpectedOutput has a TTestPreprocessor, which obtains the value of the
 """
 
-
-
-def unsupported_strategy(gxout: ToolTestDescription) -> TTestExpectedOutput:
-    raise AttributeNotSupportedError()
-
-def has_size_strategy(gxout: ToolTestDescription) -> TTestExpectedOutput:
-    pass
-    # return TTestExpectedOutput(
-    #     gxout.name,
-    #     TTestPreprocessor.FileSize
-    #     ...
-    # )
-
-
-
-strategy_map: dict[str, Callable[..., TTestExpectedOutput]] = {
-    'lines_diff': has_size_strategy,
-    'ftype': has_size_strategy,
-    'has_size': has_size_strategy,
-    'has_text': has_size_strategy,
-    'not_has_text': has_size_strategy,
-    'has_text_matching': has_size_strategy,
-    'has_line': has_size_strategy,
-    'has_line_matching': has_size_strategy,
-    'has_n_lines': has_size_strategy,
-    'has_n_columns': has_size_strategy,
-
-    're_match': unsupported_strategy,
-    're_match_multiline': unsupported_strategy,
-
-    'has_archive_member': unsupported_strategy,
-    'is_valid_xml': unsupported_strategy,
-    'xml_element': unsupported_strategy,
-    'has_element_with_path': unsupported_strategy,
-    'has_n_elements_with_path': unsupported_strategy,
-    'element_text_matches': unsupported_strategy,
-    'element_text_is': unsupported_strategy,
-    'attribute_matches': unsupported_strategy,
-    'attribute_is': unsupported_strategy,
-    'element_text': unsupported_strategy,
-    'has_h5_keys': unsupported_strategy,
-    'has_h5_attribute': unsupported_strategy
-}
-
-
-
-@dataclass
-class ValidCheck:
-    name: str
-    value: Any
-
-
 class TestFactory:
     def produce(self, gxtest: ToolTestDescription) -> TTestCase:
         return TTestCase(
-            gxtest.name,
+            str(gxtest.name),
             self.prepare_inputs(gxtest),
             self.prepare_outputs(gxtest)
         )
 
     def prepare_inputs(self, gxtest: ToolTestDescription) -> dict[str, Any]:
-        pass
+        """maps the galaxy test def inputs to janis format. not many changes."""
+        inputs: dict[str, Any] = {}
+        for key, val in gxtest.inputs.items():
+            if isinstance(val, list) and len(val) == 1:
+                val = val[0]
+            inputs[str(key)] = val
+        return inputs
         
     def prepare_outputs(self, gxtest: ToolTestDescription) -> list[TTestExpectedOutput]:
+        outputs: list[TTestExpectedOutput] = []
         for gxout in gxtest.outputs:
             checks = self.gather_checks(gxout)
-            print()
+            outputs += [map_ttestout(c) for c in checks]
+        return outputs
 
-    # TODO here
     def gather_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
         checks: list[ValidCheck] = []
-        
-        # file diff
-        if gxout['value']:
-            checks.append(ValidCheck('lines_diff', gxout['attributes']['lines_diff']))
+        checks += self.gather_diff_checks(gxout)
+        checks += self.gather_re_match_checks(gxout)
+        checks += self.gather_sim_size_checks(gxout)
+        checks += self.gather_file_fingerprint_checks(gxout)
+        checks += self.gather_file_assert_checks(gxout)
+        checks += self.gather_file_contains_checks(gxout)
+        return checks
 
-        match gxout['attributes']['compare']:
-            case 'diff':
-                pass
-            case 're_match' | 're_match_multiline':
-                pass
-            case 'sim_size':
-                pass
-            case 'contains':
-                pass
-            case _:
-                pass
+    def gather_diff_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        if gxout['attributes']['compare'] == 'diff' and gxout['value']:
+            return [self.create_check(gxout['name'], 'lines_diff', gxout['attributes']['lines_diff'], reffile=gxout['value'])]
+        return []
+    
+    def gather_re_match_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        if gxout['attributes']['compare'] in ['re_match', 're_match_multiline']:
+            raise AttributeNotSupportedError('re_match and re_match_multiline not yet supported')
+        return []
+    
+    def gather_sim_size_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        if gxout['attributes']['compare'] == 'sim_size':
+            fields = ['delta', 'delta_frac']
+            return self.create_attribute_checks(gxout, fields=fields)
+        return []
         
-        # file fingerprint
-        for attname, attval in gxout['attributes'].items():
-            if attname in ['ftype', 'md5', 'checksum'] and attval:
-                checks.append(ValidCheck(attname, attval))
+    def gather_file_fingerprint_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        # file fingerprints
+        # TODO add ftype checks!
+        #fields = ['ftype', 'md5', 'checksum']
+        fields = ['md5', 'checksum']
 
-        # file contents
+        return self.create_attribute_checks(gxout, fields=fields)
+
+    def gather_file_assert_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        checks: list[ValidCheck] = []
         if gxout['attributes']['assert_list']:
             for assertcheck in gxout['attributes']['assert_list']:
-                checks.append(
-                    ValidCheck(
-                        assertcheck['tag'], assertcheck['attributes']
-                    )
-                )
-
+                checks.append(self.create_check(gxout['name'], assertcheck['tag'], assertcheck['attributes']))
         return checks
+        
+    def gather_file_contains_checks(self, gxout: dict[str, Any]) -> list[ValidCheck]:
+        checks: list[ValidCheck] = []
+        if gxout['attributes']['compare'] == 'contains' and gxout['value']:
+            checks.append(self.create_check(gxout['name'], 'has_text', None, reffile=gxout['value']))
+        return checks
+
+    def create_attribute_checks(self, gxout: dict[str, Any], fields: Optional[list[str]] = None) -> list[ValidCheck]:
+        if not fields:
+            fields = []
+        return [ self.create_check(gxout['name'], attname, attval) 
+                 for attname, attval in gxout['attributes'].items() 
+                 if attname in fields and attval]
+
+    def create_check(self, name: str, ctype: str, value: Optional[str], reffile: Optional[str]=None) -> ValidCheck:
+        return ValidCheck(name, ctype, value, reffile)
 
 
         

@@ -9,7 +9,7 @@ from xml_ingestion.galaxy.OutputParamFactory import OutputParamFactory
 from galaxy_tool.param.InputRegister import InputRegister
 from galaxy_tool.param.OutputRegister import OutputRegister
 from galaxy_tool.test import TestRegister
-from xml_ingestion.galaxy.TestFactory import TestFactory
+from xml_ingestion.galaxy.tests.TestFactory import TestFactory
 from galaxy_tool.requirements import Requirement, CondaRequirement, ContainerRequirement
 from galaxy_tool.metadata import Metadata
 

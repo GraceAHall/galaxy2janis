@@ -10,3 +10,9 @@ venv/
 src/galaxy/
 test/data/
 test/rubbish/
+
+richard_questions.txt
+TODO.txt
+galaxy_requirements.txt
+requirements.txt
+edge_cases.txt

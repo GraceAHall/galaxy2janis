@@ -16,7 +16,7 @@ from galaxy_tool.param.InputParam import DataParam, FloatParam, SelectParam
 from galaxy_tool.param.OutputRegister import OutputRegister
 from galaxy_tool.param.OutputParam import DataOutputParam
 
-from janis_core.tool.test_classes import TTestCase
+from janis_core.tool.test_classes import TTestCase, TTestExpectedOutput, TTestPreprocessor
 from galaxy_tool.test import TestRegister
 
 
@@ -103,18 +103,28 @@ class TestGalaxyIngestion(unittest.TestCase):
         self.assertIsInstance(test, TTestCase)
 
         # TTestCase inputs
-        self.assertIsInstance(test.input, dict[str, Any])
+        # TODO add more here later
         self.assertEquals(test.input['file_input'], 'Acetobacter.fna')
         
         # TTestCase outputs
-        self.assertIsInstance(test.output, list[TTestExpectedOutput])
-        #self.assertEquals(test.input[0], )
-        TTestExpectedOutput(
-                        "out_variants_gridss",
-                        preprocessor=TTestPreprocessor.FileContent,
-                        operator=operator.eq,
-                        expected_file=f"{chr17}/NA12878/brca1.germline.gridss.vcf",
-                    ),
+        # Test-1
+        test = tool.list_tests()[0]
+        self.assertEquals(len(test.output), 4)
+        self.assertIsInstance(test.output[0], TTestExpectedOutput)
+        ttestout = test.output[0]
+        self.assertEqual(ttestout.preprocessor, TTestPreprocessor.LinesDiff)
+        self.assertEqual(ttestout.file_diff_source, 'output_noresults.txt')
+        self.assertEqual(ttestout.expected_value, 0)
+        ttestout = test.output[1]
+        self.assertEqual(ttestout.preprocessor, TTestPreprocessor.FileContent)
+        self.assertEqual(ttestout.expected_value, 'ACCESSION')
+
+        # Test-2
+        test = tool.list_tests()[1]
+        ttestout = test.output[0]
+        self.assertEqual(ttestout.preprocessor, TTestPreprocessor.FileContent)
+        self.assertEqual(ttestout.expected_file, 'output_mrsa.txt')
+
 
 
 

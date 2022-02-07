@@ -9,15 +9,8 @@ TODO v0.1
 
 
 
-
-
-Today:
- - all about params 
-
 2022
 TODO:
- - ABC for everything - ToolParam etc. Want zero coupling to Galaxy classes. 
- - map galaxy toolparam to internal
  - command parsing 
     - process command 3 tokens at a time as TokenThruples
     - prev, curr, next 
