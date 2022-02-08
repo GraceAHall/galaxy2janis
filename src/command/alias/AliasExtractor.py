@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from galaxy_tool.tool_definition import GalaxyToolDefinition
+    from tool.tool_definition import GalaxyToolDefinition
 
 
 from logger.Logger import Logger

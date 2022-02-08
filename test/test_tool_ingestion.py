@@ -1,23 +1,26 @@
 
 
-from typing import Any
 import unittest
 
-from execution import load_settings
+from runtime import load_settings
 from xml_ingestion import ingest
 
-from galaxy_tool.tool_definition import GalaxyToolDefinition
-from galaxy_tool.metadata import Metadata
-from galaxy_tool.requirements import CondaRequirement
+from tool.tool_definition import GalaxyToolDefinition
+from tool.metadata import Metadata
+from tool.requirements import CondaRequirement
 
-from galaxy_tool.param.InputRegister import InputRegister
-from galaxy_tool.param.InputParam import DataParam, FloatParam, SelectParam
+from tool.param.InputRegister import InputRegister
+from tool.param.InputParam import DataParam, FloatParam, SelectParam
 
-from galaxy_tool.param.OutputRegister import OutputRegister
-from galaxy_tool.param.OutputParam import DataOutputParam
+from tool.param.OutputRegister import OutputRegister
+from tool.param.OutputParam import DataOutputParam
 
-from janis_core.tool.test_classes import TTestCase, TTestExpectedOutput, TTestPreprocessor
-from galaxy_tool.test import TestRegister
+from janis_core.tool.test_classes import (
+    TTestCase, 
+    TTestExpectedOutput, 
+    TTestPreprocessor
+)
+from tool.test import TestRegister
 
 
 class TestGalaxyIngestion(unittest.TestCase):

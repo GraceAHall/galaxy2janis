@@ -5,8 +5,8 @@
 
 from command.alias.Alias import AliasRegister
 from command.tokens.Tokens import Token, TokenType
-from galaxy_tool.param.ParamRegister import ParamRegister
-from galaxy_tool.param.OutputRegister import OutputRegister
+from tool.param.ParamRegister import ParamRegister
+from tool.param.OutputRegister import OutputRegister
 from logger.Logger import Logger
 from utils import general_utils
 

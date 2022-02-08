@@ -14,7 +14,6 @@ from galaxy.tools.parameters.basic import ToolParameter
 from command.tokens.Tokens import Token, TokenType
 
 from command.tokens.token_utils import tokenify
-import galaxy_utils
 
 
 

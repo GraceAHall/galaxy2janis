@@ -5,7 +5,7 @@ import requests
 import json
 import os
 import regex as re
-from galaxy_tool.tool_definition import GalaxyToolDefinition
+from tool.tool_definition import GalaxyToolDefinition
 
 from logger.Logger import Logger
 from utils.general_utils import global_align

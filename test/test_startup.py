@@ -3,9 +3,9 @@
 
 
 import unittest
-from execution import load_settings
-from execution.settings import ExecutionSettings, InputWorkflow
-from execution.validation import InputException, SettingsValidator
+from runtime import load_settings
+from runtime.settings import ExecutionSettings, InputWorkflow
+from runtime.validation import InputException, SettingsValidator
 
 
 

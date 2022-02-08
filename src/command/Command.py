@@ -2,12 +2,13 @@
 
 # pyright: basic 
 
+from dataclasses import dataclass
 from re import L, split
 from typing import Union, Optional
 
 from command.CommandString import CommandString
-from galaxy_tool.param.OutputRegister import OutputRegister
-from galaxy_tool.param.ParamRegister import ParamRegister
+from tool.param.OutputRegister import OutputRegister
+from tool.param.ParamRegister import ParamRegister
 from command.CommandComponents import Positional, Flag, Option, Output
 from command.tokens.Tokens import Token, TokenType
 from galaxy.tool_util.parser.output_objects import ToolOutput
@@ -17,15 +18,24 @@ from command.tokens.token_utils import split_keyval_to_best_tokens
 CommandComponent = Union[Positional, Flag, Option]
 
 
+
+# @dataclass
+# class Command:
+#     positionals: dict[int, Positional] = {}
+#     flags: dict[str, Flag] = {}
+#     options: dict[str, Option] = {}
+#     outputs: list[Output] = []
+
+#     def update_positionals(self, positional: Positional) -> None:
+#         pass
+
+
+
 class Command:
     def __init__(self, param_register: ParamRegister, out_register: OutputRegister):
         self.param_register = param_register
         self.out_register = out_register
 
-        self.positionals: dict[int, Positional] = {}
-        self.flags: dict[str, Flag] = {}
-        self.options: dict[str, Option] = {}
-        self.outputs: list[Output] = self.init_outputs()
         self.base_command: list[str] = []
 
         # iteration attributes

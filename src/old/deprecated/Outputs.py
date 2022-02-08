@@ -6,7 +6,7 @@
 from xml.etree import ElementTree as et
 import re
 
-from galaxy_tool.param.ParamRegister import ParamRegister
+from tool.param.ParamRegister import ParamRegister
 from utils.etree_utils import get_attribute_value
 #from utils.galaxy_utils import consolidate_types
 

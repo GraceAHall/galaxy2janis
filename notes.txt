@@ -1,4 +1,30 @@
 
+
+
+
+galaxy stuff
+public
+- get_app
+- get_tool
+- eval_test_cmdstring
+
+private
+- init_app
+- init_tool
+- setup_evaluator
+- setup_job
+    - inputs
+    - parameters
+    - outputs
+- generate_dataset
+    - generate_hda
+
+
+
+
+
+
+
 Questions
 - what to do when the tool version doesnt match the main requirement version?
 

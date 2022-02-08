@@ -1,14 +1,14 @@
 
 
 import sys
-from typing import Container 
+from typing import Container
 
+from runtime.startup import load_settings
+from runtime.settings import ExecutionSettings
 
-from execution import load_settings
-from execution.settings import ExecutionSettings
-
-from xml_ingestion import ingest
-from galaxy_tool.tool_definition import GalaxyToolDefinition
+from gxmanager import GalaxyManager
+from tool.parsing import parse_gx_to_internal
+from tool.tool_definition import GalaxyToolDefinition
 
 from command.Command import Command
 from containers.Container import Container
@@ -17,32 +17,40 @@ from containers.Container import Container
 
 # main entry point
 def main():
-    esettings = load_settings(sys.argv[1:])
-    gx_tool_def = ingest(esettings.get_xml_path(), method='galaxy')
-
+    esettings: ExecutionSettings = load_settings(sys.argv[1:])
+    gxmanager = load_galaxy_manager(esettings)
+    toolrep = load_tool(gxmanager)
     
-    command = infer_command(esettings, gx_tool_def)
-    container = fetch_container(esettings, gx_tool_def)
-    write_janis(esettings, gx_tool_def, command, container)
-    write_tests(esettings, gx_tool_def)
+
+    command = infer_command(gxmanager, toolrep)
+
+    container = fetch_container(esettings, toolrep)
+    write_janis(esettings, toolrep, command, container)
+    write_tests(esettings, toolrep)
 
 
-def infer_command(esettings: ExecutionSettings, gx_tool_def: GalaxyToolDefinition) -> Command:
+def load_galaxy_manager(esettings: ExecutionSettings) -> GalaxyManager:
+    return GalaxyManager(esettings.get_xml_path())
+
+def load_tool(gxmanager: GalaxyManager) -> GalaxyToolDefinition:
+    galaxytool = gxmanager.get_tool()
+    return parse_gx_to_internal(galaxytool)
+
+def infer_command(gxmanager: GalaxyManager, tooldef: GalaxyToolDefinition) -> Command:
+    commandstrs = gxmanager.get_command_strings(tooldef)
+    print()
+
+def fetch_container(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> Container:
     pass
-
-
-def fetch_container(esettings: ExecutionSettings, gx_tool_def: GalaxyToolDefinition) -> Container:
-    pass
-
 
 def write_janis(esettings: ExecutionSettings, 
-                gx_tool_def: GalaxyToolDefinition,
+                tooldef: GalaxyToolDefinition,
                 command: Command, 
                 container: Container) -> None:
     pass
 
 
-def write_tests(esettings: ExecutionSettings, gx_tool_def: GalaxyToolDefinition) -> None:
+def write_tests(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> None:
     pass
 
 
