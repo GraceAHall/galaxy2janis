@@ -43,8 +43,8 @@ class CommandBlock:
     def init_tokens(self, word: str) -> Token:
         token = tokenify(word, param_register=self.param_register, out_register=self.out_register)
         
-        # possibly split token if GX_PARAM is hiding flags or options
-        if token.type == TokenType.GX_PARAM:
+        # possibly split token if GX_INPUT is hiding flags or options
+        if token.type == TokenType.GX_INPUT:
             tokens = self.expand_galaxy_tokens(token)
         else:
             tokens = [token]
@@ -53,7 +53,7 @@ class CommandBlock:
 
 
     def get_galaxy_ref_count(self) -> int:
-        galaxy_token_types = [TokenType.GX_PARAM, TokenType.GX_OUT, TokenType.GX_KEYWORD]
+        galaxy_token_types = [TokenType.GX_INPUT, TokenType.GX_OUT, TokenType.GX_KEYWORD]
         count = len([t for tl in self.tokens for t in tl if t.type in galaxy_token_types])
         return count
 
@@ -62,7 +62,7 @@ class CommandBlock:
         cutoff = self.get_first_command_end()
         tokens = self.tokens[:cutoff]
         # sentinel
-        tokens.append([Token('__END_COMMAND__', self.statement_block, TokenType.END_COMMAND)])
+        tokens.append([Token('__END_STATEMENT__', self.statement_block, TokenType.END_STATEMENT)])
         return tokens
 
 

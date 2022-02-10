@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 from logger.Logger import Logger
 from command.tokens.Tokens import Token, TokenType
 
-from command.expressions.regex_utils import find_unquoted, get_simple_strings
+from command.regex.utils import find_unquoted, get_simple_strings
 from command.tokens.token_utils import tokenify
 
 
@@ -85,7 +85,7 @@ class AliasRegister:
             # update
             if source is not None and dest is not None:
                 # destination is a know galaxy object
-                if dest.type in [TokenType.GX_OUT, TokenType.GX_PARAM]:
+                if dest.type in [TokenType.GX_OUT, TokenType.GX_INPUT]:
                     self.add(source.text, dest.text, from_cmd, line)
 
                 # destination is a number

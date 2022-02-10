@@ -19,7 +19,7 @@ def generate_dataset(app: MockApp, varname: str, iotype: str) -> Union[JobToInpu
     """
     i = app.dataset_counter
     path = varname
-    varrep = '__uwu_' + varname
+    varrep = '__ʕ•́ᴥ•̀ʔっ♡_' + varname
     app.dataset_counter += 1
 
     if iotype == 'input':

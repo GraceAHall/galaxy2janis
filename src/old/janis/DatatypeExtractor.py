@@ -356,7 +356,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
         \"""
         fallback_datatypes = self.file_t
 
-        if the_token.type == TokenType.GX_PARAM:
+        if the_token.type == TokenType.GX_INPUT:
             varname, param = self.tool.param_register.get(the_token.gx_ref)
             gxformat_list = param.galaxy_type.split(',')
 
@@ -412,13 +412,13 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
         \"""
         flags or option can have multiple references in the command string
         and therefore be set from multiple tokens
-        some tokens (ie GX_PARAM or GX_OUT) are more informative of the real type(s)
+        some tokens (ie GX_INPUT or GX_OUT) are more informative of the real type(s)
         this func selects the best source to annotate types from
         \"""
 
         from_galaxy = []
         for token_type, datatypes in source_datatypes:
-            if token_type in [TokenType.GX_PARAM, TokenType.GX_OUT] and len(datatypes) > 0:
+            if token_type in [TokenType.GX_INPUT, TokenType.GX_OUT] and len(datatypes) > 0:
                 from_galaxy.append(datatypes)
         
         from_numeric = [dt for tt, dt in source_datatypes if tt in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]]    

@@ -15,7 +15,6 @@ from command.tokens.Tokens import Token, TokenType
 from logger.Logger import Logger
 
 from utils.general_utils import global_align
-from command.expressions.regex_utils import get_galaxy_keyword_value, get_galaxy_keywords, get_words
 from command.tokens.token_utils import split_line_by_ands
 
 
@@ -35,7 +34,7 @@ class CommandString:
         self.logger = logger
         self.alias_register = AliasRegister(self.tool, self.logger)
         self.command_blocks: list[CommandBlock] = []
-        self.keywords = self.get_keywords()
+        self.keywords = self.load_keywords()
         
         self.statement_block = -1
         self.levels = {
@@ -46,7 +45,7 @@ class CommandString:
         self.set_best_block()
 
 
-    def get_keywords(self) -> dict[str, set[str]]:
+    def load_keywords(self) -> dict[str, set[str]]:
         keywords: dict[str, set[str]] = {}
         keywords['ch_open_conditional'] = set(['#if ', '#unless '])
         keywords['ch_close_conditional'] = set(['#end if', '#end unless'])
@@ -87,7 +86,7 @@ class CommandString:
 
     def add_block_sentinels(self) -> None:
         for block in self.command_blocks:
-            end_sentinel = Token('__END__', TokenType.END_COMMAND)
+            end_sentinel = Token('__END__', TokenType.END_STATEMENT)
             block.tokens.append([end_sentinel])
 
 

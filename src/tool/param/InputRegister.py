@@ -2,7 +2,6 @@
 
 
 from typing import Any, Optional
-import json 
 
 from tool.param.Param import Param 
 from tool.param.ParamRegister import (
@@ -32,6 +31,26 @@ class InputRegister(ParamRegister):
         search_strategy = strategy_map[strategy]
         return search_strategy.search(query, self.inputs)
 
+    def to_dict(self) -> dict[str, Any]:
+        param_dict: dict[str, Any] = {}
+        for varname, param in self.inputs.items():
+            node = param_dict
+            varpath = varname.split('.')
+            for i, text in enumerate(varpath):
+                if text not in node:
+                    if i == len(varpath) - 1:
+                        # terminal path, add param to node
+                        node[text] = param.get_default()
+                        break
+                    else:
+                        # create new node for section
+                        node[text] = {}
+                node = node[text]
+        return param_dict
+
+
+    
+    """
     def to_json(self) -> dict[str, Any]:
         param_dict = self._get_param_dict()
         param_dict = self._jsonify_param_dict(param_dict)
@@ -59,6 +78,6 @@ class InputRegister(ParamRegister):
             if type(val) == dict:
                 param_dict[key] = json.dumps(val)  
         return param_dict
-
+    """
 
 

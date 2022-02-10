@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from re import L, split
 from typing import Union, Optional
 
-from command.CommandString import CommandString
+from command.CommandStringOld import CommandString
 from tool.param.OutputRegister import OutputRegister
 from tool.param.ParamRegister import ParamRegister
 from command.CommandComponents import Positional, Flag, Option, Output
@@ -429,7 +429,7 @@ class Command:
                 return True
             
             # this is the last command token
-            elif ntoken.type == TokenType.END_COMMAND:
+            elif ntoken.type == TokenType.END_STATEMENT:
                 return True
                 
         return False

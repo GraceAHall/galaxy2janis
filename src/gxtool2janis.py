@@ -1,7 +1,8 @@
 
 
 import sys
-from typing import Container
+from command.CommandStringFactory import CommandStringFactory
+from typing import Container, Tuple
 
 from runtime.startup import load_settings
 from runtime.settings import ExecutionSettings
@@ -37,7 +38,10 @@ def load_tool(gxmanager: GalaxyManager) -> GalaxyToolDefinition:
     return parse_gx_to_internal(galaxytool)
 
 def infer_command(gxmanager: GalaxyManager, tooldef: GalaxyToolDefinition) -> Command:
-    commandstrs = gxmanager.get_command_strings(tooldef)
+    raw_strings: list[Tuple[str, str]] = gxmanager.get_raw_command_strings(tooldef)
+    csf = CommandStringFactory(tooldef)
+    for source, raw_str in raw_strings:
+        cmdstr = csf.create(source, raw_str)
     print()
 
 def fetch_container(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> Container:

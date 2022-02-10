@@ -2,6 +2,7 @@
 
 
 #from gx_src.tools import Tool as GalaxyTool
+import json
 from typing import Any, Optional
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
@@ -28,6 +29,7 @@ class JobFactory:
         self.init_job(history)
         self.set_job_inputs()
         self.handle_test_values()
+        self.jsonify_job_inputs()
         self.set_job_parameters()
         self.set_job_outputs()
         return self.job
@@ -44,7 +46,7 @@ class JobFactory:
         self.job.history.id = 1337
 
     def set_job_inputs(self) -> None:
-        self.job_inputs = self.tool.inputs_to_json()
+        self.job_inputs: dict[str, Any] = self.tool.get_inputs(format='dict')
 
     def handle_test_values(self) -> None:
         tvalues: dict[str, Any] = self.test.inputs
@@ -77,6 +79,11 @@ class JobFactory:
                 tree[text] = value
             else:
                 tree = tree[text]
+
+    def jsonify_job_inputs(self) -> None:
+        for key, val in self.job_inputs.items():
+            if type(val) == dict:
+                self.job_inputs[key] = json.dumps(val)  
 
     def set_job_parameters(self) -> None:
         self.job.parameters = [JobParameter(name=k, value=v) for k, v in self.job_inputs.items()]

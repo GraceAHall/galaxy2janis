@@ -4,11 +4,6 @@ NOTE check janis-patterns github for tricky situations
 
 TODO v0.1
 
-
-
-
-
-
 2022
 TODO:
  - command parsing 

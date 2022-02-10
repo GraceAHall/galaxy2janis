@@ -6,13 +6,12 @@ from typing import Tuple
 from command.tokens.Tokens import Token, TokenType
 from tool.param.OutputRegister import OutputRegister
 from tool.param.ParamRegister import ParamRegister 
-from command.expressions.regex_utils import (
+from command.regex.utils import (
     get_cheetah_vars, 
     get_quoted_numbers,
     get_raw_numbers,
     get_quoted_strings,
     get_raw_strings,
-    get_linux_operators,
     get_keyval_pairs,
     find_unquoted
 )  
@@ -65,8 +64,8 @@ def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_regi
     gets all the possible token interpretations of the_string
     """  
     # early exits
-    if the_string == '__END_COMMAND__':
-        return [Token('', TokenType.END_COMMAND)]
+    if the_string == '__END_STATEMENT__':
+        return [Token('', TokenType.END_STATEMENT)]
     elif the_string == '':
         raise Exception('cannot tokenify blank string')
 
@@ -77,7 +76,7 @@ def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_regi
     ch_vars = get_cheetah_vars(the_string) # get cheetah vars
     if param_register is not None:
         gx_params = [x for x in ch_vars if param_register.get(x)[0] is not None]
-        tokens += [Token(gx_var, TokenType.GX_PARAM) for gx_var in gx_params]
+        tokens += [Token(gx_var, TokenType.GX_INPUT) for gx_var in gx_params]
     
     if out_register is not None:
         gx_outs = [x for x in ch_vars if out_register.get(x) is not None]  
@@ -125,7 +124,7 @@ def select_highest_priority_token(tokens: list[Token], prioritise_tokens: True) 
 
 def get_highest_priority_token(tokens: list[Token]) -> Token:
     kv_pairs = [t for t in tokens if t.type == TokenType.KV_PAIR]
-    gx_params = [t for t in tokens if t.type == TokenType.GX_PARAM]
+    gx_params = [t for t in tokens if t.type == TokenType.GX_INPUT]
     gx_outs = [t for t in tokens if t.type == TokenType.GX_OUT]
     linux_ops = [t for t in tokens if t.type == TokenType.LINUX_OP]
 

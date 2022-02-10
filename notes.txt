@@ -2,22 +2,22 @@
 
 
 
-galaxy stuff
-public
-- get_app
-- get_tool
-- eval_test_cmdstring
 
-private
-- init_app
-- init_tool
-- setup_evaluator
-- setup_job
-    - inputs
-    - parameters
-    - outputs
-- generate_dataset
-    - generate_hda
+
+Command
+
+simplify raw string
+resolve aliases
+split raw string into CommandStatements
+    - search for && || | ;
+tokenize
+
+
+
+
+
+
+
 
 
 

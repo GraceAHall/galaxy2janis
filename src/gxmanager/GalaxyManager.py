@@ -4,7 +4,7 @@
 
 import os
 import tempfile
-from typing import Optional
+from typing import Any, Optional, Tuple
 
 from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.parser import get_tool_source
@@ -17,7 +17,11 @@ from tool.tool_definition import GalaxyToolDefinition
 from gxmanager.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
 from gxmanager.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
 
-from command.CommandString import CommandString
+from command.CommandStringOld import CommandString
+
+
+
+
 
 
 class GalaxyManager:
@@ -41,13 +45,18 @@ class GalaxyManager:
             self.tool = self._init_tool()
         return self.tool
 
-    def get_command_strings(self, tooldef: GalaxyToolDefinition) -> list[CommandString]:
+    def get_raw_command_strings(self, tooldef: GalaxyToolDefinition) -> list[Tuple[str, str]]:
         test_cmds = self._get_test_commands(tooldef)
-        xml_cmd = self._get_xml_command(tooldef)
-        #workflow_cmd = self._get_workflow_command()
-        return test_cmds + [xml_cmd]
-    
-    def _get_test_commands(self, tooldef: GalaxyToolDefinition) -> list[CommandString]:
+        xml_cmds = self._get_xml_commands(tooldef)
+        #workflow_cmds = self._get_workflow_command()
+
+        out: list[Tuple[str, str]] = []
+        out += [('test', cmdstr) for cmdstr in test_cmds]
+        out += [('xml', cmdstr) for cmdstr in xml_cmds]
+        #out += [('workflow', cmdstr) for cmdstr in workflow_cmds]
+        return out
+
+    def _get_test_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
         app = self.get_app()
         gxtool = self.get_tool()
         tcl = TestCommandLoader(app, self.history, gxtool, tooldef)
@@ -55,10 +64,12 @@ class GalaxyManager:
         cmdstrs = [s for s in cmdstrs if s is not None]
         return cmdstrs
 
-    def _get_xml_command(self, tooldef: GalaxyToolDefinition) -> list[str]:
+    def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
         # create CommandString for tooldef.command
         xcl = XMLCommandLoader(tooldef)
-        return xcl.load()
+        cmdstrs = [xcl.load()]
+        cmdstrs = [s for s in cmdstrs if s is not None]
+        return cmdstrs
 
     def _get_workflow_command(self) -> None:
         raise NotImplementedError

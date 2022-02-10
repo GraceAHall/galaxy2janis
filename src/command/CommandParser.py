@@ -6,7 +6,7 @@ from typing import Optional, Any
 from galaxy.tools import Tool as GalaxyTool
 from tool.tool_definition import GalaxyToolDefinition
 from classes.templating.MockClasses import MockApp
-from command.CommandString import CommandString
+from command.CommandStringOld import CommandString
 from command.Command import Command
 from classes.command.XMLCommandLoader import XMLCommandLoader
 from classes.command.TestCommandLoader import TestCommandLoader
