@@ -15,12 +15,7 @@ from command.regex.utils import find_unquoted, get_simple_strings
 from command.tokens.token_utils import tokenify
 
 
-class Alias:
-    def __init__(self, source: str, dest: str, instruction: str, text: str):
-        self.source = source
-        self.dest = dest
-        self.instruction = instruction
-        self.text = text
+
 
 
 """
