@@ -13,7 +13,7 @@ from command.CommandComponents import Positional, Flag, Option, Output
 from command.tokens.Tokens import Token, TokenType
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tools.parameters.basic import ToolParameter
-from command.tokens.token_utils import split_keyval_to_best_tokens 
+from command.tokens.utils import split_keyval_to_best_tokens 
 
 CommandComponent = Union[Positional, Flag, Option]
 

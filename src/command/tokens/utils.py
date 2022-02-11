@@ -7,12 +7,7 @@ from command.tokens.Tokens import Token, TokenType
 from tool.param.OutputRegister import OutputRegister
 from tool.param.ParamRegister import ParamRegister 
 from command.regex.utils import (
-    get_cheetah_vars, 
-    get_quoted_numbers,
-    get_raw_numbers,
-    get_quoted_strings,
-    get_raw_strings,
-    get_keyval_pairs,
+
     find_unquoted
 )  
 
@@ -73,7 +68,7 @@ def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_regi
 
     # galaxy inputs / outputs
     # quoted or not doesn't matter. just linking. can resolve its datatype later. 
-    ch_vars = get_cheetah_vars(the_string) # get cheetah vars
+    ch_vars = get_variables(the_string) # get cheetah vars
     if param_register is not None:
         gx_params = [x for x in ch_vars if param_register.get(x)[0] is not None]
         tokens += [Token(gx_var, TokenType.GX_INPUT) for gx_var in gx_params]

@@ -13,7 +13,7 @@ from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tools.parameters.basic import ToolParameter
 from command.tokens.Tokens import Token, TokenType
 
-from command.tokens.token_utils import tokenify
+from command.tokens.utils import tokenify
 
 
 

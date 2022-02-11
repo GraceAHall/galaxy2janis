@@ -28,7 +28,7 @@ class GalaxyToolDefinition:
     tests: TestRegister
 
     def get_input(self, query: str, strategy: str='default') -> Optional[Param]:
-        return self.inputs.get(query, strategy=strategy)
+        return self.inputs.get(query.lstrip('$'), strategy=strategy)
     
     def get_inputs(self, format: str='list') -> Any:
         if format == 'list':
@@ -37,7 +37,7 @@ class GalaxyToolDefinition:
             return self.inputs.to_dict()
 
     def get_output(self, query: str, strategy: str='default') -> Optional[Param]:
-        return self.outputs.get(query, strategy=strategy)
+        return self.outputs.get(query.lstrip('$'), strategy=strategy)
     
     def list_outputs(self) -> list[Param]:
         return self.outputs.list()

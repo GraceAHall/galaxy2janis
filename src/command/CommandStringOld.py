@@ -8,14 +8,14 @@ if TYPE_CHECKING:
     from tool.tool_definition import GalaxyToolDefinition
 
 
-from command.alias.Alias import AliasRegister
+from command.alias.AliasOld import AliasRegister
 from command.CommandBlock import CommandBlock
 
 from command.tokens.Tokens import Token, TokenType
 from logger.Logger import Logger
 
 from utils.general_utils import global_align
-from command.tokens.token_utils import split_line_by_ands
+from command.tokens.utils import split_line_by_ands
 
 
 

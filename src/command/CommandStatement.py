@@ -1,19 +1,22 @@
 
 
 
+from typing import Optional
 from command.linux_constructs import Tee, Redirect, StreamMerge
 from command.tokens.Tokens import Token
 
 
 class CommandStatement:
-    def __init__(self, raw_string: str):
-        self.raw_string = raw_string
+    def __init__(self, cmdline: str, end_delim: Optional[str]=None):
+        self.cmdline = cmdline
+        self.end_delim = end_delim
         self.tokens: list[list[Token]] = []
-        
-        # L8R
+
+        # later
         self.stream_merges: list[StreamMerge] = []
         self.redirects: list[Redirect] = []
         self.tees: list[Tee] = []
 
 
-    
+    'abricate input > output'  
+    'cp working/* outputs/*'

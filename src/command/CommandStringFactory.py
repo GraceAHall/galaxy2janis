@@ -6,30 +6,67 @@
 
 
 
+from typing import Optional
+
 from command.CommandStatement import CommandStatement
 from tool.tool_definition import GalaxyToolDefinition
+from command.tokens.Tokenifier import Tokenifier
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 from command.alias.AliasResolver import AliasResolver
 from command.CommandStatement import CommandStatement
+from command.regex.scanners import get_statement_delims
+        
+
+def split_statements(the_string: str) -> list[CommandStatement]:
+    """
+    splits a string into individual command line statements.
+    these are delimited by &&, ||, | etc
+    """
+    statements: list[str] = []
+    delims: list[Optional[str]] = []
+
+    matches = get_statement_delims(the_string)
+    matches.sort(key=lambda x: x.start())
+
+    for m in reversed(matches):
+        delim: Optional[str] = m[0]
+        left_split = the_string[:m.start()]
+        right_split = the_string[m.end():]
+
+        # working in reverse, so prepend new statements and delims
+        statements = [right_split] + statements
+        delims = [delim] + delims
+
+        # update the string to only be to the left of the split
+        the_string = left_split
+
+    # add final remaining statment (actually is the first statement)
+    # add a None to the end of delims to shift the alignment of stmts and delims
+    # last statement doesnt have trailing delim as command ends
+    statements = [the_string] + statements
+    delims.append(None)
+
+    return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
+
 
 
 class CommandString:
     def __init__(self, statements: list[CommandStatement]):
-        pass
+        self.statements = statements
 
 
 class CommandStringFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
+        self.tokenifier: Tokenifier = Tokenifier(self.tool)
 
     def create(self, source: str, raw_string: str) -> CommandString:
-        simple_str = self.simplify(source, raw_string)
-        resolved_str = self.resolve_aliases(simple_str)
-        print()
-        #statements = self.create_statements(resolved_str)
-        #return CommandString(statements)
+        simple_str = self.simplify_raw_string(source, raw_string)
+        statements = self.create_statements(simple_str)
+        statements = self.resolve_aliases(statements)
+        return CommandString(statements)
 
-    def simplify(self, source: str, the_string: str) -> str:
+    def simplify_raw_string(self, source: str, the_string: str) -> str:
         strategy_map = {
             'test': TestCommandSimplifier(),
             'xml': XMLCommandSimplifier(),
@@ -37,12 +74,15 @@ class CommandStringFactory:
         strategy = strategy_map[source]
         return strategy.simplify(the_string)
 
-    def resolve_aliases(self, the_string: str) -> str:
-        ar = AliasResolver(self.tool)
-        return ar.resolve(the_string)
-
     def create_statements(self, the_string: str) -> list[CommandStatement]:
-        pass
-        #CommandStatement(cmdstr)
+        return split_statements(the_string)
 
+    def resolve_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+        ar = AliasResolver(self.tool, self.tokenifier)
+        for cmd_statement in statements:
+            ar.extract(cmd_statement)
+        for cmd_statement in statements:
+            ar.resolve(cmd_statement)
+        return statements
+        
 

@@ -3,14 +3,14 @@
 
 
 
-from command.alias.Alias import AliasRegister
+from command.alias.AliasOld import AliasRegister
 from command.tokens.Tokens import Token, TokenType
 from tool.param.ParamRegister import ParamRegister
 from tool.param.OutputRegister import OutputRegister
 from logger.Logger import Logger
 from utils import general_utils
 
-from command.tokens.token_utils import tokenify
+from command.tokens.utils import tokenify
 
 
 

@@ -13,7 +13,7 @@ SIMPLE_STRINGS = r'[\w$_-]+'
 WORDS = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
 KEYVAL_PAIRS = r'(?<=\s|^)\S+?[=:]\S+?(?=\s|$)'
 
-VARIABLES = r'(?<=\s|\\)\$\{?[\w.]+\}?'
+VARIABLES = r'\$\{?[\w.]+\}?'
 GX_DYNAMIC_KEYWORDS = r'\$\{?_?GALAXY_.*?[\s:]-(\w+?)\}'
 GX_STATIC_KEYWORDS = r'\$__tool_directory__|\$__new_file_path__|\$__tool_data_path__|\$__root_dir__|\$__datatypes_config__|\$__user_id__|\$__user_email__|\$__app__|\$__target_datatype__'
 
@@ -22,3 +22,4 @@ SH_REDIRECT = r'((?<=\s)\d|&)?>[>&]?(?![>&]?\d)'
 SH_TEE = r'(?<![\d&])\| ?tee( -a)?'
 SH_STREAM_MERGE = r'(?<=\s)\d?>&\d'
 
+OPERATOR = r'[-+\\/*=]?='

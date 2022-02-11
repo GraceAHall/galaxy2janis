@@ -9,11 +9,11 @@ if TYPE_CHECKING:
 
 
 from logger.Logger import Logger
-from command.alias.Alias import AliasRegister
+from command.alias.AliasOld import AliasRegister
 from command.tokens.Tokens import Token, TokenType
 
 from command.regex.utils import find_unquoted, get_simple_strings
-from command.tokens.token_utils import tokenify, split_line_by_ands
+from command.tokens.utils import tokenify, split_line_by_ands
 
 
 """
@@ -61,13 +61,7 @@ class AliasExtractor:
             self.update_aliases(left, right, 'set', line)  
 
 
-    def split_variable_assignment(self, line: str) -> Tuple[str, str]:
-        operator_pattern = r'[-+\\/*=]?='
-        #print('\n' + line)
-
-        operator_start, operator_end = find_unquoted(line, operator_pattern)
-        left, right = line[:operator_start].strip(), line[operator_end:].strip()
-        return left, right
+    
 
             
     def update_aliases(self, left: str, right: str, from_cmd: str, line: str) -> None:

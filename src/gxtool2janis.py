@@ -42,7 +42,7 @@ def infer_command(gxmanager: GalaxyManager, tooldef: GalaxyToolDefinition) -> Co
     csf = CommandStringFactory(tooldef)
     for source, raw_str in raw_strings:
         cmdstr = csf.create(source, raw_str)
-    print()
+        print()
 
 def fetch_container(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> Container:
     pass
