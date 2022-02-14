@@ -2,10 +2,6 @@
 
 
 
-
-
-
-
 from typing import Optional
 
 from command.CommandStatement import CommandStatement
@@ -17,7 +13,7 @@ from command.CommandStatement import CommandStatement
 from command.regex.scanners import get_statement_delims
         
 
-def split_statements(the_string: str) -> list[CommandStatement]:
+def split_to_statements(the_string: str) -> list[CommandStatement]:
     """
     splits a string into individual command line statements.
     these are delimited by &&, ||, | etc
@@ -49,21 +45,27 @@ def split_statements(the_string: str) -> list[CommandStatement]:
     return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 
-
 class CommandString:
     def __init__(self, statements: list[CommandStatement]):
         self.statements = statements
+        self.tool_statement: Optional[CommandStatement] = None
+
+    def set_tool_statement(self) -> None:
+        """guesses which CommandStatement corresponds to tool execution"""
+        pass
 
 
 class CommandStringFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
-        self.tokenifier: Tokenifier = Tokenifier(self.tool)
+        self.tokenifier = Tokenifier(self.tool)
 
     def create(self, source: str, raw_string: str) -> CommandString:
         simple_str = self.simplify_raw_string(source, raw_string)
         statements = self.create_statements(simple_str)
-        statements = self.resolve_aliases(statements)
+        statements = self.resolve_statement_aliases(statements)
+        statements = self.set_statement_tokens(statements)
+        statements = self.set_statement_attrs(statements)
         return CommandString(statements)
 
     def simplify_raw_string(self, source: str, the_string: str) -> str:
@@ -75,9 +77,9 @@ class CommandStringFactory:
         return strategy.simplify(the_string)
 
     def create_statements(self, the_string: str) -> list[CommandStatement]:
-        return split_statements(the_string)
+        return split_to_statements(the_string)
 
-    def resolve_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+    def resolve_statement_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
         ar = AliasResolver(self.tool, self.tokenifier)
         for cmd_statement in statements:
             ar.extract(cmd_statement)
@@ -85,4 +87,12 @@ class CommandStringFactory:
             ar.resolve(cmd_statement)
         return statements
         
+    def set_statement_tokens(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+        for cmd_statement in statements:
+            cmd_statement.set_tokens(self.tokenifier)
+        return statements
 
+    def set_statement_attrs(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+        for cmd_statement in statements:
+            cmd_statement.set_attrs()
+        return statements

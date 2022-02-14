@@ -3,7 +3,7 @@
 
 
 import unittest
-from runtime import load_settings
+from runtime.startup import load_settings
 from runtime.settings import ExecutionSettings, InputWorkflow
 from runtime.validation import InputException, SettingsValidator
 

@@ -2,8 +2,9 @@
 
 import unittest
 
-from runtime import load_settings
-from xml_ingestion import ingest
+from gxtool2janis import load_galaxy_manager, load_tool
+from runtime.startup import load_settings
+from runtime.settings import ExecutionSettings
 
 from tool.tool_definition import GalaxyToolDefinition
 from tool.metadata import Metadata
@@ -34,8 +35,9 @@ class TestGalaxyIngestion(unittest.TestCase):
             "abricate.xml", "test/data/abricate", 
             "--outdir", "test/rubbish",
         ]
-        esettings = load_settings(argv)
-        self.tool = ingest(esettings.get_xml_path(), method='galaxy')
+        esettings: ExecutionSettings = load_settings(argv)
+        gxmanager = load_galaxy_manager(esettings)
+        self.tool = load_tool(gxmanager)
 
     def test_tool(self) -> None:
         self.assertIsNotNone(self.tool)
@@ -61,7 +63,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     def test_inputs(self) -> None:
         tool = self.tool
         self.assertIsInstance(tool.inputs, InputRegister)
-        self.assertEquals(len(tool.list_inputs()), 5)
+        self.assertEquals(len(tool.get_inputs()), 5)
 
     def test_input_params(self) -> None:
         tool = self.tool

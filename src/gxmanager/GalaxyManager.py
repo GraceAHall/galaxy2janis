@@ -4,7 +4,7 @@
 
 import os
 import tempfile
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.parser import get_tool_source
@@ -12,22 +12,28 @@ from galaxy.tools import create_tool_from_source
 from galaxy.model import History
 
 from gxmanager.mock import MockApp, MockObjectStore
+from runtime.settings import ExecutionSettings
 from tool.tool_definition import GalaxyToolDefinition
 
 from gxmanager.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
 from gxmanager.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
 
-from command.CommandStringOld import CommandString
-
-
-
-
 
 
 class GalaxyManager:
-    def __init__(self, xml_path: str) -> None:
-        self.xml_path = xml_path
-        self.history = History()
+    def __init__(self, esettings: ExecutionSettings):
+        """ 
+        Manages all galaxy related operations.
+        This includes loading tool xml, templating test cases into command strings, 
+        creating galaxy app etc
+
+        Ideally, all galaxy operations are contained within this class. 
+        
+        single history needed during execution, otherwise will have to reload app 
+        (don't know how to dynamically swap histories using the api) 
+        """
+        self.esettings = esettings
+        self.history = History()  
         self.app: Optional[MockApp] = None
         self.tool: Optional[GxTool] = None
 
@@ -45,7 +51,7 @@ class GalaxyManager:
             self.tool = self._init_tool()
         return self.tool
 
-    def get_raw_command_strings(self, tooldef: GalaxyToolDefinition) -> list[Tuple[str, str]]:
+    def get_raw_cmdstrs(self, tooldef: GalaxyToolDefinition) -> list[Tuple[str, str]]:
         test_cmds = self._get_test_commands(tooldef)
         xml_cmds = self._get_xml_commands(tooldef)
         #workflow_cmds = self._get_workflow_command()
@@ -90,8 +96,8 @@ class GalaxyManager:
 
     def _init_tool(self) -> GxTool:
         app = self.get_app()
-        tool_source = get_tool_source(self.xml_path)
-        tool = create_tool_from_source(app, tool_source, config_file=self.xml_path)
+        tool_source = get_tool_source(self.esettings.get_xml_path())
+        tool = create_tool_from_source(app, tool_source, config_file=self.esettings.get_xml_path())
         tool.assert_finalized()
         return tool
 

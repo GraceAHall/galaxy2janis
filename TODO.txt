@@ -2,21 +2,29 @@
 
 NOTE check janis-patterns github for tricky situations
 
-TODO v0.1
+
+recent TODOs
+
+
+
+ - add a group of tools (the ones in the basic workflow?) to the test suite
+    - create the toolrep
+    - create CommandStatements / CommandString for that toolrep 
+    - Evalutate the tool's tests using TestCommandLoader / JobFactory
+    - etc etc
+    - this way can test a diverse number of input tools 
+
+
 
 2022
 TODO:
- - command parsing 
-    - process command 3 tokens at a time as TokenThruples
-    - prev, curr, next 
- - tokenisation
-    - refactor
-    - python structural pattern matching 
+ - 
  - shlex to handle quotes? 
  - make string representation of TTestCases so we can actually write to a janis tool def file
 
 BEFORE v1.0
-- citations need to be parsed. currently its just skipped. 
+ - migrate AliasResolver stuff to default vals then cheetah templating?
+ - citations need to be parsed. currently its just skipped. 
 
 
 

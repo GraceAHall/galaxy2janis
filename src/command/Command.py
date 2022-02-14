@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from re import L, split
 from typing import Union, Optional
 
-from command.CommandStringOld import CommandString
+from old.CommandStringOld import CommandString
 from tool.param.OutputRegister import OutputRegister
 from tool.param.ParamRegister import ParamRegister
 from command.CommandComponents import Positional, Flag, Option, Output
