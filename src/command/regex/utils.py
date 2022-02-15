@@ -69,6 +69,7 @@ def strip_method_calls(text: str, match: re.Match[str]) -> str:
 
 
 def strip_common_attributes(text: str) -> str:
+    return text
     gx_attributes = set([
         '.forward',
         '.reverse',

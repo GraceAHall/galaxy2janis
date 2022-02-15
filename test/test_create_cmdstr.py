@@ -3,7 +3,7 @@
 
 
 import unittest
-from command.CommandString import CommandStringFactory
+from command.cmdstr.CommandString import CommandStringFactory
 from command.tokens.Tokenifier import Tokenifier
 
 from gxtool2janis import load_galaxy_manager, load_tool
@@ -31,7 +31,6 @@ STATEMENT1_TOKENS = [
     [TokenType.KV_PAIR],
     [TokenType.LINUX_REDIRECT]
 ]
-
 
 
 class TestCreateCommandString(unittest.TestCase):

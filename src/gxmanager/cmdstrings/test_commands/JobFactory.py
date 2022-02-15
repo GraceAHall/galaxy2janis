@@ -2,11 +2,12 @@
 
 
 #from gx_src.tools import Tool as GalaxyTool
+import os
 import json
 from typing import Any, Optional
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-
+from runtime.settings import ExecutionSettings
 from galaxy.model import Job, JobParameter
 from gxmanager.cmdstrings.test_commands.datasets import generate_dataset
 from gxmanager.mock import MockApp
@@ -23,6 +24,8 @@ from galaxy.model import (
 
 
 class JobFactory:
+    def __init__(self, esettings: ExecutionSettings):
+        self.esettings = esettings
     
     def create(self, app: MockApp, history: History, test: ToolTestDescription, tool: GalaxyToolDefinition) -> Optional[Job]:
         self.refresh_attributes(app, test, tool)
@@ -57,11 +60,13 @@ class JobFactory:
             if isinstance(pvalue, list):
                 pvalue = pvalue[0]
             pname = pname.replace('|', '.')
-            input_param = self.tool.get_input(pname, strategy='lca')
-            if input_param:
-                self.handle_input_param(input_param, pvalue)
-            else:
-                raise RuntimeError(f'could not find param {pname}')
+            #testing out a more simple approach, disregarding finding the param
+            #input_param = self.tool.get_input(pname, strategy='lca')
+            # if input_param:
+            #     self.handle_input_param_simple(input_param, pvalue)
+            # else:
+            #     raise RuntimeError(f'could not find param {pname}')
+            self.handle_input_param_simple(pname, pvalue)
 
     def handle_input_param(self, param: Param, override_value: Any) -> None:
         match param:
@@ -73,6 +78,19 @@ class JobFactory:
                 raise NotImplementedError
             case _:
                 self.update_job_input_tree(param.name, override_value)
+    
+    def handle_input_param_simple(self, pname: str, override_value: Any) -> None:
+        if self.test_data_exists(override_value):
+            job_input = generate_dataset(self.app, pname, 'input')
+            self.job.input_datasets.append(job_input)
+            override_value = str(job_input.dataset.dataset_id)
+        self.update_job_input_tree(pname, override_value) 
+
+    def test_data_exists(self, filename: str) -> bool:
+        filepath = f'{self.esettings.get_tool_test_dir()}/{filename}'
+        if os.path.exists(filepath):
+            return True
+        return False
 
     def update_job_input_tree(self, paramname: str, value: Any) -> None:
         param_path = paramname.split('.')
@@ -80,6 +98,9 @@ class JobFactory:
         for i, text in enumerate(param_path):
             if i == len(param_path) - 1:
                 tree[text] = value
+            elif text not in tree:
+                tree[text] = {}
+                tree = tree[text]
             else:
                 tree = tree[text]
 

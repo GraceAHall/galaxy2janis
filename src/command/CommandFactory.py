@@ -3,7 +3,7 @@
 
 
 from command.Command import Command
-from command.CommandString import CommandString
+from command.cmdstr.CommandString import CommandString
 from tool.tool_definition import GalaxyToolDefinition
 
 

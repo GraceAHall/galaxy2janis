@@ -6,9 +6,11 @@ from enum import Enum, auto
 from typing import Optional
 import regex as re
 
+from tool.param.Param import Param
+
 class TokenType(Enum):
     GX_INPUT        = auto()
-    GX_OUT          = auto()
+    GX_OUTPUT       = auto()
     GX_KEYWORD      = auto()
     ENV_VAR         = auto()
     KV_PAIR         = auto()
@@ -21,20 +23,17 @@ class TokenType(Enum):
     LINUX_STREAM_MERGE = auto()
     START_STATEMENT = auto()
     END_STATEMENT   = auto()
+    UNKNOWN         = auto()
 
 
 class Token:
-    def __init__(self, match: re.Match[str], token_type: TokenType, gxvar: Optional[str]=None):
+    def __init__(self, match: re.Match[str], token_type: TokenType, gxvar: Optional[Param]=None):
         self.match = match
         self.type = token_type
         self.gxvar = gxvar
-        self.in_conditional = False
-        self.in_loop = False
-    
+        
     @property
     def text(self) -> str:
-        if self.gxvar:
-            return self.gxvar
         return self.match[0] # type: ignore
     
     @property
@@ -44,6 +43,7 @@ class Token:
     @property
     def end(self) -> int:
         return self.match.end()
+
 
     """
     def __str__(self) -> str:

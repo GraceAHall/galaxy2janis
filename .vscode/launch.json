@@ -25,27 +25,49 @@
             ]
         },
         {
-            "name": "quast",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "args": [
-                "quast.xml", "tools/quast/", 
-                "--outdir", "parsed",
-                "--wflow", "test/test-data/assembly_qc.ga", 
-                "--wstep", "3", 
-                "--debug"
-            ]
-        },
-        {
             "name": "abricate",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
             "args": [
-                "abricate.xml", "tools/abricate/", 
+                "abricate.xml", "test/data/abricate/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
+        {
+            "name": "cutadapt",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "cutadapt.xml", "test/data/cutadapt/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
+        {
+            "name": "multiqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "multiqc.xml", "test/data/multiqc/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
+        {
+            "name": "quast",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "quast.xml", "test/data/quast/", 
                 "--outdir", "parsed",
                 "--debug"
             ]

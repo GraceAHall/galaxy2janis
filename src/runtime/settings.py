@@ -26,6 +26,9 @@ class ExecutionSettings:
         """joins the xmldir and xmlfile to provide xml path"""
         return f'{self.xmldir}/{self.xmlfile}'
 
+    def get_tool_test_dir(self) -> str:
+        return f'{self.xmldir}/test-data'
+
     def get_outdir(self) -> str:
         """
         gets the path to the runtime outdir.

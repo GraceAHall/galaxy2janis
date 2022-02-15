@@ -53,7 +53,7 @@ class CommandBlock:
 
 
     def get_galaxy_ref_count(self) -> int:
-        galaxy_token_types = [TokenType.GX_INPUT, TokenType.GX_OUT, TokenType.GX_KEYWORD]
+        galaxy_token_types = [TokenType.GX_INPUT, TokenType.GX_OUTPUT, TokenType.GX_KEYWORD]
         count = len([t for tl in self.tokens for t in tl if t.type in galaxy_token_types])
         return count
 

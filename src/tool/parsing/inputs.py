@@ -46,7 +46,8 @@ class ParamFlattener:
                     self.explore_node(child, heirarchy)
 
             case Repeat():
-                raise TagNotSupportedError()
+                pass
+                #raise TagNotSupportedError()
 
             case _:
                 raise NotImplementedError()

@@ -182,7 +182,7 @@ class Command:
         """
         """
         if ctoken.type == TokenType.LINUX_OP:
-            if ntoken.type in [TokenType.RAW_STRING, TokenType.GX_OUT]:
+            if ntoken.type in [TokenType.RAW_STRING, TokenType.GX_OUTPUT]:
                 return True
         return False
 

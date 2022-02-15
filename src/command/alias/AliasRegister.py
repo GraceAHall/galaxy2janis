@@ -4,6 +4,10 @@ from typing import Optional
 from command.alias.Alias import Alias
 
 
+# TODO
+# add support for export, mv? statements
+
+
 class AliasRegister:
     def __init__(self):
         self.aliases: dict[str, list[Alias]] = {}

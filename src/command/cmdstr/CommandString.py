@@ -1,17 +1,26 @@
 
 
-
-
 from typing import Optional
 
-from command.CommandStatement import CommandStatement
+from command.cmdstr.CommandStatement import CommandStatement
 from tool.tool_definition import GalaxyToolDefinition
 from command.tokens.Tokenifier import Tokenifier
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 from command.alias.AliasResolver import AliasResolver
-from command.CommandStatement import CommandStatement
 from command.regex.scanners import get_statement_delims
-        
+
+
+
+class CommandString:
+    def __init__(self, statements: list[CommandStatement]):
+        self.statements = statements
+        self.tool_statement: Optional[CommandStatement] = None
+
+    def set_tool_statement(self) -> None:
+        """guesses which CommandStatement corresponds to tool execution"""
+        pass
+
+
 
 def split_to_statements(the_string: str) -> list[CommandStatement]:
     """
@@ -25,7 +34,7 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
     matches.sort(key=lambda x: x.start())
 
     for m in reversed(matches):
-        delim: Optional[str] = m[0]
+        delim: Optional[str] = m[0] # type: ignore
         left_split = the_string[:m.start()]
         right_split = the_string[m.end():]
 
@@ -45,16 +54,6 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
     return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 
-class CommandString:
-    def __init__(self, statements: list[CommandStatement]):
-        self.statements = statements
-        self.tool_statement: Optional[CommandStatement] = None
-
-    def set_tool_statement(self) -> None:
-        """guesses which CommandStatement corresponds to tool execution"""
-        pass
-
-
 class CommandStringFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
@@ -64,7 +63,7 @@ class CommandStringFactory:
         simple_str = self.simplify_raw_string(source, raw_string)
         statements = self.create_statements(simple_str)
         statements = self.resolve_statement_aliases(statements)
-        statements = self.set_statement_tokens(statements)
+        statements = self.set_statement_cmdwords(statements)
         statements = self.set_statement_attrs(statements)
         return CommandString(statements)
 
@@ -87,9 +86,9 @@ class CommandStringFactory:
             ar.resolve(cmd_statement)
         return statements
         
-    def set_statement_tokens(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+    def set_statement_cmdwords(self, statements: list[CommandStatement]) -> list[CommandStatement]:
         for cmd_statement in statements:
-            cmd_statement.set_tokens(self.tokenifier)
+            cmd_statement.set_cmdwords(self.tokenifier)
         return statements
 
     def set_statement_attrs(self, statements: list[CommandStatement]) -> list[CommandStatement]:

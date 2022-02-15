@@ -12,6 +12,9 @@ from command.regex.utils import (
 )  
 
 
+
+
+
 def split_keyval_to_best_tokens(kv_token: Token, param_register: ParamRegister, out_register: OutputRegister) -> Tuple[Token, Token, str]:
     """
     keyval options need to be split into two tokens
@@ -75,7 +78,7 @@ def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_regi
     
     if out_register is not None:
         gx_outs = [x for x in ch_vars if out_register.get(x) is not None]  
-        tokens += [Token(out, TokenType.GX_OUT) for out in gx_outs]  
+        tokens += [Token(out, TokenType.GX_OUTPUT) for out in gx_outs]  
 
     # quoted numbers / strings
     quoted_num_lits = get_quoted_numbers(the_string)
@@ -120,7 +123,7 @@ def select_highest_priority_token(tokens: list[Token], prioritise_tokens: True) 
 def get_highest_priority_token(tokens: list[Token]) -> Token:
     kv_pairs = [t for t in tokens if t.type == TokenType.KV_PAIR]
     gx_params = [t for t in tokens if t.type == TokenType.GX_INPUT]
-    gx_outs = [t for t in tokens if t.type == TokenType.GX_OUT]
+    gx_outs = [t for t in tokens if t.type == TokenType.GX_OUTPUT]
     linux_ops = [t for t in tokens if t.type == TokenType.LINUX_OP]
 
     if len(kv_pairs) > 0:

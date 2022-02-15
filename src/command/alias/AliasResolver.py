@@ -1,7 +1,7 @@
 
 
 from tool.tool_definition import GalaxyToolDefinition
-from command.CommandStatement import CommandStatement
+from command.cmdstr.CommandStatement import CommandStatement
 from command.regex.utils import split_variable_assignment, is_variable_substr, is_string_substr
 from command.regex.scanners import get_simple_strings, get_custom
 from command.tokens.Tokens import TokenType as tt

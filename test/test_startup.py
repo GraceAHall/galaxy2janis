@@ -83,7 +83,7 @@ class TestSettingsValidation(unittest.TestCase):
     def test_validate_xml_fails(self) -> None:
         """should throw FileNotFoundError"""
         self.validator.esettings.xmlfile = 'macros.xml'
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(InputException):
             self.validator.validate_xml()
 
 

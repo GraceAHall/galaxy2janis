@@ -108,6 +108,9 @@ class BoolParam(InputParam):
     def is_optional(self) -> bool:
         return True
 
+    def get_all_values(self) -> list[str]:
+        return [self.truevalue, self.falsevalue]
+
 
 @dataclass
 class SelectOption:
@@ -128,7 +131,6 @@ class SelectParam(InputParam):
         
         if len(self.options) > 0:
             return self.options[0].value
-
         return None        
 
     def get_docstring(self) -> str:
@@ -147,6 +149,9 @@ class SelectParam(InputParam):
             return True
         return False
 
+    def get_all_values(self) -> list[str]:
+        return [opt.value for opt in self.options]
+    
 
 class DataParam(InputParam):
     def __init__(self, name: str):

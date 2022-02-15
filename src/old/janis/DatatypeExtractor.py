@@ -360,7 +360,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
             varname, param = self.tool.param_register.get(the_token.gx_ref)
             gxformat_list = param.galaxy_type.split(',')
 
-        elif the_token.type == TokenType.GX_OUT:
+        elif the_token.type == TokenType.GX_OUTPUT:
             output_var, output = self.tool.out_register.get(the_token.gx_ref)
             gxformat_list = output.galaxy_type.split(',')
 
@@ -418,7 +418,7 @@ def infer_types_from_gx(self, the_token: Token) -> list[dict[str, str]]:
 
         from_galaxy = []
         for token_type, datatypes in source_datatypes:
-            if token_type in [TokenType.GX_INPUT, TokenType.GX_OUT] and len(datatypes) > 0:
+            if token_type in [TokenType.GX_INPUT, TokenType.GX_OUTPUT] and len(datatypes) > 0:
                 from_galaxy.append(datatypes)
         
         from_numeric = [dt for tt, dt in source_datatypes if tt in [TokenType.RAW_NUM, TokenType.QUOTED_NUM]]    

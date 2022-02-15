@@ -48,3 +48,11 @@ def has_n_columns(output_value: Any, kwargs: dict[str, Any]) -> bool:
     return True
 
 
+def has_text_matching(output_value: Any, kwargs: dict[str, Any]) -> bool:
+    try:
+        assert_has_text_matching(output_value, kwargs['expected_value'])
+    except AssertionError:
+        return False
+    return True
+
+

@@ -3,10 +3,13 @@
 NOTE check janis-patterns github for tricky situations
 
 
+OFFLINE
+Repeat tags (and any templating errors caused by repeats)
+creating TTestCases
+
+
 recent TODOs
-
-
-
+ - add ignoring for cheetah #def, #for loops
  - add a group of tools (the ones in the basic workflow?) to the test suite
     - create the toolrep
     - create CommandStatements / CommandString for that toolrep 

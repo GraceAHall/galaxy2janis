@@ -66,7 +66,11 @@ class GalaxyToolIngestor:
         return OutputRegister(outputs)
     
     def get_tests(self) -> TestRegister:
-        """returns a formatted list of tests using the representation"""
-        fac = TestFactory()
-        ttestcases = [fac.produce(t) for t in self.gxtool.tests]
-        return TestRegister(ttestcases)
+        """
+        returns a formatted list of tests using the representation
+        needs to be properly fleshed out later!
+        """
+        return TestRegister([])
+        #fac = TestFactory()
+        #ttestcases = [fac.produce(t) for t in self.gxtool.tests]
+        #return TestRegister(ttestcases)

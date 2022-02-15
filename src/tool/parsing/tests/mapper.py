@@ -29,27 +29,35 @@ def lines_diff_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
     )
 
 def has_size_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
-    return TTestExpectedOutput(
-        tag=f'{vcheck.outname}_{vcheck.ctype}',
-        preprocessor=TTestPreprocessor.FileSize,
-        operator=operator.eq,
-        expected_value=int(vcheck.value)
-    )
-
-def has_text_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
-    if vcheck.value:
+    if vcheck.reffile:
         return TTestExpectedOutput(
             tag=f'{vcheck.outname}_{vcheck.ctype}',
-            preprocessor=TTestPreprocessor.FileContent,
-            operator=custom_ops.has_text,
-            expected_value=str(vcheck.value['text'])
+            preprocessor=TTestPreprocessor.FileSize,
+            operator=operator.eq,
+            expected_file=str(vcheck.reffile)
         )
-    elif vcheck.reffile:
+    elif vcheck.value:
+        return TTestExpectedOutput(
+            tag=f'{vcheck.outname}_{vcheck.ctype}',
+            preprocessor=TTestPreprocessor.FileSize,
+            operator=operator.eq,
+            expected_value=int(vcheck.value)
+        )
+
+def has_text_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
+    if vcheck.reffile:
         return TTestExpectedOutput(
             tag=f'{vcheck.outname}_{vcheck.ctype}',
             preprocessor=TTestPreprocessor.FileContent,
             operator=custom_ops.has_text,
             expected_file=str(vcheck.reffile)
+        )
+    elif vcheck.value:
+        return TTestExpectedOutput(
+            tag=f'{vcheck.outname}_{vcheck.ctype}',
+            preprocessor=TTestPreprocessor.FileContent,
+            operator=custom_ops.has_text,
+            expected_value=str(vcheck.value['text'])
         )
     raise AttributeError('either value or reffile needs to be supplied to each ValidCheck')
     
@@ -67,6 +75,14 @@ def has_n_columns_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
         preprocessor=TTestPreprocessor.FileContent,
         operator=custom_ops.has_n_columns,
         expected_value=int(vcheck.value['n'])
+    )
+
+def has_text_matching_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
+    return TTestExpectedOutput(
+        tag=f'{vcheck.outname}_{vcheck.ctype}',
+        preprocessor=TTestPreprocessor.FileContent,
+        operator=custom_ops.has_text_matching,
+        expected_value=str(vcheck.value['expression'])
     )
 
 def ftype_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:
@@ -90,10 +106,10 @@ strategy_map: dict[str, Callable[..., TTestExpectedOutput]] = {
     'has_text': has_text_strategy,
     'has_n_lines': has_n_lines_strategy,
     'has_n_columns': has_n_columns_strategy,
+    'has_text_matching': has_text_matching_strategy,
 
     # not Implemented
     'not_has_text': not_implemented_strategy,
-    'has_text_matching': not_implemented_strategy,
     'has_line': not_implemented_strategy,
     'has_line_matching': not_implemented_strategy,
 

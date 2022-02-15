@@ -17,9 +17,13 @@ from command.regex.expressions import (
     SH_TEE, 
     SH_STREAM_MERGE, 
     VARIABLES,
-    SH_STATEMENT_DELIMS
+    SH_STATEMENT_DELIMS,
+    ALL
 )
 
+def get_all(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(ALL, the_string)
+    return [m for m in matches]
 
 def get_custom(pattern: str, the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(pattern, the_string)

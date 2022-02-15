@@ -1,6 +1,8 @@
 
 
 import unittest
+from data.tool_args import error_tools, passing_tools
+
 
 from gxtool2janis import load_galaxy_manager, load_tool
 from runtime.startup import load_settings
@@ -31,17 +33,21 @@ class TestGalaxyIngestion(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        argv = [
-            "abricate.xml", "test/data/abricate", 
-            "--outdir", "test/rubbish",
-        ]
-        esettings: ExecutionSettings = load_settings(argv)
-        gxmanager = load_galaxy_manager(esettings)
-        self.tool = load_tool(gxmanager)
+        args: list[str] = passing_tools['abricate']
+        esettings: ExecutionSettings = load_settings(args)
+        self.gxmanager = load_galaxy_manager(esettings)
+        self.tool = load_tool(self.gxmanager)
 
     def test_tool(self) -> None:
         self.assertIsNotNone(self.tool)
         self.assertIsInstance(self.tool, GalaxyToolDefinition)
+
+    def test_all_tools(self) -> None:
+        for toolname, args in passing_tools.items():
+            esettings: ExecutionSettings = load_settings(args)
+            gxmanager = load_galaxy_manager(esettings)
+            tool = load_tool(gxmanager)
+            self.assertIsNotNone(tool)
 
     def test_metadata(self) -> None:
         tool = self.tool
@@ -94,7 +100,7 @@ class TestGalaxyIngestion(unittest.TestCase):
         self.assertIsInstance(param, DataOutputParam)
         self.assertEquals(param.datatypes, ['tabular']) #type: ignore
 
-
+    @unittest.skip("TTestCase parsing currently disabled")
     def test_tests(self) -> None:
         """checks tool xml <tests> ingestion"""
         # All tests are being loaded into register

@@ -5,7 +5,7 @@ from typing import Tuple
 
 from gxmanager import GalaxyManager
 from tool.tool_definition import GalaxyToolDefinition
-from command.CommandString import CommandString, CommandStringFactory
+from command.cmdstr.CommandString import CommandString, CommandStringFactory
 from command.Command import Command
 from command.CommandFactory import CommandFactory
 

@@ -57,15 +57,15 @@ class GalaxyManager:
         #workflow_cmds = self._get_workflow_command()
 
         out: list[Tuple[str, str]] = []
-        out += [('test', cmdstr) for cmdstr in test_cmds]
         out += [('xml', cmdstr) for cmdstr in xml_cmds]
+        out += [('test', cmdstr) for cmdstr in test_cmds]
         #out += [('workflow', cmdstr) for cmdstr in workflow_cmds]
         return out
 
     def _get_test_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
         app = self.get_app()
         gxtool = self.get_tool()
-        tcl = TestCommandLoader(app, self.history, gxtool, tooldef)
+        tcl = TestCommandLoader(app, self.history, gxtool, tooldef, self.esettings)
         cmdstrs = [tcl.load(test) for test in gxtool.tests]
         cmdstrs = [s for s in cmdstrs if s is not None]
         return cmdstrs

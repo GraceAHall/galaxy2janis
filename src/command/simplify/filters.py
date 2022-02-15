@@ -51,6 +51,7 @@ def simplify_sh_constructs(cmdstr: str) -> str:
     cmdstr = cmdstr.replace("&lt;", "<")
     cmdstr = cmdstr.replace("&gt;", ">")
     cmdstr = cmdstr.replace("|&", "2>&1 |")
+    cmdstr = cmdstr.replace("| tee", "|tee")
     cmdstr = cmdstr.replace("1>", ">")
     return cmdstr 
 

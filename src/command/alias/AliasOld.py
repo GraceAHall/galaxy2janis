@@ -77,7 +77,7 @@ class AliasRegister:
             # update
             if source is not None and dest is not None:
                 # destination is a know galaxy object
-                if dest.type in [TokenType.GX_OUT, TokenType.GX_INPUT]:
+                if dest.type in [TokenType.GX_OUTPUT, TokenType.GX_INPUT]:
                     self.add(source.text, dest.text, from_cmd, line)
 
                 # destination is a number

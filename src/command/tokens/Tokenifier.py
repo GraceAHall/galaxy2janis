@@ -1,7 +1,6 @@
 
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from command.tokens.Tokens import Token, TokenType
 from command.regex import scanners as scanners
@@ -35,7 +34,7 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
         priorities: dict[TokenType, int] = {
             TokenType.KV_PAIR: 1,
             TokenType.GX_INPUT: 2,
-            TokenType.GX_OUT: 2,
+            TokenType.GX_OUTPUT: 2,
             TokenType.GX_KEYWORD: 3,
             TokenType.ENV_VAR: 3,
             TokenType.QUOTED_STRING: 4,
@@ -46,7 +45,8 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
             TokenType.END_STATEMENT: 4,
             TokenType.LINUX_TEE: 4,
             TokenType.LINUX_REDIRECT: 4,
-            TokenType.LINUX_STREAM_MERGE: 4
+            TokenType.LINUX_STREAM_MERGE: 4,
+            TokenType.UNKNOWN: 999,
         }
         token_list.sort(key=lambda x: priorities[x.type])
         return token_list
@@ -60,7 +60,11 @@ class Tokenifier:
             (scanners.get_quoted_numbers, TokenType.QUOTED_NUM),
             (scanners.get_quoted_strings, TokenType.QUOTED_STRING),
             (scanners.get_raw_numbers, TokenType.RAW_NUM),
-            (scanners.get_raw_strings, TokenType.RAW_STRING)
+            (scanners.get_raw_strings, TokenType.RAW_STRING),
+            (scanners.get_redirects, TokenType.LINUX_REDIRECT),
+            (scanners.get_tees, TokenType.LINUX_TEE),
+            (scanners.get_stream_merges, TokenType.LINUX_STREAM_MERGE),
+            (scanners.get_all, TokenType.UNKNOWN)
         ]
         self.ordering_strategies: dict[str, TokenOrderingStrategy] = {
             'first':  FirstTokenOrderingStrategy(),
@@ -68,7 +72,7 @@ class Tokenifier:
             'longest':  LongestTokenOrderingStrategy()
         }
     
-    def tokenify(self, word: str, prioritisation: str='priority') -> Optional[Token]:
+    def tokenify(self, word: str, prioritisation: str='priority') -> Token:
         """
         extracts the best token from a word.
         where multiple token types are possible, selection can be made 
@@ -76,9 +80,7 @@ class Tokenifier:
         token_list = self.get_all_tokens(word)
         token_list = self.perform_default_ordering(token_list)
         final_ordering = self.perform_final_ordering(token_list,  prioritisation)
-        if final_ordering:
-            return final_ordering[0]
-        return None
+        return final_ordering[0]
 
     def perform_default_ordering(self, token_list: list[Token]) -> list[Token]:
         #default orderings (low to high priority) first, longest, priority
@@ -111,12 +113,12 @@ class Tokenifier:
         matches = scanners.get_variables(the_string)
         base_vars = [get_base_variable(m) for m in matches]
         
-        for m, var in zip(matches, base_vars):
-            if var:
-                if self.tool.get_input(var):
-                    tokens.append(Token(m, TokenType.GX_INPUT, gxvar=var))
-                elif self.tool.get_output(var):
-                    tokens.append(Token(m, TokenType.GX_OUT, gxvar=var))
+        for m, varname in zip(matches, base_vars):
+            if varname:
+                if self.tool.get_input(varname):
+                    tokens.append(Token(m, TokenType.GX_INPUT, gxvar=self.tool.get_input(varname)))
+                elif self.tool.get_output(varname):
+                    tokens.append(Token(m, TokenType.GX_OUTPUT, gxvar=self.tool.get_output(varname)))
                 else:
                     tokens.append(Token(m, TokenType.ENV_VAR))
         return tokens

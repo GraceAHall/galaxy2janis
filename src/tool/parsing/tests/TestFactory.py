@@ -93,15 +93,26 @@ class TestFactory:
             checks.append(self.create_check(gxout['name'], 'has_text', None, reffile=gxout['value']))
         return checks
 
-    def create_attribute_checks(self, gxout: dict[str, Any], fields: Optional[list[str]] = None) -> list[ValidCheck]:
-        if not fields:
-            fields = []
+    def create_attribute_checks(self, gxout: dict[str, Any], valid_fields: Optional[list[str]] = None) -> list[ValidCheck]:
+        """creates an attribute checks based on the values of valid_valid_fields"""
+        if not valid_fields:
+            valid_fields = []
         return [ self.create_check(gxout['name'], attname, attval) 
                  for attname, attval in gxout['attributes'].items() 
-                 if attname in fields and attval]
+                 if attname in valid_fields and attval]
 
-    def create_check(self, name: str, ctype: str, value: Optional[str], reffile: Optional[str]=None) -> ValidCheck:
+    def create_check(self, name: str, ctype: str, value: Optional[Any], reffile: Optional[str]=None) -> ValidCheck:
         return ValidCheck(name, ctype, value, reffile)
+
+    def create_check2(self, name: str, ctype: str, value: Optional[Any], reffile: Optional[str]=None) -> ValidCheck:
+        if value:
+            if not isinstance(value, dict):
+                test_values: dict[str, Any] = {'value': value}
+            else:
+                test_values = value
+        else:
+            test_values: dict[str, Any] = {}
+        return ValidCheck(name, ctype, test_values, reffile)
 
 
         

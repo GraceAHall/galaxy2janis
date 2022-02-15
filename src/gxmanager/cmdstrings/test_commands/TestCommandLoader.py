@@ -2,6 +2,7 @@
 
 import tempfile
 from typing import Optional
+from runtime.settings import ExecutionSettings
 
 from tool.tool_definition import GalaxyToolDefinition
 from galaxy.tools import Tool as GxTool
@@ -22,21 +23,26 @@ class TestCommandLoader:
     Uses galaxy code to template the galaxy tool and the parameter dict 
     into a valid command string
     """
-    def __init__(self, app: MockApp, history: History, gxtool: GxTool, toolrep: GalaxyToolDefinition):
+    def __init__(self, app: MockApp, history: History, gxtool: GxTool, toolrep: GalaxyToolDefinition, esettings: ExecutionSettings):
         self.app = app
         self.history = history
         self.gxtool = gxtool
         self.toolrep = toolrep
+        self.esettings = esettings
         self.test_directory = tempfile.mkdtemp()
         self.dataset_counter: int = 1
-        self.jobfactory = JobFactory()
+        self.jobfactory = JobFactory(self.esettings)
         
     def load(self, test: ToolTestDescription) -> Optional[list[str]]:
-        job = self.jobfactory.create(self.app, self.history, test, self.toolrep)
-        if job:
-            evaluator = self.setup_evaluator(self.app, self.gxtool, job)
-            command_line, _, __ = evaluator.build()
-            return command_line
+        try:
+            job = self.jobfactory.create(self.app, self.history, test, self.toolrep)
+            if job:
+                evaluator = self.setup_evaluator(self.app, self.gxtool, job)
+                command_line, _, __ = evaluator.build()
+                return command_line
+        # TODO bare excepts are kinda bad.
+        except:
+            return None
 
     def setup_evaluator(self, app: MockApp, gxtool: GxTool, job: Job) -> ToolEvaluator:
         evaluator = ToolEvaluator(app, gxtool, job, self.test_directory)
