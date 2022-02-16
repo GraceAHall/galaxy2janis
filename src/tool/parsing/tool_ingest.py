@@ -44,7 +44,6 @@ def parse_gx_to_internal(gxtool: GxTool) -> GalaxyToolDefinition:
     ingestor = GalaxyToolIngestor(gxtool)
     return GalaxyToolDefinition(
         ingestor.get_metadata(),
-        ingestor.get_requirements(),
         ingestor.get_command(),
         ingestor.get_inputs(),
         ingestor.get_outputs(),

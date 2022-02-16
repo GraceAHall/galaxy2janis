@@ -2,6 +2,7 @@
 from typing import Any, Optional
 
 from tool.param.Param import Param
+from tool.parsing.selectors import Selector
 
 
 class OutputParam(Param):
@@ -9,9 +10,7 @@ class OutputParam(Param):
         self.name: str = name
         self.label: str = ''
         self.datatypes: list[str] = []
-        self.files_wildcard: Optional[str] = ''
-        #self.format_source: Optional[str] = '' TODO later
-        #self.metadata_source: Optional[str] = '' TODO later
+        self.selector: Optional[Selector] = None
 
     def get_default(self) -> Any:
         return None
@@ -33,7 +32,7 @@ class DataOutputParam(OutputParam):
         super().__init__(name)
 
     def is_array(self) -> bool:
-        if self.files_wildcard and '*' in self.files_wildcard:
+        if self.selector and '*' in self.selector.contents:
             return True
         return False
 

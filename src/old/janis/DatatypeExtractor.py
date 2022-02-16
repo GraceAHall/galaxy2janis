@@ -12,7 +12,7 @@ from galaxy.tool_util.parser.output_objects import ToolOutput
 
 from tool.param.ParamRegister import ParamRegister
 from tool.param.OutputRegister import OutputRegister
-from command.CommandComponents import Positional, Flag, Option, Output
+from command.components.CommandComponent import Positional, Flag, Option, Output
 from command.Command import TokenType
 from logger.Logger import Logger
 

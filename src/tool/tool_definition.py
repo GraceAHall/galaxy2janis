@@ -21,7 +21,6 @@ class GalaxyToolDefinition:
     Permits storing and retreiving data about the tool.
     """
     metadata: Metadata
-    requirements: list[Requirement]
     command: str
     inputs: InputRegister
     outputs: OutputRegister

@@ -8,7 +8,7 @@ from datetime import date
 
 
 from tool.tool_definition import GalaxyToolDefinition
-from command.CommandComponents import Output
+from command.components.CommandComponent import Output
 from classes.janis.DatatypeExtractor import DatatypeExtractor
 
 from logger.Logger import Logger

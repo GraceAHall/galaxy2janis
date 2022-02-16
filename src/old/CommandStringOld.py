@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 from command.alias.AliasOld import AliasRegister
-from command.CommandBlock import CommandBlock
+from command.cmdstr.CommandBlock import CommandBlock
 
 from command.tokens.Tokens import Token, TokenType
 from logger.Logger import Logger

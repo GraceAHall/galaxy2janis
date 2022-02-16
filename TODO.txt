@@ -7,6 +7,9 @@ OFFLINE
 Repeat tags (and any templating errors caused by repeats)
 creating TTestCases
 
+today:
+ - fix delim issue (splitting too early with no record)
+
 
 recent TODOs
  - add ignoring for cheetah #def, #for loops

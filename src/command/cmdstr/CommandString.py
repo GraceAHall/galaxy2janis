@@ -2,25 +2,29 @@
 
 from typing import Optional
 
-from command.cmdstr.CommandStatement import CommandStatement
 from tool.tool_definition import GalaxyToolDefinition
+from tool.metadata import Metadata
+
+from command.cmdstr.CommandStatement import CommandStatement
 from command.tokens.Tokenifier import Tokenifier
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 from command.alias.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
+from command.cmdstr.best_statement import get_best_statement
 
 
 
 class CommandString:
-    def __init__(self, statements: list[CommandStatement]):
+    def __init__(self, source: str, statements: list[CommandStatement]):
+        self.source = source
         self.statements = statements
         self.tool_statement: Optional[CommandStatement] = None
 
-    def set_tool_statement(self) -> None:
+    def set_tool_statement(self, metadata: Metadata) -> None:
         """guesses which CommandStatement corresponds to tool execution"""
-        pass
+        self.tool_statement = get_best_statement(self.statements, metadata)
 
-
+   
 
 def split_to_statements(the_string: str) -> list[CommandStatement]:
     """
@@ -54,6 +58,7 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
     return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 
+
 class CommandStringFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
@@ -65,7 +70,9 @@ class CommandStringFactory:
         statements = self.resolve_statement_aliases(statements)
         statements = self.set_statement_cmdwords(statements)
         statements = self.set_statement_attrs(statements)
-        return CommandString(statements)
+        cmdstr = CommandString(source, statements)
+        cmdstr.set_tool_statement(self.tool.metadata)
+        return cmdstr
 
     def simplify_raw_string(self, source: str, the_string: str) -> str:
         strategy_map = {
