@@ -49,7 +49,7 @@ def get_raw_similarities(statements: list[CommandStatement], mainreq: str) -> di
 def get_firstword_similarity(statement: CommandStatement, main_requirement: str) -> float:
     if len(statement.cmdwords) == 0:
         return 0
-    firstword = statement.cmdwords[0].get_first_token()
+    firstword = statement.cmdwords[0].token
     if firstword:
         return global_align(firstword.text, main_requirement)
     return 0

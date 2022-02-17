@@ -62,7 +62,7 @@ class CommandBlock:
         cutoff = self.get_first_command_end()
         tokens = self.tokens[:cutoff]
         # sentinel
-        tokens.append([Token('__END_STATEMENT__', self.statement_block, TokenType.END_STATEMENT)])
+        tokens.append([Token('__END_SENTINEL__', self.statement_block, TokenType.END_SENTINEL)])
         return tokens
 
 

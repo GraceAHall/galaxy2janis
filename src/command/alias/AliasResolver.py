@@ -11,9 +11,8 @@ import regex as re
 
 
 class AliasResolver:
-    def __init__(self, tool: GalaxyToolDefinition, tokenifier: Tokenifier):
-        self.tool = tool
-        self.tokenifier = tokenifier
+    def __init__(self, tool: GalaxyToolDefinition):
+        self.tokenifier = Tokenifier(tool=tool)
         self.register: AliasRegister = AliasRegister()
 
     def extract(self, statement: CommandStatement) -> None:
@@ -83,7 +82,7 @@ class AliasResolver:
                     if self.string_is_polite(dest.text):
                         self.register.add(source.text, dest.text, line)
                 case tt.LINUX_TEE | tt.LINUX_REDIRECT | tt.LINUX_STREAM_MERGE | \
-                    tt.START_STATEMENT | tt.END_STATEMENT:
+                    tt.START_STATEMENT | tt.END_SENTINEL:
                         pass
                 case _:
                     self.register.add(source.text, dest.text, line)

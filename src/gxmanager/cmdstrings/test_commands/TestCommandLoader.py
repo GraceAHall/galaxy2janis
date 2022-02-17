@@ -42,6 +42,7 @@ class TestCommandLoader:
                 return command_line
         # TODO bare excepts are kinda bad.
         except:
+            print(f'test {test.name} failed to template')
             return None
 
     def setup_evaluator(self, app: MockApp, gxtool: GxTool, job: Job) -> ToolEvaluator:

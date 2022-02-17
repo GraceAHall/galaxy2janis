@@ -32,20 +32,21 @@ class LongestTokenOrderingStrategy(TokenOrderingStrategy):
 class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
     def order(self, token_list: list[Token]) -> list[Token]:
         priorities: dict[TokenType, int] = {
-            TokenType.KV_PAIR: 1,
-            TokenType.GX_INPUT: 2,
-            TokenType.GX_OUTPUT: 2,
-            TokenType.GX_KEYWORD: 3,
-            TokenType.ENV_VAR: 3,
-            TokenType.QUOTED_STRING: 4,
-            TokenType.QUOTED_NUM: 4,
-            TokenType.RAW_STRING: 4,
-            TokenType.RAW_NUM: 4,
-            TokenType.START_STATEMENT: 4,
-            TokenType.END_STATEMENT: 4,
-            TokenType.LINUX_TEE: 4,
-            TokenType.LINUX_REDIRECT: 4,
-            TokenType.LINUX_STREAM_MERGE: 4,
+            TokenType.GX_KW_DYNAMIC: 1,
+            TokenType.GX_KW_STATIC: 2,
+            TokenType.KV_PAIR: 3,
+            TokenType.GX_INPUT: 4,
+            TokenType.GX_OUTPUT: 4,
+            TokenType.ENV_VAR: 5,
+            TokenType.QUOTED_STRING: 6,
+            TokenType.QUOTED_NUM: 6,
+            TokenType.RAW_STRING: 6,
+            TokenType.RAW_NUM: 6,
+            TokenType.START_STATEMENT: 6,
+            TokenType.END_SENTINEL: 6,
+            TokenType.LINUX_TEE: 6,
+            TokenType.LINUX_REDIRECT: 6,
+            TokenType.LINUX_STREAM_MERGE: 6,
             TokenType.UNKNOWN: 999,
         }
         token_list.sort(key=lambda x: priorities[x.type])
@@ -64,6 +65,8 @@ class Tokenifier:
             (scanners.get_redirects, TokenType.LINUX_REDIRECT),
             (scanners.get_tees, TokenType.LINUX_TEE),
             (scanners.get_stream_merges, TokenType.LINUX_STREAM_MERGE),
+            (scanners.get_dynamic_keywords, TokenType.GX_KW_DYNAMIC),
+            (scanners.get_static_keywords, TokenType.GX_KW_STATIC),
             (scanners.get_all, TokenType.UNKNOWN)
         ]
         self.ordering_strategies: dict[str, TokenOrderingStrategy] = {
@@ -71,12 +74,18 @@ class Tokenifier:
             'priority':  PriorityTokenOrderingStrategy(),
             'longest':  LongestTokenOrderingStrategy()
         }
+
+    def spawn_sentinel(self) -> Token:
+        matches = scanners.get_all('end')
+        return Token(matches[0], TokenType.END_SENTINEL)
     
     def tokenify(self, word: str, prioritisation: str='priority') -> Token:
         """
         extracts the best token from a word.
         where multiple token types are possible, selection can be made 
         """
+        if word == '${GALAXY_SLOTS:-2}':
+            print()
         token_list = self.get_all_tokens(word)
         token_list = self.perform_default_ordering(token_list)
         final_ordering = self.perform_final_ordering(token_list,  prioritisation)
@@ -122,3 +131,5 @@ class Tokenifier:
                 else:
                     tokens.append(Token(m, TokenType.ENV_VAR))
         return tokens
+    
+    

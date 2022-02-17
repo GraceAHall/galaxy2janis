@@ -6,7 +6,6 @@ from tool.tool_definition import GalaxyToolDefinition
 from tool.metadata import Metadata
 
 from command.cmdstr.CommandStatement import CommandStatement
-from command.tokens.Tokenifier import Tokenifier
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 from command.alias.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
@@ -14,7 +13,7 @@ from command.cmdstr.best_statement import get_best_statement
 
 
 
-class CommandString:
+class ToolExecutionString:
     def __init__(self, source: str, statements: list[CommandStatement]):
         self.source = source
         self.statements = statements
@@ -59,18 +58,17 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
 
 
 
-class CommandStringFactory:
+class ToolExecutionStringFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
-        self.tokenifier = Tokenifier(self.tool)
 
-    def create(self, source: str, raw_string: str) -> CommandString:
+    def create(self, source: str, raw_string: str) -> ToolExecutionString:
         simple_str = self.simplify_raw_string(source, raw_string)
         statements = self.create_statements(simple_str)
         statements = self.resolve_statement_aliases(statements)
         statements = self.set_statement_cmdwords(statements)
         statements = self.set_statement_attrs(statements)
-        cmdstr = CommandString(source, statements)
+        cmdstr = ToolExecutionString(source, statements)
         cmdstr.set_tool_statement(self.tool.metadata)
         return cmdstr
 
@@ -86,7 +84,7 @@ class CommandStringFactory:
         return split_to_statements(the_string)
 
     def resolve_statement_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
-        ar = AliasResolver(self.tool, self.tokenifier)
+        ar = AliasResolver(self.tool)
         for cmd_statement in statements:
             ar.extract(cmd_statement)
         for cmd_statement in statements:
@@ -95,7 +93,7 @@ class CommandStringFactory:
         
     def set_statement_cmdwords(self, statements: list[CommandStatement]) -> list[CommandStatement]:
         for cmd_statement in statements:
-            cmd_statement.set_cmdwords(self.tokenifier)
+            cmd_statement.set_cmdwords(self.tool)
         return statements
 
     def set_statement_attrs(self, statements: list[CommandStatement]) -> list[CommandStatement]:

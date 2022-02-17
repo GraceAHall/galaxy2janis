@@ -37,7 +37,7 @@ class Command:
 
 
 
-    # def parse_positionals(self, command_string: CommandString) -> None:
+    # def parse_positionals(self, command_string: ToolExecutionString) -> None:
     #     """
     #     providing a list of tokens allows the command to be updated with new info.
     #     the list of tokens could be from initial tool xml parsing, or from

@@ -62,8 +62,8 @@ def get_all_tokens(the_string: str, param_register: ParamRegister=None, out_regi
     gets all the possible token interpretations of the_string
     """  
     # early exits
-    if the_string == '__END_STATEMENT__':
-        return [Token('', TokenType.END_STATEMENT)]
+    if the_string == '__END_SENTINEL__':
+        return [Token('', TokenType.END_SENTINEL)]
     elif the_string == '':
         raise Exception('cannot tokenify blank string')
 

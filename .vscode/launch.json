@@ -72,6 +72,30 @@
                 "--debug"
             ]
         },
+        {
+            "name": "samtools_idxstats",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "samtools_idxstats.xml", "test/data/samtools_idxstats/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
+        {
+            "name": "fastqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "rgFastQC.xml", "test/data/fastqc/", 
+                "--outdir", "parsed",
+                "--debug"
+            ]
+        },
     
         {
             "name": "parse tools",

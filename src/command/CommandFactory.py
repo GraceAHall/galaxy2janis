@@ -4,18 +4,19 @@
 
 from command.Command import Command
 from command.cmdstr.CommandStatement import CommandStatement
-from command.cmdstr.CommandString import CommandString
+from command.cmdstr.ToolExecutionString import ToolExecutionString
 from command.components.CommandComponent import CommandComponent
 from command.components.CommandComponentFactory import CommandComponentFactory
 from command.components.Positional import Positional
 from command.components.Option import Option
+from tool.tool_definition import GalaxyToolDefinition
 
 
 class CommandFactory:
-    def __init__(self):
+    def __init__(self, tool: GalaxyToolDefinition):
         self.command = Command()
-        self.cmdstrs: list[CommandString] = []
-        self.component_factory = CommandComponentFactory()
+        self.cmdstrs: list[ToolExecutionString] = []
+        self.component_factory = CommandComponentFactory(tool)
         self.has_non_xml_cmdstrs = False
         
         self.ingested_cmdstr_index: int = 0
@@ -23,14 +24,14 @@ class CommandFactory:
         self.positional_count: int = 0
         self.step_size: int = 1
 
-    def create(self, command_line_strings: list[CommandString]) -> Command:
+    def create(self, command_line_strings: list[ToolExecutionString]) -> Command:
         self.refresh_attributes(command_line_strings)
         self.feed_cmdstrs(source='test')
         self.feed_cmdstrs(source='workflow')
         self.feed_cmdstrs(source='xml')
         self.cleanup()
 
-    def refresh_attributes(self, command_line_strings: list[CommandString]) -> None:
+    def refresh_attributes(self, command_line_strings: list[ToolExecutionString]) -> None:
         self.command = Command()
         self.has_non_xml_cmdstrs = True if any([cmdstr.source != 'xml' for cmdstr in command_line_strings]) else False
         self.cmdstrs = command_line_strings
@@ -47,12 +48,12 @@ class CommandFactory:
         for cmdstr in active_cmdstrs:
             self.feed(cmdstr)
     
-    def feed(self, cmdstr: CommandString) -> None:
+    def feed(self, cmdstr: ToolExecutionString) -> None:
         self.ingested_cmdstr_index += 1
         self.refresh_iter_attributes()
         self.update_command(cmdstr)
 
-    def update_command(self, cmdstr: CommandString) -> None:
+    def update_command(self, cmdstr: ToolExecutionString) -> None:
         # flags and options first
         statement: CommandStatement = cmdstr.tool_statement
         self.update_flags_options(statement)

@@ -11,7 +11,8 @@ from tool.param.Param import Param
 class TokenType(Enum):
     GX_INPUT        = auto()
     GX_OUTPUT       = auto()
-    GX_KEYWORD      = auto()
+    GX_KW_DYNAMIC   = auto()
+    GX_KW_STATIC    = auto()
     ENV_VAR         = auto()
     KV_PAIR         = auto()
     QUOTED_STRING   = auto()
@@ -22,7 +23,7 @@ class TokenType(Enum):
     LINUX_REDIRECT  = auto()
     LINUX_STREAM_MERGE = auto()
     START_STATEMENT = auto()
-    END_STATEMENT   = auto()
+    END_SENTINEL    = auto()
     UNKNOWN         = auto()
 
 

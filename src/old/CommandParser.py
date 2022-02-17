@@ -6,7 +6,7 @@ from typing import Optional, Any
 from galaxy.tools import Tool as GalaxyTool
 from tool.tool_definition import GalaxyToolDefinition
 from classes.templating.MockClasses import MockApp
-from old.CommandStringOld import CommandString
+from old.ToolExecutionStringOld import ToolExecutionString
 from command.Command import Command
 from classes.command.XMLCommandLoader import XMLCommandLoader
 from classes.command.TestCommandLoader import TestCommandLoader
@@ -43,7 +43,7 @@ class CommandParser:
             cmd_txt = loader.load(test)
             if cmd_txt:
                 print('\n', cmd_txt)
-                cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+                cmd_str = ToolExecutionString(cmd_txt, self.tool, self.logger)
                 #print('\nTEST\n', cmd_str)
                 self.command.update(cmd_str, source='test')
                 print(f'\nTEST {i}\n', self.command)
@@ -53,7 +53,7 @@ class CommandParser:
         loader = WorkflowStepCommandLoader(self.app, self.gxtool, self.tool, self.logger)
         if workflow_step:
             cmd_txt = loader.load(workflow, workflow_step)
-            cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+            cmd_str = ToolExecutionString(cmd_txt, self.tool, self.logger)
             #print('\nWORKFLOW STEP\n', cmd_str)
             self.command.update(cmd_str, source='workflowstep')
             print(f'\nWORKFLOW STEP\n', self.command)
@@ -62,7 +62,7 @@ class CommandParser:
     def update_command_from_xml(self) -> None:
         loader = XMLCommandLoader(self.gxtool, self.logger)
         cmd_txt = loader.load()
-        cmd_str = CommandString(cmd_txt, self.tool, self.logger)
+        cmd_str = ToolExecutionString(cmd_txt, self.tool, self.logger)
         #print('\nXML\n', cmd_str)
         self.command.update(cmd_str, source='xml')
         print(f'\nXML\n', self.command)

@@ -1,36 +1,44 @@
 
-from command.cmdstr.ConstructTracker import ConstructTracker
-from command.tokens.Tokens import Token, TokenType
-from command.tokens.Tokenifier import Tokenifier
-from command.cmdstr.utils import (
-    split_lines, 
-    split_words, 
-    join_lines
-)
+from command.cmdstr.CommandWord import CommandWord
+from command.cmdstr.CommandWord import CommandWordFactory
+from command.tokens.Tokens import TokenType
+from tool.tool_definition import GalaxyToolDefinition
+
 
 class KeyValExpander:
-    def __init__(self, tokenifier: Tokenifier):
-        self.construct_tracker = ConstructTracker()
-        self.tokenifier = tokenifier
+    def __init__(self, tool: GalaxyToolDefinition):
+        self.factory = CommandWordFactory(tool)
 
-    def expand(self, the_string: str) -> str:
-        expanded_lines: list[str] = []
-        # expand each line (returns original line if no kv pairs)
-        for line in split_lines(the_string):
-            expanded_lines.append(self.expand_line(line))
-        return join_lines(expanded_lines)
+    def expand(self, cmdwords: list[CommandWord]) -> list[CommandWord]:
+        out: list[CommandWord] = []
+        for cmdword in cmdwords:
+            if self.is_kvpair(cmdword):
+                out += self.split_kvpair(cmdword)
+            else:
+                out.append(cmdword)
+        return out
 
-    def expand_line(self, line: str) -> str:
-        # expand each line (returns original line if no kv pairs)
-        if self.construct_tracker.should_kvexpand_line(line):
-            words = split_words(line)
-            tokens = [self.tokenifier.tokenify(word) for word in words]
-            expanded_words = [self.expand_token_to_str(token) for token in tokens]
-            return ' '.join(expanded_words)
-        return line
+    def is_kvpair(self, cmdword: CommandWord) -> bool:
+        if cmdword.token.type == TokenType.KV_PAIR:
+            return True
+        return False
 
-    def expand_token_to_str(self, token: Token) -> str:
-        if token.type == TokenType.KV_PAIR:
-            return str(token.match.group(1)) + ' ' + str(token.match.group(2))
-        else:
-            return(token.match.string)
+    def split_kvpair(self, kv_cmdword: CommandWord) -> list[CommandWord]:
+        kv_token = kv_cmdword.token
+        
+        left_text = str(kv_token.match.group(1))
+        delim = str(kv_token.match.group(2))
+        right_text = str(kv_token.match.group(3))
+
+        left_cmdword = self.factory.create(left_text, nextword_delim=delim)
+        right_cmdword = self.factory.create(right_text, nextword_delim=' ')
+
+        self.transfer_context(kv_cmdword, left_cmdword)
+        self.transfer_context(kv_cmdword, right_cmdword)
+
+        return [left_cmdword, right_cmdword]
+
+    def transfer_context(self, source: CommandWord, dest: CommandWord) -> None:
+        dest.in_conditional = source.in_conditional
+        dest.in_loop = source.in_loop
+

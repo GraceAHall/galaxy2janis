@@ -3,12 +3,12 @@
 from typing import Optional
 
 from command.components.linux_constructs import Tee, Redirect, StreamMerge
-from command.tokens.Tokenifier import Tokenifier
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
 from command.cmdstr.KeyValExpander import KeyValExpander
 from command.tokens.Tokens import TokenType
 
+from tool.tool_definition import GalaxyToolDefinition
 
 class CommandStatement:
     def __init__(self, cmdline: str, end_delim: Optional[str]=None):
@@ -21,19 +21,19 @@ class CommandStatement:
         self.tees: Optional[Tee] = None
         self.words_to_remove: list[int] = []
 
-    def set_cmdwords(self, tokenifier: Tokenifier) -> None:
-        # expand kv pairs in cmdline
-        cmdline_expanded = self.expand_cmdline_kv_pairs(tokenifier)
-        self.cmdwords = self.create_cmdwords(cmdline_expanded, tokenifier)
+    def set_cmdwords(self, tool: GalaxyToolDefinition) -> None:
+        cmdwords = self.create_cmdwords(tool)
+        cmdwords = self.expand_kvpair_cmdwords(cmdwords, tool)
+        self.cmdwords = cmdwords
 
-    def expand_cmdline_kv_pairs(self, tokenifier: Tokenifier) -> str:
-        kv_expander = KeyValExpander(tokenifier)
-        return kv_expander.expand(self.cmdline)
+    def create_cmdwords(self, tool: GalaxyToolDefinition) -> list[CommandWord]:
+        wordifier = CommandWordifier(tool)
+        return wordifier.wordify(self.cmdline)
     
-    def create_cmdwords(self, the_string: str, tokenifier: Tokenifier) -> list[CommandWord]:
-        wordifier = CommandWordifier(tokenifier)
-        return wordifier.wordify(the_string)
-
+    def expand_kvpair_cmdwords(self, cmdwords: list[CommandWord], tool: GalaxyToolDefinition) -> list[CommandWord]:
+        kv_expander = KeyValExpander(tool)
+        return kv_expander.expand(cmdwords)
+    
     def set_attrs(self) -> None:
         if len(self.cmdwords) == 0:
             raise RuntimeError(f'CommandStatement has no cmdwords set. cmdline: {self.cmdline}')
@@ -44,25 +44,21 @@ class CommandStatement:
     # the below could probably do with a refactor
     def set_stream_merges(self) -> None:
         for word_ptr, cmdword in enumerate(self.cmdwords):
-            if cmdword.has_single_realised_token():
-                token = cmdword.get_first_token()
-                if token and token.type == TokenType.LINUX_STREAM_MERGE:
-                    self.handle_stream_merge(word_ptr)
+            if cmdword.token.type == TokenType.LINUX_STREAM_MERGE:
+                self.handle_stream_merge(word_ptr)
         self.flush_cmdwords()
 
     def handle_stream_merge(self, word_ptr: int) -> None:
-        token = self.cmdwords[word_ptr].get_first_token()
+        token = self.cmdwords[word_ptr].token
         if token:
             self.stream_merges.append(StreamMerge(token))
             self.words_to_remove.append(word_ptr)
     
     def set_redirect(self) -> None:
         for word_ptr, cmdword in enumerate(self.cmdwords):
-            if cmdword.has_single_realised_token():
-                token = cmdword.get_first_token()
-                if token and token.type == TokenType.LINUX_REDIRECT:
-                    self.handle_redirect(word_ptr)
-                    break
+            if cmdword.token.type == TokenType.LINUX_REDIRECT:
+                self.handle_redirect(word_ptr)
+                break
         self.flush_cmdwords()
     
     def handle_redirect(self, word_ptr: int) -> None:
@@ -70,8 +66,8 @@ class CommandStatement:
         handles an identified redirect. 
         creates Redirect() and marks corresponding CommandWords for removal
         """
-        redirect_token = self.cmdwords[word_ptr].get_first_token()
-        file_token = self.cmdwords[word_ptr + 1].get_first_token()
+        redirect_token = self.cmdwords[word_ptr].token
+        file_token = self.cmdwords[word_ptr + 1].token
         if redirect_token and file_token:
             self.redirect = Redirect(redirect_token, file_token)
             self.words_to_remove.append(word_ptr)
@@ -79,12 +75,9 @@ class CommandStatement:
                     
     def set_tee(self) -> None:
         for word_ptr, cmdword in enumerate(self.cmdwords):
-            if cmdword.has_single_realised_token():
-                token = cmdword.get_first_token()
-                # tee identified
-                if token and token.type == TokenType.LINUX_TEE:
-                    self.handle_tee(word_ptr)
-                    break
+            if cmdword.token.type == TokenType.LINUX_TEE:
+                self.handle_tee(word_ptr)
+                break
         self.flush_cmdwords()
 
     def handle_tee(self, word_ptr: int) -> None:
@@ -94,7 +87,7 @@ class CommandStatement:
         # tee options
         while self.cmdwords[word_ptr+1].text.startswith('-'):
             word_ptr += 1
-            token = self.cmdwords[word_ptr].get_first_token()
+            token = self.cmdwords[word_ptr].token
             if token:
                 tee.options.append(token)
                 self.words_to_remove.append(word_ptr)
@@ -102,7 +95,7 @@ class CommandStatement:
         # tee files
         while word_ptr < len(self.cmdwords):
             word_ptr += 1
-            token = self.cmdwords[word_ptr].get_first_token()
+            token = self.cmdwords[word_ptr].token
             if token:
                 tee.files.append(token)
                 self.words_to_remove.append(word_ptr)

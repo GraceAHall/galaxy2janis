@@ -19,7 +19,7 @@ from command.tokens.utils import split_line_by_ands
 
 
 
-class CommandString:
+class ToolExecutionString:
     """
     - resolves aliases
     - breaks command into statement_blocks
@@ -86,7 +86,7 @@ class CommandString:
 
     def add_block_sentinels(self) -> None:
         for block in self.command_blocks:
-            end_sentinel = Token('__END__', TokenType.END_STATEMENT)
+            end_sentinel = Token('__END__', TokenType.END_SENTINEL)
             block.tokens.append([end_sentinel])
 
 
