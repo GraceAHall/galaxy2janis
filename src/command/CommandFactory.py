@@ -58,7 +58,7 @@ class CommandFactory:
 
     def update_command(self, cmdstr: ToolExecutionString) -> None:
         # flags and options first
-        statement: CommandStatement = cmdstr.tool_statement
+        statement: CommandStatement = cmdstr.tool_statement # type: ignore
         self.update_command_components(statement, disallow=[Positional])
         # positionals if test or workflowstep (or only xml available)
         #if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
@@ -76,7 +76,7 @@ class CommandFactory:
             self.step_size = 1
             cword = cmdstmt.cmdwords[i]
             nword = cmdstmt.cmdwords[i + 1]
-            components = self.component_factory.create(cword, nword, self.cmdstr_index)
+            components = self.component_factory.create(cword, nword, self.cmdstr_index, self.command.positional_ptr)
             components = self.refine_components(components)
             self.update_step_size(components)
             self.update_components(components, disallow=disallow)
@@ -115,7 +115,7 @@ class CommandFactory:
     def update_components(self, components: list[CommandComponent], disallow: list[type[CommandComponent]]) -> None:
         for component in components:
             if type(component) not in disallow:
-                self.command.update(component)
+                self.command.update(component, self.cmdstr_index)
     
     def cleanup(self) -> None:
         self.update_components_presence_array()

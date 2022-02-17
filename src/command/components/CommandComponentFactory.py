@@ -22,12 +22,12 @@ CommandComponent = Flag | Option | Positional
 
 class ComponentSpawner(ABC):
     @abstractmethod
-    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int) -> CommandComponent:
+    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int, cmd_pos: int) -> CommandComponent:
         """creates a specific CommandComponent"""
         ...
 
 class FlagComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int) -> Flag:
+    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int, cmd_pos: int) -> Flag:
         return Flag(
             prefix=ctoken.text,
             cmdstr_index=cmdstr_index
@@ -42,7 +42,7 @@ class FlagComponentSpawner(ComponentSpawner):
         )
 
 class OptionComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int) -> Option:
+    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int, cmd_pos: int) -> Option:
         return Option(
             prefix=ctoken.text,
             value=ntoken.text,
@@ -51,10 +51,11 @@ class OptionComponentSpawner(ComponentSpawner):
         )
 
 class PositionalComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int) -> Positional:
+    def create(self, ctoken: Token, ntoken: Token, cmdstr_index: int, cmd_pos: int) -> Positional:
         return Positional(
             value=ctoken.text,
-            cmdstr_index=cmdstr_index
+            cmdstr_index=cmdstr_index,
+            cmd_pos=cmd_pos
         )
 
 
@@ -62,6 +63,7 @@ class CommandComponentFactory:
     cword: CommandWord
     nword: CommandWord
     cmdstr_index: int
+    cmd_pos: int
     """
     these values above are set using the create() method. 
     just to avoid passing around a lot
@@ -74,8 +76,9 @@ class CommandComponentFactory:
         spawner = FlagComponentSpawner()
         return spawner.create_from_opt(option)
 
-    def create(self, cword: CommandWord, nword: CommandWord, cmdstr_index: int) -> list[CommandComponent]:
+    def create(self, cword: CommandWord, nword: CommandWord, cmdstr_index: int, cmd_pos: int) -> list[CommandComponent]:
         self.cmdstr_index = cmdstr_index
+        self.cmd_pos = cmd_pos
         self.cword = cword
         self.nword = nword
         if self.is_simple_case():
@@ -91,7 +94,7 @@ class CommandComponentFactory:
         return True
 
     def make_simple(self) -> list[CommandComponent]:
-        new_component = self.make_component(self.cword.token, self.nword.token, self.cmdstr_index)
+        new_component = self.make_component(self.cword.token, self.nword.token)
         new_component = self.transfer_cmdword_attrs(new_component)
         return [new_component]
 
@@ -108,9 +111,9 @@ class CommandComponentFactory:
                 component.gxvar = self.cword.gxvar
         return component
 
-    def make_component(self, ctoken: Token, ntoken: Token, cmdstr_index: int) -> CommandComponent:
+    def make_component(self, ctoken: Token, ntoken: Token) -> CommandComponent:
         spawner = self.select_spawner(ctoken, ntoken)
-        return spawner.create(ctoken, ntoken, cmdstr_index)
+        return spawner.create(ctoken, ntoken, self.cmdstr_index, self.cmd_pos)
 
     def select_spawner(self, ctoken: Token, ntoken: Token) -> ComponentSpawner:
         if component_utils.is_flag(ctoken, ntoken):
@@ -149,7 +152,7 @@ class CommandComponentFactory:
             step_size = 1
             cword = cmdwords[i]
             nword = cmdwords[i + 1]
-            components = self.create(cword, nword, self.cmdstr_index)
+            components = self.create(cword, nword, self.cmdstr_index, self.cmd_pos)
             assert(len(components) == 1)
             out += components
             if isinstance(components[0], Option):

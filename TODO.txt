@@ -10,7 +10,7 @@ today:
  - positionals cmd_pos causing issues due to make_multiple()
  - options presence array causing issues due to make_multiple()
  - for the above, supply a specific value for cmd_pos and cmdstr_ptr rather than just always adding to presence array
- 
+ - a bug will occur related to skipping in make_multiple()?
  make_multiple makes a bunch of positionals. fix 
 
 

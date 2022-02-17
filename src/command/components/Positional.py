@@ -5,27 +5,26 @@ from __future__ import annotations
 from typing import Optional
 
 from tool.param.Param import Param
-from command.components.ObservedValueRecord import ObservedValueRecord, ObservedValue
+from command.components.ObservedValueRecord import ObservedValueRecord
 
 
 class Positional:
-    def __init__(self, value: str, cmdstr_index: int):
-        self.is_after_options: bool = False
+    def __init__(self, value: str, cmdstr_index: int, cmd_pos: int):
         self.value_record: ObservedValueRecord = ObservedValueRecord()
-        self.value_record.update(ObservedValue(value, cmdstr_index))
+        self.value_record.add(value)
+        self.cmd_pos = cmd_pos
+        self.is_after_options: bool = False
 
         self.gxvar: Optional[Param] = None
         self.presence_array: list[bool] = []
-        self.cmd_pos: int = 0
         self.update_presence_array(cmdstr_index)
 
-    def update(self, incoming: Positional):
+    def update(self, incoming: Positional, cmdstr_index: int):
         # cmdstr presence
-        cmdstr_index = len(incoming.presence_array) # NOTE shitty work around
         self.update_presence_array(cmdstr_index)
         # values
         for obsval in incoming.value_record.record:
-            self.value_record.update(obsval)
+            self.value_record.add(obsval)
         # galaxy param reference
         if not self.gxvar and incoming.gxvar:
             self.gxvar = incoming.gxvar

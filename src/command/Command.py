@@ -16,7 +16,7 @@ CommandComponent = Positional | Flag | Option
 class Updater(ABC):
 
     @abstractmethod
-    def update(self, command: Command, incoming: Any) -> None:
+    def update(self, command: Command, incoming: Any, cmdstr_index: int) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         ...
 
@@ -39,12 +39,13 @@ class Updater(ABC):
 class PositionalUpdater(Updater):
     command: Command
     incoming: Positional
+    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Positional) -> None:
+    def update(self, command: Command, incoming: Positional, cmdstr_index: int) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         self.command = command
         self.incoming = incoming
-        self.command.positional_ptr += 1
+        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
@@ -61,21 +62,24 @@ class PositionalUpdater(Updater):
         cmd_pos = self.command.positional_ptr
         existing_comp = self.command.get_positional(cmd_pos)
         if existing_comp:
-            existing_comp.update(self.incoming)
+            existing_comp.update(self.incoming, self.cmdstr_index)
     
     def add(self) -> None:
         cmd_pos = self.command.positional_ptr
         self.command.positionals[cmd_pos] = self.incoming
+        self.command.positional_ptr += 1
 
 
 class FlagUpdater(Updater):
     command: Command
     incoming: Flag
+    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Flag) -> None:
+    def update(self, command: Command, incoming: Flag, cmdstr_index: int) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         self.command = command
         self.incoming = incoming
+        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
@@ -102,11 +106,13 @@ class FlagUpdater(Updater):
 class OptionUpdater(Updater):
     command: Command
     incoming: Option
+    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Option) -> None:
+    def update(self, command: Command, incoming: Option, cmdstr_index: int) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         self.command = command
         self.incoming = incoming
+        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
@@ -123,7 +129,7 @@ class OptionUpdater(Updater):
         query_prefix = self.incoming.prefix
         existing_comp = self.command.get_option(query_prefix)
         if existing_comp:
-            existing_comp.update(self.incoming)
+            existing_comp.update(self.incoming, self.cmdstr_index)
     
     def add(self) -> None:
         prefix = self.incoming.prefix
@@ -138,9 +144,9 @@ class Command:
         self.options: dict[str, Option] = {}
         self.redirect: Optional[Redirect] = None
 
-    def update(self, incoming: CommandComponent):
+    def update(self, incoming: CommandComponent, cmdstr_index: int):
         updater = self.select_updater(incoming)
-        updater.update(self, incoming)
+        updater.update(self, incoming, cmdstr_index)
 
     def select_updater(self, incoming: CommandComponent) -> Updater:
         match incoming:

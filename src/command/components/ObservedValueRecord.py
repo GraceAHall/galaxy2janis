@@ -1,34 +1,21 @@
 
 
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import Optional
 
 
-
-@dataclass
-class ObservedValue:
-    value: str
-    cmdstr_index: int 
-
 class ObservedValueRecord:
     def __init__(self):
-        self.record: list[ObservedValue] = []
+        self.record: list[str] = []
 
-    def update(self, obsval: ObservedValue) -> None:
+    def add(self, obsval: str) -> None:
         self.record.append(obsval)
 
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            counts[obsval.value] += 1
+            counts[obsval] += 1
         return counts
-
-    def get_cmdstr_index_value(self, cmdstr_index: int) -> Optional[str]:
-        for obsval in self.record:
-            if obsval.cmdstr_index == cmdstr_index:
-                return obsval.value
-        return None
 
     def get_most_common_value(self) -> Optional[str]:
         counts_dict = self.get_counts()
