@@ -6,17 +6,18 @@ from tool.param.Param import Param
 
 
 class Flag:
-    def __init__(self, prefix: str, cmdstr_index: int):
+    def __init__(self, prefix: str, cmdstr_index: int, gxvar: Optional[Param]=None):
         self.prefix = prefix
-        self.galaxy_object: Optional[Param] = None
+        self.gxvar = gxvar
         self.presence_array: list[bool] = []
         self.cmd_pos: int = 0
         self.update_presence_array(cmdstr_index)
 
-    def update(self, incoming: Flag, cmdstr_index: int):
+    def update(self, incoming: Flag):
+        cmdstr_index = len(incoming.presence_array) # NOTE shitty work around
         self.update_presence_array(cmdstr_index)
-        if not self.galaxy_object and incoming.galaxy_object:
-            self.galaxy_object = incoming.galaxy_object
+        if not self.gxvar and incoming.gxvar:
+            self.gxvar = incoming.gxvar
 
     def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
         # ensure presence array is filled in to current cmdstr

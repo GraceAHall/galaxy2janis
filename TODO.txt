@@ -2,23 +2,12 @@
 
 NOTE check janis-patterns github for tricky situations
 
-
 OFFLINE
 Repeat tags (and any templating errors caused by repeats)
 creating TTestCases
 
 today:
- - fix delim issue (splitting too early with no record)
-
-
-recent TODOs
- - add ignoring for cheetah #def, #for loops
- - add a group of tools (the ones in the basic workflow?) to the test suite
-    - create the toolrep
-    - create CommandStatements / CommandString for that toolrep 
-    - Evalutate the tool's tests using TestCommandLoader / JobFactory
-    - etc etc
-    - this way can test a diverse number of input tools 
+ - positionals are being bad. because CommandComponentFactory needs to flesh out how to handle Bool and Select params. 
 
 
 

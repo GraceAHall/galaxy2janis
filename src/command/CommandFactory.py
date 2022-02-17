@@ -2,14 +2,17 @@
 
 
 
+from tool.tool_definition import GalaxyToolDefinition
 from command.Command import Command
 from command.cmdstr.CommandStatement import CommandStatement
 from command.cmdstr.ToolExecutionString import ToolExecutionString
-from command.components.CommandComponent import CommandComponent
+
 from command.components.CommandComponentFactory import CommandComponentFactory
-from command.components.Positional import Positional
+from command.components.Flag import Flag
 from command.components.Option import Option
-from tool.tool_definition import GalaxyToolDefinition
+from command.components.Positional import Positional
+
+CommandComponent = Flag | Option | Positional
 
 
 class CommandFactory:
@@ -19,7 +22,7 @@ class CommandFactory:
         self.component_factory = CommandComponentFactory(tool)
         self.has_non_xml_cmdstrs = False
         
-        self.ingested_cmdstr_index: int = 0
+        self.cmdstr_index: int = 0
         self.opts_encountered: bool = False
         self.positional_count: int = 0
         self.step_size: int = 1
@@ -30,17 +33,17 @@ class CommandFactory:
         self.feed_cmdstrs(source='workflow')
         self.feed_cmdstrs(source='xml')
         self.cleanup()
+        return self.command
 
     def refresh_attributes(self, command_line_strings: list[ToolExecutionString]) -> None:
         self.command = Command()
         self.has_non_xml_cmdstrs = True if any([cmdstr.source != 'xml' for cmdstr in command_line_strings]) else False
         self.cmdstrs = command_line_strings
-        self.num_ingested_cmdstrs = 0   
         self.refresh_iter_attributes()
 
     def refresh_iter_attributes(self):
+        self.command.positional_ptr = 0
         self.opts_encountered: bool = False
-        self.positional_count: int = 0
         self.step_size: int = 1
 
     def feed_cmdstrs(self, source: str) -> None:
@@ -49,19 +52,19 @@ class CommandFactory:
             self.feed(cmdstr)
     
     def feed(self, cmdstr: ToolExecutionString) -> None:
-        self.ingested_cmdstr_index += 1
         self.refresh_iter_attributes()
         self.update_command(cmdstr)
+        self.cmdstr_index += 1
 
     def update_command(self, cmdstr: ToolExecutionString) -> None:
         # flags and options first
         statement: CommandStatement = cmdstr.tool_statement
-        self.update_flags_options(statement)
+        self.update_command_components(statement, disallow=[Positional])
         # positionals if test or workflowstep (or only xml available)
-        if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
-            self.update_positionals(statement)
+        #if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
+        self.update_command_components(statement, disallow=[Flag, Option])
     
-    def update_flags_options(self, cmdstmt: CommandStatement) -> None:
+    def update_command_components(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]) -> None:
         """
         iterate through command words (with next word for context)
         each pair of words may actually yield more than one component.
@@ -73,39 +76,52 @@ class CommandFactory:
             self.step_size = 1
             cword = cmdstmt.cmdwords[i]
             nword = cmdstmt.cmdwords[i + 1]
-            components = self.component_factory.create(cword, nword)
+            components = self.component_factory.create(cword, nword, self.cmdstr_index)
             components = self.refine_components(components)
             self.update_step_size(components)
-            self.update_components(components, disallow=[Positional])
+            self.update_components(components, disallow=disallow)
             i += self.step_size
     
     def refine_components(self, components: list[CommandComponent]) -> list[CommandComponent]:
+        # refines each component and returns
+        return [self.refine_comp(comp) for comp in components]
+    
+    def refine_comp(self, component: CommandComponent) -> CommandComponent:
         """
         updates the component based on existing knowledge of the command.
         and example is where we think a component was an option, 
         but its actually a flag followed by a positional.
         """
-        # get Command to look up its components and see if any match or part match
-        # cast Option to 
-        raise NotImplementedError
-    
-    def refine_comp(self, component: CommandComponent) -> CommandComponent:
-        raise NotImplementedError
+        # cast Option to Flag
+        if isinstance(component, Option):
+            flags = self.command.get_flags()
+            for flag in flags:
+                match flag:
+                    case Flag(prefix=component.prefix):
+                        component = self.component_factory.cast_to_flag(component)
+                        break
+                    case _:
+                        pass
+        return component
 
     def update_step_size(self, components: list[CommandComponent]) -> None:
-        raise NotImplementedError
-        if isinstance(component, Option):
+        # TODO lol edge cases are so complicated.
+        # should cover 99% of cases with the current implementation
+        if len(components) == 1 and isinstance(components[0], Option):
             self.step_size = 2
         else:
             self.step_size = 1
 
-    def update_components(self, components: list[CommandComponent], disallow: list[CommandComponent]) -> None:
-        raise NotImplementedError
+    def update_components(self, components: list[CommandComponent], disallow: list[type[CommandComponent]]) -> None:
+        for component in components:
+            if type(component) not in disallow:
+                self.command.update(component)
     
-    def update_positionals(self, cmdstmt: CommandStatement) -> None:
-        raise NotImplementedError
-
     def cleanup(self) -> None:
-        self.update_components_presence_array() # ?????
+        self.update_components_presence_array()
+
+    def update_components_presence_array(self) -> None:
+        for component in self.command.get_all_components():
+            component.update_presence_array(self.cmdstr_index)
 
 

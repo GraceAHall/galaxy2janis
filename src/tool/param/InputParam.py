@@ -108,8 +108,11 @@ class BoolParam(InputParam):
     def is_optional(self) -> bool:
         return True
 
-    def get_all_values(self) -> list[str]:
-        return [self.truevalue, self.falsevalue]
+    def get_all_values(self, nonempty: bool=False) -> list[str]:
+        values = [self.truevalue, self.falsevalue]
+        if nonempty:
+            values = [v for v in values if v != '']
+        return values
 
 
 @dataclass
@@ -149,8 +152,11 @@ class SelectParam(InputParam):
             return True
         return False
 
-    def get_all_values(self) -> list[str]:
-        return [opt.value for opt in self.options]
+    def get_all_values(self, nonempty: bool=False) -> list[str]:
+        values = [opt.value for opt in self.options]
+        if nonempty:
+            values = [v for v in values if v != '']
+        return values
     
 
 class DataParam(InputParam):

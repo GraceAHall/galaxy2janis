@@ -13,7 +13,7 @@ def split_lines(cmdstr: str) -> list[str]:
 def join_lines(lines: list[str]) -> str:
     return '\n'.join(lines)
 
-def split_words(line: str) -> list[str]:
+def split_to_words(line: str) -> list[str]:
     return shlex.split(line)
 
 def global_align(pattern: str, template: str) -> int:

@@ -1,16 +1,14 @@
 
 
 
-from typing import Iterator, Optional
-from dataclasses import dataclass, field
+from typing import Optional
+from dataclasses import dataclass
 
 from tool.param.Param import Param
-from tool.param.InputParam import BoolParam, SelectParam
-from command.cmdstr.utils import split_words
 from command.tokens.Tokenifier import Tokenifier
-from command.tokens.Tokens import Token, TokenType
+from command.tokens.Tokens import Token
 from tool.tool_definition import GalaxyToolDefinition
-GalaxyToolDefinition
+
 
 @dataclass
 class CommandWord:
@@ -32,12 +30,9 @@ class CommandWord:
     @property
     def gxvar(self) -> Optional[Param]:
         return self.token.gxvar
-
-
-
-""""""
-
-
+    
+    def __repr__(self) -> str:
+        return f'CommandWord(value={self.text}, token={self.token.type}, gxvar={self.gxvar})'
 
 
 class CommandWordFactory:
@@ -63,6 +58,8 @@ class CommandWordFactory:
                 cmdword.in_conditional = True
             if levels['loop'] > 0:
                 cmdword.in_loop = True
+
+
     
     
     

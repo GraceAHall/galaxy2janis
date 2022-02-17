@@ -208,8 +208,8 @@ class JanisFormatter:
     def extract_janis_positional(self, posit: Positional) -> dict[str, str]:       
         c_data = {}
 
-        if posit.galaxy_object is not None:
-            tag = posit.galaxy_object.name
+        if posit.gxvar is not None:
+            tag = posit.gxvar.name
         else:
             tag = '_'.join(posit.get_token_values(as_list=True))
         
@@ -247,7 +247,7 @@ class JanisFormatter:
 
 
     def get_docstring(self, component: CommandComponent) -> str:
-        gxobj = component.galaxy_object
+        gxobj = component.gxvar
         if gxobj:
             if is_tool_parameter(gxobj):
                 docstring = gxobj.label + ' ' + gxobj.help

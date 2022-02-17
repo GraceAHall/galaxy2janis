@@ -131,7 +131,7 @@ class DatatypeExtractor:
     def extract_from_output(self, output: Output) -> list[dict]:
         types = []
 
-        galaxy_formats = get_output_formats(output.galaxy_object, self.param_register)
+        galaxy_formats = get_output_formats(output.gxvar, self.param_register)
         for gxformat in galaxy_formats:
             types += self.cast_gxformat_to_datatypes(gxformat)
 
@@ -147,7 +147,7 @@ class DatatypeExtractor:
         delegates what method to use for datatype inference.
         """
         # galaxy 
-        gxobj = component.galaxy_object
+        gxobj = component.gxvar
         if gxobj:
             if is_tool_parameter(gxobj):
                 return self.extract_types_from_galaxy_param(component)
@@ -173,7 +173,7 @@ class DatatypeExtractor:
 
 
     def extract_types_from_galaxy_param(self, component: CommandComponent) -> list[dict]:
-        gxobj = component.galaxy_object
+        gxobj = component.gxvar
         if gxobj.type == 'integer':
             return [self.integer_t]
         elif gxobj.type == 'float':
@@ -268,7 +268,7 @@ class DatatypeExtractor:
     # now the datastructures are initialised, here are some methods
     # to access types given gxformat or extension
     def extract_types_from_gx_select(self, component: CommandComponent) -> list[dict[str, str]]:       
-        if component.galaxy_object is not None and component.galaxy_object.type == 'select':
+        if component.gxvar is not None and component.gxvar.type == 'select':
             component_tokens = component.get_galaxy_options(as_tokens=True)
             # all tokens are numeric
             out = [t.type in [TokenType.RAW_NUM, TokenType.QUOTED_NUM] for t in component_tokens]

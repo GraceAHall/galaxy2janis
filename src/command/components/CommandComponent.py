@@ -7,8 +7,7 @@ from tool.param.Param import Param
 
 
 class CommandComponent(Protocol):
-    galaxy_object: Optional[Param]
-    this_cmdstr_presence: bool
+    gxvar: Optional[Param]
     presence_array: list[bool]
     cmd_pos: int
     
@@ -80,7 +79,7 @@ def get_default_value_old() -> Optional[str]:
     # else, uses the list of sources (witnessed occurances) to decide 
     # what the default should be.
     
-    if self.galaxy_object:
+    if self.gxvar:
         return self.get_galaxy_default_value()
     return self.get_most_common_token_text()
 
@@ -89,7 +88,7 @@ def get_galaxy_default_value() -> str:
     
     # gets the default value for a galaxy param
     
-    gxobj = self.galaxy_object
+    gxobj = self.gxvar
     if gxobj:
         if gx_utils.is_tool_parameter(gxobj):
             return gx_utils.get_param_default_value(gxobj)
@@ -109,9 +108,9 @@ def get_most_common_token_text() -> Any:
 
 
 def get_galaxy_options(as_tokens: bool=False) -> Optional[Union[list[TokenType], list[str]]]:
-    if self.galaxy_object and self.galaxy_object.type in ['select', 'boolean']:
+    if self.gxvar and self.gxvar.type in ['select', 'boolean']:
         
-        opts = gx_utils.get_param_options(self.galaxy_object)
+        opts = gx_utils.get_param_options(self.gxvar)
         if as_tokens:
             opts = [tokenify(opt) for opt in opts]
         return opts
@@ -138,7 +137,7 @@ def is_optional() -> bool:
             return True
     
     # has galaxy object
-    gxobj = self.galaxy_object
+    gxobj = self.gxvar
     if gxobj:
         if gx_utils.is_tool_parameter(gxobj):
             return gx_utils.param_is_optional(gxobj)
@@ -150,7 +149,7 @@ def is_optional() -> bool:
 
 def is_array() -> bool:
     # has galaxy object
-    gxobj = self.galaxy_object
+    gxobj = self.gxvar
     if gxobj:
         if gx_utils.is_tool_parameter(gxobj):
             return gx_utils.param_is_array(gxobj)

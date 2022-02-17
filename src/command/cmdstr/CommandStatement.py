@@ -5,7 +5,6 @@ from typing import Optional
 from command.components.linux_constructs import Tee, Redirect, StreamMerge
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
-from command.cmdstr.KeyValExpander import KeyValExpander
 from command.tokens.Tokens import TokenType
 
 from tool.tool_definition import GalaxyToolDefinition
@@ -22,17 +21,8 @@ class CommandStatement:
         self.words_to_remove: list[int] = []
 
     def set_cmdwords(self, tool: GalaxyToolDefinition) -> None:
-        cmdwords = self.create_cmdwords(tool)
-        cmdwords = self.expand_kvpair_cmdwords(cmdwords, tool)
-        self.cmdwords = cmdwords
-
-    def create_cmdwords(self, tool: GalaxyToolDefinition) -> list[CommandWord]:
         wordifier = CommandWordifier(tool)
-        return wordifier.wordify(self.cmdline)
-    
-    def expand_kvpair_cmdwords(self, cmdwords: list[CommandWord], tool: GalaxyToolDefinition) -> list[CommandWord]:
-        kv_expander = KeyValExpander(tool)
-        return kv_expander.expand(cmdwords)
+        self.cmdwords = wordifier.wordify(self.cmdline)
     
     def set_attrs(self) -> None:
         if len(self.cmdwords) == 0:
