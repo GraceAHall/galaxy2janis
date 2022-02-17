@@ -5,9 +5,11 @@ from typing import Optional
 from dataclasses import dataclass
 
 from tool.param.Param import Param
-from command.tokens.Tokenifier import Tokenifier
-from command.tokens.Tokens import Token
 from tool.tool_definition import GalaxyToolDefinition
+
+from command.tokens.Tokenifier import Tokenifier
+from command.tokens.Tokens import Token, TokenType
+import command.components.utils as component_utils
 
 
 @dataclass
@@ -33,6 +35,11 @@ class CommandWord:
     
     def __repr__(self) -> str:
         return f'CommandWord(value={self.text}, token={self.token.type}, gxvar={self.gxvar})'
+
+    def get_values(self) -> list[str]:
+        if component_utils.word_is_bool_select(self):
+            return self.token.gxvar.get_all_values(nonempty=True) # type: ignore
+        return [self.token.text]
 
 
 class CommandWordFactory:

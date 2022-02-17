@@ -5,15 +5,14 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from command.cmdstr.CommandWord import CommandWord
+from command.cmdstr.CommandWordifier import CommandWordifier
 
 from command.tokens.Tokens import Token
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.Positional import Positional
-
-CommandComponent = Flag | Option | Positional
+from command.cmdstr.utils import split_to_words
 
 
+
+# maybe keep tokencombination stuff? 
 @dataclass
 class WordToken:
     word: str
@@ -32,13 +31,24 @@ class TokenCombination:
         return new_comb
         
 
+
+
+
 class ExecutionFork:
-    def __init__(self, cword: CommandWord, nword: CommandWord):
+    def __init__(self, cword: CommandWord, nword: CommandWord, wordifier: CommandWordifier):
         self.cword = cword
         self.nword = nword
+        self.wordifier = wordifier
     
-    def forks(self) -> Iterable[TokenCombination]:
-        pass
-        # for ctoken_list in self.cword.realised_values:
-        #     for ntoken_list in self.nword.realised_values:
-        #         yield TokenCombination(ctoken_list, ntoken_list)
+    def forks(self) -> Iterable[list[CommandWord]]:
+        cword_vals = self.cword.get_values()
+        nword_vals = self.nword.get_values()
+        for cval in cword_vals:
+            for nval in nword_vals:
+                cwords = self.wordifier.wordify(cval)
+                nwords = self.wordifier.wordify(nval)
+                # okay this looks mental but its just returning
+                # the current cval CommandWords, and the first CommandWord
+                # from nval, plus a sentinel on the end
+                sentinel = cwords[-1]
+                yield cwords[:-1] + [nwords[0]] + [sentinel]
