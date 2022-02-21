@@ -16,3 +16,9 @@ def write_janis(esettings: ExecutionSettings, tool: GalaxyToolDefinition, comman
     outputs_str = formatter.format_outputs(command)
     commandtool_str = formatter.format_commandtool(tool, command, container) #TODO container Optionality None
     translate_str = formatter.format_translate_func(tool) 
+    with open(esettings.get_janis_definition_path(), 'w') as fp:
+        fp.write(imports_str + '\n')
+        fp.write(inputs_str + '\n\n')
+        fp.write(outputs_str + '\n')
+        fp.write(commandtool_str + '\n')
+        fp.write(translate_str + '\n')

@@ -5,6 +5,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
+from command.components.linux_constructs import Redirect
 from runtime.settings import ExecutionSettings
 import yaml
 
@@ -115,6 +116,9 @@ class DatatypeRegister:
         # array and optional
         elif component.is_optional() and component.is_array():
             out_str = f'Array({dtype}(), optional=True)'
+
+        if isinstance(component, Redirect):
+            out_str = f'Stdout({out_str})'
 
         return out_str
 

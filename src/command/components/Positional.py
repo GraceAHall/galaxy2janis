@@ -38,6 +38,16 @@ class Positional(BaseCommandComponent):
             return self.gxvar.get_default()
         # otherwise, most commonly witnessed option value
         return self.value_record.get_most_common_value()
+    
+    def get_name(self) -> str:
+        # get name from galaxy param if available
+        if self.gxvar:
+            return self.gxvar.name
+        # otherwise, most commonly witnessed option value as name
+        # pseudo_name = self.value_record.get_most_common_value()
+        # if pseudo_name:
+        #     return pseudo_name.strip('$')
+        return f'positional_{self.cmd_pos}'
 
     def get_datatype(self) -> list[str]:
         if self.gxvar:
@@ -54,13 +64,18 @@ class Positional(BaseCommandComponent):
         return True
 
     def is_array(self) -> bool:
-        raise NotImplementedError
+        return False
     
     def has_unique_value(self) -> bool:
         counts = self.value_record.get_counts()
         if len(counts) == 1:
             return True
         return False
+    
+    def get_docstring(self) -> Optional[str]:
+        if self.gxvar:
+            return self.gxvar.get_docstring()
+        return f'examples: {self.value_record.get_unique_values()[:3]}'
 
     def __str__(self) -> str:
         return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

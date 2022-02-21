@@ -42,11 +42,7 @@ class ImportHandler:
             self.datatype_imports.add(import_str)
 
     def update_selector_imports(self, component: CommandComponent):
-        if isinstance(component, Redirect):
-            selector = component.get_selector()
-            import_path = selector_map[selector.stype]
-            self.selector_imports.add(import_path)
-        elif isinstance(component.gxvar, OutputParam):
+        if isinstance(component.gxvar, OutputParam):
             if component.gxvar.selector:
                 import_path = selector_map[component.gxvar.selector.stype]
                 self.selector_imports.add(import_path)

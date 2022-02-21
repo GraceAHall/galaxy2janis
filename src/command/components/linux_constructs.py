@@ -70,6 +70,16 @@ class Redirect:
     def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
         pass # TODO
 
+    def get_name(self) -> str:
+        # get name from galaxy param if available
+        if self.gxvar:
+            return self.gxvar.name
+        # otherwise, most commonly witnessed option value as name
+        pseudo_name = self.value_record.get_most_common_value()
+        if pseudo_name:
+            return pseudo_name.split('.', 1)[0].split(' ', 1)[0]
+        return self.file.text.split('.', 1)[0]
+
     def get_default_value(self) -> Any:
         return None
 
@@ -90,13 +100,18 @@ class Redirect:
                 pass
         return False
 
-    def get_selector(self) -> Selector:
-        match self.file.gxvar:
-            case CollectionOutputParam() | DataOutputParam():
-                if self.file.gxvar.selector:
-                    return self.file.gxvar.selector
-            case _:
-                pass
-        raise RuntimeError(f'no selector for {self.text}')
+    def get_docstring(self) -> Optional[str]:
+        if self.gxvar:
+            return self.gxvar.get_docstring()
+        return f'examples: {self.value_record.get_unique_values()[:3]}'
+
+    # def get_selector(self) -> Selector:
+    #     match self.file.gxvar:
+    #         case CollectionOutputParam() | DataOutputParam():
+    #             if self.file.gxvar.selector:
+    #                 return self.file.gxvar.selector
+    #         case _:
+    #             pass
+    #     raise RuntimeError(f'no selector for {self.text}')
         
 

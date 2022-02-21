@@ -11,7 +11,7 @@ def tool_input_snippet(
     datatype: str,
     prefix: Optional[str]=None,
     separator: Optional[str]=None,
-    separate_value_from_prefix: Optional[bool]=None,
+    separate_value_from_prefix: bool=False,
     position: Optional[int]=None,
     default: Optional[str]=None,
     doc: Optional[str]=None
@@ -24,7 +24,7 @@ def tool_input_snippet(
         separator="{separator}",
         separate_value_from_prefix={separate_value_from_prefix},
         position={position},
-        default={default},
+        default="{default}",
         doc="{doc}"
     )"""
 
@@ -32,15 +32,23 @@ def tool_input_snippet(
 def tool_output_snippet(
     tag: str,
     datatype: str,
-    selector_type: str,
-    selector_contents: str,
+    selector_type: Optional[str],
+    selector_contents: Optional[str],
     doc: Optional[str]=None
 ) -> str:
-    return f"""
+    if selector_type and selector_contents:
+        return f"""
     ToolOutput(
         "{tag}",
         {datatype},
         selector={selector_type}("{selector_contents}")
+        doc="{doc}"
+    )"""
+    else:
+        return f"""
+    ToolOutput(
+        "{tag}",
+        {datatype},
         doc="{doc}"
     )"""
 
@@ -55,11 +63,11 @@ def command_tool_builder_snippet(
 {toolname} = CommandToolBuilder(
     tool="{toolname}",
     base_command={base_command},
-    inputs=fastp_inputs,
-    outputs=fastp_outputs,
+    inputs=inputs,
+    outputs=outputs,
     container="{container}",
     version="{version}",
-    doc={help}
+    doc=\"\"\"{str(help)}\"\"\"
 )"""
 
 # missing from command_tool_builder_snippet()

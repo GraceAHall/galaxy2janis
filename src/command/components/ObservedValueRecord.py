@@ -47,3 +47,6 @@ class ObservedValueRecord:
                 pass
         return False
 
+    def get_unique_values(self) -> list[str]:
+        return list(set(self.record))
+

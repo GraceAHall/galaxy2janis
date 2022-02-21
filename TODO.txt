@@ -11,6 +11,8 @@ today:
 
 2022
 TODO:
+ - base_command
+ - outputs should be inputselector when $output format, not stringformatter
  - ensure option delims correct = ' ' and '='
  - shlex to handle quotes? 
  - make string representation of TTestCases so we can actually write to a janis tool def file

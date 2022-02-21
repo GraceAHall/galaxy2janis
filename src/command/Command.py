@@ -9,6 +9,7 @@ from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.linux_constructs import Redirect
 from command.components.CommandComponent import CommandComponent
+from tool.param.OutputParam import OutputParam
 
 
 class Updater(ABC):
@@ -137,7 +138,7 @@ class RedirectUpdater(Updater):
             self.add()
 
     def should_merge(self) -> bool:
-        if not self.command.redirect:
+        if self.command.redirect:
             return True
         return False
     
@@ -173,11 +174,18 @@ class Command:
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
-    def get_all_components(self) -> list[CommandComponent]:
+    def get_all_inputs(self) -> list[CommandComponent]:
         components: list[CommandComponent] = []
         components += self.get_positionals()
         components += self.get_flags()
         components += self.get_options()
+        return components
+    
+    def get_all_outputs(self) -> list[CommandComponent]:
+        components: list[CommandComponent] = []
+        for comp in self.get_all_inputs():
+            if comp.gxvar and isinstance(comp.gxvar, OutputParam):
+                components.append(comp)
         if self.redirect:
             components.append(self.redirect)
         return components

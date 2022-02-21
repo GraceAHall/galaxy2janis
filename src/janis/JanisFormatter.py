@@ -1,15 +1,21 @@
 
 
 
+from typing import Optional
+from command.components.CommandComponent import CommandComponent
+from command.components.linux_constructs import Redirect
 from command.infer import Command
 from containers.Container import Container
 from runtime.settings import ExecutionSettings
 from tool.tool_definition import GalaxyToolDefinition
-from command.components.CommandComponent import CommandComponent
+from command.components.Flag import Flag
+from command.components.Option import Option
+from command.components.Positional import Positional
 
 from janis.DatatypeRegister import DatatypeRegister
 from janis.ImportHandler import ImportHandler
 from janis.TagValidator import TagValidator
+from tool.parsing.selectors import Selector, SelectorType
 
 from janis.formatting_snippets import (
     tool_input_snippet,
@@ -17,6 +23,12 @@ from janis.formatting_snippets import (
     command_tool_builder_snippet,
     translate_snippet
 )
+
+selector_map: dict[SelectorType, str] = {
+    SelectorType.INPUT_SELECTOR: 'InputSelector',
+    SelectorType.WILDCARD_SELECTOR: 'WildcardSelector',
+    SelectorType.STRING_FORMATTER: 'StringFormatter'
+}
 
 
 class JanisFormatter:
@@ -26,34 +38,118 @@ class JanisFormatter:
         self.tag_validator = TagValidator()
 
     def format_imports(self, command: Command) -> str:
-        for component in command.get_all_components():
+        for component in command.get_all_inputs():
             self.import_handler.update(component)
+        if command.redirect:
+            self.import_handler.update(command.redirect)
         return self.import_handler.imports_to_string()
 
     def format_inputs(self, command: Command) -> str:
-        for component in command.get_all_components():
-            out_str += 
+        out_str: str = ''
+        out_str += 'inputs = ['
+        for component in command.get_all_inputs():
+            match component:
+                case Flag():
+                    out_str += f'{self.format_flag(component)},'
+                case Option():
+                    out_str += f'{self.format_option(component)},'
+                case Positional():
+                    out_str += f'{self.format_positional(component)},'
+                case _:
+                    pass
+        out_str += ']'
+        return out_str
 
-    def format_input(self, command: Command)
-            datatype = self.datatype_formatter.to_janis_def_string(component)
+    def format_flag(self, flag: Flag) -> str:
+        datatype = self.datatype_formatter.to_janis_def_string(flag)
+        return tool_input_snippet(
+            tag=self.tag_validator.format_prefix(flag.prefix),
+            datatype=datatype,
+            prefix=flag.prefix,
+            doc=flag.get_docstring()
+        )
+    
+    def format_option(self, opt: Option) -> str:
+        datatype = self.datatype_formatter.to_janis_def_string(opt)
+        separator = opt.delim
+        separate_value_from_prefix = True if separator != ' ' else False
+        return tool_input_snippet(
+            tag=self.tag_validator.format_prefix(opt.prefix),
+            datatype=datatype,
+            separator=separator,
+            separate_value_from_prefix=separate_value_from_prefix,
+            prefix=opt.prefix,
+            default=opt.get_default_value(),
+            doc=opt.get_docstring()
+        )
+    
+    def format_positional(self, positional: Positional) -> str:
+        datatype = self.datatype_formatter.to_janis_def_string(positional)
+        return tool_input_snippet(
+            tag=self.tag_validator.format_name(positional.get_name()),
+            datatype=datatype,
+            position=positional.cmd_pos,
+            doc=positional.get_docstring()
+        )
 
     def format_outputs(self, command: Command) -> str:
-        pass
+        out_str: str = ''
+        out_str += 'outputs = ['
+        for output in command.get_all_outputs():
+            out_str += self.format_output(output)
+        out_str += ']'
+        return out_str
+
+    def format_output(self, component: CommandComponent) -> str:
+        datatype = self.datatype_formatter.to_janis_def_string(component)
+        name = self.format_output_name(component)
+        selector = self.format_selector(component, name)
+        stype: Optional[str] = None
+        scontents: Optional[str] = None
+        if selector:
+            stype = selector_map[selector.stype]
+            scontents = selector.contents
+        return tool_output_snippet(
+            tag=name,
+            datatype=datatype,
+            selector_type=stype,
+            selector_contents=scontents,
+            doc=component.get_docstring()
+        )
+        
+    def format_output_name(self, component: CommandComponent) -> str:
+        name: str = ''
+        match component:
+            case Flag() | Option():
+                name = component.prefix  
+            case Positional() | Redirect():
+                name = component.get_name()  
+            case _:
+                pass
+        return self.tag_validator.format_name(name)
+
+    def format_selector(self, component: CommandComponent, output_name: str) -> Optional[Selector]:
+        if not isinstance(component, Redirect):
+            return Selector(
+                stype=SelectorType.INPUT_SELECTOR,
+                contents=output_name
+            )
+        return None
 
     def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
-        base_command = command.infer_base_command()
-        name: str = self.tag_validator.format_tool_name(tool.metadata.name)
+        #base_command = command.infer_base_command() # TODO
+        name: str = self.tag_validator.format_name(tool.metadata.name)
 
         return command_tool_builder_snippet(
             toolname=name,
-            base_command=base_command,
+            base_command=[],
             container=container.url,
             version=tool.metadata.version, # should this be based on get_main_requirement()?
             help=tool.metadata.help
         )
 
     def format_translate_func(self, tool: GalaxyToolDefinition) -> str:
-        name: str = self.tag_validator.format_tool_name(tool.metadata.name)
+        name: str = self.tag_validator.format_name(tool.metadata.name)
         return translate_snippet(name)
         
 

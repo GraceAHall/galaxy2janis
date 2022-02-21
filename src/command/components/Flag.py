@@ -34,5 +34,10 @@ class Flag(BaseCommandComponent):
     def is_array(self) -> bool:
         return False
 
+    def get_docstring(self) -> Optional[str]:
+        if self.gxvar:
+            return self.gxvar.get_docstring()
+        return None
+        
     def __str__(self) -> str:
         return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
+from tool.param.InputParam import SelectParam
 
 from tool.param.Param import Param
 from command.components.ObservedValueRecord import ObservedValueRecord
@@ -54,8 +55,16 @@ class Option(BaseCommandComponent):
         return True
 
     def is_array(self) -> bool:
-        # yes, this is possible to work out (using the galaxy param)
-        raise NotImplementedError
+        if self.gxvar:
+            if isinstance(self.gxvar, SelectParam):
+                if self.gxvar.multiple:
+                    return True
+        return False
+
+    def get_docstring(self) -> Optional[str]:
+        if self.gxvar:
+            return self.gxvar.get_docstring()
+        return f'examples: {self.value_record.get_unique_values()[:3]}'
 
     def __str__(self) -> str:
         return f'{str(self.prefix):30}{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

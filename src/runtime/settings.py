@@ -65,7 +65,7 @@ class ExecutionSettings:
         return self.container_cachedir
 
     def get_datatype_definitions_path(self) -> str:
-        return 'src/datatypes/gxformat_combined_types.yaml' # TODO make this an actual CLI setting
+        return 'datatypes/gxformat_combined_types.yaml' # TODO make this an actual CLI setting
 
         
 

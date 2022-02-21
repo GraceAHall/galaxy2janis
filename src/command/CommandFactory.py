@@ -48,11 +48,15 @@ class CommandFactory:
         #if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
         statement: CommandStatement = cmdstr.tool_statement # type: ignore
         print(statement.cmdline) # TODO REMOVE TESTING
-        self.update_command_components(statement, disallow=[])
-        #self.update_command_components(statement, disallow=[Flag, Option])
+        self.update_redirects(statement)
+        self.update_command_components(statement)
         self.iter_context.increment_cmdstr()
     
-    def update_command_components(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]) -> None:
+    def update_redirects(self, cmdstmt: CommandStatement) -> None:
+        if cmdstmt.redirect:
+            self.update_command([cmdstmt.redirect])
+    
+    def update_command_components(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
         """
         iterate through command words (with next word for context)
         each pair of words may actually yield more than one component.
@@ -116,7 +120,7 @@ class CommandFactory:
         self.update_components_presence_array()
 
     def update_components_presence_array(self) -> None:
-        for component in self.command.get_all_components():
+        for component in self.command.get_all_inputs():
             component.update_presence_array(self.iter_context.cmdstr - 1, fill_false=True)
 
 

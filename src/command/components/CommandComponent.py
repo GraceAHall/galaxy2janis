@@ -29,6 +29,10 @@ class CommandComponent(Protocol):
     def is_array(self) -> bool:
         ...
 
+    def get_docstring(self) -> Optional[str]:
+        ...
+    
+
 
 # this mainly exists because each CommandComponent has the same 
 # update_presence_array method. 
@@ -88,6 +92,13 @@ class BaseCommandComponent(ABC):
         returns whether the component is an array or not
         uses galaxy param information if available.
         flags components are never arrays.
+        """
+        ...
+
+    def get_docstring(self) -> Optional[str]:
+        """
+        gets helptext for the component. uses galaxy param if available,
+        otherwise usually just presents the witnessed values as examples. 
         """
         ...
 
