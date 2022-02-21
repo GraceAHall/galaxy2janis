@@ -12,7 +12,6 @@ from galaxy.tool_util.parser.output_objects import ToolOutput
 
 from tool.param.ParamRegister import ParamRegister
 from tool.param.OutputRegister import OutputRegister
-from command.components.CommandComponent import Positional, Flag, Option, Output
 from command.Command import TokenType
 from logger.Logger import Logger
 
@@ -23,7 +22,7 @@ from utils.galaxy_utils import (
     is_tool_output
 )
 
-CommandComponent = Union[Positional, Flag, Option]
+from command.components.CommandComponent import CommandComponent
 
 
 class DatatypeExtractor:
@@ -64,57 +63,7 @@ class DatatypeExtractor:
         }
 
 
-    def init_datastructures(self) -> None:
-        self.format_datatype_map = self.load_yaml('src/data/gxformat_combined_types.yaml')
-        self.ext_to_format_map = self.index_by_ext(self.format_datatype_map)
     
-
-    def load_yaml(self, filepath: str) -> dict[str, dict[str, str]]:
-        """
-        func loads the combined datatype yaml then converts it to dict with format as keys
-        provides structue where we can search all the galaxy and janis types given what we see
-        in galaxy 'format' attributes.
-        """
-        with open(filepath, 'r') as fp:
-            datatypes = yaml.safe_load(fp)
-        
-        format_datatype_map = {}
-
-        for dtype in datatypes['types']:
-            # add new elem if not exists
-            if dtype['format'] not in format_datatype_map:
-                format_datatype_map[dtype['format']] = []
-            
-            # add this type
-            format_datatype_map[dtype['format']].append(dtype)
-
-        return format_datatype_map
-
-
-    def index_by_ext(self, format_datatype_map: dict[str, dict[str, str]]) -> dict[str, str]:
-        """
-        maps ext -> list of datatypes (janis / galaxy) 
-        this way can look up a file extension, and get the gxformats that use that type
-        can then use self.format_datatype_map to get the actual janis and galaxy type info 
-        """
-        ext_format_map = {}
-        for gxformat, dtype_list in format_datatype_map.items():
-            # get all exts from galaxy + janis types of that gxformat
-            exts = set()
-            for dtype in dtype_list:
-                if dtype['extensions'] is not None:
-                    dtype_exts = dtype['extensions'].split(',')
-                    exts.update(dtype_exts)
-            
-            # for each ext, add as key to ext_format_map or append datatype to that key
-            for ext in list(exts):
-                # make entry if not exists
-                if ext not in ext_format_map:
-                    ext_format_map[ext] = []
-                # append gxformat
-                ext_format_map[ext].append(gxformat)
-
-        return ext_format_map
 
 
     def extract(self, incoming: Union[CommandComponent, Output]) -> list[dict]:
@@ -300,9 +249,7 @@ class DatatypeExtractor:
         return []
 
 
-    def assert_has_datatype(self, obj):
-        # TODO
-        pass
+
 
 
     

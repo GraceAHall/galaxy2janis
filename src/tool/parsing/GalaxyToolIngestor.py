@@ -5,7 +5,7 @@ from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 
 from tool.metadata import Metadata
-from tool.requirements import Requirement, CondaRequirement, ContainerRequirement
+from tool.requirements import CondaRequirement, ContainerRequirement
 from tool.citations import Citation
 
 from tool.parsing.InputParamFactory import InputParamFactory
@@ -14,9 +14,11 @@ from tool.param.InputRegister import InputRegister
 from tool.param.OutputRegister import OutputRegister
 
 from tool.parsing.tests.TestFactory import TestFactory
-from tool.test import TestRegister
+from tool.TestRegister import TestRegister
 
 from tool.parsing.inputs import get_flattened_params
+
+Requirement = ContainerRequirement | CondaRequirement
 
 
 class GalaxyToolIngestor:

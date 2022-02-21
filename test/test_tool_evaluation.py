@@ -1,12 +1,11 @@
 
 
-
 import unittest
+from data.tool_args import error_tools, passing_tools
 
-from gxtool2janis import load_galaxy_manager, load_tool
-from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
-
+from runtime.startup import load_settings, ExecutionSettings
+from galaxy_interaction import load_manager, GalaxyManager
+from tool.tool import load_tool, GalaxyToolDefinition
 
 
 class TestToolEvaluation(unittest.TestCase):
@@ -21,13 +20,10 @@ class TestToolEvaluation(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        argv = [
-            "abricate.xml", "test/data/abricate", 
-            "--outdir", "test/rubbish",
-        ]
-        esettings: ExecutionSettings = load_settings(argv)
-        self.gxmanager = load_galaxy_manager(esettings)
-        self.tool = load_tool(self.gxmanager)
+        args: list[str] = passing_tools['abricate']
+        esettings: ExecutionSettings = load_settings(args)
+        self.gxmanager: GalaxyManager = load_manager(esettings)
+        self.tool: GalaxyToolDefinition = load_tool(self.gxmanager)
         
     def test_evaluation(self):
         TEMPLATED_STR = "ln -sf '__ʕ•́ᴥ•̀ʔっ♡_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > '__ʕ•́ᴥ•̀ʔっ♡_report'"

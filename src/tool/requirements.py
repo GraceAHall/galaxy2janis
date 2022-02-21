@@ -1,10 +1,5 @@
 
 
-
-
-
-
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 
@@ -19,25 +14,26 @@ EXAMPLE
 
 
 @dataclass
-class Requirement(ABC):
-    @abstractmethod
-    def get_text(self) -> str:
-        ...
-
-@dataclass
-class CondaRequirement(Requirement):
+class CondaRequirement:
     name: str
     version: str
 
     def get_text(self) -> str:
         return self.name
 
+    def get_version(self) -> str:
+        return self.version
+
+
 @dataclass
-class ContainerRequirement(Requirement):
+class ContainerRequirement:
     uri: str
 
     def get_text(self) -> str:
         return self.uri
+
+    def get_version(self) -> str:
+        raise NotImplementedError
 
 
 

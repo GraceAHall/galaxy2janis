@@ -23,3 +23,27 @@ class ObservedValueRecord:
         counts_list.sort(key=lambda x: x[1], reverse=True)
         return counts_list[0][0]
 
+    def values_are_ints(self) -> bool:
+        if all([self.is_int(x) for x in self.record]):
+            return True
+        return False
+    
+    def values_are_floats(self) -> bool:
+        if all([self.is_float(x) for x in self.record]):
+            return True
+        return False
+
+    def is_int(self, the_string: str) -> bool:
+        if the_string.isdigit():
+            return True
+        return False
+
+    def is_float(self, the_string: str) -> bool:
+        if not self.is_int(the_string):
+            try:
+                float(the_string)
+                return True
+            except ValueError:
+                pass
+        return False
+

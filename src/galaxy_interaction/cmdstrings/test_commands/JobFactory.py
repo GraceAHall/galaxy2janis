@@ -9,8 +9,8 @@ from typing import Any, Optional
 from galaxy.tool_util.verify.interactor import ToolTestDescription
 from runtime.settings import ExecutionSettings
 from galaxy.model import Job, JobParameter
-from gxmanager.cmdstrings.test_commands.datasets import generate_dataset
-from gxmanager.mock import MockApp
+from galaxy_interaction.cmdstrings.test_commands.datasets import generate_dataset
+from galaxy_interaction.mock import MockApp
 from tool.param.Param import Param
 from tool.param.InputParam import DataParam, DataCollectionParam
 

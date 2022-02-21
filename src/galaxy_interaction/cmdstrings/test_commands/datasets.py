@@ -3,7 +3,7 @@
 
 from typing import Union
 
-from gxmanager.mock import MockApp
+from galaxy_interaction.mock import MockApp
 from galaxy.model import (
     Dataset,
     HistoryDatasetAssociation,

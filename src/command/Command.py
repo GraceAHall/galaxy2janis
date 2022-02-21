@@ -2,21 +2,19 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 
 from command.components.Positional import Positional
 from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.linux_constructs import Redirect
-
-CommandComponent = Positional | Flag | Option
-
+from command.components.CommandComponent import CommandComponent
 
 
 class Updater(ABC):
 
     @abstractmethod
-    def update(self, command: Command, incoming: Any, cmdstr_index: int) -> None:
+    def update(self, command: Command, incoming: Any) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         ...
 
@@ -39,47 +37,40 @@ class Updater(ABC):
 class PositionalUpdater(Updater):
     command: Command
     incoming: Positional
-    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Positional, cmdstr_index: int) -> None:
-        """updates the command's store of CommandComponents with the incoming component"""
+    def update(self, command: Command, incoming: Positional) -> None:
         self.command = command
         self.incoming = incoming
-        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
             self.add()
 
     def should_merge(self) -> bool:
-        cmd_pos = self.command.positional_ptr
+        cmd_pos = self.incoming.cmd_pos
         existing_comp = self.command.get_positional(cmd_pos)
         if existing_comp:
             return True
         return False
     
     def merge(self) -> None:
-        cmd_pos = self.command.positional_ptr
+        cmd_pos = self.incoming.cmd_pos
         existing_comp = self.command.get_positional(cmd_pos)
         if existing_comp:
-            existing_comp.update(self.incoming, self.cmdstr_index)
+            existing_comp.update(self.incoming)
     
     def add(self) -> None:
-        cmd_pos = self.command.positional_ptr
+        cmd_pos = self.incoming.cmd_pos
         self.command.positionals[cmd_pos] = self.incoming
-        self.command.positional_ptr += 1
 
 
 class FlagUpdater(Updater):
     command: Command
     incoming: Flag
-    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Flag, cmdstr_index: int) -> None:
-        """updates the command's store of CommandComponents with the incoming component"""
+    def update(self, command: Command, incoming: Flag) -> None:
         self.command = command
         self.incoming = incoming
-        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
@@ -106,13 +97,10 @@ class FlagUpdater(Updater):
 class OptionUpdater(Updater):
     command: Command
     incoming: Option
-    cmdstr_index: int
 
-    def update(self, command: Command, incoming: Option, cmdstr_index: int) -> None:
-        """updates the command's store of CommandComponents with the incoming component"""
+    def update(self, command: Command, incoming: Option) -> None:
         self.command = command
         self.incoming = incoming
-        self.cmdstr_index = cmdstr_index
         if self.should_merge():
             self.merge()
         else:
@@ -129,24 +117,48 @@ class OptionUpdater(Updater):
         query_prefix = self.incoming.prefix
         existing_comp = self.command.get_option(query_prefix)
         if existing_comp:
-            existing_comp.update(self.incoming, self.cmdstr_index)
+            existing_comp.update(self.incoming)
     
     def add(self) -> None:
         prefix = self.incoming.prefix
         self.command.options[prefix] = self.incoming
 
 
+class RedirectUpdater(Updater):
+    command: Command
+    incoming: Redirect
+
+    def update(self, command: Command, incoming: Redirect) -> None:
+        self.command = command
+        self.incoming = incoming
+        if self.should_merge():
+            self.merge()
+        else:
+            self.add()
+
+    def should_merge(self) -> bool:
+        if not self.command.redirect:
+            return True
+        return False
+    
+    def merge(self) -> None:
+        if self.command.redirect:
+            self.command.redirect.update(self.incoming)
+    
+    def add(self) -> None:
+        self.command.redirect = self.incoming
+
+
 class Command:
     def __init__(self):
-        self.positional_ptr: int = 0
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
         self.redirect: Optional[Redirect] = None
 
-    def update(self, incoming: CommandComponent, cmdstr_index: int):
+    def update(self, incoming: CommandComponent):
         updater = self.select_updater(incoming)
-        updater.update(self, incoming, cmdstr_index)
+        updater.update(self, incoming)
 
     def select_updater(self, incoming: CommandComponent) -> Updater:
         match incoming:
@@ -156,6 +168,8 @@ class Command:
                 return FlagUpdater()
             case Option():
                 return OptionUpdater()
+            case Redirect():
+                return RedirectUpdater()
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
@@ -164,6 +178,8 @@ class Command:
         components += self.get_positionals()
         components += self.get_flags()
         components += self.get_options()
+        if self.redirect:
+            components.append(self.redirect)
         return components
 
     def get_positionals(self) -> list[Positional]:
@@ -189,5 +205,35 @@ class Command:
         if query_prefix in self.options:
             return self.options[query_prefix]
         return None
- 
 
+    def infer_base_command(self) -> list[str]:
+        return []
+
+    # string representations
+    def __str__(self) -> str:
+        return f""" \
+##### Command #####
+
+positionals: ------------
+{'main value':20}{'optional':>10}
+{self._get_components_list_as_str('positional')}
+
+flags: ------------
+{'prefix':20}{'optional':>10}
+{self._get_components_list_as_str('flag')}
+
+options: ------------
+{'prefix':30}{'main value':20}{'optional':>10}
+{self._get_components_list_as_str('option')}"""
+
+    def _get_components_list_as_str(self, ctype: str='positional') -> str:
+        funcmap: dict[str, Callable[[], list[CommandComponent]]]  = {
+            'positional': self.get_positionals,
+            'flag': self.get_flags,
+            'option': self.get_options,
+        }
+        outstr: str = ''
+        for comp in funcmap[ctype]():
+            outstr += comp.__str__() + '\n'
+        return outstr
+    

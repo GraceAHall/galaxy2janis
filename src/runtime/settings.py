@@ -19,6 +19,7 @@ class ExecutionSettings:
     xmlfile: str
     xmldir: str
     parent_outdir: Optional[str] = None
+    container_cachedir: str = './container_uri_cache.json'
     workflow: Optional[InputWorkflow] = None
     runmode: RunMode = RunMode.DEFAULT
 
@@ -60,4 +61,11 @@ class ExecutionSettings:
         if self.workflow:
             return self.workflow.step
 
+    def get_container_cache_path(self) -> str:
+        return self.container_cachedir
+
+    def get_datatype_definitions_path(self) -> str:
+        return 'src/datatypes/gxformat_combined_types.yaml' # TODO make this an actual CLI setting
+
+        
 

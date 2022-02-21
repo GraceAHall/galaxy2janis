@@ -1,54 +1,35 @@
 
 
 import sys
-from typing import Container
+from typing import Optional
 
-from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
+from runtime.startup import load_settings, ExecutionSettings
+from galaxy_interaction import load_manager, GalaxyManager
+from tool.tool import load_tool, GalaxyToolDefinition
+from tool.tests import write_tests
+from command.infer import infer_command, Command
+from containers.fetch import fetch_container, Container
+from janis.write_definition import write_janis
 
-from gxmanager import GalaxyManager
-from tool.parsing import parse_gx_to_internal
-from tool.tool_definition import GalaxyToolDefinition
+"""
+this file contains the main function for gxtool2janis
+the steps involved are laid out in order
+each step involves a single module
+only the tool module is called twice (load_tool, and write_tests)
+"""
 
-from command.Command import Command
-from command.infer import infer_cmd
-from containers.Container import Container
 
-
-# main entry point
 def main():
+    # main entry point
     esettings: ExecutionSettings = load_settings(sys.argv[1:])
-    gxmanager = load_galaxy_manager(esettings)
-    toolrep = load_tool(gxmanager)
-    command = infer_command(gxmanager, toolrep)
-
-    container = fetch_container(esettings, toolrep)
-    write_janis(esettings, toolrep, command, container)
-    write_tests(esettings, toolrep)
-
-def load_galaxy_manager(esettings: ExecutionSettings) -> GalaxyManager:
-    return GalaxyManager(esettings)
-
-def load_tool(gxmanager: GalaxyManager) -> GalaxyToolDefinition:
-    galaxytool = gxmanager.get_tool()
-    return parse_gx_to_internal(galaxytool)
-
-def infer_command(gxmanager: GalaxyManager, tooldef: GalaxyToolDefinition) -> Command:
-    return infer_cmd(gxmanager, tooldef)
-
-def fetch_container(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> Container:
-    pass
-
-def write_janis(esettings: ExecutionSettings, 
-                tooldef: GalaxyToolDefinition,
-                command: Command, 
-                container: Container) -> None:
-    pass
-
-
-def write_tests(esettings: ExecutionSettings, tooldef: GalaxyToolDefinition) -> None:
-    pass
-
+    gxmanager: GalaxyManager = load_manager(esettings)
+    tool: GalaxyToolDefinition = load_tool(gxmanager)
+    command: Command = infer_command(gxmanager, tool)
+    container: Optional[Container] = fetch_container(esettings, tool)
+    
+    print(command)
+    write_janis(esettings, tool, command, container)
+    write_tests(esettings, tool)
 
 
 if __name__ == '__main__':

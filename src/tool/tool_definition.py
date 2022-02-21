@@ -5,12 +5,15 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from tool.metadata import Metadata
-from tool.requirements import Requirement
+from tool.param.Param import Param
 from tool.param.InputRegister import InputRegister
 from tool.param.OutputRegister import OutputRegister
-from tool.test import TestRegister
+from tool.TestRegister import TestRegister
 from janis_core.tool.test_classes import TTestCase
-from tool.param.Param import Param
+from tool.requirements import ContainerRequirement, CondaRequirement
+
+Requirement = ContainerRequirement | CondaRequirement
+
 
 
 @dataclass
@@ -25,6 +28,7 @@ class GalaxyToolDefinition:
     inputs: InputRegister
     outputs: OutputRegister
     tests: TestRegister
+    
 
     def get_input(self, query: str, strategy: str='default') -> Optional[Param]:
         return self.inputs.get(query.lstrip('$'), strategy=strategy)
@@ -43,6 +47,12 @@ class GalaxyToolDefinition:
 
     def list_tests(self) -> list[TTestCase]:
         return self.tests.list()
+
+    def get_requirements(self) -> list[Requirement]:
+        return self.metadata.requirements
+    
+    def get_main_requirement(self) -> Requirement:
+        return self.metadata.get_main_requirement()
 
 
 

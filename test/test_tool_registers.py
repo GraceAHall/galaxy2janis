@@ -8,7 +8,7 @@ from tool.param.Param import Param
 from tool.param.OutputRegister import OutputRegister
 from tool.param.OutputParam import (
     DataOutputParam,
-    CollectionOutputParam
+    CollectionOutputParam 
 )
 
 from tool.param.InputRegister import InputRegister

@@ -18,6 +18,7 @@ from command.regex.expressions import (
     SH_STREAM_MERGE, 
     VARIABLES,
     SH_STATEMENT_DELIMS,
+    VERSIONS,
     ALL
 )
 
@@ -27,6 +28,10 @@ def get_all(the_string: str) -> list[re.Match[str]]:
 
 def get_custom(pattern: str, the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(pattern, the_string)
+    return [m for m in matches]
+
+def get_versions(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(VERSIONS, the_string)
     return [m for m in matches]
 
 def get_statement_delims(the_string: str) -> list[re.Match[str]]:

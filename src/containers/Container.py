@@ -2,11 +2,15 @@
 
 
 
+from dataclasses import dataclass
 
+
+
+
+@dataclass
 class Container: 
-    def __init__(self):
-        self.tool: str = ''
-        self.version: str = ''
-        self.url: str = ''
-        self.image_type: str = ''
-        self.registry_host: str = ''
+    tool: str = ''
+    version: str = ''
+    url: str = ''
+    image_type: str = ''
+    registry_host: str = ''

@@ -6,8 +6,10 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from tool.citations import Citation
-from tool.requirements import Requirement, CondaRequirement
 from command.cmdstr.utils import global_align
+from tool.requirements import ContainerRequirement, CondaRequirement
+
+Requirement = ContainerRequirement | CondaRequirement
 
 @dataclass
 class Metadata:
@@ -34,7 +36,8 @@ class Metadata:
         
         similarity_scores = self.get_req_similarity_scores()
         similarity_scores.sort(key=lambda x: x[1], reverse=True)
-        return similarity_scores[0][0]
+        main_requirement: Requirement = similarity_scores[0][0]
+        return main_requirement
 
     def get_req_similarity_scores(self) -> list[Tuple[Requirement, float]]:
         scores: list[Tuple[Requirement, float]] = []

@@ -9,6 +9,7 @@ from tool.param.Param import Param
 class InputParam(Param):
     def __init__(self, name: str):
         self.name: str = name
+        self.datatypes: list[str] = []
         self.label: str = ''
         self.helptext: str = ''
         self.optional: bool = False
@@ -41,6 +42,7 @@ class TextParam(InputParam):
     def __init__(self, name: str):
         super().__init__(name)
         self.value: Optional[str] = None
+        self.datatypes: list[str] = ['String']
 
     def get_default(self) -> Any:
         if self.value:
@@ -54,6 +56,7 @@ class IntegerParam(InputParam):
         self.value: Optional[str] = None
         self.min: Optional[str] = None
         self.max: Optional[str] = None
+        self.datatypes: list[str] = ['Int']
 
     def get_default(self) -> Any:
         if self.value:
@@ -72,6 +75,7 @@ class FloatParam(InputParam):
         self.value: Optional[str] = None
         self.min: Optional[str] = None
         self.max: Optional[str] = None
+        self.datatypes: list[str] = ['Float']
 
     def get_default(self) -> Any:
         if self.value:
@@ -89,6 +93,7 @@ class BoolParam(InputParam):
         self.checked: bool = True
         self.truevalue: str = ''
         self.falsevalue: str = ''
+        self.datatypes: list[str] = ['Boolean']
 
     def get_default(self) -> bool:
         return self.checked
@@ -126,6 +131,7 @@ class SelectParam(InputParam):
         super().__init__(name)
         self.options: list[SelectOption] = []
         self.multiple: bool = False
+        self.datatypes: list[str] = ['String']
 
     def get_default(self) -> Any:
         for option in self.options:

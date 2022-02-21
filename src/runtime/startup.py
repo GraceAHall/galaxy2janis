@@ -7,6 +7,7 @@ from runtime.settings import ExecutionSettings, InputWorkflow, RunMode
 from runtime.validation import SettingsValidator
 from runtime.file_initialisation import ProjectFileInitialiser
 
+
 def load_settings(argv: list[str]) -> ExecutionSettings:
     esettings = create_execution_settings(argv)
     validate_settings(esettings)
@@ -36,6 +37,10 @@ def get_args(argv: list[str]) -> argparse.Namespace:
                         "--outdir", 
                         help="parent folder for parsed tools", 
                         type=str)
+    parser.add_argument("-c",
+                        "--cachedir", 
+                        help="path to local container cache", 
+                        type=str)
     parser.add_argument("-w", 
                         "--wflow", 
                         type=str,
@@ -54,12 +59,15 @@ def get_args(argv: list[str]) -> argparse.Namespace:
 
 def init_settings(args: argparse.Namespace) -> ExecutionSettings:
     esettings = ExecutionSettings(
-        args.xmlfile, 
-        args.xmldir.rstrip('/'),
-        args.outdir
+        xmlfile=args.xmlfile, 
+        xmldir=args.xmldir.rstrip('/'),
+        parent_outdir=args.outdir
     )
+    if args.cachedir:
+        esettings.container_cachedir = args.cachedir
     if args.debug:
         esettings.runmode = RunMode.DEBUG
+    
     return esettings
 
 

@@ -9,8 +9,8 @@ from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.verify.interactor import ToolTestDescription
 
 from galaxy.model import Job, History
-from gxmanager.mock import MockApp, ComputeEnvironment
-from gxmanager.cmdstrings.test_commands.JobFactory import JobFactory
+from galaxy_interaction.mock import MockApp, ComputeEnvironment
+from galaxy_interaction.cmdstrings.test_commands.JobFactory import JobFactory
 
 from galaxy.tools.evaluation import ToolEvaluator
 

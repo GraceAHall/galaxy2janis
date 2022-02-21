@@ -7,19 +7,16 @@ Repeat tags (and any templating errors caused by repeats)
 creating TTestCases
 
 today:
- - positionals cmd_pos causing issues due to make_multiple()
- - options presence array causing issues due to make_multiple()
- - for the above, supply a specific value for cmd_pos and cmdstr_ptr rather than just always adding to presence array
- - a bug will occur related to skipping in make_multiple()?
- make_multiple makes a bunch of positionals. fix 
-
 
 
 2022
 TODO:
- - 
+ - ensure option delims correct = ' ' and '='
  - shlex to handle quotes? 
  - make string representation of TTestCases so we can actually write to a janis tool def file
+
+
+
 
 BEFORE v1.0
  - migrate AliasResolver stuff to default vals then cheetah templating?

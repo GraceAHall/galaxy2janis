@@ -8,6 +8,7 @@ from typing import Any
 
 class Param(ABC):
     name: str
+    datatypes: list[str] = []
 
     @abstractmethod
     def get_default(self) -> Any:

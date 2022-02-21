@@ -24,3 +24,4 @@ SH_TEE = r'(?<![\d&])\| ?tee( -a)?'
 SH_STREAM_MERGE = r'(?<=\s|^)\d?>&\d'
 
 OPERATOR = r'[-+\\/*=]?='
+VERSIONS = r'(\d+)(\.\d+)*'

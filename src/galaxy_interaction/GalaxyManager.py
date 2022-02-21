@@ -1,6 +1,9 @@
 
 
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tool.tool_definition import GalaxyToolDefinition
 
 import os
 import tempfile
@@ -11,12 +14,11 @@ from galaxy.tool_util.parser import get_tool_source
 from galaxy.tools import create_tool_from_source
 from galaxy.model import History
 
-from gxmanager.mock import MockApp, MockObjectStore
+from galaxy_interaction.mock import MockApp, MockObjectStore
 from runtime.settings import ExecutionSettings
-from tool.tool_definition import GalaxyToolDefinition
 
-from gxmanager.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
-from gxmanager.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
+from galaxy_interaction.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
+from galaxy_interaction.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
 
 
 

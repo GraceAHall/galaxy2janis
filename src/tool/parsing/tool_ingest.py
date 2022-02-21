@@ -9,9 +9,11 @@ from tool.tool_definition import GalaxyToolDefinition
 from tool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
 from tool.param.InputRegister import InputRegister
 from tool.param.OutputRegister import OutputRegister
-from tool.test import TestRegister
-from tool.requirements import Requirement
+from tool.TestRegister import TestRegister
 from tool.metadata import Metadata
+from tool.requirements import ContainerRequirement, CondaRequirement
+Requirement = ContainerRequirement | CondaRequirement
+
 
 
 class Ingestor(Protocol):

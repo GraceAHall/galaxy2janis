@@ -3,18 +3,14 @@
 import unittest
 from data.tool_args import error_tools, passing_tools
 
+from runtime.startup import load_settings, ExecutionSettings
+from galaxy_interaction import load_manager, GalaxyManager
+from tool.tool import load_tool, GalaxyToolDefinition
 
-from gxtool2janis import load_galaxy_manager, load_tool
-from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
-
-from tool.tool_definition import GalaxyToolDefinition
 from tool.metadata import Metadata
 from tool.requirements import CondaRequirement
-
 from tool.param.InputRegister import InputRegister
 from tool.param.InputParam import DataParam, FloatParam, SelectParam
-
 from tool.param.OutputRegister import OutputRegister
 from tool.param.OutputParam import DataOutputParam
 
@@ -23,7 +19,7 @@ from janis_core.tool.test_classes import (
     TTestExpectedOutput, 
     TTestPreprocessor
 )
-from tool.test import TestRegister
+from tool.TestRegister import TestRegister
 
 
 class TestGalaxyIngestion(unittest.TestCase):
@@ -35,8 +31,8 @@ class TestGalaxyIngestion(unittest.TestCase):
     def setUp(self) -> None:
         args: list[str] = passing_tools['abricate']
         esettings: ExecutionSettings = load_settings(args)
-        self.gxmanager = load_galaxy_manager(esettings)
-        self.tool = load_tool(self.gxmanager)
+        self.gxmanager: GalaxyManager = load_manager(esettings)
+        self.tool: GalaxyToolDefinition = load_tool(self.gxmanager)
 
     def test_tool(self) -> None:
         self.assertIsNotNone(self.tool)
@@ -45,7 +41,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     def test_all_tools(self) -> None:
         for toolname, args in passing_tools.items():
             esettings: ExecutionSettings = load_settings(args)
-            gxmanager = load_galaxy_manager(esettings)
+            gxmanager = load_manager(esettings)
             tool = load_tool(gxmanager)
             self.assertIsNotNone(tool)
 
@@ -60,9 +56,10 @@ class TestGalaxyIngestion(unittest.TestCase):
     
     def test_requirements(self) -> None:
         tool= self.tool
-        self.assertIsInstance(tool.requirements[0], CondaRequirement)
-        self.assertEquals(len(tool.requirements), 1)
-        req: CondaRequirement = tool.requirements[0] #type: ignore
+        requirements = tool.get_requirements()
+        self.assertIsInstance(requirements[0], CondaRequirement)
+        self.assertEquals(len(requirements), 1)
+        req: CondaRequirement = requirements[0] #type: ignore
         self.assertEquals(req.name, 'abricate')
         self.assertEquals(req.version, '1.0.1')
     

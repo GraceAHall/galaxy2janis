@@ -2,15 +2,15 @@
 
 from typing import Tuple
 
-
-from gxmanager import GalaxyManager
+from galaxy_interaction import GalaxyManager
 from tool.tool_definition import GalaxyToolDefinition
+
 from command.cmdstr.ToolExecutionString import ToolExecutionString, ToolExecutionStringFactory
 from command.Command import Command
 from command.CommandFactory import CommandFactory
 
 
-def infer_cmd(gxmanager: GalaxyManager, tool: GalaxyToolDefinition) -> Command:
+def infer_command(gxmanager: GalaxyManager, tool: GalaxyToolDefinition) -> Command:
     raw_strings: list[Tuple[str, str]] = gxmanager.get_raw_cmdstrs(tool)
     cmd_strings = generate_cmd_strings(raw_strings, tool)
     command = generate_cmd(cmd_strings, tool)

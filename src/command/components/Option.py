@@ -1,54 +1,63 @@
 
 from __future__ import annotations
+from dataclasses import dataclass, field
 from typing import Optional
 
 from tool.param.Param import Param
 from command.components.ObservedValueRecord import ObservedValueRecord
+from command.components.CommandComponent import BaseCommandComponent
 
 
-class Option:
-    def __init__(self, prefix: str, value: str, cmdstr_index: int, delim: str=' ', gxvar_attachment: int=1):
-        self.prefix = prefix
-        self.delim: str = delim
-        self.gxvar_attachment = gxvar_attachment
+@dataclass
+class Option(BaseCommandComponent):
+    prefix: str
+    value: str
+    delim: str = ' '
+    gxvar: Optional[Param] = None
+    gxvar_attachment: int = 1
+    presence_array: list[bool] = field(default_factory=list)
+
+    def __post_init__(self):
         self.value_record: ObservedValueRecord = ObservedValueRecord()
-        self.value_record.add(value)
-        
-        self.gxvar: Optional[Param] = None
-        self.presence_array: list[bool] = []
-        self.update_presence_array(cmdstr_index)
+        self.value_record.add(self.value)
 
-    def update(self, incoming: Option, cmdstr_index: int):
-        # cmdstr presence
-        self.update_presence_array(cmdstr_index)
-        # values
+    def update(self, incoming: Option):
+        # transfer values
         for obsval in incoming.value_record.record:
             self.value_record.add(obsval)
-        # galaxy param reference
+        # transfer galaxy param reference
         if not self.gxvar and incoming.gxvar:
             self.gxvar = incoming.gxvar
-
-    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
-        # ensure presence array is filled in to current cmdstr
-        while len(self.presence_array) < cmdstr_index - 1:
-            self.presence_array.append(False)
-        
-        # now that component is up to date
-        presence = False if fill_false else True
-        self.presence_array.append(presence)
+        # presence
+        cmdstr_index = len(incoming.presence_array) - 1
+        self.update_presence_array(cmdstr_index)
 
     def get_default_value(self) -> Optional[str]:
-        # galaxy param if available
+        # get default from galaxy param if available
         if self.gxvar:
             return self.gxvar.get_default()
         # otherwise, most commonly witnessed option value
         return self.value_record.get_most_common_value()
+
+    def get_datatype(self) -> list[str]:
+        if self.gxvar:
+            return self.gxvar.datatypes
+        elif self.value_record.values_are_ints():
+            return ['Int']
+        elif self.value_record.values_are_floats():
+            return ['Int']
+        return ['File']  # TODO what is the fallback type? 
         
     def is_optional(self) -> bool:
-        raise NotImplementedError
+        if all(self.presence_array):
+            return False
+        return True
 
     def is_array(self) -> bool:
         # yes, this is possible to work out (using the galaxy param)
         raise NotImplementedError
+
+    def __str__(self) -> str:
+        return f'{str(self.prefix):30}{str(self.get_default_value()):20}{str(self.is_optional()):>10}'
 
 
