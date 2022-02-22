@@ -15,7 +15,6 @@ from command.components.Positional import Positional
 from command.components.CommandComponent import CommandComponent
 
 
-
 class CommandFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.command = Command()
@@ -46,6 +45,7 @@ class CommandFactory:
         # flags and options first
         # positionals if test or workflowstep (or only xml available)
         #if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
+        self.command.pos_manager.reset()
         statement: CommandStatement = cmdstr.tool_statement # type: ignore
         print(statement.cmdline) # TODO REMOVE TESTING
         self.update_redirects(statement)
@@ -120,7 +120,7 @@ class CommandFactory:
         self.update_components_presence_array()
 
     def update_components_presence_array(self) -> None:
-        for component in self.command.get_all_inputs():
+        for component in self.command.get_inputs():
             component.update_presence_array(self.iter_context.cmdstr - 1, fill_false=True)
 
 

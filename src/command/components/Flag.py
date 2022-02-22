@@ -12,6 +12,7 @@ from command.components.CommandComponent import BaseCommandComponent
 class Flag(BaseCommandComponent):
     prefix: str
     gxvar: Optional[Param] = None
+    stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)
 
     def update(self, incoming: Flag):

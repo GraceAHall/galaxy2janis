@@ -2,12 +2,14 @@
 
 
 from typing import Optional
+from runtime.settings import ExecutionSettings
+from tool.param.Param import Param
+from tool.tool_definition import GalaxyToolDefinition
+from containers.Container import Container
+
+from command.infer import Command
 from command.components.CommandComponent import CommandComponent
 from command.components.linux_constructs import Redirect
-from command.infer import Command
-from containers.Container import Container
-from runtime.settings import ExecutionSettings
-from tool.tool_definition import GalaxyToolDefinition
 from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.Positional import Positional
@@ -18,6 +20,7 @@ from janis.TagValidator import TagValidator
 from tool.parsing.selectors import Selector, SelectorType
 
 from janis.formatting_snippets import (
+    path_append_snippet,
     tool_input_snippet,
     tool_output_snippet,
     command_tool_builder_snippet,
@@ -37,71 +40,95 @@ class JanisFormatter:
         self.import_handler = ImportHandler(self.datatype_formatter)
         self.tag_validator = TagValidator()
 
-    def format_imports(self, command: Command) -> str:
-        for component in command.get_all_inputs():
-            self.import_handler.update(component)
-        if command.redirect:
-            self.import_handler.update(command.redirect)
-        return self.import_handler.imports_to_string()
+    def format_path_appends(self) -> str:
+        return path_append_snippet
 
     def format_inputs(self, command: Command) -> str:
         out_str: str = ''
         out_str += 'inputs = ['
-        for component in command.get_all_inputs():
-            match component:
-                case Flag():
-                    out_str += f'{self.format_flag(component)},'
-                case Option():
-                    out_str += f'{self.format_option(component)},'
-                case Positional():
-                    out_str += f'{self.format_positional(component)},'
-                case _:
-                    pass
-        out_str += ']'
+        for pos, component in command.get_input_positions():
+            if pos > 0:
+                self.import_handler.update(component)
+                match component:
+                    case Flag():
+                        out_str += f'{self.format_flag(pos, component)},'
+                    case Option():
+                        out_str += f'{self.format_option(pos, component)},'
+                    case Positional():
+                        out_str += f'{self.format_positional(pos, component)},'
+                    case _:
+                        pass
+        out_str += '\n]'
         return out_str
 
-    def format_flag(self, flag: Flag) -> str:
-        datatype = self.datatype_formatter.to_janis_def_string(flag)
+    def format_flag(self, pos: int, flag: Flag) -> str:
+        datatype = self.datatype_formatter.get(component=flag)
         return tool_input_snippet(
             tag=self.tag_validator.format_prefix(flag.prefix),
             datatype=datatype,
+            position=pos,
             prefix=flag.prefix,
             doc=flag.get_docstring()
         )
     
-    def format_option(self, opt: Option) -> str:
-        datatype = self.datatype_formatter.to_janis_def_string(opt)
-        separator = opt.delim
-        separate_value_from_prefix = True if separator != ' ' else False
+    def format_option(self, pos: int, opt: Option) -> str:
+        datatype = self.datatype_formatter.get(component=opt)
+        default = opt.get_default_value()
+        if default:
+            if 'Int' not in datatype and 'Float' not in datatype:
+                default = f'"{default}"'
         return tool_input_snippet(
             tag=self.tag_validator.format_prefix(opt.prefix),
             datatype=datatype,
-            separator=separator,
-            separate_value_from_prefix=separate_value_from_prefix,
-            prefix=opt.prefix,
-            default=opt.get_default_value(),
+            position=pos,
+            prefix=opt.prefix if opt.delim == ' ' else opt.prefix + opt.delim,
+            kv_space=True if opt.delim == ' ' else False,
+            default=default,
             doc=opt.get_docstring()
         )
     
-    def format_positional(self, positional: Positional) -> str:
-        datatype = self.datatype_formatter.to_janis_def_string(positional)
+    def format_positional(self, pos: int, positional: Positional) -> str:
+        datatype = self.datatype_formatter.get(component=positional)
         return tool_input_snippet(
             tag=self.tag_validator.format_name(positional.get_name()),
             datatype=datatype,
-            position=positional.cmd_pos,
+            position=pos,
             doc=positional.get_docstring()
         )
 
-    def format_outputs(self, command: Command) -> str:
+    def format_outputs(self, tool: GalaxyToolDefinition, command: Command) -> str:
         out_str: str = ''
         out_str += 'outputs = ['
-        for output in command.get_all_outputs():
-            out_str += self.format_output(output)
-        out_str += ']'
+        # galaxy outputs with no reference in <command> section
+        for output in tool.list_outputs():
+            if output not in command.get_linked_gxparams():
+                self.import_handler.update(output)
+                out_str += f'{self.format_output_param(output)},'
+        # Redirects and command components linked to galaxy outputs
+        for output in command.get_outputs():
+            self.import_handler.update(output)
+            out_str += f'{self.format_output_componet(output)},'
+        out_str += '\n]'
         return out_str
 
-    def format_output(self, component: CommandComponent) -> str:
-        datatype = self.datatype_formatter.to_janis_def_string(component)
+    def format_output_param(self, param: Param) -> str:
+        name = self.tag_validator.format_name(param.name)
+        datatype = self.datatype_formatter.get(param=param)
+        stype: Optional[str] = None
+        scontents: Optional[str] = None
+        if param.selector:
+            stype = selector_map[param.selector.stype]
+            scontents = param.selector.contents
+        return tool_output_snippet(
+            tag=name,
+            datatype=datatype,
+            selector_type=stype,
+            selector_contents=scontents,
+            doc=param.get_docstring()
+        )
+
+    def format_output_componet(self, component: CommandComponent) -> str:
+        datatype = self.datatype_formatter.get(component=component)
         name = self.format_output_name(component)
         selector = self.format_selector(component, name)
         stype: Optional[str] = None
@@ -137,12 +164,12 @@ class JanisFormatter:
         return None
 
     def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
-        #base_command = command.infer_base_command() # TODO
+        base_command = command.get_base_command()
         name: str = self.tag_validator.format_name(tool.metadata.name)
 
         return command_tool_builder_snippet(
             toolname=name,
-            base_command=[],
+            base_command=base_command,
             container=container.url,
             version=tool.metadata.version, # should this be based on get_main_requirement()?
             help=tool.metadata.help
@@ -151,6 +178,9 @@ class JanisFormatter:
     def format_translate_func(self, tool: GalaxyToolDefinition) -> str:
         name: str = self.tag_validator.format_name(tool.metadata.name)
         return translate_snippet(name)
+
+    def format_imports(self) -> str:
+        return self.import_handler.imports_to_string()
         
 
 
@@ -184,7 +214,7 @@ class JanisFormatter:
     #     base_positionals = []
     #     for p in positionals:
     #         p_types = p.get_token_types()
-    #         if TokenType.RAW_STRING in p_types and len(p_types) == 1 and p.has_unique_value():
+    #         if TokenType.RAW_STRING in p_types and len(p_types) == 1 and p.has_single_value():
     #             base_positionals.append(p)
 
     #     # remove these Positional CommandComponents as they are now considered 

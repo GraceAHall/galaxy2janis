@@ -15,6 +15,7 @@ class Positional(BaseCommandComponent):
     value: str
     cmd_pos: int = 0
     gxvar: Optional[Param] = None
+    stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)
 
     def __post_init__(self):
@@ -32,22 +33,20 @@ class Positional(BaseCommandComponent):
         cmdstr_index = len(incoming.presence_array) - 1
         self.update_presence_array(cmdstr_index)
 
-    def get_default_value(self) -> Optional[str]:
+    def get_default_value(self) -> str:
         # get default from galaxy param if available
         if self.gxvar:
             return self.gxvar.get_default()
         # otherwise, most commonly witnessed option value
         return self.value_record.get_most_common_value()
-    
+
     def get_name(self) -> str:
         # get name from galaxy param if available
         if self.gxvar:
             return self.gxvar.name
         # otherwise, most commonly witnessed option value as name
-        # pseudo_name = self.value_record.get_most_common_value()
-        # if pseudo_name:
-        #     return pseudo_name.strip('$')
-        return f'positional_{self.cmd_pos}'
+        pseudo_name = self.value_record.get_most_common_value()
+        return pseudo_name.strip('$')
 
     def get_datatype(self) -> list[str]:
         if self.gxvar:
@@ -66,7 +65,7 @@ class Positional(BaseCommandComponent):
     def is_array(self) -> bool:
         return False
     
-    def has_unique_value(self) -> bool:
+    def has_single_value(self) -> bool:
         counts = self.value_record.get_counts()
         if len(counts) == 1:
             return True
@@ -75,7 +74,7 @@ class Positional(BaseCommandComponent):
     def get_docstring(self) -> Optional[str]:
         if self.gxvar:
             return self.gxvar.get_docstring()
-        return f'examples: {self.value_record.get_unique_values()[:3]}'
+        return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
     def __str__(self) -> str:
         return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

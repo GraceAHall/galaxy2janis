@@ -44,6 +44,7 @@ class Redirect:
         self.gxvar: Optional[Param] = file.gxvar
         self.append: bool = True if redirect.text == '>>' else False
         self.stream: Stream = self.extract_stream()
+        self.stage: str = 'post_options'
         self.presence_array: list[bool] = []
         self.value_record: ObservedValueRecord = ObservedValueRecord()
         self.value_record.add(file.text)
@@ -103,7 +104,7 @@ class Redirect:
     def get_docstring(self) -> Optional[str]:
         if self.gxvar:
             return self.gxvar.get_docstring()
-        return f'examples: {self.value_record.get_unique_values()[:3]}'
+        return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
     # def get_selector(self) -> Selector:
     #     match self.file.gxvar:

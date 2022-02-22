@@ -1,1 +1,1 @@
-{"abricate": {"1.0.1": {"tool": "abricate", "version": "1.0.1", "url": "quay.io/biocontainers/abricate:1.0.1--h1341992_0", "image_type": "Docker", "registry_host": "quay.io/"}}}
+{"abricate": {"1.0.1": {"tool": "abricate", "version": "1.0.1", "url": "quay.io/biocontainers/abricate:1.0.1--h1341992_0", "image_type": "Docker", "registry_host": "quay.io/"}}, "fastqc": {"0.73": {"tool": "fastqc", "version": "0.73", "url": "quay.io/biocontainers/fastqc:0.11.9--0", "image_type": "Docker", "registry_host": "quay.io/"}}}

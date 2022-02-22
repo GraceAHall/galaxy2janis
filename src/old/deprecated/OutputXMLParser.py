@@ -20,7 +20,7 @@ class OutputXMLParser:
 
     
     def parse(self) -> list[Output]:
-        output_elems = self.get_all_outputs()
+        output_elems = self.get_outputs()
         
         # initialize all outputs
         outputs = []
@@ -48,7 +48,7 @@ class OutputXMLParser:
                 break
 
 
-    def get_all_outputs(self) -> list[et.Element]:
+    def get_outputs(self) -> list[et.Element]:
         root = self.tree.getroot()
         output_section = root.find('outputs')
 

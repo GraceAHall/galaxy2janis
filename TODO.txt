@@ -6,18 +6,19 @@ OFFLINE
 Repeat tags (and any templating errors caused by repeats)
 creating TTestCases
 
-today:
 
+
+bugs:
+ - fastqc:
+    - $html_file.files_path
 
 2022
 TODO:
- - base_command
- - outputs should be inputselector when $output format, not stringformatter
- - ensure option delims correct = ' ' and '='
- - shlex to handle quotes? 
+ - logging
+ - make OutputParam.selector not Optional
+ - make container not Optional
+ - get tool test evaluation produce cmdstr for all tests!!!! really screwing me
  - make string representation of TTestCases so we can actually write to a janis tool def file
-
-
 
 
 BEFORE v1.0

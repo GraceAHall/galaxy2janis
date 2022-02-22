@@ -26,8 +26,6 @@ def main():
     tool: GalaxyToolDefinition = load_tool(gxmanager)
     command: Command = infer_command(gxmanager, tool)
     container: Optional[Container] = fetch_container(esettings, tool)
-    
-    print(command)
     write_janis(esettings, tool, command, container)
     write_tests(esettings, tool)
 

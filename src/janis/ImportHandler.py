@@ -1,10 +1,10 @@
 
 
+from typing import Optional
 from command.components.CommandComponent import CommandComponent
 from tool.param.OutputParam import OutputParam
 from tool.parsing.selectors import SelectorType
-from janis.DatatypeRegister import DatatypeRegister
-from command.components.linux_constructs import Redirect
+from janis.DatatypeRegister import DatatypeRegister, JanisDatatype
 
 default_import_str = """
 from janis_core import (
@@ -30,22 +30,33 @@ class ImportHandler:
         self.selector_imports: set[str] = set()
         self.datatype_register = datatype_register
 
-    def update(self, component: CommandComponent):
-        self.update_datatype_imports(component)
-        self.update_selector_imports(component)
+    def update(self, incoming: OutputParam | CommandComponent):
+        if isinstance(incoming, OutputParam):
+            self.update_param(incoming)
+        else:
+            self.update_component(incoming)
 
-    def update_datatype_imports(self, component: CommandComponent): 
+    def update_param(self, param: OutputParam) -> None:
+        datatypes = self.datatype_register.cast_types(param.datatypes)
+        self.update_datatype_imports(datatypes)
+        self.update_selector_imports(param)
+    
+    def update_component(self, component: CommandComponent) -> None:
         raw_datatype = component.get_datatype()
-        janis_types = self.datatype_register.get(raw_datatype)
+        datatypes = self.datatype_register.cast_types(raw_datatype)
+        self.update_datatype_imports(datatypes)
+        if isinstance(component.gxvar, OutputParam):
+            self.update_selector_imports(component.gxvar)
+
+    def update_datatype_imports(self, janis_types: list[JanisDatatype]) -> None: 
         for jtype in janis_types:
             import_str = f'from {jtype.import_path} import {jtype.classname}'
             self.datatype_imports.add(import_str)
 
-    def update_selector_imports(self, component: CommandComponent):
-        if isinstance(component.gxvar, OutputParam):
-            if component.gxvar.selector:
-                import_path = selector_map[component.gxvar.selector.stype]
-                self.selector_imports.add(import_path)
+    def update_selector_imports(self, gxvar: OutputParam) -> None:
+        if gxvar.selector:
+            import_path = selector_map[gxvar.selector.stype]
+            self.selector_imports.add(import_path)
 
     def imports_to_string(self) -> str:
         out_str: str = ''

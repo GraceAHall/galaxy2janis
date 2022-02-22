@@ -2,8 +2,8 @@
 
 
 import re
-from command.regex.utils import find_unquoted, get_unpaired_quotes_start
-
+from command.regex.utils import find_unquoted
+import command.regex.scanners as scanners
 
 def translate_variable_markers(cmdstr: str) -> str:
     return cmdstr.replace("__ʕ•́ᴥ•̀ʔっ♡_", "$")
@@ -55,9 +55,19 @@ def simplify_sh_constructs(cmdstr: str) -> str:
     cmdstr = cmdstr.replace("1>", ">")
     return cmdstr 
 
-def simplify_galaxy_reserved_words(cmdstr: str) -> str:
-    """modifies galaxy reserved words to relevant format. only $__tool_directory__ for now."""
+def simplify_galaxy_static_vars(cmdstr: str) -> str:
+    """
+    modifies galaxy reserved words to relevant format. only $__tool_directory__ for now. 
+    There is a scanner for this, but the actual substitutions might be different. 
+    """
     cmdstr = re.sub(r"['\"]?\$__tool_directory__['\"]?/", "", cmdstr)
+    return cmdstr
+
+def simplify_galaxy_dynamic_vars(cmdstr: str) -> str:
+    """  ${GALAXY_SLOTS:-2} -> 2   etc """
+    matches = scanners.get_dynamic_keywords(cmdstr)
+    for match in matches:
+        cmdstr = cmdstr.replace(match[0], match.group(1)) # type
     return cmdstr
 
 def remove_cheetah_comments(cmdstr: str) -> str:

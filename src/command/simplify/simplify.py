@@ -6,7 +6,8 @@ from command.simplify.filters import (
     translate_variable_markers,
     standardise_variable_format,
     simplify_sh_constructs,
-    simplify_galaxy_reserved_words,
+    simplify_galaxy_static_vars,
+    simplify_galaxy_dynamic_vars,
     remove_cheetah_comments,
 )
 
@@ -27,6 +28,7 @@ class TestCommandSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         translate_variable_markers,
         standardise_variable_format,
+        simplify_galaxy_dynamic_vars,
         simplify_sh_constructs
     ]
 
@@ -35,7 +37,8 @@ class XMLCommandSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         standardise_variable_format,
         simplify_sh_constructs,
-        simplify_galaxy_reserved_words,
+        simplify_galaxy_static_vars,
+        simplify_galaxy_dynamic_vars,
         remove_cheetah_comments
     ]
 

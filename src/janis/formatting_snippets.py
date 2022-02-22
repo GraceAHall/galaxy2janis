@@ -1,56 +1,49 @@
 
 
+from typing import Any, Optional
 
-
-
-from typing import Optional
-
+path_append_snippet = """
+import sys
+sys.path.append('/home/grace/work/pp/gxtool2janis')"""
 
 def tool_input_snippet(
     tag: str,
     datatype: str,
     prefix: Optional[str]=None,
-    separator: Optional[str]=None,
-    separate_value_from_prefix: bool=False,
+    kv_space: Optional[bool]=None,
     position: Optional[int]=None,
-    default: Optional[str]=None,
+    default: Optional[Any]=None,
     doc: Optional[str]=None
 ) -> str:
-    return f"""
-    ToolInput(
-        "{tag}",
-        {datatype},
-        prefix="{prefix}",
-        separator="{separator}",
-        separate_value_from_prefix={separate_value_from_prefix},
-        position={position},
-        default="{default}",
-        doc="{doc}"
-    )"""
-
+    out_str: str = ''
+    out_str += '\n\tToolInput(\n'
+    out_str += f"\t\t'{tag}',\n"
+    out_str += f"\t\t{datatype},\n"
+    out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
+    out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''
+    out_str += f"\t\tposition={position},\n" if position else ''
+    out_str += f"\t\tdefault={default},\n" if default else ''
+    out_str += f'\t\tdoc="{doc}",\n' if doc else ''
+    out_str += '\t)'
+    return out_str
+    
 
 def tool_output_snippet(
     tag: str,
     datatype: str,
-    selector_type: Optional[str],
-    selector_contents: Optional[str],
+    selector_type: Optional[str]=None,
+    selector_contents: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
-    if selector_type and selector_contents:
-        return f"""
-    ToolOutput(
-        "{tag}",
-        {datatype},
-        selector={selector_type}("{selector_contents}")
-        doc="{doc}"
-    )"""
-    else:
-        return f"""
-    ToolOutput(
-        "{tag}",
-        {datatype},
-        doc="{doc}"
-    )"""
+    out_str: str = ''
+    out_str += '\n\tToolOutput(\n'
+    out_str += f"\t\t'{tag}',\n"
+    out_str += f"\t\t{datatype},\n"
+    out_str +=  f"\t\tselector={selector_type}('{selector_contents}'),\n" \
+                if selector_type and selector_contents else ''
+    out_str += f'\t\tdoc="{doc}",\n' if doc else ''
+    out_str += '\t)'
+    return out_str
 
 
 def command_tool_builder_snippet(
@@ -69,7 +62,6 @@ def command_tool_builder_snippet(
     version="{version}",
     doc=\"\"\"{str(help)}\"\"\"
 )"""
-
 # missing from command_tool_builder_snippet()
 #out_str += f'\tfriendly_name="{friendly_name}",\n'
 #out_str += f'\targuments="{arguments}",\n'
@@ -83,7 +75,6 @@ def command_tool_builder_snippet(
 #out_str += f'\tdisk="{disk}",\n'
 #out_str += f'\tdirectories_to_create="{directories_to_create}",\n'
 #out_str += f'\tfiles_to_create="{files_to_create}",\n'
-
 
 
 def translate_snippet(toolname: str) -> str:

@@ -16,6 +16,7 @@ class Option(BaseCommandComponent):
     delim: str = ' '
     gxvar: Optional[Param] = None
     gxvar_attachment: int = 1
+    stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)
 
     def __post_init__(self):
@@ -64,7 +65,7 @@ class Option(BaseCommandComponent):
     def get_docstring(self) -> Optional[str]:
         if self.gxvar:
             return self.gxvar.get_docstring()
-        return f'examples: {self.value_record.get_unique_values()[:3]}'
+        return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
     def __str__(self) -> str:
         return f'{str(self.prefix):30}{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

@@ -10,6 +10,7 @@ from tool.param.Param import Param
 class CommandComponent(Protocol):
     gxvar: Optional[Param]
     presence_array: list[bool]
+    stage: str
     
     def update(self, incoming: Any):
         ...
@@ -39,6 +40,7 @@ class CommandComponent(Protocol):
 class BaseCommandComponent(ABC):
     gxvar: Optional[Param]
     presence_array: list[bool]
+    stage: str
     
     def update(self, incoming: Any):
         """

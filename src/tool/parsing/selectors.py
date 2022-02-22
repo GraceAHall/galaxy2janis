@@ -46,7 +46,7 @@ class CollectorStrategy(Strategy):
 class FallbackStrategy(Strategy):
     def fetch(self, gxout: GxOutput) -> Selector:
         return Selector(
-            SelectorType.STRING_FORMATTER, 
+            SelectorType.INPUT_SELECTOR, 
             '$' + str(gxout.name)
         )
 

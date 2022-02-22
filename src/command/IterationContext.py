@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 
 from dataclasses import dataclass
 
-from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.Positional import Positional
 from command.components.CommandComponent import CommandComponent
@@ -25,7 +24,6 @@ class IterationContext:
     cmdstr: int = 0
     position: int = 0
     step_size: int = 1
-    opts_encountered: bool = False
 
     def increment_cmdstr(self):
         self.cmdstr += 1
@@ -36,7 +34,6 @@ class IterationContext:
     def update(self, valid_components: list[CommandComponent], referrer: CommandFactory) -> None:
         self.update_step(valid_components)
         self.update_position(valid_components)
-        self.update_opts_encountered(valid_components)
 
     def update_step(self, components: list[CommandComponent]) -> None:
         if all([isinstance(comp, Option) for comp in components]):
@@ -47,9 +44,3 @@ class IterationContext:
     def update_position(self, components: list[CommandComponent]) -> None:
         if len(components) == 1 and isinstance(components[0], Positional):
             self.position += 1
-
-    def update_opts_encountered(self, components: list[CommandComponent]) -> None:
-        for comp in components:
-            if isinstance(comp, Flag) or isinstance(comp, Option):
-                self.opts_encountered = True
-                

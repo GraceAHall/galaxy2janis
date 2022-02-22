@@ -2,20 +2,22 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Callable
+from typing import Any, Optional, Callable, Tuple
 
+from command.positions.PositionManager import PositionManager
 from command.components.Positional import Positional
 from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.linux_constructs import Redirect
 from command.components.CommandComponent import CommandComponent
 from tool.param.OutputParam import OutputParam
-
+from command.positions.positions import format_input_positions
+from tool.param.Param import Param
 
 class Updater(ABC):
 
     @abstractmethod
-    def update(self, command: Command, incoming: Any) -> None:
+    def update(self, command: Command, pos_manager: PositionManager, incoming: Any) -> None:
         """updates the command's store of CommandComponents with the incoming component"""
         ...
 
@@ -39,13 +41,18 @@ class PositionalUpdater(Updater):
     command: Command
     incoming: Positional
 
-    def update(self, command: Command, incoming: Positional) -> None:
+    def update(self, command: Command, pos_manager: PositionManager, incoming: Positional) -> None:
         self.command = command
         self.incoming = incoming
+        self.update_position_info(pos_manager)
         if self.should_merge():
             self.merge()
         else:
             self.add()
+    
+    def update_position_info(self, pos_manager: PositionManager) -> None:
+        pos_manager.update('positional')
+        pos_manager.mark_component_stage(self.incoming)
 
     def should_merge(self) -> bool:
         cmd_pos = self.incoming.cmd_pos
@@ -69,13 +76,18 @@ class FlagUpdater(Updater):
     command: Command
     incoming: Flag
 
-    def update(self, command: Command, incoming: Flag) -> None:
+    def update(self, command: Command, pos_manager: PositionManager, incoming: Flag) -> None:
         self.command = command
         self.incoming = incoming
+        self.update_position_info(pos_manager)
         if self.should_merge():
             self.merge()
         else:
             self.add()
+
+    def update_position_info(self, pos_manager: PositionManager) -> None:
+        pos_manager.update('flag')
+        pos_manager.mark_component_stage(self.incoming)
 
     def should_merge(self) -> bool:
         query_prefix = self.incoming.prefix
@@ -99,13 +111,18 @@ class OptionUpdater(Updater):
     command: Command
     incoming: Option
 
-    def update(self, command: Command, incoming: Option) -> None:
+    def update(self, command: Command, pos_manager: PositionManager, incoming: Option) -> None:
         self.command = command
         self.incoming = incoming
+        self.update_position_info(pos_manager)
         if self.should_merge():
             self.merge()
         else:
             self.add()
+
+    def update_position_info(self, pos_manager: PositionManager) -> None:
+        pos_manager.update('option')
+        pos_manager.mark_component_stage(self.incoming)
 
     def should_merge(self) -> bool:
         query_prefix = self.incoming.prefix
@@ -129,7 +146,7 @@ class RedirectUpdater(Updater):
     command: Command
     incoming: Redirect
 
-    def update(self, command: Command, incoming: Redirect) -> None:
+    def update(self, command: Command, pos_manager: PositionManager, incoming: Redirect) -> None:
         self.command = command
         self.incoming = incoming
         if self.should_merge():
@@ -156,10 +173,11 @@ class Command:
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
         self.redirect: Optional[Redirect] = None
+        self.pos_manager: PositionManager = PositionManager() 
 
     def update(self, incoming: CommandComponent):
         updater = self.select_updater(incoming)
-        updater.update(self, incoming)
+        updater.update(self, self.pos_manager, incoming)
 
     def select_updater(self, incoming: CommandComponent) -> Updater:
         match incoming:
@@ -174,21 +192,28 @@ class Command:
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
-    def get_all_inputs(self) -> list[CommandComponent]:
+    def get_inputs(self) -> list[CommandComponent]:
         components: list[CommandComponent] = []
         components += self.get_positionals()
         components += self.get_flags()
         components += self.get_options()
         return components
     
-    def get_all_outputs(self) -> list[CommandComponent]:
+    def get_outputs(self) -> list[CommandComponent]:
         components: list[CommandComponent] = []
-        for comp in self.get_all_inputs():
+        for comp in self.get_inputs():
             if comp.gxvar and isinstance(comp.gxvar, OutputParam):
                 components.append(comp)
         if self.redirect:
             components.append(self.redirect)
         return components
+
+    def get_linked_gxparams(self) -> list[Param]:
+        components: list[CommandComponent] = []
+        components += self.get_inputs()
+        components += self.get_outputs()
+        gxparams = [c.gxvar for c in components]
+        return [p for p in gxparams if p is not None]
 
     def get_positionals(self) -> list[Positional]:
         return list(self.positionals.values())
@@ -214,8 +239,15 @@ class Command:
             return self.options[query_prefix]
         return None
 
-    def infer_base_command(self) -> list[str]:
-        return []
+    def get_input_positions(self) -> list[Tuple[int, CommandComponent]]:
+        inputs = self.get_inputs()
+        return format_input_positions(inputs)
+
+    def get_base_command(self) -> list[str]:
+        input_positions = self.get_input_positions()
+        base_components = [inp for pos, inp in input_positions if pos == 0]
+        base_cmd = [c.get_default_value() for c in base_components]
+        return base_cmd
 
     # string representations
     def __str__(self) -> str:

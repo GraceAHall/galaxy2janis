@@ -4,30 +4,29 @@
 
 from abc import ABC, abstractmethod
 
+from tool.tool_definition import GalaxyToolDefinition
+
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
 
-from command.tokens.Tokens import Token
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.Positional import Positional
-from command.components.ExecutionFork import ExecutionFork
 import command.components.utils as component_utils
-
-from tool.tool_definition import GalaxyToolDefinition
-from command.components.CommandComponent import CommandComponent
+from .CommandComponent import CommandComponent
+from .Flag import Flag
+from .Option import Option
+from .Positional import Positional
+from .ExecutionFork import ExecutionFork
 
 
 ## strategies to initialise individual CommandComponents    
 class ComponentSpawner(ABC):
     @abstractmethod
-    def create(self, ctoken: Token, ntoken: Token) -> CommandComponent:
+    def create(self, cword: CommandWord, nword: CommandWord) -> CommandComponent:
         """creates a specific CommandComponent"""
         ...
 
 class FlagComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token) -> Flag:
-        return Flag(prefix=ctoken.text)
+    def create(self, cword: CommandWord, nword: CommandWord) -> Flag:
+        return Flag(prefix=cword.token.text)
 
     def create_from_opt(self, option: Option) -> Flag:
         flag = Flag(prefix=option.prefix)
@@ -36,16 +35,16 @@ class FlagComponentSpawner(ComponentSpawner):
         return flag
 
 class OptionComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token) -> Option:
+    def create(self, cword: CommandWord, nword: CommandWord) -> Option:
         return Option(
-            prefix=ctoken.text,
-            value=ntoken.text,
-            delim=' ' # TODO change this ive split '=' and ':' delims without noting! 
+            prefix=cword.token.text,
+            value=nword.token.text,
+            delim=cword.nextword_delim
         )
 
 class PositionalComponentSpawner(ComponentSpawner):
-    def create(self, ctoken: Token, ntoken: Token) -> Positional:
-        return Positional(value=ctoken.text)
+    def create(self, cword: CommandWord, nword: CommandWord) -> Positional:
+        return Positional(value=cword.token.text)
 
 
 
@@ -67,18 +66,18 @@ class SingleComponentCreationStrategy(ComponentCreationStrategy):
     
     def create(self) -> list[CommandComponent]:
         """creates list of command components using cword and nword"""
-        new_component = self.make_component(self.cword.token, self.nword.token)
+        new_component = self.make_component()
         new_component = self.transfer_gxvars(new_component)
         return [new_component]
 
-    def make_component(self, ctoken: Token, ntoken: Token) -> CommandComponent:
-        spawner = self.select_spawner(ctoken, ntoken)
-        return spawner.create(ctoken, ntoken)
+    def make_component(self) -> CommandComponent:
+        spawner = self.select_spawner()
+        return spawner.create(self.cword, self.nword)
     
-    def select_spawner(self, ctoken: Token, ntoken: Token) -> ComponentSpawner:
-        if component_utils.is_flag(ctoken, ntoken):
+    def select_spawner(self) -> ComponentSpawner:
+        if component_utils.is_flag(self.cword.token, self.nword.token):
             return FlagComponentSpawner()
-        elif component_utils.is_option(ctoken, ntoken):
+        elif component_utils.is_option(self.cword.token, self.nword.token):
             return OptionComponentSpawner()
         # positional - this has to happen last, as last resort. just trust me.
         else:
