@@ -2,7 +2,7 @@
 
 
 from typing import Optional
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from tool.param.Param import Param
 from tool.tool_definition import GalaxyToolDefinition
 from containers.Container import Container
@@ -35,7 +35,7 @@ selector_map: dict[SelectorType, str] = {
 
 
 class JanisFormatter:
-    def __init__(self, esettings: ExecutionSettings):
+    def __init__(self, esettings: ToolExeSettings):
         self.datatype_formatter = DatatypeRegister(esettings)
         self.import_handler = ImportHandler(self.datatype_formatter)
         self.tag_validator = TagValidator()

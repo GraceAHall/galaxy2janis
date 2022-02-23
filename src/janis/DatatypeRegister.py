@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
 from command.components.linux_constructs import Redirect
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 import yaml
 
 from tool.param.Param import Param
@@ -29,7 +29,7 @@ class DatatypeDetails:
 
 
 class DatatypeRegister:
-    def __init__(self, esettings: ExecutionSettings):
+    def __init__(self, esettings: ToolExeSettings):
         self.dtype_map: dict[str, JanisDatatype] = {}
         self.load_yaml_to_dtype_map(esettings.get_datatype_definitions_path())
         #self.ext_to_raw_map = self.index_by_ext(self.format_datatype_map)

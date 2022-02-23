@@ -67,7 +67,7 @@ def simplify_galaxy_dynamic_vars(cmdstr: str) -> str:
     """  ${GALAXY_SLOTS:-2} -> 2   etc """
     matches = scanners.get_dynamic_keywords(cmdstr)
     for match in matches:
-        cmdstr = cmdstr.replace(match[0], match.group(1)) # type
+        cmdstr = cmdstr.replace(match[0], match.group(1)) 
     return cmdstr
 
 def remove_cheetah_comments(cmdstr: str) -> str:

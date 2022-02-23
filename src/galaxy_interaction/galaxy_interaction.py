@@ -1,9 +1,9 @@
 
 
 
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from galaxy_interaction.GalaxyManager import GalaxyManager
 
 
-def load_manager(esettings: ExecutionSettings) -> GalaxyManager:
+def load_manager(esettings: ToolExeSettings) -> GalaxyManager:
     return GalaxyManager(esettings)

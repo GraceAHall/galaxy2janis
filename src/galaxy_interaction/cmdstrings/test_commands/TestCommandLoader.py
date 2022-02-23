@@ -2,7 +2,7 @@
 
 import tempfile
 from typing import Optional
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 
 from tool.tool_definition import GalaxyToolDefinition
 from galaxy.tools import Tool as GxTool
@@ -23,7 +23,7 @@ class TestCommandLoader:
     Uses galaxy code to template the galaxy tool and the parameter dict 
     into a valid command string
     """
-    def __init__(self, app: MockApp, history: History, gxtool: GxTool, toolrep: GalaxyToolDefinition, esettings: ExecutionSettings):
+    def __init__(self, app: MockApp, history: History, gxtool: GxTool, toolrep: GalaxyToolDefinition, esettings: ToolExeSettings):
         self.app = app
         self.history = history
         self.gxtool = gxtool

@@ -15,7 +15,7 @@ from galaxy.tools import create_tool_from_source
 from galaxy.model import History
 
 from galaxy_interaction.mock import MockApp, MockObjectStore
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 
 from galaxy_interaction.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
 from galaxy_interaction.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
@@ -23,7 +23,7 @@ from galaxy_interaction.cmdstrings.xml_commands.XMLCommandLoader import XMLComma
 
 
 class GalaxyManager:
-    def __init__(self, esettings: ExecutionSettings):
+    def __init__(self, esettings: ToolExeSettings):
         """ 
         Manages all galaxy related operations.
         This includes loading tool xml, templating test cases into command strings, 

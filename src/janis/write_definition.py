@@ -3,13 +3,13 @@
 
 from typing import Optional
 from janis.JanisFormatter import JanisFormatter
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from tool.tool import GalaxyToolDefinition
 from command.infer import Command
 from containers.fetch import Container
 
 
-def write_janis(esettings: ExecutionSettings, tool: GalaxyToolDefinition, command: Command, container: Optional[Container]) -> None:
+def write_janis(esettings: ToolExeSettings, tool: GalaxyToolDefinition, command: Command, container: Optional[Container]) -> None:
     formatter = JanisFormatter(esettings)
     path_str = formatter.format_path_appends()
     inputs_str = formatter.format_inputs(command)

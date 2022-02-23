@@ -47,7 +47,6 @@ class CommandFactory:
         #if cmdstr.source != 'xml' or not self.has_non_xml_cmdstrs:
         self.command.pos_manager.reset()
         statement: CommandStatement = cmdstr.tool_statement # type: ignore
-        print(statement.cmdline) # TODO REMOVE TESTING
         self.update_redirects(statement)
         self.update_command_components(statement)
         self.iter_context.increment_cmdstr()

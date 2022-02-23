@@ -8,7 +8,7 @@ from command.tokens.Tokenifier import Tokenifier
 
 from gxtool2janis import load_galaxy_manager, load_tool
 from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from command.tokens.Tokens import TokenType
 
 
@@ -43,7 +43,7 @@ class TestCreateToolExecutionString(unittest.TestCase):
             "abricate.xml", "test/data/abricate", 
             "--outdir", "test/rubbish",
         ]
-        esettings: ExecutionSettings = load_settings(argv)
+        esettings: ToolExeSettings = load_settings(argv)
         gxmanager = load_galaxy_manager(esettings)
         tool = load_tool(gxmanager)
         self.tokenifier = Tokenifier(tool=tool)

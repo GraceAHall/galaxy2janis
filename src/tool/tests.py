@@ -1,9 +1,9 @@
 
 
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from tool.tool_definition import GalaxyToolDefinition
 
 
 
-def write_tests(esettings: ExecutionSettings, tool: GalaxyToolDefinition) -> None:
+def write_tests(esettings: ToolExeSettings, tool: GalaxyToolDefinition) -> None:
     pass

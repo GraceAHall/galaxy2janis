@@ -3,7 +3,7 @@
 import unittest
 from data.tool_args import error_tools, passing_tools
 
-from runtime.startup import load_settings, ExecutionSettings
+from runtime.startup import load_settings, ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
 from tool.tool import load_tool, GalaxyToolDefinition
 
@@ -30,7 +30,7 @@ class TestGalaxyIngestion(unittest.TestCase):
 
     def setUp(self) -> None:
         args: list[str] = passing_tools['abricate']
-        esettings: ExecutionSettings = load_settings(args)
+        esettings: ToolExeSettings = load_settings(args)
         self.gxmanager: GalaxyManager = load_manager(esettings)
         self.tool: GalaxyToolDefinition = load_tool(self.gxmanager)
 
@@ -40,7 +40,7 @@ class TestGalaxyIngestion(unittest.TestCase):
 
     def test_all_tools(self) -> None:
         for toolname, args in passing_tools.items():
-            esettings: ExecutionSettings = load_settings(args)
+            esettings: ToolExeSettings = load_settings(args)
             gxmanager = load_manager(esettings)
             tool = load_tool(gxmanager)
             self.assertIsNotNone(tool)

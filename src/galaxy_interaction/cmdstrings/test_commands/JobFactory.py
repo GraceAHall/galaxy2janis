@@ -7,7 +7,7 @@ import json
 from typing import Any, Optional
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 from galaxy_interaction.cmdstrings.test_commands.datasets import generate_dataset
 from galaxy_interaction.mock import MockApp
@@ -24,7 +24,7 @@ from galaxy.model import (
 
 
 class JobFactory:
-    def __init__(self, esettings: ExecutionSettings):
+    def __init__(self, esettings: ToolExeSettings):
         self.esettings = esettings
     
     def create(self, app: MockApp, history: History, test: ToolTestDescription, tool: GalaxyToolDefinition) -> Optional[Job]:

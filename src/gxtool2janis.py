@@ -1,33 +1,30 @@
 
 
-import sys
+
 from typing import Optional
+from runtime.cli import CLIparser
 
-from runtime.startup import load_settings, ExecutionSettings
-from galaxy_interaction import load_manager, GalaxyManager
-from tool.tool import load_tool, GalaxyToolDefinition
-from tool.tests import write_tests
-from command.infer import infer_command, Command
-from containers.fetch import fetch_container, Container
-from janis.write_definition import write_janis
+from parse_tool import parse_tool
+from parse_workflow import parse_workflow
 
 """
-this file contains the main function for gxtool2janis
-the steps involved are laid out in order
-each step involves a single module
-only the tool module is called twice (load_tool, and write_tests)
+gxtool2janis program entry point
+parses cli settings then hands execution to other files based on command
 """
-
 
 def main():
-    # main entry point
-    esettings: ExecutionSettings = load_settings(sys.argv[1:])
-    gxmanager: GalaxyManager = load_manager(esettings)
-    tool: GalaxyToolDefinition = load_tool(gxmanager)
-    command: Command = infer_command(gxmanager, tool)
-    container: Optional[Container] = fetch_container(esettings, tool)
-    write_janis(esettings, tool, command, container)
-    write_tests(esettings, tool)
+    args = load_args()
+    match args['command']:
+        case 'tool':
+            parse_tool(args)
+        case 'workflow':
+            parse_workflow(args)
+        case _:
+            pass
+
+def load_args() -> dict[str, Optional[str]]:
+    parser = CLIparser()
+    return parser.args
 
 
 if __name__ == '__main__':

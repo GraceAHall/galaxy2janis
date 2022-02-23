@@ -4,7 +4,7 @@ import unittest
 
 from gxtool2janis import load_galaxy_manager, load_tool, infer_command
 from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 
 
 class TestCommandInference(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestCommandInference(unittest.TestCase):
             "abricate.xml", "test/data/abricate", 
             "--outdir", "test/rubbish",
         ]
-        esettings: ExecutionSettings = load_settings(argv)
+        esettings: ToolExeSettings = load_settings(argv)
         gxmanager = load_galaxy_manager(esettings)
         self.tool = load_tool(gxmanager)
         self.command = infer_command(gxmanager, self.tool)

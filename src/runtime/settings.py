@@ -2,12 +2,7 @@
 
 
 from dataclasses import dataclass
-from enum import Enum, auto
 from typing import Optional
-
-class RunMode(Enum):
-    DEFAULT = auto()
-    DEBUG = auto()
 
 @dataclass
 class InputWorkflow:
@@ -15,51 +10,50 @@ class InputWorkflow:
     step: int
 
 @dataclass
-class ExecutionSettings:
-    xmlfile: str
-    xmldir: str
-    parent_outdir: Optional[str] = None
-    container_cachedir: str = './container_uri_cache.json'
-    workflow: Optional[InputWorkflow] = None
-    runmode: RunMode = RunMode.DEFAULT
+class WorkflowExeSettings:
+    pass
+
+@dataclass
+class ToolExeSettings:
+    xmlfile: Optional[str] = None
+    xmldir: Optional[str] = None
+    remote_url: Optional[str] = None
+    parent_outdir: str = 'parsed'
+    container_cachedir: str = 'container_uri_cache.json'
 
     def get_xml_path(self) -> str:
         """joins the xmldir and xmlfile to provide xml path"""
-        return f'{self.xmldir}/{self.xmlfile}'
+        if self.xmldir and self.xmlfile:
+            return f'{self.xmldir}/{self.xmlfile}'
+        raise RuntimeError('cannot be called until xmldir and xmlfile are set.')            
 
     def get_tool_test_dir(self) -> str:
-        return f'{self.xmldir}/test-data'
+        if self.xmldir:
+            return f'{self.xmldir}/test-data'
+        raise RuntimeError('cannot be called until xmldir is set.')            
 
     def get_outdir(self) -> str:
         """
         gets the path to the runtime outdir.
         contains logs and parsed janis tool definition
         """
-        parent_folder = self.parent_outdir + '/' if self.parent_outdir else ''
-        folder = self.xmldir.rsplit('/', 1)[-1]
-        return parent_folder + folder
+        if self.xmldir:
+            parent_folder = self.parent_outdir + '/'
+            folder = self.xmldir.rsplit('/', 1)[-1]
+            return parent_folder + folder
+        raise RuntimeError('cannot be called until xmldir and xmlfile are set.')            
 
     def get_logfile_path(self) -> str:
-        toolname = self.xmlfile.rsplit('.', 1)[0]
-        return f'{self.get_outdir()}/{toolname}.log'
+        if self.xmlfile:
+            toolname = self.xmlfile.rsplit('.', 1)[0]
+            return f'{self.get_outdir()}/{toolname}.log'
+        raise RuntimeError('cannot be called until xmlfile is set.')            
     
     def get_janis_definition_path(self) -> str:
-        toolname = self.xmlfile.rsplit('.', 1)[0]
-        return f'{self.get_outdir()}/{toolname}.py'
-
-    def add_workflow(self, workflow: InputWorkflow) -> None:
-        """adds a workflow object to settings"""
-        self.workflow = workflow  
-
-    def get_workflow_path(self) -> Optional[str]:
-        """gets the relative path to the provided workflow file"""
-        if self.workflow:
-            return self.workflow.path
-
-    def get_workflow_step(self) -> Optional[int]:
-        """gets the workflow step we will parse"""
-        if self.workflow:
-            return self.workflow.step
+        if self.xmlfile:
+            toolname = self.xmlfile.rsplit('.', 1)[0]
+            return f'{self.get_outdir()}/{toolname}.py'
+        raise RuntimeError('cannot be called until xmlfile is set.')            
 
     def get_container_cache_path(self) -> str:
         return self.container_cachedir
@@ -68,4 +62,3 @@ class ExecutionSettings:
         return 'datatypes/gxformat_combined_types.yaml' # TODO make this an actual CLI setting
 
         
-

@@ -4,7 +4,7 @@
 
 import unittest
 from runtime.startup import load_settings
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from runtime.settings import InputWorkflow 
 from runtime.validation import InputException, SettingsValidator
 
@@ -25,11 +25,11 @@ class TestStartup(unittest.TestCase):
         ]
     
     def test_startup(self) -> None:
-        # this usually returns ExecutionSettings but dont need it
+        # this usually returns ToolExeSettings but dont need it
         load_settings(self.argv) 
     
     def test_startup_fails(self) -> None:
-        # this usually returns ExecutionSettings but dont need it
+        # this usually returns ToolExeSettings but dont need it
         self.argv = [
             "test-data/quast/quast.xml", "test/", 
         ]
@@ -42,7 +42,7 @@ class TestSettingsValidation(unittest.TestCase):
     """tests user input settings/validation"""
 
     def setUp(self) -> None:
-        esettings = ExecutionSettings(
+        esettings = ToolExeSettings(
             'quast.xml', 
             'test/data/quast',
             'test/parsed'
@@ -89,11 +89,11 @@ class TestSettingsValidation(unittest.TestCase):
 
 
 
-class TestExecutionSettings(unittest.TestCase):
-    """creates fake ExecutionSettings then tests some functions"""
+class TestToolExeSettings(unittest.TestCase):
+    """creates fake ToolExeSettings then tests some functions"""
     
     def setUp(self) -> None:
-        self.esettings = ExecutionSettings(
+        self.esettings = ToolExeSettings(
             'quast.xml', 
             'test/test-data/quast',
             'test/parsed'

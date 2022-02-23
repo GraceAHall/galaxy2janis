@@ -2,11 +2,11 @@
 
 
 import os
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 
 
 class ProjectFileInitialiser:
-    def __init__(self, esettings: ExecutionSettings) -> None:
+    def __init__(self, esettings: ToolExeSettings) -> None:
         self.esettings = esettings
 
     def initialise(self) -> None:

@@ -3,13 +3,13 @@
 
 from typing import Optional
 from containers.ContainerCache import ContainerCache
-from runtime.settings import ExecutionSettings
+from runtime.settings import ToolExeSettings
 from tool.tool_definition import GalaxyToolDefinition
 from containers.Container import Container
 from containers.ContainerFetcher import ContainerFetcher
 
 
-def fetch_container(esettings: ExecutionSettings, tool: GalaxyToolDefinition) -> Optional[Container]:
+def fetch_container(esettings: ToolExeSettings, tool: GalaxyToolDefinition) -> Optional[Container]:
     cache: ContainerCache = load_cache(esettings)
     if cache.exists(tool.metadata.id, tool.metadata.version):
         container = cache.get(tool.metadata.id, tool.metadata.version)
@@ -20,7 +20,7 @@ def fetch_container(esettings: ExecutionSettings, tool: GalaxyToolDefinition) ->
             cache.add(container)
     return container
 
-def load_cache(esettings: ExecutionSettings) -> ContainerCache:
+def load_cache(esettings: ToolExeSettings) -> ContainerCache:
     cache_path = esettings.get_container_cache_path()
     return ContainerCache(cache_path)
 

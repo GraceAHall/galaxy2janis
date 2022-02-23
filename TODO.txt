@@ -15,6 +15,7 @@ bugs:
 2022
 TODO:
  - logging
+ - repo pulling from toolshed
  - make OutputParam.selector not Optional
  - make container not Optional
  - get tool test evaluation produce cmdstr for all tests!!!! really screwing me
