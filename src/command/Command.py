@@ -14,6 +14,8 @@ from tool.param.OutputParam import OutputParam
 from command.positions.positions import format_input_positions
 from tool.param.Param import Param
 
+
+
 class Updater(ABC):
 
     @abstractmethod
@@ -165,6 +167,7 @@ class RedirectUpdater(Updater):
     
     def add(self) -> None:
         self.command.redirect = self.incoming
+
 
 
 class Command:

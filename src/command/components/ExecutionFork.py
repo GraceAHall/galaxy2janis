@@ -8,7 +8,6 @@ from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
 
 from command.tokens.Tokens import Token
-from command.cmdstr.utils import split_to_words
 
 
 
@@ -30,8 +29,6 @@ class TokenCombination:
         new_comb += [WordToken('next', ntoken) for ntoken in self.ntoken_list]
         return new_comb
         
-
-
 
 
 class ExecutionFork:

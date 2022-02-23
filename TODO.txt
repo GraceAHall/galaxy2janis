@@ -14,6 +14,7 @@ bugs:
 
 2022
 TODO:
+ - assume greedy --opt1 val val val heuristic! ensure proper user notification
  - logging
  - repo pulling from toolshed
  - make OutputParam.selector not Optional
