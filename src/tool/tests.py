@@ -1,6 +1,6 @@
 
 
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
 from tool.tool_definition import GalaxyToolDefinition
 
 

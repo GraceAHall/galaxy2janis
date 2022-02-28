@@ -36,6 +36,41 @@
                 "--xml", "abricate.xml",
             ]
         },
+        {
+            "name": "fastqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "tool",
+                "--dir", "test/data/fastqc", 
+                "--xml", "rgFastQC.xml",
+            ]
+        },
+        {
+            "name": "multiqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "tool",
+                "--dir", "test/data/multiqc", 
+                "--xml", "multiqc.xml",
+            ]
+        },
+        {
+            "name": "simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "args": [
+                "workflow",
+                "test/data/simple_workflow.ga"
+            ]
+        },
         
     ]
 }

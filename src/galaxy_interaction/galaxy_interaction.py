@@ -1,7 +1,7 @@
 
 
 
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction.GalaxyManager import GalaxyManager
 
 

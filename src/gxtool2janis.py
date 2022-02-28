@@ -2,7 +2,7 @@
 
 
 from typing import Optional
-from runtime.cli import CLIparser
+from startup.CLIparser import CLIparser
 
 from parse_tool import parse_tool
 from parse_workflow import parse_workflow
@@ -11,6 +11,7 @@ from parse_workflow import parse_workflow
 gxtool2janis program entry point
 parses cli settings then hands execution to other files based on command
 """
+
 
 def main():
     args = load_args()

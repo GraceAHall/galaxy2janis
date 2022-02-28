@@ -1,6 +1,6 @@
 
 
-from logger.errors import AttributeNotSupportedError, ParamNotSupportedError
+from runtime.exceptions import AttributeNotSupportedError, ParamNotSupportedError
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 
 from tool.param.InputRegister import InputRegister

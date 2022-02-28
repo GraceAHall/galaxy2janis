@@ -3,8 +3,8 @@
 import unittest
 
 from gxtool2janis import load_galaxy_manager, load_tool, infer_command
-from runtime.startup import load_settings
-from runtime.settings import ToolExeSettings
+from startup.settings import load_settings
+from startup.ExeSettings import ToolExeSettings
 
 
 class TestCommandInference(unittest.TestCase):

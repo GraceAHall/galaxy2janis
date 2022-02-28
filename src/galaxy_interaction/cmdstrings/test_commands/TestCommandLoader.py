@@ -2,7 +2,8 @@
 
 import tempfile
 from typing import Optional
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
+from runtime.Logger import Logger
 
 from tool.tool_definition import GalaxyToolDefinition
 from galaxy.tools import Tool as GxTool
@@ -42,7 +43,8 @@ class TestCommandLoader:
                 return command_line
         # TODO bare excepts are kinda bad.
         except:
-            print(f'test {test.name} failed to template')
+            logger = Logger(self.esettings.get_logfile_path())
+            logger.log(1, 'test failed to template')
             return None
 
     def setup_evaluator(self, app: MockApp, gxtool: GxTool, job: Job) -> ToolEvaluator:

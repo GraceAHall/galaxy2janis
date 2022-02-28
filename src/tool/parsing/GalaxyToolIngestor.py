@@ -3,11 +3,13 @@
 from galaxy.tools import Tool as GxTool
 from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
+from startup.ExeSettings import ToolExeSettings
 
 from tool.metadata import Metadata
 from tool.requirements import CondaRequirement, ContainerRequirement
 from tool.citations import Citation
 
+from tool.parsing.ParamFlattener import ParamFlattener
 from tool.parsing.InputParamFactory import InputParamFactory
 from tool.parsing.OutputParamFactory import OutputParamFactory
 from tool.param.InputRegister import InputRegister
@@ -16,14 +18,14 @@ from tool.param.OutputRegister import OutputRegister
 from tool.parsing.tests.TestFactory import TestFactory
 from tool.TestRegister import TestRegister
 
-from tool.parsing.inputs import get_flattened_params
 
 Requirement = ContainerRequirement | CondaRequirement
 
 
 class GalaxyToolIngestor:
-    def __init__(self, gxtool: GxTool):
+    def __init__(self, gxtool: GxTool, esettings: ToolExeSettings):
         self.gxtool = gxtool
+        self.esettings = esettings
         self.inputs = InputRegister([])
 
     def get_metadata(self) -> Metadata:
@@ -65,13 +67,14 @@ class GalaxyToolIngestor:
     
     def get_inputs(self) -> InputRegister:
         """returns a an InputRegister by reformatting the galaxy tool representation's params."""
-        gx_inputs: list[GxInput] = get_flattened_params(self.gxtool)
+        pf = ParamFlattener(self.gxtool.inputs)
+        gx_inputs: list[GxInput] = pf.flatten()
         fac = InputParamFactory()
         inputs = [fac.produce(gxp) for gxp in gx_inputs]
         # caching the input register for use in getting outputs
         self.inputs = InputRegister(inputs)
         return self.inputs
-    
+
     def get_outputs(self) -> OutputRegister:
         """returns a formatted list of outputs using the representation"""
         fac = OutputParamFactory()

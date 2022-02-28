@@ -7,8 +7,7 @@ from typing import Any
 from galaxy.tools.parameters.basic import ToolParameter
 from galaxy.tools.parameters.grouping import Conditional, ConditionalWhen, Section, Repeat
 from galaxy.tools import Tool as GxTool
-
-from logger.errors import TagNotSupportedError
+from runtime.exceptions import TagNotSupportedError
 
 
 XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
@@ -46,8 +45,7 @@ class ParamFlattener:
                     self.explore_node(child, heirarchy)
 
             case Repeat():
-                pass
-                #raise TagNotSupportedError()
+                print('repeat encountered')
 
             case _:
                 raise NotImplementedError()

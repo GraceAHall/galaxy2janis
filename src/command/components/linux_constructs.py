@@ -5,7 +5,6 @@ from enum import Enum, auto
 from typing import Any, Optional
 from command.tokens.Tokens import Token
 from tool.param.OutputParam import DataOutputParam, CollectionOutputParam
-from tool.parsing.selectors import Selector
 from tool.param.Param import Param
 from command.components.ObservedValueRecord import ObservedValueRecord
 

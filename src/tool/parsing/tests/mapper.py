@@ -4,7 +4,7 @@
 import operator
 from typing import Callable
 
-from logger.errors import AttributeNotSupportedError
+from runtime.exceptions import AttributeNotSupportedError
 from tool.parsing.tests.checks import ValidCheck
 from janis_core.tool.test_classes import (
     TTestExpectedOutput,

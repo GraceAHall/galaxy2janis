@@ -73,6 +73,8 @@ def has_format_source(gxout: GxOutput) -> bool:
     return False
     
 def has_dataset_collector(gxout: GxOutput) -> bool:
+    if len(gxout.dataset_collector_descriptions) > 0:
+        return True
     return False
 
 

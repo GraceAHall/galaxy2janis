@@ -3,7 +3,7 @@
 
 from galaxy.tools.parameters.basic import ToolParameter as GalaxyParam
 
-from logger.errors import ParamNotSupportedError
+from runtime.exceptions import ParamNotSupportedError
 from tool.param.Param import Param
 from tool.param.InputParam import (
     InputParam,

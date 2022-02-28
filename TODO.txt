@@ -8,19 +8,20 @@ creating TTestCases
 
 
 
-bugs:
- - fastqc:
-    - $html_file.files_path
+
 
 2022
 TODO:
- - assume greedy --opt1 val val val heuristic! ensure proper user notification
- - logging
- - repo pulling from toolshed
- - make OutputParam.selector not Optional
- - make container not Optional
  - get tool test evaluation produce cmdstr for all tests!!!! really screwing me
+ - logging
+    - needs to be done better in general :/ maybe runtime temp config file? 
+    - couldnt create selector (make OutputParam.selector not Optional)
+ - assume greedy --opt1 val val val heuristic! ensure proper user notification
  - make string representation of TTestCases so we can actually write to a janis tool def file
+
+
+bugs
+ - quast $report_html.files_path  
 
 
 BEFORE v1.0

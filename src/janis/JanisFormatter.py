@@ -2,7 +2,7 @@
 
 
 from typing import Optional
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
 from tool.param.Param import Param
 from tool.tool_definition import GalaxyToolDefinition
 from containers.Container import Container
@@ -165,7 +165,7 @@ class JanisFormatter:
 
     def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
         base_command = command.get_base_command()
-        name: str = self.tag_validator.format_name(tool.metadata.name)
+        name: str = self.tag_validator.format_name(tool.metadata.id)
 
         return command_tool_builder_snippet(
             toolname=name,
@@ -176,7 +176,7 @@ class JanisFormatter:
         )
 
     def format_translate_func(self, tool: GalaxyToolDefinition) -> str:
-        name: str = self.tag_validator.format_name(tool.metadata.name)
+        name: str = self.tag_validator.format_name(tool.metadata.id)
         return translate_snippet(name)
 
     def format_imports(self) -> str:

@@ -1,31 +1,12 @@
 
 
-
-default imports
-datatype imports
-selector imports
+fill_template() in __build_command_line() actually tempates galaxy tool
+(src/galaxy/tools/evaluation.py)
 
 
 
-
-
-Command
-
-simplify raw string
-resolve aliases
-split raw string into CommandStatements
-    - search for && || | ;
-tokenize
-
-
-
-
-
-
-
-
-
-
+logging
+currently reporting:
 
 
 

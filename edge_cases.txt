@@ -1,5 +1,18 @@
 
 
+
+
+
+
+
+unicycler:
+#if str( $paired_unpaired.fastq_input_selector ) == "paired"
+    -1 '$fq1'
+    -2 '$fq2'
+
+are the -1 and -2 negative integers, or flags/opts? theyre opts. 
+
+
 velvetg:
 
     <param name="read_trkg" type="boolean" checked="false" truevalue="-read_trkg yes" falsevalue="-read_trkg no" label="Tracking of short read positions in assembly" help="Generates Graph2 dataset" />

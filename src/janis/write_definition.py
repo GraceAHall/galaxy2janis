@@ -3,8 +3,8 @@
 
 from typing import Optional
 from janis.JanisFormatter import JanisFormatter
-from runtime.settings import ToolExeSettings
-from tool.tool import GalaxyToolDefinition
+from startup.ExeSettings import ToolExeSettings
+from tool.load import GalaxyToolDefinition
 from command.infer import Command
 from containers.fetch import Container
 

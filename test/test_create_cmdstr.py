@@ -7,8 +7,8 @@ from command.cmdstr.ToolExecutionString import ToolExecutionStringFactory
 from command.tokens.Tokenifier import Tokenifier
 
 from gxtool2janis import load_galaxy_manager, load_tool
-from runtime.startup import load_settings
-from runtime.settings import ToolExeSettings
+from startup.settings import load_settings
+from startup.ExeSettings import ToolExeSettings
 from command.tokens.Tokens import TokenType
 
 

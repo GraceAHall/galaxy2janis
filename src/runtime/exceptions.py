@@ -13,4 +13,6 @@ class AttributeNotSupportedError(Exception):
 class DuplicateParamError(Exception):
     """Raise when two param names clash - another param with the same name was already known"""
 
+class InputError(Exception):
+    """Raise when user inputs are not complete / correct"""
 

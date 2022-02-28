@@ -3,9 +3,9 @@
 import unittest
 from data.tool_args import error_tools, passing_tools
 
-from runtime.startup import load_settings, ToolExeSettings
+from startup.settings import load_settings, ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
-from tool.tool import load_tool, GalaxyToolDefinition
+from tool.load import load_tool, GalaxyToolDefinition
 
 
 class TestToolEvaluation(unittest.TestCase):

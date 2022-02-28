@@ -3,10 +3,10 @@
 
 
 import unittest
-from runtime.startup import load_settings
-from runtime.settings import ToolExeSettings
-from runtime.settings import InputWorkflow 
-from runtime.validation import InputException, SettingsValidator
+from startup.settings import load_settings
+from startup.ExeSettings import ToolExeSettings
+from startup.ExeSettings import InputWorkflow 
+#from runtime.validation import InputException, SettingsValidator
 
 
  

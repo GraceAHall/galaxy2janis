@@ -13,8 +13,6 @@ from command.regex.utils import (
 
 
 
-
-
 def split_keyval_to_best_tokens(kv_token: Token, param_register: ParamRegister, out_register: OutputRegister) -> Tuple[Token, Token, str]:
     """
     keyval options need to be split into two tokens

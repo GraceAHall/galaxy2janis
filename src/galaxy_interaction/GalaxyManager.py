@@ -15,7 +15,7 @@ from galaxy.tools import create_tool_from_source
 from galaxy.model import History
 
 from galaxy_interaction.mock import MockApp, MockObjectStore
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
 
 from galaxy_interaction.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
 from galaxy_interaction.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader

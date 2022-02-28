@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
 from command.components.linux_constructs import Redirect
-from runtime.settings import ToolExeSettings
+from startup.ExeSettings import ToolExeSettings
 import yaml
 
 from tool.param.Param import Param

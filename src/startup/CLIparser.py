@@ -43,7 +43,7 @@ class CLIparser:
                             type=str)
         parser.add_argument("-r",
                             "--remote_url", 
-                            help="toolshed url. used in place of --dir and --xml. downloads tool from the toolshed and parses",
+                            help="toolshed tarball url. downloads tool tarball from from the toolshed and parses.",
                             type=str)
         parser.add_argument("-o",
                             "--outdir", 
@@ -61,7 +61,17 @@ class CLIparser:
     def workflow(self):
         parser = argparse.ArgumentParser(
             description='') 
-        parser.add_argument('repository')
+        parser.add_argument("workflow", 
+                            help="path to workflow. all tools invoked in the workflow will be parsed to a janis definition.", 
+                            type=str)
+        parser.add_argument("-o",
+                            "--outdir", 
+                            help="parent folder to place output janis definitions. default=-w(workflow name)", 
+                            type=str)
+        parser.add_argument("-c",
+                            "--cachedir", 
+                            help="path to local container cache. default='./'", 
+                            type=str)
         args = parser.parse_args(sys.argv[2:])
         out: dict[str, Optional[str]] = args.__dict__
         out['command'] = self.command

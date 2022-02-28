@@ -4,7 +4,7 @@
 
 from typing import Any, Optional
 
-from logger.errors import AttributeNotSupportedError
+from runtime.exceptions import AttributeNotSupportedError
 from galaxy.tool_util.verify.interactor import ToolTestDescription
 from tool.parsing.tests.checks import ValidCheck
 from tool.parsing.tests.mapper import map_ttestout
