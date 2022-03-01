@@ -16,7 +16,7 @@ from galaxy.tools.parameters.basic import (
     IntegerToolParameter,
 )
 from galaxy.auth import AuthManager
-from galaxy.datatypes import registry
+from galaxy.datatypes.registry import Registry
 from galaxy.jobs.manager import NoopManager
 from galaxy.jobs import SimpleComputeEnvironment
 from galaxy.managers.users import UserManager
@@ -27,6 +27,7 @@ from galaxy.security import idencoding
 from galaxy.structured_app import BasicApp, MinimalManagerApp, StructuredApp
 from galaxy.tool_util.deps.containers import NullContainerFinder
 from galaxy.util import StructuredExecutionTimer
+from galaxy.util import galaxy_directory
 from galaxy.util.bunch import Bunch
 from galaxy.util.dbkeys import GenomeBuilds
 from galaxy.web_stack import ApplicationStack
@@ -34,8 +35,7 @@ from galaxy.util import XML
 from galaxy.tools.parameters import params_from_strings # for MockTool
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tool_util.biotools import BiotoolsMetadataSource
-
-
+#from galaxy.datatypes.registry import example_datatype_registry_for_sample
 
 # terrible stuff from galaxy. not planning on a refactor.
 
@@ -87,8 +87,17 @@ class MockApp(di.Container):
         self.url_for = url_for
 
     def init_datatypes(self):
-        datatypes_registry = registry.Registry()
-        datatypes_registry.load_datatypes()
+        # config = Bunch(sniff_compressed_dynamic_datatypes_default=True)
+        # datatypes_registry = registry.Registry(config=config)
+        # datatypes_registry.load_datatypes(root_dir='galaxy', config='config/datatypes_conf.xml.sample')
+        # datatypes_registry = example_datatype_registry_for_sample()
+        # model.set_datatypes_registry(datatypes_registry)
+        # self.datatypes_registry = datatypes_registry
+        galaxy_dir = galaxy_directory()
+        sample_conf = os.path.join(galaxy_dir, "site-packages", "galaxy", "config", "sample", "datatypes_conf.xml.sample")
+        config = Bunch(sniff_compressed_dynamic_datatypes_default=True)
+        datatypes_registry = Registry(config)
+        datatypes_registry.load_datatypes(root_dir=galaxy_dir, config=sample_conf)
         model.set_datatypes_registry(datatypes_registry)
         self.datatypes_registry = datatypes_registry
 

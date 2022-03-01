@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 import os
 import tempfile
+import packaging.version
+
 from typing import Optional, Tuple
 
 from galaxy.tools import Tool as GxTool
@@ -70,6 +72,8 @@ class GalaxyManager:
         tcl = TestCommandLoader(app, self.history, gxtool, tooldef, self.esettings)
         cmdstrs = [tcl.load(test) for test in gxtool.tests]
         cmdstrs = [s for s in cmdstrs if s is not None]
+        for cmdstr in cmdstrs:
+            print(cmdstr)
         return cmdstrs
 
     def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
@@ -92,6 +96,7 @@ class GalaxyManager:
         app.config.admin_users = "grace@thebest.com"
         app.config.len_file_path = "moocow"
         # database
+        
         app.model.context.add(self.history)
         app.model.context.flush()
         return app
@@ -99,7 +104,7 @@ class GalaxyManager:
     def _init_tool(self) -> GxTool:
         app = self.get_app()
         tool_source = get_tool_source(self.esettings.get_xml_path())
-        tool = create_tool_from_source(app, tool_source, config_file=self.esettings.get_xml_path())
+        tool = create_tool_from_source(app, tool_source)
         tool.assert_finalized()
         return tool
 

@@ -6,7 +6,7 @@ from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 
 def translate_variable_markers(cmdstr: str) -> str:
-    return cmdstr.replace("__ʕ•́ᴥ•̀ʔっ♡_", "$")
+    return cmdstr.replace("gxvar_", "$")
 
 def standardise_variable_format(cmdstr: str) -> str:
     """standardises different forms of a galaxy variable ${var}, $var etc"""

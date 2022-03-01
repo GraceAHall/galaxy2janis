@@ -1,11 +1,13 @@
 
-
+#import sys
+#sys.path.append('./galaxy/lib')
 
 from typing import Optional
 from startup.CLIparser import CLIparser
 
 from parse_tool import parse_tool
 from parse_workflow import parse_workflow
+
 
 """
 gxtool2janis program entry point

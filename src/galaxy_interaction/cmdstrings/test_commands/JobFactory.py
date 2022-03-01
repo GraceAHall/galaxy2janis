@@ -60,34 +60,22 @@ class JobFactory:
             if isinstance(pvalue, list):
                 pvalue = pvalue[0]
             pname = pname.replace('|', '.')
-            #testing out a more simple approach, disregarding finding the param
-            #input_param = self.tool.get_input(pname, strategy='lca')
-            # if input_param:
-            #     self.handle_input_param_simple(input_param, pvalue)
-            # else:
-            #     raise RuntimeError(f'could not find param {pname}')
             self.handle_input_param_simple(pname, pvalue)
-
-    def handle_input_param(self, param: Param, override_value: Any) -> None:
-        match param:
-            case DataParam():
-                job_input = generate_dataset(self.app, param.name, 'input')
-                self.job.input_datasets.append(job_input)
-                self.update_job_input_tree(param.name, str(job_input.dataset.dataset_id)) 
-            case DataCollectionParam():
-                raise NotImplementedError
-            case _:
-                self.update_job_input_tree(param.name, override_value)
-    
-    def handle_input_param_simple(self, pname: str, override_value: Any) -> None:
-        if self.test_data_exists(override_value):
+       
+    def handle_input_param_simple(self, pname: str, filename: Any) -> None:
+        # TODO really unsure whether galaxy actually needs to know where the file is or not.
+        data_path = self.get_test_data_path(filename)
+        if self.file_exists(data_path):
             job_input = generate_dataset(self.app, pname, 'input')
             self.job.input_datasets.append(job_input)
-            override_value = str(job_input.dataset.dataset_id)
-        self.update_job_input_tree(pname, override_value) 
+            self.update_job_input_tree(pname, str(job_input.dataset.dataset_id))
+        else:
+            raise RuntimeError(f'test data {filename} could not be found at {data_path}')
 
-    def test_data_exists(self, filename: str) -> bool:
-        filepath = f'{self.esettings.get_tool_test_dir()}/{filename}'
+    def get_test_data_path(self, filename: str) -> str:
+        return f'{self.esettings.get_tool_test_dir()}/{filename}'
+
+    def file_exists(self, filepath: str) -> bool:
         if os.path.exists(filepath):
             return True
         return False

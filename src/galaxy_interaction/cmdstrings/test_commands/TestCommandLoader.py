@@ -42,7 +42,8 @@ class TestCommandLoader:
                 command_line, _, __ = evaluator.build()
                 return command_line
         # TODO bare excepts are kinda bad.
-        except:
+        except Exception as e:
+            print(e)
             logger = Logger(self.esettings.get_logfile_path())
             logger.log(1, 'test failed to template')
             return None

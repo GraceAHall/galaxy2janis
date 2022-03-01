@@ -26,7 +26,7 @@ class TestToolEvaluation(unittest.TestCase):
         self.tool: GalaxyToolDefinition = load_tool(self.gxmanager)
         
     def test_evaluation(self):
-        TEMPLATED_STR = "ln -sf '__ʕ•́ᴥ•̀ʔっ♡_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > '__ʕ•́ᴥ•̀ʔっ♡_report'"
+        TEMPLATED_STR = "ln -sf 'gxvar_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > 'gxvar_report'"
 
         cmdstrs = self.gxmanager.get_raw_cmdstrs(self.tool)
         test_cmd_strs = [cstr[1] for cstr in cmdstrs if cstr[0] == 'test']

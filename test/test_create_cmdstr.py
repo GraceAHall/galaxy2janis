@@ -12,7 +12,7 @@ from startup.ExeSettings import ToolExeSettings
 from command.tokens.Tokens import TokenType
 
 
-RAW_CMDSTR = "ln -sf '__ʕ•́ᴥ•̀ʔっ♡_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > '__ʕ•́ᴥ•̀ʔっ♡_report'"
+RAW_CMDSTR = "ln -sf 'gxvar_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > 'gxvar_report'"
 
 STATEMENT0_STR = "ln -sf '$file_input' file_input"
 STATEMENT1_STR = "abricate $file_input  --minid=80.0 --mincov=80.0 --db=resfinder > '$report'"

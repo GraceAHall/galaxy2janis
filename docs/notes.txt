@@ -2,7 +2,7 @@
 
 fill_template() in __build_command_line() actually tempates galaxy tool
 (src/galaxy/tools/evaluation.py)
-
+read galaxy src for logging pattern
 
 
 logging
