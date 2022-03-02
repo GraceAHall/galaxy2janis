@@ -4,12 +4,12 @@
 #from gx_src.tools import Tool as GalaxyTool
 import os
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
 from startup.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
-from galaxy_interaction.cmdstrings.test_commands.datasets import generate_dataset
+import galaxy_interaction.cmdstrings.test_commands.datasets as datasets
 from galaxy_interaction.mock import MockApp
 from tool.param.Param import Param
 from tool.param.InputParam import DataParam, DataCollectionParam
@@ -24,6 +24,11 @@ from galaxy.model import (
 
 
 class JobFactory:
+    app: MockApp
+    history: History
+    test: ToolTestDescription
+    tool: GalaxyToolDefinition
+
     def __init__(self, esettings: ToolExeSettings):
         self.esettings = esettings
     
@@ -55,18 +60,41 @@ class JobFactory:
         self.input_dict: dict[str, Any] = self.tool.get_inputs(format='dict')
 
     def handle_test_values(self) -> None:
-        tvalues: dict[str, Any] = self.test.inputs
-        for pname, pvalue in tvalues.items():
-            if isinstance(pvalue, list):
-                pvalue = pvalue[0]
-            pname = pname.replace('|', '.')
-            self.handle_input_param_simple(pname, pvalue)
-       
-    def handle_input_param_simple(self, pname: str, filename: Any) -> None:
-        # TODO really unsure whether galaxy actually needs to know where the file is or not.
+        test_inputs: dict[str, Any] = self.test.inputs
+        for pname, pvalue in test_inputs.items():
+            pname = self.format_param_name(pname)     # param name
+            pvalue = self.format_param_value(pvalue)  # param value
+            self.handle_input_param(pname, pvalue)
+
+    def format_param_name(self, pname: str) -> str:
+        return pname.replace('|', '.') 
+    
+    def format_param_value(self, pvalue: Any) -> Any:
+        # TODO REMOVE THIS ITS A BAD HACK TO AVOID ARRAYS
+        if isinstance(pvalue, list):
+            return pvalue[0]
+        return pvalue
+
+    def handle_input_param(self, pname: str, pvalue: Any) -> None:
+        if self.is_required_file(pvalue):
+            self.handle_data_param(pname, pvalue)
+        else:
+            self.handle_non_data_param(pname, pvalue)
+
+    def is_required_file(self, pvalue: str) -> bool:
+        required_files: list[Tuple[str, dict[str, Any]]] = self.test.required_files
+        for filename, _ in required_files:
+            if filename == pvalue:
+                return True
+        return False
+
+    def handle_non_data_param(self, pname: str, pvalue: Any) -> None:
+        self.update_job_input_tree(pname, pvalue)
+
+    def handle_data_param(self, pname: str, filename: Any) -> None:
         data_path = self.get_test_data_path(filename)
         if self.file_exists(data_path):
-            job_input = generate_dataset(self.app, pname, 'input')
+            job_input = datasets.generate_input_dataset(self.app, pname, data_path)
             self.job.input_datasets.append(job_input)
             self.update_job_input_tree(pname, str(job_input.dataset.dataset_id))
         else:
@@ -104,7 +132,7 @@ class JobFactory:
         # note i think out is an object not a str
         for out in self.test.outputs:
             output_var = str(out['name'].replace('|', '.'))
-            job_output = generate_dataset(self.app, output_var, 'output')
+            job_output = datasets.generate_output_dataset(self.app, output_var, out['attributes']['ftype'])
             self.job.output_datasets.append(job_output)
 
 

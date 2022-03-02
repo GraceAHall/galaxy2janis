@@ -74,6 +74,7 @@ class GalaxyManager:
         cmdstrs = [s for s in cmdstrs if s is not None]
         for cmdstr in cmdstrs:
             print(cmdstr)
+            print()
         return cmdstrs
 
     def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
