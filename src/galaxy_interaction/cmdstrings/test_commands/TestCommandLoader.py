@@ -41,7 +41,6 @@ class TestCommandLoader:
                 evaluator = self.setup_evaluator(self.app, self.gxtool, job)
                 command_line, _, __ = evaluator.build()
                 return command_line
-        # TODO bare excepts are kinda bad.
         except Exception as e:
             print(e)
             logger = Logger(self.esettings.get_logfile_path())

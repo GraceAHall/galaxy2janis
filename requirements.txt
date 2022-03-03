@@ -9,3 +9,7 @@ galaxy-tool-util@git+https://github.com/galaxyproject/galaxy.git@release_21.09#s
 galaxy-web-framework@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_framework
 galaxy-web-stack@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_stack
 galaxy-app@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/app
+
+# add
+# wget
+# tarfile

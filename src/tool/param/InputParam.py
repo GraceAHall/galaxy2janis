@@ -13,7 +13,7 @@ class InputParam(Param):
         self.label: str = ''
         self.helptext: str = ''
         self.optional: bool = False
-        self.argument: Optional[str] = None  ## i dont know if this is needed
+        self.argument: Optional[str] = None
 
     def get_default(self) -> Any:
         return None

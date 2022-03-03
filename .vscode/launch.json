@@ -30,6 +30,7 @@
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
+            "justMyCode": false,
             "args": [
                 "tool",
                 "--dir", "test/data/abricate", 
@@ -55,10 +56,24 @@
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
+            "justMyCode": false,
             "args": [
                 "tool",
                 "--dir", "test/data/multiqc", 
                 "--xml", "multiqc.xml",
+            ]
+        },
+        {
+            "name": "unicycler",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/unicycler", 
+                "--xml", "unicycler.xml",
             ]
         },
         {
@@ -67,6 +82,7 @@
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
+            "justMyCode": false,
             "args": [
                 "workflow",
                 "test/data/simple_workflow.ga"

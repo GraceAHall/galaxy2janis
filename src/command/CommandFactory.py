@@ -25,6 +25,7 @@ class CommandFactory:
 
     def create(self, command_line_strings: list[ToolExecutionString]) -> Command:
         self.set_attrs(command_line_strings)
+        self.infer_components_using_param_arguments()
         self.feed_cmdstrs(source='test')
         self.feed_cmdstrs(source='workflow')
         self.feed_cmdstrs(source='xml')
@@ -35,6 +36,9 @@ class CommandFactory:
         self.command = Command()
         self.has_non_xml_cmdstrs = True if any([cmdstr.source != 'xml' for cmdstr in command_line_strings]) else False
         self.cmdstrs = command_line_strings
+
+    def infer_components_using_param_arguments(self) -> None:
+        pass
 
     def feed_cmdstrs(self, source: str) -> None:
         active_cmdstrs = [c for c in self.cmdstrs if c.source == source]

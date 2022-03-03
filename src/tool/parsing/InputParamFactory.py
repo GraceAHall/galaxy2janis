@@ -38,7 +38,7 @@ class InputParamFactory:
             case _:
                 raise ParamNotSupportedError(f'unknown param type: {str(gxparam.type)}')
         
-        param = self.map_common_fields(gxparam, param) #type: ignore
+        param = self.map_common_fields(gxparam, param)
         return param 
         
     def map_common_fields(self, gxparam: GalaxyParam, param: InputParam) -> InputParam:
