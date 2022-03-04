@@ -6,7 +6,7 @@ from typing import Any, Optional
 from command.tokens.Tokens import Token
 from tool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from tool.param.Param import Param
-from command.components.ObservedValueRecord import ObservedValueRecord
+from command.components.ValueRecord import PositionalValueRecord
 
 class Stream(Enum):
     STDIN = auto()
@@ -45,7 +45,7 @@ class Redirect:
         self.stream: Stream = self.extract_stream()
         self.stage: str = 'post_options'
         self.presence_array: list[bool] = []
-        self.value_record: ObservedValueRecord = ObservedValueRecord()
+        self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(file.text)
 
     @property

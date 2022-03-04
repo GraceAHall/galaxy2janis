@@ -1,7 +1,6 @@
 
 
 
-from typing import Any
 from command.tokens.Tokens import Token, TokenType
 from tool.param.InputParam import BoolParam, SelectParam
 
@@ -13,9 +12,9 @@ NON_VALUE_TOKENTYPES = set([
     TokenType.END_SENTINEL,
 ])
 
-def word_is_bool_select(word: Any) -> bool:
-    if word.token.type == TokenType.GX_INPUT:
-        match word.gxvar:
+def is_bool_select(token: Token) -> bool:
+    if token.type == TokenType.GX_INPUT:
+        match token.gxvar:
             case BoolParam() | SelectParam():
                 return True
             case _:

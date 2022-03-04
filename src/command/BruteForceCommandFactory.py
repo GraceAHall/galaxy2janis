@@ -13,21 +13,23 @@ from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.Positional import Positional
 from command.components.CommandComponent import CommandComponent
+from command.iterators.GreedyCmdStrIterator import GreedyCmdStrIterator
 
 
-class CommandFactory:
+class BruteForceCommandFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.command = Command()
-        self.iter_context = IterationContext()
         self.cmdstrs: list[ToolExecutionSource] = []
+        self.iter_context = IterationContext()
+        self.cmdstr_iterator: GreedyCmdStrIterator = GreedyCmdStrIterator()
         self.component_factory = CommandComponentFactory(tool)
         self.has_non_xml_cmdstrs = False
 
     def create(self, command_line_strings: list[ToolExecutionSource]) -> Command:
         self.set_attrs(command_line_strings)
-        self.feed_cmdstrs(source='test')
-        self.feed_cmdstrs(source='workflow')
-        self.feed_cmdstrs(source='xml')
+        self.ingest_test_cmdstrs()
+        #self.ingest_workflow_cmdstrs()
+        self.ingest_xml_cmdstrs()
         self.cleanup()
         return self.command
 
@@ -36,26 +38,37 @@ class CommandFactory:
         self.has_non_xml_cmdstrs = True if any([cmdstr.source != 'xml' for cmdstr in command_line_strings]) else False
         self.cmdstrs = command_line_strings
 
-    def infer_components_using_param_arguments(self) -> None:
-        pass
-
-    def feed_cmdstrs(self, source: str) -> None:
-        active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
-        for cmdstr in active_cmdstrs:
+    def ingest_test_cmdstrs(self) -> None:
+        test_cmdstrs = [c for c in self.cmdstrs if c.source == 'test']
+        for cmdstr in test_cmdstrs:
             self.feed(cmdstr)
     
+    def ingest_workflow_cmdstrs(self) -> None:
+        test_cmdstrs = [c for c in self.cmdstrs if c.source == 'workflow']
+        for cmdstr in test_cmdstrs:
+            self.feed(cmdstr)
+    
+    def ingest_xml_cmdstrs(self) -> None:
+        xml_cmdstr = [c for c in self.cmdstrs if c.source == 'xml'][0]
+        for exe_path in gen_execution_paths(xml_cmdstr):
+            self.feed(exe_path)
+
     def feed(self, cmdstr: ToolExecutionSource) -> None:
         self.command.pos_manager.reset()
         statement: CommandStatement = cmdstr.tool_statement
         self.update_redirects(statement)
-        self.update_command_components(statement)
+        self.update_components_from_params()
+        self.update_components_from_iteration(statement)
         self.iter_context.increment_cmdstr()
-    
+
     def update_redirects(self, cmdstmt: CommandStatement) -> None:
         if cmdstmt.redirect:
             self.update_command([cmdstmt.redirect])
+
+    def update_components_from_params(self) -> None:
+        pass
     
-    def update_command_components(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
+    def update_components_from_iteration(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
         """
         iterate through command words (with next word for context)
         each pair of words may actually yield more than one component.

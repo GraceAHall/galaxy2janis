@@ -1,9 +1,11 @@
 
 
+from typing import Optional
 import unittest
-from data.tool_args import error_tools, passing_tools
+from data.tool_args import passing_tools
 
-from startup.settings import load_settings, ToolExeSettings
+from startup.settings import load_tool_settings
+from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
 from tool.load import load_tool, GalaxyToolDefinition
 
@@ -29,8 +31,8 @@ class TestGalaxyIngestion(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        args: list[str] = passing_tools['abricate']
-        esettings: ToolExeSettings = load_settings(args)
+        args: dict[str, Optional[str]] = passing_tools['abricate']
+        esettings: ToolExeSettings = load_tool_settings(args)
         self.gxmanager: GalaxyManager = load_manager(esettings)
         self.tool: GalaxyToolDefinition = load_tool(self.gxmanager)
 
@@ -39,8 +41,8 @@ class TestGalaxyIngestion(unittest.TestCase):
         self.assertIsInstance(self.tool, GalaxyToolDefinition)
 
     def test_all_tools(self) -> None:
-        for toolname, args in passing_tools.items():
-            esettings: ToolExeSettings = load_settings(args)
+        for tool_args in passing_tools.values():
+            esettings: ToolExeSettings = load_tool_settings(tool_args)
             gxmanager = load_manager(esettings)
             tool = load_tool(gxmanager)
             self.assertIsNotNone(tool)

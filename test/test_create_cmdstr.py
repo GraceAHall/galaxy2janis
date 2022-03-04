@@ -3,8 +3,8 @@
 
 
 import unittest
-from command.cmdstr.ToolExecutionString import ToolExecutionStringFactory
-from command.tokens.Tokenifier import Tokenifier
+from command.cmdstr.ToolExecutionSource import ToolExecutionSourceFactory
+from command.tokens.TokenFactory import TokenFactory
 
 from gxtool2janis import load_galaxy_manager, load_tool
 from startup.settings import load_settings
@@ -33,7 +33,7 @@ STATEMENT1_TOKENS = [
 ]
 
 
-class TestCreateToolExecutionString(unittest.TestCase):
+class TestCreateToolExecutionSource(unittest.TestCase):
     """
     tests whether CommandStatments are being correctly set up 
     """
@@ -46,8 +46,8 @@ class TestCreateToolExecutionString(unittest.TestCase):
         esettings: ToolExeSettings = load_settings(argv)
         gxmanager = load_galaxy_manager(esettings)
         tool = load_tool(gxmanager)
-        self.tokenifier = Tokenifier(tool=tool)
-        self.cmdstr_fac = ToolExecutionStringFactory(tool)
+        self.TokenFactory = TokenFactory(tool=tool)
+        self.cmdstr_fac = ToolExecutionSourceFactory(tool)
 
     def test_basic_overall_creation(self) -> None:
         cmdstr = self.cmdstr_fac.create('test', RAW_CMDSTR)

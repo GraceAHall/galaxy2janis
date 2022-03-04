@@ -78,7 +78,7 @@ class GalaxyManager:
         return cmdstrs
 
     def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
-        # create ToolExecutionString for tooldef.command
+        # create ToolExecutionSource for tooldef.command
         xcl = XMLCommandLoader(tooldef)
         cmdstrs = [xcl.load()]
         cmdstrs = [s for s in cmdstrs if s is not None]

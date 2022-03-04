@@ -35,6 +35,7 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
             TokenType.GX_KW_DYNAMIC: 1,
             TokenType.GX_KW_STATIC: 2,
             TokenType.KV_PAIR: 3,
+            TokenType.KV_LINKER: 3,
             TokenType.GX_INPUT: 4,
             TokenType.GX_OUTPUT: 4,
             TokenType.ENV_VAR: 5,
@@ -42,8 +43,6 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
             TokenType.QUOTED_NUM: 6,
             TokenType.RAW_STRING: 6,
             TokenType.RAW_NUM: 6,
-            TokenType.START_STATEMENT: 6,
-            TokenType.END_SENTINEL: 6,
             TokenType.LINUX_TEE: 6,
             TokenType.LINUX_REDIRECT: 6,
             TokenType.LINUX_STREAM_MERGE: 6,
@@ -53,7 +52,7 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
         return token_list
 
 
-class Tokenifier:
+class TokenFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool    
         self.generic_scanners = [
@@ -75,11 +74,15 @@ class Tokenifier:
             'longest':  LongestTokenOrderingStrategy()
         }
 
-    def spawn_sentinel(self) -> Token:
+    def spawn_end_sentinel(self) -> Token:
         matches = scanners.get_all('end')
         return Token(matches[0], TokenType.END_SENTINEL)
-    
-    def tokenify(self, word: str, prioritisation: str='priority') -> Token:
+
+    def spawn_kv_linker(self, delim: str) -> Token:
+        matches = scanners.get_all(delim)
+        return Token(matches[0], TokenType.KV_LINKER)
+
+    def create(self, word: str, prioritisation: str='priority') -> Token:
         """
         extracts the best token from a word.
         where multiple token types are possible, selection can be made 
@@ -88,8 +91,9 @@ class Tokenifier:
             print()
         token_list = self.get_all_tokens(word)
         token_list = self.perform_default_ordering(token_list)
-        final_ordering = self.perform_final_ordering(token_list,  prioritisation)
-        return final_ordering[0]
+        final_ordering = self.perform_final_ordering(token_list, prioritisation)
+        final_token = final_ordering[0]
+        return final_token
 
     def perform_default_ordering(self, token_list: list[Token]) -> list[Token]:
         #default orderings (low to high priority) first, longest, priority

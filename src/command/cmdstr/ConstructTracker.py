@@ -59,7 +59,7 @@ class ConstructTracker:
             return False
         return True
 
-    def should_wordify_line(self, line: str) -> bool:
+    def should_tokenify_line(self, line: str) -> bool:
         if self.is_construct_line(line) or self.in_banned_segment():
             return False
         return True

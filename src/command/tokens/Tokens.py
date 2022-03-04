@@ -15,6 +15,7 @@ class TokenType(Enum):
     GX_KW_STATIC    = auto()
     ENV_VAR         = auto()
     KV_PAIR         = auto()
+    KV_LINKER       = auto()
     QUOTED_STRING   = auto()
     QUOTED_NUM      = auto()
     RAW_STRING      = auto()
@@ -23,6 +24,7 @@ class TokenType(Enum):
     LINUX_REDIRECT  = auto()
     LINUX_STREAM_MERGE = auto()
     START_STATEMENT = auto()
+    EXCISION        = auto()
     END_SENTINEL    = auto()
     UNKNOWN         = auto()
 
@@ -33,6 +35,10 @@ class Token:
         self.type = token_type
         self.gxvar = gxvar
         
+        self.position: Optional[int] = None
+        self.in_conditional: bool = False
+        self.in_loop: bool = False
+
     @property
     def text(self) -> str:
         return self.match[0] # type: ignore
@@ -44,12 +50,4 @@ class Token:
     @property
     def end(self) -> int:
         return self.match.end()
-
-
-    """
-    def __str__(self) -> str:
-        return f'{self.text[:29]:<30}{self.gx_ref[:29]:30}{self.type.name:25}{self.in_conditional:5}'
-    """
-
-
 

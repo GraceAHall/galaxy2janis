@@ -8,43 +8,13 @@ from tool.tool_definition import GalaxyToolDefinition
 
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
-
-import command.components.utils as component_utils
-from .CommandComponent import CommandComponent
-from .Flag import Flag
-from .Option import Option
-from .Positional import Positional
-from .ExecutionFork import ExecutionFork
+from command.components.creation.ComponentSpawner import init_spawner
 
 
-## strategies to initialise individual CommandComponents    
-class ComponentSpawner(ABC):
-    @abstractmethod
-    def create(self, cword: CommandWord, nword: CommandWord) -> CommandComponent:
-        """creates a specific CommandComponent"""
-        ...
-
-class FlagComponentSpawner(ComponentSpawner):
-    def create(self, cword: CommandWord, nword: CommandWord) -> Flag:
-        return Flag(prefix=cword.token.text)
-
-    def create_from_opt(self, option: Option) -> Flag:
-        flag = Flag(prefix=option.prefix)
-        gxvar = option.gxvar if option.gxvar_attachment == 1 else None
-        flag.gxvar = gxvar
-        return flag
-
-class OptionComponentSpawner(ComponentSpawner):
-    def create(self, cword: CommandWord, nword: CommandWord) -> Option:
-        return Option(
-            prefix=cword.token.text,
-            value=nword.token.text,
-            delim=cword.nextword_delim
-        )
-
-class PositionalComponentSpawner(ComponentSpawner):
-    def create(self, cword: CommandWord, nword: CommandWord) -> Positional:
-        return Positional(value=cword.token.text)
+from command.components.CommandComponent import CommandComponent
+from command.components.Flag import Flag
+from command.components.Option import Option
+from command.components.Positional import Positional
 
 
 
@@ -71,17 +41,10 @@ class SingleComponentCreationStrategy(ComponentCreationStrategy):
         return [new_component]
 
     def make_component(self) -> CommandComponent:
-        spawner = self.select_spawner()
+        spawner = init_spawner(self.cword, self.nword)
         return spawner.create(self.cword, self.nword)
     
-    def select_spawner(self) -> ComponentSpawner:
-        if component_utils.is_flag(self.cword.token, self.nword.token):
-            return FlagComponentSpawner()
-        elif component_utils.is_option(self.cword.token, self.nword.token):
-            return OptionComponentSpawner()
-        # positional - this has to happen last, as last resort. just trust me.
-        else:
-            return PositionalComponentSpawner()
+    
     
     def transfer_gxvars(self, component: CommandComponent) -> CommandComponent:
         match component:
@@ -97,7 +60,6 @@ class SingleComponentCreationStrategy(ComponentCreationStrategy):
             case _:
                 pass
         return component
-
 
 
 class MultipleComponentCreationStrategy(ComponentCreationStrategy):
@@ -119,7 +81,7 @@ class MultipleComponentCreationStrategy(ComponentCreationStrategy):
         converting the commandwords into components
         """
         components: list[CommandComponent] = []
-        efork = ExecutionFork(self.cword, self.nword, self.wordifier)
+        #efork = ExecutionPath(self.cword, self.nword, self.wordifier)
         for path in efork.forks():
             path_components = self.iter_words(path)
             path_components = self.transfer_gxvars(path_components)

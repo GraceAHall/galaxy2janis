@@ -63,7 +63,7 @@ class CommandWordifier:
         return dest
 
     def post_sentinel(self) -> None:
-        sentinel = self.factory.spawn_sentinel()
+        sentinel = self.factory.spawn_end_sentinel()
         self.cmdwords.append(sentinel)
 
 

@@ -5,14 +5,14 @@ from command.cmdstr.CommandStatement import CommandStatement
 from command.regex.utils import split_variable_assignment, is_variable_substr, is_string_substr
 from command.regex.scanners import get_simple_strings, get_custom
 from command.tokens.Tokens import TokenType as tt
-from command.tokens.Tokenifier import Tokenifier
+from command.tokens.TokenFactory import TokenFactory
 from command.alias.AliasRegister import AliasRegister
 import regex as re
 
 
 class AliasResolver:
     def __init__(self, tool: GalaxyToolDefinition):
-        self.tokenifier = Tokenifier(tool=tool)
+        self.TokenFactory = TokenFactory(tool=tool)
         self.register: AliasRegister = AliasRegister()
 
     def extract(self, statement: CommandStatement) -> None:
@@ -73,8 +73,8 @@ class AliasResolver:
     
     def update_aliases(self, left: str, right: str, line: str) -> None:
         # get tokens from text
-        source = self.tokenifier.tokenify(left)
-        dest = self.tokenifier.tokenify(right)
+        source = self.TokenFactory.tokenify(left)
+        dest = self.TokenFactory.tokenify(right)
         
         if source and dest:
             match dest.type:

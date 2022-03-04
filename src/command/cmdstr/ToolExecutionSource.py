@@ -12,8 +12,7 @@ from command.regex.scanners import get_statement_delims
 from command.cmdstr.best_statement import get_best_statement
 
 
-
-class ToolExecutionString:
+class ToolExecutionSource:
     def __init__(self, source: str, statements: list[CommandStatement]):
         self.source = source
         self.statements = statements
@@ -23,7 +22,6 @@ class ToolExecutionString:
         """guesses which CommandStatement corresponds to tool execution"""
         self.tool_statement = get_best_statement(self.statements, metadata)
 
-   
 
 def split_to_statements(the_string: str) -> list[CommandStatement]:
     """
@@ -58,17 +56,17 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
 
 
 
-class ToolExecutionStringFactory:
+class ToolExecutionSourceFactory:
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
 
-    def create(self, source: str, raw_string: str) -> ToolExecutionString:
+    def create(self, source: str, raw_string: str) -> ToolExecutionSource:
         simple_str = self.simplify_raw_string(source, raw_string)
         statements = self.create_statements(simple_str)
-        statements = self.resolve_statement_aliases(statements)
-        statements = self.set_statement_cmdwords(statements)
+        #statements = self.resolve_statement_aliases(statements)
+        statements = self.set_statement_tokens(statements)
         statements = self.set_statement_attrs(statements)
-        cmdstr = ToolExecutionString(source, statements)
+        cmdstr = ToolExecutionSource(source, statements)
         cmdstr.set_tool_statement(self.tool.metadata)
         return cmdstr
 
@@ -91,9 +89,9 @@ class ToolExecutionStringFactory:
             ar.resolve(cmd_statement)
         return statements
         
-    def set_statement_cmdwords(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+    def set_statement_tokens(self, statements: list[CommandStatement]) -> list[CommandStatement]:
         for cmd_statement in statements:
-            cmd_statement.set_cmdwords(self.tool)
+            cmd_statement.set_tokens(self.tool)
         return statements
 
     def set_statement_attrs(self, statements: list[CommandStatement]) -> list[CommandStatement]:

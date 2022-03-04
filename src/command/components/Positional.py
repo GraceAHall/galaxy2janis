@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from tool.param.Param import Param
-from command.components.ObservedValueRecord import ObservedValueRecord
+from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 
 
@@ -19,7 +19,7 @@ class Positional(BaseCommandComponent):
     presence_array: list[bool] = field(default_factory=list)
 
     def __post_init__(self):
-        self.value_record: ObservedValueRecord = ObservedValueRecord()
+        self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(self.value)
 
     def update(self, incoming: Positional):

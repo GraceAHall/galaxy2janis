@@ -5,14 +5,14 @@ from typing import Optional
 from tool.param.InputParam import SelectParam
 
 from tool.param.Param import Param
-from command.components.ObservedValueRecord import ObservedValueRecord
+from command.components.ValueRecord import OptionValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 
 
 @dataclass
 class Option(BaseCommandComponent):
     prefix: str
-    value: str
+    value: list[str]
     delim: str = ' '
     gxvar: Optional[Param] = None
     gxvar_attachment: int = 1
@@ -20,7 +20,7 @@ class Option(BaseCommandComponent):
     presence_array: list[bool] = field(default_factory=list)
 
     def __post_init__(self):
-        self.value_record: ObservedValueRecord = ObservedValueRecord()
+        self.value_record: OptionValueRecord = OptionValueRecord()
         self.value_record.add(self.value)
 
     def update(self, incoming: Option):
