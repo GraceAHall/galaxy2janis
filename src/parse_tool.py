@@ -25,16 +25,16 @@ only the tool module is called twice (load_tool, and write_tests)
 def parse_tool(args: dict[str, Optional[str]]):
     esettings: ToolExeSettings = load_tool_settings(args) 
     logger = Logger(esettings.get_logfile_path())
-    try:
-        gxmanager: GalaxyManager = load_manager(esettings)
-        tool: GalaxyToolDefinition = load_tool(gxmanager)
-        command: Command = infer_command(gxmanager, tool)
-        container: Optional[Container] = fetch_container(esettings, logger, tool)
-        write_janis(esettings, tool, command, container)
-        write_tests(esettings, tool)
-    except Exception as e:
-        print(e)
-        logger.log(2, 'parse_tool failed')
+    # try:
+    gxmanager: GalaxyManager = load_manager(esettings)
+    tool: GalaxyToolDefinition = load_tool(gxmanager)
+    command: Command = infer_command(gxmanager, tool)
+    container: Optional[Container] = fetch_container(esettings, logger, tool)
+    write_janis(esettings, tool, command, container)
+    write_tests(esettings, tool)
+    # except Exception as e:
+    #     print(e)
+    #     logger.log(2, 'parse_tool failed')
         
 
 

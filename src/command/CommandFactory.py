@@ -5,8 +5,11 @@ from command.IterationContext import IterationContext
 from command.Command import Command
 
 from tool.tool_definition import GalaxyToolDefinition
-from command.cmdstr.CommandStatement import CommandStatement
-from command.cmdstr.ToolExecutionSource import ToolExecutionSource
+from command.cmdstr.DynamicCommandString import DynamicCommandString
+
+from command.cmdstr.ExecutionPath import ExecutionPath
+from command.iteration.GreedyEPathIterator import GreedyEPathIterator
+#from command.iteration.TwoWordEPathIterator import TwoWordEPathIterator
 
 from command.components.creation.CommandComponentFactory import CommandComponentFactory
 from command.components.Flag import Flag
@@ -14,48 +17,57 @@ from command.components.Option import Option
 from command.components.Positional import Positional
 from command.components.CommandComponent import CommandComponent
 
-
+# deprecated oops
 class CommandFactory:
+    epath_iterator: GreedyEPathIterator
+    
     def __init__(self, tool: GalaxyToolDefinition):
+        self.tool = tool
         self.command = Command()
         self.iter_context = IterationContext()
-        self.cmdstrs: list[ToolExecutionSource] = []
+        self.cmdstrs: list[DynamicCommandString] = []
         self.component_factory = CommandComponentFactory(tool)
-        self.has_non_xml_cmdstrs = False
+        self.has_non_xml_sources = False
 
-    def create(self, command_line_strings: list[ToolExecutionSource]) -> Command:
-        self.set_attrs(command_line_strings)
+    def create(self, cmdstrs: list[DynamicCommandString]) -> Command:
+        self.set_attrs(cmdstrs)
         self.feed_cmdstrs(source='test')
         self.feed_cmdstrs(source='workflow')
         self.feed_cmdstrs(source='xml')
         self.cleanup()
         return self.command
 
-    def set_attrs(self, command_line_strings: list[ToolExecutionSource]) -> None:
+    def set_attrs(self, cmdstrs: list[DynamicCommandString]) -> None:
         self.command = Command()
-        self.has_non_xml_cmdstrs = True if any([cmdstr.source != 'xml' for cmdstr in command_line_strings]) else False
-        self.cmdstrs = command_line_strings
-
-    def infer_components_using_param_arguments(self) -> None:
-        pass
+        self.has_non_xml_sources = True if any([source.source != 'xml' for source in cmdstrs]) else False
+        self.cmdstrs = cmdstrs
 
     def feed_cmdstrs(self, source: str) -> None:
         active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
         for cmdstr in active_cmdstrs:
-            self.feed(cmdstr)
-    
-    def feed(self, cmdstr: ToolExecutionSource) -> None:
+            for epath in cmdstr.tool_statement.get_execution_paths():
+                self.feed(epath)
+
+    def feed(self, epath: ExecutionPath) -> None:
         self.command.pos_manager.reset()
-        statement: CommandStatement = cmdstr.tool_statement
-        self.update_redirects(statement)
-        self.update_command_components(statement)
+        self.update_redirects(epath)
+        self.infer_components_using_param_arguments(epath)
+        self.update_command_components(epath)
         self.iter_context.increment_cmdstr()
+
+    def infer_components_using_param_arguments(self, epath: ExecutionPath) -> None:
+        iterator = GreedyEPathIterator(epath)
+        for param in self.tool.list_inputs():
+            if param.argument:
+                component = iterator.search(param.argument)
+                if component:
+                    pass
     
-    def update_redirects(self, cmdstmt: CommandStatement) -> None:
-        if cmdstmt.redirect:
-            self.update_command([cmdstmt.redirect])
+    def update_redirects(self, epath: ExecutionPath) -> None:
+        if epath.redirect:
+            self.update_command([epath.redirect])
     
-    def update_command_components(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
+    def update_command_components(self, cmdstmt: ExecutionPath, disallow: list[type[CommandComponent]]=[]) -> None:
         """
         iterate through command words (with next word for context)
         each pair of words may actually yield more than one component.

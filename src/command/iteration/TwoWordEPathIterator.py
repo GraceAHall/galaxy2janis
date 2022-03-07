@@ -1,15 +1,15 @@
 
 
 from typing import Iterable, Tuple
-from command.cmdstr.ToolExecutionSource import ToolExecutionSource
+from command.cmdstr.DynamicCommandString import DynamicCommandString
 from command.tokens.Tokens import Token
 
-class TwoWordCmdStrIterator:
+class TwoWordEPathIterator:
     """
-    iterates through a ToolExecutionSource, yielding the current tokens being assessed.
-    keeps track of the location we are in the ToolExecutionSource
+    iterates through a DynamicCommandString, yielding the current tokens being assessed.
+    keeps track of the location we are in the DynamicCommandString
 
-    Example ToolExecutionSource:
+    Example DynamicCommandString:
     fastqc --in1 input1.fastq --mode fast report.txt ...
     
     0           1             2             3           4           5
@@ -31,7 +31,7 @@ class TwoWordCmdStrIterator:
     }
     """
 
-    def iter(self, cmdstr: ToolExecutionSource) -> Iterable[Tuple[Token, list[Token]]]:
+    def iter(self, cmdstr: DynamicCommandString) -> Iterable[Tuple[Token, list[Token]]]:
         raise NotImplementedError
 
     # def next(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:

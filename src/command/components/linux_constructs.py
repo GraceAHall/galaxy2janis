@@ -46,7 +46,7 @@ class Redirect:
         self.stage: str = 'post_options'
         self.presence_array: list[bool] = []
         self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(file.text)
+        self.value_record.add(0, file.text)
 
     @property
     def text(self) -> str:
@@ -64,8 +64,7 @@ class Redirect:
         if not self.gxvar and incoming.gxvar:
             self.gxvar = incoming.gxvar
         # add values
-        for obsval in incoming.value_record.record:
-            self.value_record.add(obsval)
+        self.value_record.record += incoming.value_record.record
 
     def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
         pass # TODO

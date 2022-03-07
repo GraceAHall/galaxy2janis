@@ -12,7 +12,8 @@ from command.components.CommandComponent import BaseCommandComponent
 @dataclass
 class Option(BaseCommandComponent):
     prefix: str
-    value: list[str]
+    values: list[str]
+    epath_id: int
     delim: str = ' '
     gxvar: Optional[Param] = None
     gxvar_attachment: int = 1
@@ -21,12 +22,11 @@ class Option(BaseCommandComponent):
 
     def __post_init__(self):
         self.value_record: OptionValueRecord = OptionValueRecord()
-        self.value_record.add(self.value)
+        self.value_record.add(self.epath_id, self.values)
 
     def update(self, incoming: Option):
         # transfer values
-        for obsval in incoming.value_record.record:
-            self.value_record.add(obsval)
+        self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference
         if not self.gxvar and incoming.gxvar:
             self.gxvar = incoming.gxvar

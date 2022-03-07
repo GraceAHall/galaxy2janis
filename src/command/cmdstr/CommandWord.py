@@ -9,7 +9,7 @@ from tool.tool_definition import GalaxyToolDefinition
 
 from command.tokens.TokenFactory import TokenFactory
 from command.tokens.Tokens import Token
-import command.iterators.utils as component_utils
+import command.iteration.utils as component_utils
 
 
 @dataclass

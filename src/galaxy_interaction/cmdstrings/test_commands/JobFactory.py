@@ -57,7 +57,7 @@ class JobFactory:
         self.set_job_parameters()
 
     def set_input_dict(self) -> None:
-        self.input_dict: dict[str, Any] = self.tool.get_inputs(format='dict')
+        self.input_dict: dict[str, Any] = self.tool.dict_inputs()
 
     def handle_test_values(self) -> None:
         test_inputs: dict[str, Any] = self.test.inputs

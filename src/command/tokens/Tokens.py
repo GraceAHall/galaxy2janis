@@ -51,3 +51,6 @@ class Token:
     def end(self) -> int:
         return self.match.end()
 
+    def __repr__(self) -> str:
+        return f'Token: {self.text}, gxvar: {self.gxvar}'
+

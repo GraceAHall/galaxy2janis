@@ -9,12 +9,15 @@ from command.components.linux_constructs import Tee, Redirect, StreamMerge
 from command.regex import scanners as scanners
 
 class ExecutionPath:
+    id: int
+
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.stream_merges: list[StreamMerge] = []
         self.redirect: Optional[Redirect] = None
         self.tees: Optional[Tee] = None
         self.tokens_to_excise: list[int] = []
+        self.set_attrs()
 
     def set_attrs(self) -> None:
         self.set_stream_merges()
@@ -80,8 +83,10 @@ class ExecutionPath:
                 
         self.tee = tee
 
-    def excise_tokens(self) -> None:
-        for ind in self.tokens_to_excise:
+    def excise_tokens(self, elements: Optional[list[int]]=None) -> None:
+        if not elements:
+            elements = self.tokens_to_excise
+        for ind in elements:
             matches = scanners.get_all('excision')
             self.tokens[ind] = Token(matches[0], TokenType.EXCISION)
         self.tokens_to_excise = []

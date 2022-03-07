@@ -68,7 +68,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     def test_inputs(self) -> None:
         tool = self.tool
         self.assertIsInstance(tool.inputs, InputRegister)
-        self.assertEquals(len(tool.get_inputs()), 5)
+        self.assertEquals(len(tool.list_inputs()), 5)
 
     def test_input_params(self) -> None:
         tool = self.tool

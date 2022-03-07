@@ -13,6 +13,7 @@ from command.components.CommandComponent import BaseCommandComponent
 @dataclass
 class Positional(BaseCommandComponent):
     value: str
+    epath_id: int
     cmd_pos: int = 0
     gxvar: Optional[Param] = None
     stage: str = 'pre_options'
@@ -20,12 +21,11 @@ class Positional(BaseCommandComponent):
 
     def __post_init__(self):
         self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(self.value)
+        self.value_record.add(self.epath_id, self.value)
 
     def update(self, incoming: Positional):
         # transfer values
-        for obsval in incoming.value_record.record:
-            self.value_record.add(obsval)
+        self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference
         if not self.gxvar and incoming.gxvar:
             self.gxvar = incoming.gxvar

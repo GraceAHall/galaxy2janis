@@ -72,13 +72,13 @@ class GalaxyManager:
         tcl = TestCommandLoader(app, self.history, gxtool, tooldef, self.esettings)
         cmdstrs = [tcl.load(test) for test in gxtool.tests]
         cmdstrs = [s for s in cmdstrs if s is not None]
-        for cmdstr in cmdstrs:
-            print(cmdstr)
-            print()
+        # for cmdstr in cmdstrs:
+        #     print(cmdstr)
+        #     print()
         return cmdstrs
 
     def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
-        # create ToolExecutionSource for tooldef.command
+        # create DynamicCommandString for tooldef.command
         xcl = XMLCommandLoader(tooldef)
         cmdstrs = [xcl.load()]
         cmdstrs = [s for s in cmdstrs if s is not None]

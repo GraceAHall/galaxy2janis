@@ -2,12 +2,20 @@
 
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Any
+
+
+
+@dataclass
+class ObservedValue:
+    epath_id: int
+    value: Any
 
 
 class ValueRecord(ABC):
     @abstractmethod
-    def add(self, obsval: Any) -> None:
+    def add(self, epath_id: int, value: Any) -> None:
         """adds an observed value to the record"""
         ...
 
@@ -54,59 +62,62 @@ class ValueRecord(ABC):
 
 class PositionalValueRecord(ValueRecord):
     def __init__(self):
-        self.record: list[str] = []
+        self.record: list[ObservedValue] = []
 
-    def add(self, obsval: str) -> None:
-        self.record.append(obsval)
+    def add(self, epath_id: int, value: Any) -> None:
+        self.record.append(ObservedValue(epath_id, value))
 
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            counts[obsval] += 1
+            counts[obsval.value] += 1
         return counts
 
     def values_are_ints(self) -> bool:
-        if all([self.is_int(x) for x in self.record]):
+        if all([self.is_int(obsval.value) for obsval in self.record]):
             return True
         return False
     
     def values_are_floats(self) -> bool:
-        if all([self.is_float(x) for x in self.record]):
+        if all([self.is_float(obsval.value) for obsval in self.record]):
             return True
         return False
 
     def get_unique_values(self) -> list[str]:
-        return list(set(self.record))
+        return list(set([obsval.value for obsval in self.record]))
 
 
+
+
+# should be cmdstr_count, value
 class OptionValueRecord(ValueRecord):
     def __init__(self):
-        self.record: list[list[str]] = []
+        self.record: list[ObservedValue] = []
 
-    def add(self, obsval: list[str]) -> None:
-        self.record.append(obsval)
+    def add(self, epath_id: int, value: list[str]) -> None:
+        self.record.append(ObservedValue(epath_id, value))
 
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
-        for obsval_array in self.record:
-            label = ' '.join(obsval_array)
+        for obsval in self.record:
+            label = ' '.join(obsval.value)
             counts[label] += 1
         return counts
 
     def values_are_ints(self) -> bool:
-        for obsval_array in self.record:
-            if not all([self.is_int(x) for x in obsval_array]):
+        for obsval in self.record:
+            if not all([self.is_int(x) for x in obsval.value]):
                 return False
         return True
     
     def values_are_floats(self) -> bool:
-        for obsval_array in self.record:
-            if not all([self.is_float(x) for x in obsval_array]):
+        for obsval in self.record:
+            if not all([self.is_float(x) for x in obsval.value]):
                 return False
         return True
 
     def get_unique_values(self) -> list[str]:
-        str_vals = [' '.join(obsval_array) for obsval_array in self.record]
+        str_vals = [' '.join(obsval.value) for obsval in self.record]
         return list(set(str_vals))
 
 

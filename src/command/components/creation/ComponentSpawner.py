@@ -8,7 +8,7 @@ from command.components.CommandComponent import CommandComponent
 from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.Positional import Positional
-import command.iterators.utils as component_utils
+import command.iteration.utils as component_utils
 
 
 
