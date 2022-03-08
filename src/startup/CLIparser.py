@@ -1,7 +1,6 @@
 
 
 import argparse
-import sys
 from typing import Optional
 
 useage_str = '''
@@ -14,22 +13,22 @@ Commands:
 '''
 
 class CLIparser:
-    def __init__(self):
+    def __init__(self, argv: list[str]):
         parser = argparse.ArgumentParser(
             description='gxtool2janis.py',
             usage=useage_str
         )
         parser.add_argument('command', help='Command')
-        args = parser.parse_args(sys.argv[1:2])
+        args = parser.parse_args(argv[1:2])
         if not hasattr(self, args.command):
-            print(f'Unrecognized command {sys.argv[1]}')
+            print(f'Unrecognized command {argv[1]}')
             parser.print_help()
             exit(1)
         # dispatch pattern (calls the function with same name as args.command)
         self.command = args.command
-        getattr(self, args.command)()
+        getattr(self, args.command)(argv)
 
-    def tool(self):
+    def tool(self, argv: list[str]):
         parser = argparse.ArgumentParser(
             description='Parse single galaxy tool'
         )
@@ -53,12 +52,12 @@ class CLIparser:
                             "--cachedir", 
                             help="path to local container cache. default='./'", 
                             type=str)
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(argv[2:])
         out: dict[str, Optional[str]] = args.__dict__
         out['command'] = self.command
         self.args = out
 
-    def workflow(self):
+    def workflow(self, argv: list[str]):
         parser = argparse.ArgumentParser(
             description='') 
         parser.add_argument("workflow", 
@@ -72,11 +71,8 @@ class CLIparser:
                             "--cachedir", 
                             help="path to local container cache. default='./'", 
                             type=str)
-        args = parser.parse_args(sys.argv[2:])
+        args = parser.parse_args(argv[2:])
         out: dict[str, Optional[str]] = args.__dict__
         out['command'] = self.command
         self.args = out
 
-
-if __name__ == '__main__':
-    CLIparser()

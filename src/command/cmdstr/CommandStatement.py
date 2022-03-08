@@ -5,7 +5,7 @@ from typing import Iterable, Optional
 
 from tool.tool_definition import GalaxyToolDefinition
 from command.tokens.RealisedTokenValues import RealisedTokenValueifier, RealisedTokenValues
-from command.cmdstr.ExecutionPath import ExecutionPath
+from command.epath.ExecutionPath import ExecutionPath
 
 class CommandStatement:
     """
@@ -75,8 +75,8 @@ class CommandStatement:
 
     def print_execution_paths(self) -> None:
         for epath in self.get_execution_paths():
-            for token in epath.tokens:
-                print(token.text, end=' ')
+            for position in epath.positions:
+                print(position.token.text, end=' ')
             print()
 
 

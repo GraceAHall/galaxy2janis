@@ -1,7 +1,7 @@
 
-#import sys
 #sys.path.append('./galaxy/lib')
 
+import sys
 from typing import Optional
 from startup.CLIparser import CLIparser
 
@@ -26,7 +26,7 @@ def main():
             pass
 
 def load_args() -> dict[str, Optional[str]]:
-    parser = CLIparser()
+    parser = CLIparser(sys.argv)
     return parser.args
 
 

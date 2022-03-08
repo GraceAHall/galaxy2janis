@@ -58,7 +58,6 @@ class CommandInferer:
             cmdstr.tool_statement.print_execution_paths()
         print()
 
-
     def gen_command(self) -> None:
         factory = BruteForceCommandFactory(self.tool)
         self.command = factory.create(self.cmdstrs)

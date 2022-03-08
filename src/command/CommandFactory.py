@@ -7,9 +7,9 @@ from command.Command import Command
 from tool.tool_definition import GalaxyToolDefinition
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 
-from command.cmdstr.ExecutionPath import ExecutionPath
-from command.iteration.GreedyEPathIterator import GreedyEPathIterator
-#from command.iteration.TwoWordEPathIterator import TwoWordEPathIterator
+from command.epath.ExecutionPath import ExecutionPath
+from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
+#from command.epath.TwoWordEPathAnnotator import TwoWordEPathAnnotator
 
 from command.components.creation.CommandComponentFactory import CommandComponentFactory
 from command.components.Flag import Flag
@@ -19,7 +19,7 @@ from command.components.CommandComponent import CommandComponent
 
 # deprecated oops
 class CommandFactory:
-    epath_iterator: GreedyEPathIterator
+    epath_iterator: GreedyEPathAnnotator
     
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
@@ -56,7 +56,7 @@ class CommandFactory:
         self.iter_context.increment_cmdstr()
 
     def infer_components_using_param_arguments(self, epath: ExecutionPath) -> None:
-        iterator = GreedyEPathIterator(epath)
+        iterator = GreedyEPathAnnotator(epath)
         for param in self.tool.list_inputs():
             if param.argument:
                 component = iterator.search(param.argument)

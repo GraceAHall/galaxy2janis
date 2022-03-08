@@ -24,6 +24,9 @@ enum_str_map = {
 
 @dataclass
 class PositionManager:
+    """
+    manages our position within the epath being iterated through
+    """
     stage: CmdStrStage = CmdStrStage.PRE_OPTIONS
     options_encountered: bool = False
 

@@ -4,7 +4,7 @@ from typing import Iterable, Tuple
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 from command.tokens.Tokens import Token
 
-class TwoWordEPathIterator:
+class TwoWordEPathAnnotator:
     """
     iterates through a DynamicCommandString, yielding the current tokens being assessed.
     keeps track of the location we are in the DynamicCommandString

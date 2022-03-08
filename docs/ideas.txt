@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+env variables #set by cheetah
+ - rewrite the XML <command> section with echo '\$varname' '$varname' everytime we can set a cheetah variable
+ - that way, whenever a cheetah env var is set, the varname and its realised value are printed
+ - can use this for the input mapping to command line for workflow parsing
+
+ - make string representation of TTestCases so we can actually write to a janis tool def file
+
+
+Galaxy types
+    - composite types like imzML? is there info on secondary type? 
+    - that kind of extra data can be found in the actual type class def. needed?  
+
+non-wildcard Outputs
+    - currently just keeping as WilcardSelector. Not sure how glob works and is deprecated. 
+    - glob="output.fastq" works when path is directly known
+    - stringformatter for paths ie concatenating folder and filename
+
+Helptext
+    - restructuredText processing to make helptext nicer
+
+
+Future -------------------------------------------
+    
+ - workflowstep command loading
+    - '__class__': 'ConnectedValue' - do traceback to original dataset
+    - '__class__': 'RuntimeValue' - write warning to user stating the value needs to be set on the run
+
+ - paired files & collections (short reads, composite types imzml)
+ - new tools added to toolshed automatically parsed 
+ - any which do not pass tests can have manual intervention (fornight / monthly activity)
+ - start galaxy workflow parser -> janis

@@ -9,11 +9,11 @@
 
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional, Tuple
-from command.cmdstr.ExecutionPath import ExecutionPath
+from command.epath.ExecutionPath import ExecutionPath
 from command.tokens.Tokens import Token
 
 
-class EPathIterator(ABC):
+class EPathAnnotator(ABC):
     """
     iterates through a ExecutionPath, yielding the current tokens being assessed.
     keeps track of the location we are in the ExecutionPath

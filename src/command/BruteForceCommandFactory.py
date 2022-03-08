@@ -1,23 +1,19 @@
 
 
 from command.IterationContext import IterationContext
-
-from command.Command import Command
+from command.Command import Command 
 
 from tool.tool_definition import GalaxyToolDefinition
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 
-from command.cmdstr.ExecutionPath import ExecutionPath
-from command.iteration.GreedyEPathIterator import GreedyEPathIterator
+from command.epath.ExecutionPath import ExecutionPath
+from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
 
-from command.components.Flag import Flag
-from command.components.Option import Option
 from command.components.Positional import Positional
 from command.components.CommandComponent import CommandComponent
-import command.iteration.utils as component_utils
 
 class BruteForceCommandFactory:
-    epath_iterator: GreedyEPathIterator
+    epath_iterator: GreedyEPathAnnotator
     
     def __init__(self, tool: GalaxyToolDefinition):
         self.tool = tool
@@ -47,52 +43,30 @@ class BruteForceCommandFactory:
                 self.feed(epath)
 
     def feed(self, epath: ExecutionPath) -> None:
-        self.command.pos_manager.reset()
-        self.update_redirects(epath)
-        self.infer_components_via_param_args(epath)
-        self.infer_components_via_iter_epath(epath)
+        annotator = GreedyEPathAnnotator(epath, self.tool, self.command)
+        epath = annotator.annotate()
+        print(epath)
+        self.update_components(epath) 
         self.iter_context.increment_epath()
+        print()
 
     def update_redirects(self, epath: ExecutionPath) -> None:
         if epath.redirect:
             self.update_command_components(epath.redirect)
 
-    def infer_components_via_param_args(self, epath: ExecutionPath) -> None:
-        iterator = GreedyEPathIterator(epath)
-        for param in self.tool.list_inputs():
-            if param.argument:
-                component = iterator.search(param.argument)
-                if component:
-                    self.update_command_components(component)
-    
-    def infer_components_via_iter_epath(self, epath: ExecutionPath) -> None:
-        iterator = GreedyEPathIterator(epath)
-        for component in iterator.iter():
-            self.update_command_components(component)
+    def update_components(self, epath: ExecutionPath) -> None:
+        """
+        updates command components using an annotated epath
+        """
+        for pos, component in epath.get_components().items():
+            # TODO HERE
+            raise NotImplementedError
     
     def update_command_components(self, component: CommandComponent) -> None:
-        component = self.refine_component(component)
+        #component = self.refine_component(component)
         self.iter_context.update(component)
         self.annotate_iter_attrs(component)
         self.command.update(component)
-    
-    def refine_component(self, component: CommandComponent) -> CommandComponent:
-        """
-        updates the component based on existing knowledge of the command.
-        and example is where we think a component was an option, 
-        but its actually a flag followed by a positional.
-        """
-        # cast Option to Flag
-        if isinstance(component, Option):
-            flags = self.command.get_flags()
-            for flag in flags:
-                match flag:
-                    case Flag(prefix=component.prefix):
-                        component = component_utils.cast_opt_to_flag(component)
-                        break
-                    case _:
-                        pass
-        return component
     
     def annotate_iter_attrs(self, component: CommandComponent) -> None:
         match component:
@@ -108,5 +82,18 @@ class BruteForceCommandFactory:
     def update_components_presence_array(self) -> None:
         for component in self.command.get_inputs():
             component.update_presence_array(self.iter_context.epath - 1, fill_false=True)
+    
+    
+    # def infer_components_via_param_args(self, iterator: GreedyEPathAnnotator) -> None:
+    #     for param in self.tool.list_inputs():
+    #         if param.argument:
+    #             component = iterator.search(param.argument)
+    #             if component:
+    #                 self.update_command_components(component)
+    
+    # def infer_components_via_iter_epath(self, iterator: GreedyEPathAnnotator) -> None:
+    #     for component in iterator.iter():
+    #         self.update_command_components(component)
+
 
 

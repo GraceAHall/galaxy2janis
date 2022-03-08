@@ -13,7 +13,7 @@ from command.cmdstr.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
 from command.tokens.Tokens import Token, TokenType
 from command.tokens.TokenFactory import TokenFactory
-from command.iteration.utils import is_bool_select
+from command.epath.utils import is_bool_select
 
 
 class RealisedTokenValues:
