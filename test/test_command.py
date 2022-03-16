@@ -29,12 +29,12 @@ class TestCommandInference(unittest.TestCase):
         cmd = self.command
         self.assertEquals(len(cmd.positionals), 2)
 
-        posit1 = cmd.positionals[1]
+        posit1 = cmd.positionals[0]
         self.assertEquals(posit1.get_default_value(), 'abricate')
         self.assertEquals(posit1.value_record.get_counts()['abricate'], 17)
         self.assertEquals(posit1.is_optional(), False)
         
-        posit2 = cmd.positionals[2]
+        posit2 = cmd.positionals[1]
         self.assertEquals(posit2.get_default_value(), '$sample_name')
         self.assertEquals(posit2.is_optional(), False)
     

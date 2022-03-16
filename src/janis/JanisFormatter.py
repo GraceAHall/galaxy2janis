@@ -2,6 +2,7 @@
 
 
 from typing import Optional
+
 from startup.ExeSettings import ToolExeSettings
 from tool.param.Param import Param
 from tool.tool_definition import GalaxyToolDefinition
@@ -43,23 +44,37 @@ class JanisFormatter:
     def format_path_appends(self) -> str:
         return path_append_snippet
 
+    # TODO refactor
     def format_inputs(self, command: Command) -> str:
+        components = command.get_component_positions()
         out_str: str = ''
         out_str += 'inputs = ['
-        for pos, component in command.get_input_positions():
-            if pos > 0:
-                self.import_handler.update(component)
-                match component:
-                    case Flag():
-                        out_str += f'{self.format_flag(pos, component)},'
-                    case Option():
-                        out_str += f'{self.format_option(pos, component)},'
-                    case Positional():
-                        out_str += f'{self.format_positional(pos, component)},'
-                    case _:
-                        pass
+
+        out_str += '\n\t# Positionals'
+        for cmd_pos, positional in components['positionals']:
+            self.import_handler.update(positional)
+            out_str += f'{self.format_positional(cmd_pos, positional)},'
+
+        out_str += '\n\t# Flags'
+        for cmd_pos, flag in components['flags']:
+            self.import_handler.update(flag)
+            out_str += f'{self.format_flag(cmd_pos, flag)},'
+            
+        out_str += '\n\t# Options'
+        for cmd_pos, option in components['options']:
+            self.import_handler.update(option)
+            out_str += f'{self.format_option(cmd_pos, option)},'
         out_str += '\n]'
         return out_str
+   
+    def format_positional(self, pos: int, positional: Positional) -> str:
+        datatype = self.datatype_formatter.get(component=positional)
+        return tool_input_snippet(
+            tag=self.tag_validator.format_name(positional.get_name()),
+            datatype=datatype,
+            position=pos,
+            doc=positional.get_docstring()
+        )
 
     def format_flag(self, pos: int, flag: Flag) -> str:
         datatype = self.datatype_formatter.get(component=flag)
@@ -86,28 +101,24 @@ class JanisFormatter:
             default=default,
             doc=opt.get_docstring()
         )
-    
-    def format_positional(self, pos: int, positional: Positional) -> str:
-        datatype = self.datatype_formatter.get(component=positional)
-        return tool_input_snippet(
-            tag=self.tag_validator.format_name(positional.get_name()),
-            datatype=datatype,
-            position=pos,
-            doc=positional.get_docstring()
-        )
 
     def format_outputs(self, tool: GalaxyToolDefinition, command: Command) -> str:
         out_str: str = ''
         out_str += 'outputs = ['
+
+        command_outputs = command.get_outputs()
+        command_output_param_names = [o.gxvar.name for o in command_outputs if o.gxvar]
+        tool_output_params = [out for out in tool.list_outputs() if out.name not in command_output_param_names]
+        # TODO FIX THIS AWFUL OUTPUT SHIT
         # galaxy outputs with no reference in <command> section
-        for output in tool.list_outputs():
-            if output not in command.get_linked_gxparams():
-                self.import_handler.update(output)
-                out_str += f'{self.format_output_param(output)},'
-        # Redirects and command components linked to galaxy outputs
-        for output in command.get_outputs():
+        # usually use 'from_work_dir' to get file(s)
+        for output in tool_output_params:
             self.import_handler.update(output)
-            out_str += f'{self.format_output_componet(output)},'
+            out_str += f'{self.format_output_param(output)},'
+        # Redirects and command components linked to galaxy outputs
+        for output in command_outputs:
+            self.import_handler.update(output)
+            out_str += f'{self.format_output_component(output)},'
         out_str += '\n]'
         return out_str
 
@@ -127,7 +138,7 @@ class JanisFormatter:
             doc=param.get_docstring()
         )
 
-    def format_output_componet(self, component: CommandComponent) -> str:
+    def format_output_component(self, component: CommandComponent) -> str:
         datatype = self.datatype_formatter.get(component=component)
         name = self.format_output_name(component)
         selector = self.format_selector(component, name)
@@ -164,7 +175,8 @@ class JanisFormatter:
         return None
 
     def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
-        base_command = command.get_base_command()
+        base_positionals = command.get_base_positionals()
+        base_command = [p.get_default_value() for p in base_positionals]
         name: str = self.tag_validator.format_name(tool.metadata.id)
 
         return command_tool_builder_snippet(

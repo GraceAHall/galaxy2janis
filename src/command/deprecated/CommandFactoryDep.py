@@ -1,6 +1,6 @@
 
 
-from command.IterationContext import IterationContext
+from command.deprecated.IterationContextDep import IterationContext
 
 from command.Command import Command
 

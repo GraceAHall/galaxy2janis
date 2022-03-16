@@ -1,16 +1,13 @@
 
 
-
-
-from copy import deepcopy
+#from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from command.tokens.Tokens import Token, TokenType
 from command.components.linux_constructs import Tee, Redirect, StreamMerge
-from command.regex import scanners as scanners
 from command.components.CommandComponent import CommandComponent
-
+from command.epath.PositionAnnotationStrategy import SimplifiedPositionAnnotationStrategy
 
 
 @dataclass
@@ -35,11 +32,23 @@ class ExecutionPath:
     def init_positions(self, tokens: list[Token]) -> list[EPathPosition]:
         return [EPathPosition(i, token) for i, token in enumerate(tokens)]
 
-    def get_components(self) -> dict[int, CommandComponent]:
-        out: dict[int, CommandComponent] = {}
+    def get_components(self) -> list[CommandComponent]:
+        components = self.get_component_list()
+        annotation_strategy = SimplifiedPositionAnnotationStrategy()
+        return annotation_strategy.annotate(components)
+
+    def get_component_list(self) -> list[CommandComponent]:
+        """
+        gets the CommandComponents in this EPath. 
+        preserves ordering
+        """
+        ignore = [Tee, Redirect, StreamMerge]
+        out: list[CommandComponent] = []
         for position in self.positions:
-            if position.component:
-                out[position.ptr] = position.component
+            component = position.component
+            if component and type(component) not in ignore:
+                if component not in out:
+                    out.append(component)
         return out
 
     def set_attrs(self) -> None:
@@ -117,28 +126,4 @@ class ExecutionPath:
         return out
 
 
-"""
-
-
-0            1             2            3           4          5        6           7          8
-abricate     $sample_name  --no-header  --minid     =          80       --db        =          card
-RAW_STRING   ENV_VAR       RAW_STRING   RAW_STRING  KV_LINKER  RAW_INT  RAW_STRING  KV_LINKER  RAW_STRING
-positional1  positional2   flag1        option1     option1    option1  option2     option2    option2
-
-
-0            1             2            3           4          5        6           7          8
-abricate     $sample_name  --no-header  --minid     =          80       --db        =          card
-RAW_STRING   ENV_VAR       RAW_STRING   RAW_STRING  KV_LINKER  RAW_INT  RAW_STRING  KV_LINKER  RAW_STRING
-None         None          None         None        None       None     None        None       None
-
-
-"""
-
-    # def excise_tokens(self, elements: Optional[list[int]]=None) -> None:
-    #     if not elements:
-    #         elements = self.tokens_to_excise
-    #     for ind in elements:
-    #         matches = scanners.get_all('excision')
-    #         self.tokens[ind] = Token(matches[0], TokenType.EXCISION)
-    #     self.tokens_to_excise = []
 

@@ -11,6 +11,7 @@ from command.components.CommandComponent import BaseCommandComponent
 @dataclass
 class Flag(BaseCommandComponent):
     prefix: str
+    cmd_pos: int = 0
     gxvar: Optional[Param] = None
     stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)

@@ -44,30 +44,30 @@ def parse_input_step(step: dict[str, Any]) -> InputStep:
         optional = step['tool_state']['optional']
     return InputStep(
         step=step['id'],
-        inputs=[make_step_input(inp) for inp in step['inputs']],
+        inputs=[init_step_input(inp) for inp in step['inputs']],
         optional=optional
     )
 
 def parse_tool_step(step: dict[str, Any]) -> ToolStep:
     return ToolStep(
-        metadata=make_step_metadata(step),
-        inputs=[make_step_input(inp) for inp in step['inputs']],
-        outputs=[make_step_output(inp) for inp in step['outputs']]
+        metadata=init_step_metadata(step),
+        inputs=[init_step_input(inp) for inp in step['inputs']],
+        outputs=[init_step_output(inp) for inp in step['outputs']]
     )
 
-def make_step_input(input: dict[str, str]) -> StepInput:
+def init_step_input(input: dict[str, str]) -> StepInput:
     return StepInput(
         input['name'],
         input['description']
     )
 
-def make_step_output(output: dict[str, str]) -> StepOutput:
+def init_step_output(output: dict[str, str]) -> StepOutput:
     return StepOutput(
         output['name'],
         output['type']
     )
     
-def make_step_metadata(step: dict[str, Any]) -> StepMetadata:
+def init_step_metadata(step: dict[str, Any]) -> StepMetadata:
     return StepMetadata(
         step=step['id'],
         tool_name=step['tool_shed_repository']['name'],

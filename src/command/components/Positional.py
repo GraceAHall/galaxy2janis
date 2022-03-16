@@ -15,9 +15,10 @@ class Positional(BaseCommandComponent):
     value: str
     epath_id: int
     cmd_pos: int = 0
+    before_opts: bool = False
     gxvar: Optional[Param] = None
-    stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)
+    #stage: str = 'pre_options'
 
     def __post_init__(self):
         self.value_record: PositionalValueRecord = PositionalValueRecord()

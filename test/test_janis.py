@@ -3,5 +3,6 @@
 
 import unittest
 
-class TestStartup(unittest.TestCase):
+
+class TestJanisFormatting(unittest.TestCase):
     pass

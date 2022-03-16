@@ -4,7 +4,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Callable, Tuple
 
-from command.positions.PositionResolver import PositionResolver
 from command.components.Positional import Positional
 from command.components.Flag import Flag
 from command.components.Option import Option
@@ -164,7 +163,6 @@ class Command:
         self.redirect: Optional[Redirect] = None
 
     def update(self, incoming: CommandComponent) -> None:
-        raise NotImplementedError('need positions')
         updater = self.select_updater(incoming)
         updater.update(self, incoming)
 
@@ -181,13 +179,48 @@ class Command:
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
-    def get_inputs(self) -> list[CommandComponent]:
+    def get_component_positions(self) -> dict[str, Any]:
+        out: dict[str, Any] = {'positionals': [], 'flags': [], 'options': []}
+        options_pos: int = self.get_options_position()
+        for flag in self.get_flags():
+            out['flags'].append((options_pos, flag))
+        for option in self.get_options():
+            out['options'].append((options_pos, option))
+        
+        cmd_pos: int = 1
+        for positional in self.get_non_base_positionals():
+            if cmd_pos == options_pos:
+                cmd_pos += 1
+            out['positionals'].append((cmd_pos, positional))
+            cmd_pos += 1
+        
+        return out
+
+    def get_options_position(self) -> int:
+        """
+        returns cmd_pos for options and flags. 
+        base command will always occupy cmd_pos == 0
+        """
+        i: int = 0
+        positionals = self.get_non_base_positionals()
+        while i < len(positionals) and positionals[i].before_opts:
+            i += 1
+        return i + 1
+
+    def list_all_inputs(self) -> list[CommandComponent]:
         components: list[CommandComponent] = []
         components += self.get_positionals()
         components += self.get_flags()
         components += self.get_options()
         return components
-    
+
+    def get_inputs(self) -> list[CommandComponent]:
+        components: list[CommandComponent] = []
+        components += self.get_non_base_positionals()
+        components += self.get_flags()
+        components += self.get_options()
+        return components
+
     def get_outputs(self) -> list[CommandComponent]:
         components: list[CommandComponent] = []
         for comp in self.get_inputs():
@@ -197,15 +230,23 @@ class Command:
             components.append(self.redirect)
         return components
 
-    def get_linked_gxparams(self) -> list[Param]:
-        components: list[CommandComponent] = []
-        components += self.get_inputs()
-        components += self.get_outputs()
-        gxparams = [c.gxvar for c in components]
-        return [p for p in gxparams if p is not None]
+    def get_base_positionals(self) -> list[Positional]:
+        positionals = self.get_positionals()
+        positionals = [p for p in positionals if p.before_opts]
+        positionals = [p for p in positionals if not p.gxvar]
+        positionals = [p for p in positionals if p.has_single_value()]
+        return positionals
+
+    def get_non_base_positionals(self) -> list[Positional]:
+        base_positionals = self.get_base_positionals()
+        all_positionals = self.get_positionals()
+        return [p for p in all_positionals if p not in base_positionals]
 
     def get_positionals(self) -> list[Positional]:
-        return list(self.positionals.values())
+        """returns positionals in sorted order"""
+        positions_components = list(self.positionals.items())
+        positions_components.sort(key=lambda x: x[0])
+        return [p[1] for p in positions_components]
 
     def get_positional(self, cmd_pos: int) -> Optional[Positional]:
         if cmd_pos in self.positionals:
@@ -227,18 +268,6 @@ class Command:
         if query_prefix in self.options:
             return self.options[query_prefix]
         return None
-
-    def get_input_positions(self) -> list[Tuple[int, CommandComponent]]:
-        inputs = self.get_inputs()
-        pa = PositionResolver(inputs)
-        out = pa.resolve()
-        return out
-
-    def get_base_command(self) -> list[str]:
-        input_positions = self.get_input_positions()
-        base_components = [inp for pos, inp in input_positions if pos == 0]
-        base_cmd = [c.get_default_value() for c in base_components]
-        return base_cmd
 
     # string representations
     def __str__(self) -> str:

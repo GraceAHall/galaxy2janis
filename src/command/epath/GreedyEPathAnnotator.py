@@ -45,7 +45,7 @@ class GreedyEPathAnnotator:
         self.command = command
         self.pos = 0
 
-    def annotate(self) -> ExecutionPath:
+    def annotate_epath(self) -> ExecutionPath:
         self.annotate_via_param_args()
         self.annotate_via_iteration()
         return self.epath
@@ -57,6 +57,7 @@ class GreedyEPathAnnotator:
             while self.pos < len(self.epath.positions) - 1:
                 token = self.epath.positions[self.pos].token
                 if token.text == arg:
+                    token.type = TokenType.FORCED_PREFIX
                     self.annot()
                 self.pos += 1
     

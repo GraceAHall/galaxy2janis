@@ -15,9 +15,10 @@ class Option(BaseCommandComponent):
     values: list[str]
     epath_id: int
     delim: str = ' '
+    cmd_pos: int = 0
     gxvar: Optional[Param] = None
-    gxvar_attachment: int = 1
-    stage: str = 'pre_options'
+    #gxvar_attachment: int = 1
+    #stage: str = 'pre_options'
     presence_array: list[bool] = field(default_factory=list)
 
     def __post_init__(self):

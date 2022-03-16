@@ -16,6 +16,7 @@ class TokenType(Enum):
     ENV_VAR         = auto()
     KV_PAIR         = auto()
     KV_LINKER       = auto()
+    FORCED_PREFIX   = auto()
     QUOTED_STRING   = auto()
     QUOTED_NUM      = auto()
     RAW_STRING      = auto()
