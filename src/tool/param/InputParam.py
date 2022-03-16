@@ -107,6 +107,7 @@ class BoolParam(InputParam):
         docstring = self.generic_get_docstring()
         bool_values = [self.truevalue, self.falsevalue]
         bool_values = [v for v in bool_values if v != '']
+        bool_values.sort()
         bool_str = ', '.join(bool_values)
         return f'{docstring}. possible values: {bool_str}'
     
@@ -145,6 +146,7 @@ class SelectParam(InputParam):
     def get_docstring(self) -> str:
         docstring = self.generic_get_docstring()
         option_values = [v.value for v in self.options]
+        option_values.sort()
         option_str = ', '.join(option_values[:5])
         return f'{docstring}. possible values: {option_str}'
     

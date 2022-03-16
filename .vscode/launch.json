@@ -33,7 +33,7 @@
             "justMyCode": false,
             "args": [
                 "tool",
-                "--dir", "test/data/abricate", 
+                "--dir", "test/data/tools/abricate", 
                 "--xml", "abricate.xml",
             ]
         },
@@ -46,7 +46,7 @@
             "justMyCode": false,
             "args": [
                 "tool",
-                "--dir", "test/data/fastqc", 
+                "--dir", "test/data/tools/fastqc", 
                 "--xml", "rgFastQC.xml",
             ]
         },
@@ -59,7 +59,7 @@
             "justMyCode": false,
             "args": [
                 "tool",
-                "--dir", "test/data/multiqc", 
+                "--dir", "test/data/tools/multiqc", 
                 "--xml", "multiqc.xml",
             ]
         },
@@ -72,7 +72,7 @@
             "justMyCode": false,
             "args": [
                 "tool",
-                "--dir", "test/data/unicycler", 
+                "--dir", "test/data/tools/unicycler", 
                 "--xml", "unicycler.xml",
             ]
         },
@@ -85,7 +85,7 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/simple_workflow.ga"
+                "test/data/workflows/simple_workflow.ga"
             ]
         },
         

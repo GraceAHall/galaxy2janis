@@ -24,6 +24,7 @@ class TestCommandInference(unittest.TestCase):
         gxmanager: GalaxyManager = load_manager(esettings)
         self.tool: GalaxyToolDefinition = load_tool(gxmanager)
         self.command = infer_command(gxmanager, self.tool)
+        print()
 
     def test_command_positionals(self) -> None:
         cmd = self.command

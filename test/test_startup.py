@@ -11,11 +11,11 @@ from startup.ExeSettings import ToolExeSettings
 from runtime.exceptions import InputError
 
 
-LOCAL_CLI_OK = ["gxtool2janis.py", "tool", "--dir", "test/data/abricate", "--xml", "abricate.xml"]
+LOCAL_CLI_OK = ["gxtool2janis.py", "tool", "--dir", "test/data/tools/abricate", "--xml", "abricate.xml"]
 REMOTE_CLI_OK = ["gxtool2janis.py", "tool", "--remote_url", "https://toolshed.g2.bx.psu.edu/repos/devteam/fastqc/archive/e7b2202befea.tar.gz"]
 LOCAL_CLI_USER_INPUT_FAIL1 = ["gxtool2janis.py", "tool", "--xml", "abricate.xml"]
-LOCAL_CLI_USER_INPUT_FAIL2 = ["gxtool2janis.py", "--dir", "test/data/abricate", "--xml", "abricate.xml"]
-LOCAL_CLI_USER_FILES_FAIL = ["gxtool2janis.py", "tool", "--dir", "test/data/abricate", "--xml", "abricates.xml"]
+LOCAL_CLI_USER_INPUT_FAIL2 = ["gxtool2janis.py", "--dir", "test/data/tools/abricate", "--xml", "abricate.xml"]
+LOCAL_CLI_USER_FILES_FAIL = ["gxtool2janis.py", "tool", "--dir", "test/data/tools/abricate", "--xml", "abricates.xml"]
 
 
 class TestStartup(unittest.TestCase):
@@ -64,7 +64,7 @@ class TestToolExeSettings(unittest.TestCase):
         self.esettings: ToolExeSettings = load_tool_settings(self.args)  
 
     def test_get_xml_path(self) -> None:
-        true_path = 'test/data/abricate/abricate.xml'
+        true_path = 'test/data/tools/abricate/abricate.xml'
         esettings_xml_path = self.esettings.get_xml_path()
         self.assertEquals(true_path, esettings_xml_path)
     

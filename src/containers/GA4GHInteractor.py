@@ -6,9 +6,6 @@ import requests
 from requests import Response
 import json
 
-from tool.requirements import ContainerRequirement, CondaRequirement
-Requirement = ContainerRequirement | CondaRequirement
-
 
 class GA4CHInteractor:
 

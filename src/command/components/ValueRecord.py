@@ -84,7 +84,9 @@ class PositionalValueRecord(ValueRecord):
         return False
 
     def get_unique_values(self) -> list[str]:
-        return list(set([obsval.value for obsval in self.record]))
+        values = list(set([obsval.value for obsval in self.record]))
+        values.sort()
+        return values
 
 
 
@@ -118,6 +120,8 @@ class OptionValueRecord(ValueRecord):
 
     def get_unique_values(self) -> list[str]:
         str_vals = [' '.join(obsval.value) for obsval in self.record]
-        return list(set(str_vals))
+        str_vals = list(set(str_vals))
+        str_vals.sort()
+        return str_vals
 
 

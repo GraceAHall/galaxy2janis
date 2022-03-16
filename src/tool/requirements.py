@@ -1,5 +1,6 @@
 
 
+from abc import ABC
 from dataclasses import dataclass
 
 
@@ -12,9 +13,22 @@ EXAMPLE
 """
 
 
+@dataclass
+class Requirement(ABC):
+    """models a tool XML requirement"""
+
+    def get_text(self) -> str:
+        ...
+
+    def get_version(self) -> str:
+        ...
+    
+    def get_type(self) -> str:
+        ...
+
 
 @dataclass
-class CondaRequirement:
+class CondaRequirement(Requirement):
     name: str
     version: str
 
@@ -23,11 +37,15 @@ class CondaRequirement:
 
     def get_version(self) -> str:
         return self.version
+    
+    def get_type(self) -> str:
+        return 'conda'
 
 
 @dataclass
-class ContainerRequirement:
+class ContainerRequirement(Requirement):
     uri: str
+    container_type: str
 
     def get_text(self) -> str:
         return self.uri
@@ -35,6 +53,8 @@ class ContainerRequirement:
     def get_version(self) -> str:
         raise NotImplementedError
 
+    def get_type(self) -> str:
+        return self.container_type
 
 
 

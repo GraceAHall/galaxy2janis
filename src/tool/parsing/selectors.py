@@ -47,7 +47,7 @@ class FallbackStrategy(Strategy):
     def fetch(self, gxout: GxOutput) -> Selector:
         return Selector(
             SelectorType.INPUT_SELECTOR, 
-            '$' + str(gxout.name)
+            str(gxout.name)
         )
 
 

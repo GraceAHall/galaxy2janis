@@ -83,8 +83,8 @@ class Redirect:
         return None
 
     def get_datatype(self) -> list[str]:
-        if self.file.gxvar:
-            return self.file.gxvar.datatypes
+        if self.gxvar:
+            return self.gxvar.datatypes
         return ['File']  # TODO what is the fallback type? 
     
     def is_optional(self) -> bool:
@@ -92,9 +92,9 @@ class Redirect:
         return False
 
     def is_array(self) -> bool:
-        match self.file.gxvar:
+        match self.gxvar:
             case CollectionOutputParam() | DataOutputParam():
-                return self.file.gxvar.is_array()
+                return self.gxvar.is_array()
             case _:
                 pass
         return False

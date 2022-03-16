@@ -1,17 +1,14 @@
 
 
+from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Optional
 from containers.GA4GHInteractor import GA4CHInteractor
 from containers.VersionMatcher import VersionMatcher
 from utils.general_utils import global_align
 
-from tool.tool_definition import GalaxyToolDefinition
 from containers.Container import Container
-from tool.requirements import ContainerRequirement, CondaRequirement
-
-
-Requirement = ContainerRequirement | CondaRequirement
+from tool.requirements import Requirement
 
 @dataclass
 class SimilarityScore:
@@ -19,52 +16,67 @@ class SimilarityScore:
     obj: Any
 
 
-class ContainerFetcher:
+class BiocontainerFetcher(ABC):
     """
-    container is specified differently for 'package' and 'container' requirements
-    if no requirements, uses the tool id and tool version to guess a container
-    
-    main 'tool' requirement is guessed in a Metadata() instance on the Tool() class
-    
     ga4gh is searched for the most recent container build which matches the name and version
 
     individual builds not supported, except in the case of of 'container' requirements as it just directly grabs the url from the requirement text 
     """
-    def __init__(self, tool: GalaxyToolDefinition) -> None:
-        self.tool = tool
-        self.requirement = tool.metadata.get_main_requirement()
+    def __init__(self) -> None:
         self.ga4gh_interactor = GA4CHInteractor()
         self.version_matcher = VersionMatcher()
 
-    def fetch(self) -> Optional[Container]:
-        match self.requirement:
-            case CondaRequirement():
-                return self.get_biocontainer_by_package()
-            case ContainerRequirement():
-                return self.get_biocontainer_by_container()
-            case _:
-                raise RuntimeError()
+    def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
+        """finds a relevant biocontainer for a given tool requirement"""
+        ...
 
-    def get_biocontainer_by_package(self) -> Optional[Container]:
+
+class ContainerBiocontainerFetcher(BiocontainerFetcher):
+    
+    def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
+        return Container(
+            galaxy_id=tool_id,
+            galaxy_version=tool_version,
+            url=requirement.get_text(),
+            image_type=requirement.get_type(),
+            registry_host=requirement.get_text().split('/', 1)[0]
+        )
+
+
+class CondaBiocontainerFetcher(BiocontainerFetcher):
+
+    def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
         # get tool information from api request
+        self.set_attributes(tool_id, tool_version, requirement)
         query_name = self.requirement.get_text()
-        results = self.ga4gh_interactor.search(tool=query_name)
-        
-        if results:
-            tool_data = self.select_most_similar_tool(results)
-            version = self.select_most_similar_version(tool_data)
-            tool_version_data = self.ga4gh_interactor.search(version=version)
+        api_results = self.ga4gh_interactor.search(tool=query_name)
+
+        if api_results:
+            tool_version_data = self.get_tool_version_data(api_results)
 
             if tool_version_data:
                 image = self.select_image(tool_version_data)
                 return Container(
-                    tool=self.tool.metadata.id,
-                    version=self.tool.metadata.version,
+                    galaxy_id=self.tool_id,
+                    galaxy_version=self.tool_version,
                     url=image['image_name'],
                     image_type=image['image_type'],
                     registry_host=image['registry_host'],
+                    requirement_id=self.requirement.get_text(),
+                    requirement_version=self.requirement.get_version()
                 )
+
         return None
+
+    def set_attributes(self, tool_id: str, tool_version: str, requirement: Requirement) -> None:
+        self.tool_id = tool_id
+        self.tool_version = tool_version
+        self.requirement = requirement
+
+    def get_tool_version_data(self, api_results: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
+        tool_data = self.select_most_similar_tool(api_results)
+        version = self.select_most_similar_version(tool_data)
+        return self.ga4gh_interactor.search(version=version)
     
     def select_most_similar_tool(self, api_results: list[dict[str, Any]]) -> dict[str, Any]:
         """returns data for the api tool result most similar to the query tool name"""
@@ -100,7 +112,5 @@ class ContainerFetcher:
                 return image
         return images[0]
 
-    def get_biocontainer_by_container(self) -> Optional[Container]:
-        raise NotImplementedError()
         
 

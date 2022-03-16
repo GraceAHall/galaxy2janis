@@ -17,11 +17,13 @@ class ContainerCache:
         cache = self._load_cache()
         cdict = cache[tool][version]
         return Container(
-            tool= cdict['tool'],
-            version= cdict['version'],
-            url= cdict['url'],
-            image_type= cdict['image_type'],
-            registry_host= cdict['registry_host'],
+            galaxy_id=cdict['galaxy_id'],
+            galaxy_version=cdict['galaxy_version'],
+            url=cdict['url'],
+            image_type=cdict['image_type'],
+            registry_host=cdict['registry_host'],
+            requirement_id= cdict['requirement_id'],
+            requirement_version= cdict['requirement_version']
         )
 
     def exists(self, tool: str, version: str) -> bool:
@@ -33,14 +35,14 @@ class ContainerCache:
 
     def add(self, container: Container, override: bool=False):
         cache = self._load_cache()
-        tool = container.tool
-        version = container.version
-        if tool not in cache:
-            cache[tool] = {}
-        if version not in cache[tool]:
-            cache[tool][version] = container.__dict__
+        galaxy_id = container.galaxy_id
+        galaxy_version = container.galaxy_version
+        if galaxy_id not in cache:
+            cache[galaxy_id] = {}
+        if galaxy_version not in cache[galaxy_id]:
+            cache[galaxy_id][galaxy_version] = container.__dict__
         elif override:
-            cache[tool][version] = container.__dict__
+            cache[galaxy_id][galaxy_version] = container.__dict__
         self._write_cache(cache)
 
     def _load_cache(self) -> dict[str, Any]:
