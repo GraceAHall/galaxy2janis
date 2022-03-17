@@ -2,9 +2,10 @@
 ALL = r'.+'
 
 QUOTES = r'[\'"]'
-QUOTED_SECTIONS = r'"(.*?)"|\'(.*?)\''
+QUOTED_SECTIONS = r'"([^\"]*?)"|\'([^\']*?)\''
 QUOTED_STRINGS = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")'
 QUOTED_NUMBERS = r'[\'"](?<!\w)(-?\d+(\.\d+)?)(?!\d)[\'"]'
+QUOTED_SECTION_W_NEWLINE = r'\'[^\']*?\n[^\']*?\'|"[^"]*?\n[^"]*?"'
 
 RAW_NUMBERS = r'(?<=\s|^)-?\.?\d+(\.\d*)?(?=\s|$)'
 RAW_STRINGS = r'(?<=\s|^)([\/\\\w\d-.*`])[-\w\d\{\}\$.\/\\_:*`]*(?=\s|$)'

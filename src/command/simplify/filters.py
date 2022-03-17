@@ -5,6 +5,16 @@ import re
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 
+def flatten_multiline_strings(cmdstr: str) -> str:
+    matches = scanners.get_quoted_sections(cmdstr)
+    for match in matches:
+        if '\n' in match[0]:
+            old_section = match[0]
+            new_section = match[0].replace('\n', ' ')
+            cmdstr = cmdstr.replace(old_section, new_section)
+            print(f'removing a multiline string: \n{old_section}')
+    return cmdstr
+
 def translate_variable_markers(cmdstr: str) -> str:
     return cmdstr.replace("gxvar_", "$")
 

@@ -1,6 +1,6 @@
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 
@@ -16,13 +16,15 @@ EXAMPLE
 @dataclass
 class Requirement(ABC):
     """models a tool XML requirement"""
-
+    @abstractmethod
     def get_text(self) -> str:
         ...
 
+    @abstractmethod
     def get_version(self) -> str:
         ...
     
+    @abstractmethod
     def get_type(self) -> str:
         ...
 

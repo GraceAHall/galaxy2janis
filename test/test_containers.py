@@ -78,6 +78,7 @@ class TestContainerFetching(unittest.TestCase):
         self.assertEquals(container, SIMPLE_CONTAINER)
 
     def tearDown(self) -> None:
-        os.remove(self.temp_cache_dir)
+        if os.path.exists(self.temp_cache_dir):
+            os.remove(self.temp_cache_dir)
         
 

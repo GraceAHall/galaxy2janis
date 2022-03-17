@@ -2,7 +2,7 @@
 
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
@@ -24,6 +24,7 @@ class Selector:
 
 
 class Strategy(ABC):
+    @abstractmethod
     def fetch(self, gxout: GxOutput) -> Selector:
         """creates Selector for this galaxy output"""
         ...

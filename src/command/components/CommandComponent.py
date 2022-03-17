@@ -1,7 +1,7 @@
 
 
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Optional, Protocol
 from tool.param.Param import Param
 
@@ -42,6 +42,7 @@ class BaseCommandComponent(ABC):
     presence_array: list[bool]
     stage: str
     
+    @abstractmethod
     def update(self, incoming: Any):
         """
         updates this component with information from another similar component. 
@@ -70,6 +71,7 @@ class BaseCommandComponent(ABC):
             else:
                 self.presence_array.append(True)
     
+    @abstractmethod
     def get_default_value(self) -> Any:
         """
         gets the default value of the component.
@@ -78,10 +80,12 @@ class BaseCommandComponent(ABC):
         """
         ...
 
+    @abstractmethod
     def get_datatype(self) -> list[str]:
         """returns the components datatype"""
         ...
     
+    @abstractmethod
     def is_optional(self) -> bool:
         """
         returns whether the component is optional or not.
@@ -89,6 +93,7 @@ class BaseCommandComponent(ABC):
         """
         ...
 
+    @abstractmethod
     def is_array(self) -> bool:
         """
         returns whether the component is an array or not
@@ -97,6 +102,7 @@ class BaseCommandComponent(ABC):
         """
         ...
 
+    @abstractmethod
     def get_docstring(self) -> Optional[str]:
         """
         gets helptext for the component. uses galaxy param if available,

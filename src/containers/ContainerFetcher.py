@@ -1,6 +1,6 @@
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 from containers.GA4GHInteractor import GA4CHInteractor
@@ -26,6 +26,7 @@ class BiocontainerFetcher(ABC):
         self.ga4gh_interactor = GA4CHInteractor()
         self.version_matcher = VersionMatcher()
 
+    @abstractmethod
     def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
         """finds a relevant biocontainer for a given tool requirement"""
         ...

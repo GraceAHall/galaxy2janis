@@ -11,7 +11,7 @@ from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifie
 from command.alias.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
 from command.cmdstr.utils import global_align
-
+from command.regex.utils import get_quoted_sections
 
 class DynamicCommandString:
     def __init__(self, source: str, statements: list[CommandStatement], metadata: Metadata):
@@ -63,6 +63,40 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
     splits a string into individual command line statements.
     these are delimited by &&, ||, | etc
     """
+    statements: list[str] = []
+    delims: list[Optional[str]] = []
+
+    quoted_sections = get_quoted_sections(the_string)
+    delim_matches = get_statement_delims(the_string)
+    delim_matches.sort(key=lambda x: x.start())
+
+    for m in reversed(delim_matches):
+        if quoted_sections[m.start()] == False and quoted_sections[m.end()] == False:
+            delim: str = m[0]
+            left_split = the_string[:m.start()]
+            right_split = the_string[m.end():]
+
+            # working in reverse, so prepend new statements and delims
+            statements = [right_split] + statements
+            delims = [delim] + delims # type: ignore
+
+            # update the string to only be to the left of the split
+            the_string = left_split
+
+    # add final remaining statment (actually is the first statement)
+    # add a None to the end of delims to shift the alignment of stmts and delims
+    # last statement doesnt have trailing delim as command ends
+    statements = [the_string] + statements
+    delims.append(None)
+
+    return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
+
+def split_to_statements_old(the_string: str) -> list[CommandStatement]:
+    """
+    splits a string into individual command line statements.
+    these are delimited by &&, ||, | etc
+    """
+    # TODO HERE
     statements: list[str] = []
     delims: list[Optional[str]] = []
 

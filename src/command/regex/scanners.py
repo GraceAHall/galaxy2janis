@@ -6,6 +6,8 @@ import regex as re
 from command.regex.expressions import (
     QUOTED_STRINGS, 
     QUOTED_NUMBERS, 
+    QUOTED_SECTIONS,
+    QUOTED_SECTION_W_NEWLINE,
     RAW_NUMBERS, 
     RAW_STRINGS, 
     SIMPLE_STRINGS, 
@@ -22,8 +24,17 @@ from command.regex.expressions import (
     ALL
 )
 
+
 def get_all(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(ALL, the_string)
+    return [m for m in matches]
+
+def get_quoted_sections(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(QUOTED_SECTIONS, the_string)
+    return [m for m in matches]
+
+def get_quoted_sections_w_newline(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(QUOTED_SECTION_W_NEWLINE, the_string)
     return [m for m in matches]
 
 def get_custom(pattern: str, the_string: str) -> list[re.Match[str]]:

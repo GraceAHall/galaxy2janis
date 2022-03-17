@@ -5,12 +5,12 @@ fill_template() in __build_command_line() actually tempates galaxy tool
 read galaxy src for logging pattern
 
 
-logging
-currently reporting:
+WORKFLOWS
+- read galaxy source to uncover how connections are created
 
 
-test running
 
+- workflow skeleton
 
 
 

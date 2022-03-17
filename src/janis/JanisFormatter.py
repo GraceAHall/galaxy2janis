@@ -17,7 +17,7 @@ from command.components.Positional import Positional
 
 from janis.DatatypeRegister import DatatypeRegister
 from janis.ImportHandler import ImportHandler
-from janis.TagValidator import TagValidator
+from janis.TagFormatter import TagFormatter
 from tool.parsing.selectors import Selector, SelectorType
 
 from janis.formatting_snippets import (
@@ -39,7 +39,7 @@ class JanisFormatter:
     def __init__(self, esettings: ToolExeSettings):
         self.datatype_formatter = DatatypeRegister(esettings)
         self.import_handler = ImportHandler(self.datatype_formatter)
-        self.tag_validator = TagValidator()
+        self.tag_formatter = TagFormatter()
 
     def format_path_appends(self) -> str:
         return path_append_snippet
@@ -68,9 +68,10 @@ class JanisFormatter:
         return out_str
    
     def format_positional(self, pos: int, positional: Positional) -> str:
+        tag = self.tag_formatter.format(positional.get_name(), positional.get_datatype()[0])
         datatype = self.datatype_formatter.get(component=positional)
         return tool_input_snippet(
-            tag=self.tag_validator.format_name(positional.get_name()),
+            tag=tag,
             datatype=datatype,
             position=pos,
             doc=positional.get_docstring()
@@ -79,7 +80,7 @@ class JanisFormatter:
     def format_flag(self, pos: int, flag: Flag) -> str:
         datatype = self.datatype_formatter.get(component=flag)
         return tool_input_snippet(
-            tag=self.tag_validator.format_prefix(flag.prefix),
+            tag=self.tag_formatter.format(flag.prefix, flag.get_datatype()[0]),
             datatype=datatype,
             position=pos,
             prefix=flag.prefix,
@@ -93,7 +94,7 @@ class JanisFormatter:
             if 'Int' not in datatype and 'Float' not in datatype:
                 default = f'"{default}"'
         return tool_input_snippet(
-            tag=self.tag_validator.format_prefix(opt.prefix),
+            tag=self.tag_formatter.format(opt.prefix, opt.get_datatype()[0]),
             datatype=datatype,
             position=pos,
             prefix=opt.prefix if opt.delim == ' ' else opt.prefix + opt.delim,
@@ -123,7 +124,7 @@ class JanisFormatter:
         return out_str
 
     def format_output_param(self, param: Param) -> str:
-        name = self.tag_validator.format_name(param.name)
+        name = self.tag_formatter.format(param.name, param.datatypes[0])
         datatype = self.datatype_formatter.get(param=param)
         stype: Optional[str] = None
         scontents: Optional[str] = None
@@ -164,7 +165,7 @@ class JanisFormatter:
                 name = component.get_name()  
             case _:
                 pass
-        return self.tag_validator.format_name(name)
+        return self.tag_formatter.format(name, component.get_datatype()[0])
 
     def format_selector(self, component: CommandComponent, output_name: str) -> Optional[Selector]:
         if not isinstance(component, Redirect):
@@ -177,7 +178,7 @@ class JanisFormatter:
     def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
         base_positionals = command.get_base_positionals()
         base_command = [p.get_default_value() for p in base_positionals]
-        name: str = self.tag_validator.format_name(tool.metadata.id)
+        name: str = self.tag_formatter.format(tool.metadata.id)
 
         return command_tool_builder_snippet(
             toolname=name,
@@ -188,7 +189,7 @@ class JanisFormatter:
         )
 
     def format_translate_func(self, tool: GalaxyToolDefinition) -> str:
-        name: str = self.tag_validator.format_name(tool.metadata.id)
+        name: str = self.tag_formatter.format(tool.metadata.id)
         return translate_snippet(name)
 
     def format_imports(self) -> str:

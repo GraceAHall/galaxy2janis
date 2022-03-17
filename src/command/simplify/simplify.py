@@ -3,6 +3,7 @@
 from typing import Callable
 
 from command.simplify.filters import (
+    flatten_multiline_strings,
     translate_variable_markers,
     standardise_variable_format,
     simplify_sh_constructs,
@@ -35,6 +36,7 @@ class TestCommandSimplifier(CommandSimplifier):
 
 class XMLCommandSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
+        flatten_multiline_strings,
         standardise_variable_format,
         simplify_sh_constructs,
         simplify_galaxy_static_vars,

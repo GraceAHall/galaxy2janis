@@ -8,8 +8,8 @@ from startup.ExeSettings import WorkflowExeSettings
 
 
 from parse_tool import parse_tool
-from workflows.Step import ToolStep
-from workflows.WorkflowInteractor import WorkflowInteractor
+from workflows.step.Step import ToolStep
+from workflows.workflow.WorkflowInteractor import WorkflowInteractor
 
 
 """
@@ -22,9 +22,9 @@ def parse_workflow(args: dict[str, Optional[str]]):
     interactor: WorkflowInteractor = WorkflowInteractor()
     interactor.load_workflow(esettings.get_workflow_path())
 
-    for step in interactor.iter_tool_steps():
-        args = make_parse_tool_args(step, esettings)
-        parse_tool(args)
+    # for step in interactor.get_tool_steps():
+    #     args = make_parse_tool_args(step, esettings)
+    #     parse_tool(args)
     
     print('done')
 

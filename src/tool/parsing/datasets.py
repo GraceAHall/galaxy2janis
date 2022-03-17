@@ -1,12 +1,13 @@
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 from tool.param.InputRegister import InputRegister
 
 
 # helper classes 
 class FetchStrategy(ABC):
+    @abstractmethod
     def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
         """gets the datatype associated with this galaxy output"""
         ...
