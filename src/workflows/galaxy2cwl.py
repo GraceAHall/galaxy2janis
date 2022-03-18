@@ -206,8 +206,8 @@ def process_format2_yaml(wf_dict):
                 step_connection_inputs[step_in] = full_source_name
 
             step_in_details['type']='File'   ## Operation inputs and outputs MUST have a type
-            step_in_details['format']='Any' #Need to complete from tool info'   ## Operation inputs and outputs SHOULD have a format and doc
-            # step_in_details['doc']='Need to complete from tool info'   ## Operation inputs and outputs SHOULD have a format and doc
+            step_in_details['format']='Any' #Need to complete from xmltool info'   ## Operation inputs and outputs SHOULD have a format and doc
+            # step_in_details['doc']='Need to complete from xmltool info'   ## Operation inputs and outputs SHOULD have a format and doc
             step_inputs[step_in]=step_in_details
         step_run['inputs'] = step_inputs
         step_details['in'] = step_connection_inputs
@@ -219,8 +219,8 @@ def process_format2_yaml(wf_dict):
             for step_out in step['out']:
                 step_out_details={}
                 step_out_details['type']='File' ## Operation inputs and outputs MUST have a type
-                #step_out_details['doc']='Need to complete from tool info'  ## Operation inputs and outputs SHOULD have a format and doc
-                #step_out_details['format']='Need to complete from tool info' ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['doc']='Need to complete from xmltool info'  ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['format']='Need to complete from xmltool info' ## Operation inputs and outputs SHOULD have a format and doc
                 #step_out_details['outputSource']=         Not sure this makes sense to include
                 step_outputs[step_out]=step_out_details
                 step_outputs_list.append(step_out)
@@ -229,8 +229,8 @@ def process_format2_yaml(wf_dict):
             for global_out in global_outputs[corrected_step_index]:
                 step_out_details = {}
                 step_out_details['type']='File' ## Operation inputs and outputs MUST have a type
-                #step_out_details['doc']='Need to complete from tool info'  ## Operation inputs and outputs SHOULD have a format and doc
-                #step_out_details['format']='Need to complete from tool info' ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['doc']='Need to complete from xmltool info'  ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['format']='Need to complete from xmltool info' ## Operation inputs and outputs SHOULD have a format and doc
                 #step_out_details['outputSource']=         Not sure this makes sense to include
                 step_outputs[global_out]=step_out_details
                 step_outputs_list.append(global_out)
@@ -240,8 +240,8 @@ def process_format2_yaml(wf_dict):
             for global_out in global_outputs[step_name]:
                 step_out_details = {}
                 step_out_details['type']='File' ## Operation inputs and outputs MUST have a type
-                #step_out_details['doc']='Need to complete from tool info'  ## Operation inputs and outputs SHOULD have a format and doc
-                #step_out_details['format']='Need to complete from tool info' ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['doc']='Need to complete from xmltool info'  ## Operation inputs and outputs SHOULD have a format and doc
+                #step_out_details['format']='Need to complete from xmltool info' ## Operation inputs and outputs SHOULD have a format and doc
                 #step_out_details['outputSource']=         Not sure this makes sense to include
                 step_outputs[global_out]=step_out_details
                 step_outputs_list.append(global_out)

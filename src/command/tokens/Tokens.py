@@ -6,7 +6,7 @@ from enum import Enum, auto
 from typing import Optional
 import regex as re
 
-from tool.param.Param import Param
+from xmltool.param.Param import Param
 
 class TokenType(Enum):
     GX_INPUT        = auto()

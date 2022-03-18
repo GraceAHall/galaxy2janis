@@ -4,7 +4,7 @@
 from command.components.Flag import Flag
 from command.components.Option import Option
 from command.tokens.Tokens import Token, TokenType
-from tool.param.InputParam import BoolParam, SelectParam
+from xmltool.param.InputParam import BoolParam, SelectParam
 
 
 NON_VALUE_TOKENTYPES = set([

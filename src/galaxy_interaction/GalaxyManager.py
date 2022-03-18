@@ -3,13 +3,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from tool.tool_definition import GalaxyToolDefinition
+    from xmltool.tool_definition import XMLToolDefinition
 
 import os
 import tempfile
 import packaging.version
 
-from typing import Optional, Tuple
+from typing import Optional
 
 from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.parser import get_tool_source
@@ -19,8 +19,8 @@ from galaxy.model import History
 from galaxy_interaction.mock import MockApp, MockObjectStore
 from startup.ExeSettings import ToolExeSettings
 
-from galaxy_interaction.cmdstrings.test_commands.TestCommandLoader import TestCommandLoader
-from galaxy_interaction.cmdstrings.xml_commands.XMLCommandLoader import XMLCommandLoader
+from galaxy_interaction.cmdstrings.loaders.TestCommandLoader import TestCommandLoader
+from galaxy_interaction.cmdstrings.loaders.XMLCommandLoader import XMLCommandLoader
 
 
 
@@ -39,7 +39,7 @@ class GalaxyManager:
         self.esettings = esettings
         self.history = History()  
         self.app: Optional[MockApp] = None
-        self.tool: Optional[GxTool] = None
+        self.gxtool: Optional[GxTool] = None
 
     def get_app(self) -> MockApp:
         if self.app:
@@ -49,42 +49,37 @@ class GalaxyManager:
         return self.app
 
     def get_tool(self) -> GxTool:
-        if self.tool:
-            return self.tool
+        if self.gxtool:
+            return self.gxtool
         else:
-            self.tool = self._init_tool()
-        return self.tool
+            self.gxtool = self._init_tool()
+        return self.gxtool
 
-    def get_raw_cmdstrs(self, tooldef: GalaxyToolDefinition) -> list[Tuple[str, str]]:
-        test_cmds = self._get_test_commands(tooldef)
-        xml_cmds = self._get_xml_commands(tooldef)
-        #workflow_cmds = self._get_workflow_command()
+    # def get_raw_cmdstrs(self, tooldef: XMLToolDefinition) -> list[Tuple[str, str]]:
+    #     test_cmds = self._get_test_commands(tooldef)
+    #     xml_cmds = self._get_xml_commands(tooldef)
+    #     #workflow_cmds = self._get_workflow_command()
 
-        out: list[Tuple[str, str]] = []
-        out += [('xml', cmdstr) for cmdstr in xml_cmds]
-        out += [('test', cmdstr) for cmdstr in test_cmds]
-        #out += [('workflow', cmdstr) for cmdstr in workflow_cmds]
-        return out
+    #     out: list[Tuple[str, str]] = []
+    #     out += [('xml', cmdstr) for cmdstr in xml_cmds]
+    #     out += [('test', cmdstr) for cmdstr in test_cmds]
+    #     #out += [('workflow', cmdstr) for cmdstr in workflow_cmds]
+    #     return out
 
-    def _get_test_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
+    def get_test_cmdstrs(self, tooldef: XMLToolDefinition) -> list[str]:
         app = self.get_app()
         gxtool = self.get_tool()
         tcl = TestCommandLoader(app, self.history, gxtool, tooldef, self.esettings)
-        cmdstrs = [tcl.load(test) for test in gxtool.tests]
-        cmdstrs = [s for s in cmdstrs if s is not None]
-        # for cmdstr in cmdstrs:
-        #     print(cmdstr)
-        #     print()
-        return cmdstrs
+        test_cmdstrs = [tcl.load(test) for test in gxtool.tests]
+        valid_cmdstrs = [s for s in test_cmdstrs if s is not None]
+        return valid_cmdstrs
 
-    def _get_xml_commands(self, tooldef: GalaxyToolDefinition) -> list[str]:
+    def get_xml_cmdstr(self, tooldef: XMLToolDefinition) -> str:
         # create DynamicCommandString for tooldef.command
         xcl = XMLCommandLoader(tooldef)
-        cmdstrs = [xcl.load()]
-        cmdstrs = [s for s in cmdstrs if s is not None]
-        return cmdstrs
+        return xcl.load()
 
-    def _get_workflow_command(self) -> None:
+    def get_workflow_cmdstr(self, tooldef: XMLToolDefinition) -> str:
         raise NotImplementedError
         
     def _init_app(self) -> MockApp:

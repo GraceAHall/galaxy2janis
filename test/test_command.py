@@ -10,7 +10,7 @@ from data.tool_args import passing_tools
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
-from tool.load import load_tool, GalaxyToolDefinition
+from xmltool.load import load_xmltool, XMLToolDefinition
 
 from command.infer import infer_command
 
@@ -22,8 +22,8 @@ class TestCommandInference(unittest.TestCase):
         args = passing_tools['abricate']
         esettings: ToolExeSettings = load_tool_settings(args) 
         gxmanager: GalaxyManager = load_manager(esettings)
-        self.tool: GalaxyToolDefinition = load_tool(gxmanager)
-        self.command = infer_command(gxmanager, self.tool)
+        self.xmltool: XMLToolDefinition = load_xmltool(gxmanager)
+        self.command = infer_command(gxmanager, self.xmltool)
         print()
 
     def test_command_positionals(self) -> None:
@@ -119,8 +119,8 @@ class TestCommandInference(unittest.TestCase):
 #         args = passing_tools['abricate']
 #         esettings: ToolExeSettings = load_tool_settings(args) 
 #         gxmanager: GalaxyManager = load_manager(esettings)
-#         tool: GalaxyToolDefinition = load_tool(gxmanager)
-#         self.factory = DynamicCommandStringFactory(tool)
+#         xmltool: XMLToolDefinition = load_xmltool(gxmanager)
+#         self.factory = DynamicCommandStringFactory(xmltool)
 
 #     def test_basic_overall_creation(self) -> None:
 #         cmdstr = self.factory.create('test', RAW_CMDSTR)

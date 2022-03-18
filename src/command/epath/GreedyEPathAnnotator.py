@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Tuple
 
 from command.epath.ExecutionPath import ExecutionPath
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 from command.tokens.Tokens import Token, TokenType
 
 from command.Command import Command
@@ -39,9 +39,9 @@ at token 3, we would return {
 
 
 class GreedyEPathAnnotator:
-    def __init__(self, epath: ExecutionPath, tool: GalaxyToolDefinition, command: Command):
+    def __init__(self, epath: ExecutionPath, xmltool: XMLToolDefinition, command: Command):
         self.epath = epath 
-        self.tool = tool
+        self.xmltool = xmltool
         self.command = command
         self.pos = 0
 
@@ -51,7 +51,7 @@ class GreedyEPathAnnotator:
         return self.epath
         
     def annotate_via_param_args(self) -> None:
-        arguments: list[str] = [param.argument for param in self.tool.list_inputs() if param.argument]
+        arguments: list[str] = [param.argument for param in self.xmltool.list_inputs() if param.argument]
         for arg in arguments:
             self.pos = 0 # reset
             while self.pos < len(self.epath.positions) - 1:

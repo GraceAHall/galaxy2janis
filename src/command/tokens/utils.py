@@ -4,8 +4,8 @@
 from typing import Tuple
 
 from command.tokens.Tokens import Token, TokenType
-from tool.param.OutputRegister import OutputRegister
-from tool.param.ParamRegister import ParamRegister 
+from xmltool.param.OutputRegister import OutputRegister
+from xmltool.param.ParamRegister import ParamRegister 
 from command.regex.utils import (
 
     find_unquoted

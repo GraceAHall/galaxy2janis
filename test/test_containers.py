@@ -7,7 +7,7 @@ import unittest
 from containers.Container import Container
 from containers.ContainerFetcher import CondaBiocontainerFetcher
 from containers.ContainerCache import ContainerCache
-from tool.requirements import CondaRequirement
+from xmltool.requirements import CondaRequirement
 
 SIMPLE_GXTOOL_ID = 'abricate'
 SIMPLE_GXTOOL_VERSION = '1.0.1'

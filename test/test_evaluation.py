@@ -7,7 +7,7 @@ from data.tool_args import passing_tools
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
-from tool.load import load_tool, GalaxyToolDefinition
+from xmltool.load import load_xmltool, XMLToolDefinition
 
 
 
@@ -28,7 +28,7 @@ class TestToolEvaluation(unittest.TestCase):
     tests the galaxy tool evaluation / templating system
     tests:
         mock objects are correctly set up
-        job dict created correctly from tool params, inputs, outputs
+        job dict created correctly from xmltool params, inputs, outputs
         (JobFactory working as intended)
         galaxy objects like app, job, evaluator are created successfully
         output is expected from the above process
@@ -38,9 +38,8 @@ class TestToolEvaluation(unittest.TestCase):
         args = passing_tools['abricate']
         esettings: ToolExeSettings = load_tool_settings(args) 
         gxmanager: GalaxyManager = load_manager(esettings)
-        tool: GalaxyToolDefinition = load_tool(gxmanager)
-        cmdlines = gxmanager.get_raw_cmdstrs(tool)
-        cmdlines = [cstr[1] for cstr in cmdlines if cstr[0] == 'test']
+        xmltool: XMLToolDefinition = load_xmltool(gxmanager)
+        cmdlines = gxmanager.get_test_cmdstrs(xmltool)
         for cmdline in cmdlines:
             self.assertTrue(cmdline in abricate_test_cmdlines)
     

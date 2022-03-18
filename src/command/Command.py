@@ -9,8 +9,8 @@ from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.linux_constructs import Redirect
 from command.components.CommandComponent import CommandComponent
-from tool.param.OutputParam import OutputParam
-from tool.param.Param import Param
+from xmltool.param.OutputParam import OutputParam
+from xmltool.param.Param import Param
 
 
 

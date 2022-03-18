@@ -5,24 +5,24 @@ from typing import Optional
 from containers.ContainerCache import ContainerCache
 from startup.ExeSettings import ToolExeSettings
 from runtime.Logger import Logger
-from tool.requirements import Requirement, CondaRequirement, ContainerRequirement
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
+from xmltool.tool_definition import XMLToolDefinition
 from containers.Container import Container
 from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
 
 
-def fetch_container(esettings: ToolExeSettings, logger: Logger, tool: GalaxyToolDefinition) -> Optional[Container]:
+def fetch_container(esettings: ToolExeSettings, logger: Logger, xmltool: XMLToolDefinition) -> Optional[Container]:
     cache: ContainerCache = load_cache(esettings.get_container_cache_path())
-    tool_id = tool.metadata.id
-    tool_version = tool.metadata.version
-    main_requirement = tool.metadata.get_main_requirement()
+    tool_id = xmltool.metadata.id
+    tool_version = xmltool.metadata.version
+    main_requirement = xmltool.metadata.get_main_requirement()
     if cache.exists(tool_id, tool_version):
         container = cache.get(tool_id, tool_version)
     else:
         fetcher = get_fetcher(main_requirement)
         container = fetcher.fetch(
-            tool_id=tool.metadata.id,
-            tool_version=tool.metadata.version,
+            tool_id=xmltool.metadata.id,
+            tool_version=xmltool.metadata.version,
             requirement=main_requirement
         )
         if container:

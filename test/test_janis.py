@@ -4,7 +4,7 @@
 import unittest
 import os
 
-from mock.MOCK_TOOL_ESETTINGS import MOCK_TOOL_ESETTINGS
+from mock.mock_esettings import MOCK_TOOL_ESETTINGS
 from mock.mock_tool import MOCK_TOOL
 from mock.mock_command import MOCK_COMMAND
 from mock.mock_container import MOCK_CONTAINER

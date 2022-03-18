@@ -3,9 +3,10 @@
 from copy import deepcopy
 from typing import Iterable, Optional
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 from command.tokens.RealisedTokenValues import RealisedTokenValueifier, RealisedTokenValues
 from command.epath.ExecutionPath import ExecutionPath
+
 
 class CommandStatement:
     """
@@ -31,8 +32,8 @@ class CommandStatement:
         self.end_delim = end_delim
         self.tokens: list[RealisedTokenValues] = []
 
-    def set_tokens(self, tool: GalaxyToolDefinition) -> None:
-        self.tokens = RealisedTokenValueifier(tool).tokenify(self.cmdline)
+    def set_tokens(self, xmltool: XMLToolDefinition) -> None:
+        self.tokens = RealisedTokenValueifier(xmltool).tokenify(self.cmdline)
 
     def get_execution_paths(self) -> Iterable[ExecutionPath]:
         """

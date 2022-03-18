@@ -4,8 +4,8 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import Any, Optional
 from command.tokens.Tokens import Token
-from tool.param.OutputParam import DataOutputParam, CollectionOutputParam
-from tool.param.Param import Param
+from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
+from xmltool.param.Param import Param
 from command.components.ValueRecord import PositionalValueRecord
 
 class Stream(Enum):

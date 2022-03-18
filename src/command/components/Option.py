@@ -2,9 +2,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
-from tool.param.InputParam import SelectParam
+from xmltool.param.InputParam import SelectParam
 
-from tool.param.Param import Param
+from xmltool.param.Param import Param
 from command.components.ValueRecord import OptionValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 

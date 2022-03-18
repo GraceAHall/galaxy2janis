@@ -35,6 +35,8 @@ class OpenCloseSegment:
     closing: set[str] 
 
 class ConstructTracker:
+    active_line: str 
+
     def __init__(self):
         # default segments to track
         self.segments: list[OpenCloseSegment] = [
@@ -45,6 +47,7 @@ class ConstructTracker:
         self.segment_levels: dict[str, int] = {s.name: 0 for s in self.segments}
     
     def update(self, line: str):
+        self.active_line = line
         for segment in self.segments:
             if any ([line.startswith(openstr) for openstr in segment.opening]):
                 self.segment_levels[segment.name] += 1
@@ -54,14 +57,11 @@ class ConstructTracker:
     def get_levels(self) -> dict[str, int]:
         return self.segment_levels
 
-    def should_kvexpand_line(self, line: str) -> bool:
-        if self.is_construct_line(line):
-            return False
-        return True
-
-    def should_tokenify_line(self, line: str) -> bool:
-        if self.is_construct_line(line) or self.in_banned_segment():
-            return False
+    def is_within_construct(self) -> bool:
+        level_counts = self.segment_levels.values()
+        if all([count == 0 for count in level_counts]):
+            if not self.is_construct_line(self.active_line):
+                return False
         return True
 
     def is_construct_line(self, line: str) -> bool:

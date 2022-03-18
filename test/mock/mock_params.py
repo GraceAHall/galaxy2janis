@@ -2,14 +2,14 @@
 
 
 
-from tool.param.InputParam import (
+from xmltool.param.InputParam import (
     BoolParam,
     FloatParam,
     SelectOption,
     SelectParam
 )
-from tool.param.OutputParam import OutputParam
-from tool.parsing.selectors import Selector, SelectorType
+from xmltool.param.OutputParam import OutputParam
+from xmltool.parsing.selectors import Selector, SelectorType
 
 MOCK_BOOLPARAM1 = BoolParam('adv.no_header')
 MOCK_BOOLPARAM1.argument = '--noheader'

@@ -1,6 +1,6 @@
 
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 
 from command.cmdstr.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
@@ -9,9 +9,9 @@ from command.tokens.Tokens import TokenType
 
 
 class CommandWordifier:
-    def __init__(self, tool: GalaxyToolDefinition):
+    def __init__(self, xmltool: XMLToolDefinition):
         self.tracker = ConstructTracker()
-        self.factory = CommandWordFactory(tool)
+        self.factory = CommandWordFactory(xmltool)
         self.cmdwords: list[CommandWord] = []
 
     def wordify(self, the_string: str) -> list[CommandWord]:

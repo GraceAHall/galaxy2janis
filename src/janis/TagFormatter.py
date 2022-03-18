@@ -7,14 +7,14 @@ from typing import Optional
 
 class TagFormatter:
     def __init__(self):
-        self.prohibited_key_counts = {
-            "identifier": 0,
-            "tool": 0,
-            "scatter": 0,
-            "ignore_missing": 0,
-            "output": 0,
-            "input": 0,
-            "inputs": 0
+        self.prohibited_keys = {
+            "identifier",
+            "tool",
+            "scatter",
+            "ignore_missing",
+            "output",
+            "input",
+            "inputs"
         }
 
     def format(self, the_string: str, datatype: Optional[str]=None) -> str:
@@ -39,10 +39,8 @@ class TagFormatter:
         return the_string
 
     def handle_prohibited_key(self, the_string: str) -> str:
-        if the_string in self.prohibited_key_counts:
-            self.prohibited_key_counts[the_string] += 1
-            int_suffix = self.prohibited_key_counts[the_string]
-            the_string = f'the_string{int_suffix}'
+        if the_string in self.prohibited_keys:
+            the_string = f'{the_string}_param'
         return the_string
 
     def handle_short_tag(self, the_string: str, datatype: Optional[str]) -> str:

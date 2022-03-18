@@ -2,7 +2,7 @@
 
 from command.Command import Command 
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 
 from command.epath.ExecutionPath import ExecutionPath
@@ -14,8 +14,8 @@ class BruteForceCommandFactory:
     epath_iterator: GreedyEPathAnnotator
     command: Command
     
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.tool = tool
+    def __init__(self, xmltool: XMLToolDefinition):
+        self.xmltool = xmltool
         self.epath_count: int = 0
         self.cmdstrs: list[DynamicCommandString] = []
         self.has_non_xml_sources = False
@@ -46,7 +46,7 @@ class BruteForceCommandFactory:
         self.epath_count += 1
     
     def assign_epath_components(self, epath: ExecutionPath) -> ExecutionPath:
-        annotator = GreedyEPathAnnotator(epath, self.tool, self.command)
+        annotator = GreedyEPathAnnotator(epath, self.xmltool, self.command)
         return annotator.annotate_epath()
 
     def update_command(self, epath: ExecutionPath) -> None:

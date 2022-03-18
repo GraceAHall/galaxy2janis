@@ -8,7 +8,7 @@ from containers.VersionMatcher import VersionMatcher
 from utils.general_utils import global_align
 
 from containers.Container import Container
-from tool.requirements import Requirement
+from xmltool.requirements import Requirement
 
 @dataclass
 class SimilarityScore:
@@ -50,7 +50,7 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
         # get tool information from api request
         self.set_attributes(tool_id, tool_version, requirement)
         query_name = self.requirement.get_text()
-        api_results = self.ga4gh_interactor.search(tool=query_name)
+        api_results = self.ga4gh_interactor.search(toolname=query_name)
 
         if api_results:
             tool_version_data = self.get_tool_version_data(api_results)
@@ -83,9 +83,9 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
         """returns data for the api tool result most similar to the query tool name"""
         result_similarities: list[SimilarityScore] = []
         query_name = self.requirement.get_text()
-        for tool in api_results:
-            score = global_align(query_name, tool['name'])
-            result_similarities.append(SimilarityScore(score, tool))
+        for tool_data in api_results:
+            score = global_align(query_name, tool_data['name'])
+            result_similarities.append(SimilarityScore(score, tool_data))
         result_similarities.sort(key = lambda x: x.score, reverse=True)
         return result_similarities[0].obj
 

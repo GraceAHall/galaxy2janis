@@ -1,7 +1,7 @@
 
 
 
-from tool.metadata import Metadata
+from xmltool.metadata import Metadata
 
 MOCK_METADATA = Metadata(
     id='abricate',

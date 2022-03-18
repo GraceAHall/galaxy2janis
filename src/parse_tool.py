@@ -9,10 +9,12 @@ from typing import Optional
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
-from tool.load import load_tool, GalaxyToolDefinition
-from tool.tests import write_tests
+from xmltool.load import load_xmltool, XMLToolDefinition
+from xmltool.tests import write_tests
 from command.infer import infer_command, Command
 from containers.fetch import fetch_container, Container
+from tool.Tool import Tool
+from tool.generate import generate_tool
 from janis.write_definition import write_janis
 
 """
@@ -27,11 +29,12 @@ def parse_tool(args: dict[str, Optional[str]]):
     logger = Logger(esettings.get_logfile_path())
     # try:
     gxmanager: GalaxyManager = load_manager(esettings)
-    tool: GalaxyToolDefinition = load_tool(gxmanager)
-    command: Command = infer_command(gxmanager, tool)
-    container: Optional[Container] = fetch_container(esettings, logger, tool)
-    write_janis(esettings, tool, command, container)
-    write_tests(esettings, tool)
+    xmltool: XMLToolDefinition = load_xmltool(gxmanager)
+    command: Command = infer_command(gxmanager, xmltool)
+    container: Optional[Container] = fetch_container(esettings, logger, xmltool)
+    tool: Tool = generate_tool(xmltool, command, container)
+    write_janis(esettings, tool)
+    write_tests(esettings, xmltool)
     # except Exception as e:
     #     print(e)
     #     logger.log(2, 'parse_tool failed')

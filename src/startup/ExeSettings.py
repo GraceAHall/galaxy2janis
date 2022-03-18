@@ -76,7 +76,5 @@ class ToolExeSettings:
     def get_container_cache_path(self) -> str:
         return self.container_cachedir
 
-    def get_datatype_definitions_path(self) -> str:
-        return 'datatypes/gxformat_combined_types.yaml' # TODO make this an actual CLI setting
 
         

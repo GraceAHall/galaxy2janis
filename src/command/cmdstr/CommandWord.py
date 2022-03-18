@@ -4,8 +4,8 @@
 from typing import Optional
 from dataclasses import dataclass
 
-from tool.param.Param import Param
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.param.Param import Param
+from xmltool.tool_definition import XMLToolDefinition
 
 from command.tokens.TokenFactory import TokenFactory
 from command.tokens.Tokens import Token
@@ -43,8 +43,8 @@ class CommandWord:
 
 
 class CommandWordFactory:
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.TokenFactory = TokenFactory(tool)
+    def __init__(self, xmltool: XMLToolDefinition):
+        self.TokenFactory = TokenFactory(xmltool)
 
     def spawn_end_sentinel(self) -> CommandWord:
         token = self.TokenFactory.spawn_end_sentinel()

@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
 from command.components.linux_constructs import Redirect
-from startup.ExeSettings import ToolExeSettings
 import yaml
 
-from tool.param.Param import Param
+from xmltool.param.Param import Param
+
 
 @dataclass
 class JanisDatatype:
@@ -29,9 +29,10 @@ class DatatypeDetails:
 
 
 class DatatypeRegister:
-    def __init__(self, esettings: ToolExeSettings):
+    def __init__(self):
+        self.datatype_definitions_path = 'datatypes/gxformat_combined_types.yaml'
         self.dtype_map: dict[str, JanisDatatype] = {}
-        self.load_yaml_to_dtype_map(esettings.get_datatype_definitions_path())
+        self.load_yaml_to_dtype_map()
         #self.ext_to_raw_map = self.index_by_ext(self.format_datatype_map)
 
     def get(self, param: Optional[Param]=None, component: Optional[CommandComponent]=None) -> str:
@@ -94,13 +95,13 @@ class DatatypeRegister:
             out_str = f'Stdout({out_str})'
         return out_str
 
-    def load_yaml_to_dtype_map(self, filepath: str) -> None:
+    def load_yaml_to_dtype_map(self) -> None:
         """
         func loads the combined datatype yaml then converts it to dict with format as keys
         provides structue where we can search all the galaxy and janis types given what we see
         in galaxy 'format' attributes.
         """
-        with open(filepath, 'r') as fp:
+        with open(self.datatype_definitions_path, 'r') as fp:
             datatypes = yaml.safe_load(fp)
         for dtype in datatypes['types']:
             self.update_dtype_map(dtype)

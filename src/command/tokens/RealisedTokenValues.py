@@ -6,8 +6,8 @@
 from typing import Optional
 
 
-from tool.tool_definition import GalaxyToolDefinition
-from tool.param.Param import Param
+from xmltool.tool_definition import XMLToolDefinition
+from xmltool.param.Param import Param
 
 from command.cmdstr.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
@@ -57,9 +57,9 @@ class RealisedTokenValues:
 
 
 class RealisedTokenValueifier:
-    def __init__(self, tool: GalaxyToolDefinition):
+    def __init__(self, xmltool: XMLToolDefinition):
         self.tracker = ConstructTracker()
-        self.factory = TokenFactory(tool)
+        self.factory = TokenFactory(xmltool)
         self.tokens: list[RealisedTokenValues] = []
 
     def tokenify(self, the_string: str) -> list[RealisedTokenValues]:
@@ -74,12 +74,17 @@ class RealisedTokenValueifier:
 
     def handle_line(self, line: str) -> None:
         self.tracker.update(line)
-        if self.tracker.should_tokenify_line(line):
+        if self.should_tokenify_line(line):
             token_lists = self.tokenify_line(line)
             realised_token_values = self.get_realised_values(token_lists)
             for rtvs in realised_token_values:
                 rtvs.set_levels(self.tracker.get_levels())
             self.tokens += realised_token_values
+
+    def should_tokenify_line(self, line: str) -> bool:
+        if self.tracker.is_construct_line(line) or self.tracker.in_banned_segment():
+            return False
+        return True
     
     def tokenify_line(self, line: str) -> list[Token]:
         words = split_to_words(line)

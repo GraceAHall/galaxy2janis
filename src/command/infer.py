@@ -1,18 +1,16 @@
 
 
-from typing import Tuple
-
 from galaxy_interaction import GalaxyManager
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 
-from command.cmdstr.DynamicCommandString import DynamicCommandString, DynamicCommandStringFactory
+from command.cmdstr.DynamicCommandString import DynamicCommandString
+from command.cmdstr.DynamicCommandStringFactory import DynamicCommandStringFactory
 from command.Command import Command
 from command.BruteForceCommandFactory import BruteForceCommandFactory
 
 
-def infer_command(gxmanager: GalaxyManager, tool: GalaxyToolDefinition) -> Command:
-    ci = CommandInferer(gxmanager, tool)
-    ci.load_raw_strings()
+def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
+    ci = CommandInferer(gxmanager, xmltool)
     ci.gen_cmd_strings()
     ci.print_cmdstrs()
     ci.gen_command()
@@ -21,30 +19,35 @@ def infer_command(gxmanager: GalaxyManager, tool: GalaxyToolDefinition) -> Comma
 
 class CommandInferer:
     command: Command
-    raw_strs: list[Tuple[str, str]] = []
     cmdstrs: list[DynamicCommandString] = []
 
-    def __init__(self, gxmanager: GalaxyManager, tool: GalaxyToolDefinition) -> None:
+    def __init__(self, gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> None:
         self.gxmanager = gxmanager
-        self.tool = tool
-
-    def load_raw_strings(self) -> None:
-        self.raw_strs = self.gxmanager.get_raw_cmdstrs(self.tool)
+        self.xmltool = xmltool
+        self.cmdstr_factory = DynamicCommandStringFactory(self.xmltool)
 
     def gen_cmd_strings(self) -> None:
-        factory = DynamicCommandStringFactory(self.tool)
-        self.cmdstrs.append(factory.create('xml', self.get_xml_rawstr()))
-        self.cmdstrs += [factory.create('test', raw_str) for raw_str in self.get_test_rawstrs()]
+        self.gen_test_cmdstrs()
+        self.gen_xml_cmdstr()
+        #self.gen_workflow_cmdstr()
         
-    def get_test_rawstrs(self) -> list[str]:
-        return [rawstr for source, rawstr in self.raw_strs if source == 'test']
+    def gen_test_cmdstrs(self) -> None:
+        for test_str in self.gxmanager.get_test_cmdstrs(self.xmltool):
+            cmdstr = self.cmdstr_factory.create('test', test_str)
+            self.cmdstrs.append(cmdstr)
 
-    def get_xml_rawstr(self) -> str:
-        return [rawstr for source, rawstr in self.raw_strs if source == 'xml'][0]
+    def gen_xml_cmdstr(self) -> None:
+        xml_str = self.gxmanager.get_xml_cmdstr(self.xmltool)
+        cmdstr = self.cmdstr_factory.create('xml', xml_str)
+        self.cmdstrs.append(cmdstr)
 
-    def get_workflow_rawstr(self) -> str:
+    def gen_workflow_cmdstr(self) -> str:
         raise NotImplementedError
    
+    def gen_command(self) -> None:
+        factory = BruteForceCommandFactory(self.xmltool)
+        self.command = factory.create(self.cmdstrs)
+
     def print_cmdstrs(self) -> None:
         test_cmdstrs = [x for x in self.cmdstrs if x.source == 'test']
         xml_cmdstrs = [x for x in self.cmdstrs if x.source == 'xml']
@@ -58,8 +61,5 @@ class CommandInferer:
             cmdstr.tool_statement.print_execution_paths()
         print()
 
-    def gen_command(self) -> None:
-        factory = BruteForceCommandFactory(self.tool)
-        self.command = factory.create(self.cmdstrs)
 
 

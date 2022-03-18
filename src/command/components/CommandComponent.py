@@ -3,7 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Protocol
-from tool.param.Param import Param
+from xmltool.param.Param import Param
 
 
 # defines what a CommandComponent should look like
@@ -109,5 +109,16 @@ class BaseCommandComponent(ABC):
         otherwise usually just presents the witnessed values as examples. 
         """
         ...
+
+    @abstractmethod
+    def get_janis_datatype(self) -> str:
+        """gets """
+        ...
+    
+    @abstractmethod
+    def get_janis_tag(self) -> str:
+        ...
+
+
 
 

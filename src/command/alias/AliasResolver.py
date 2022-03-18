@@ -1,6 +1,6 @@
 
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 from command.cmdstr.CommandStatement import CommandStatement
 from command.regex.utils import split_variable_assignment, is_variable_substr, is_string_substr
 from command.regex.scanners import get_simple_strings, get_custom
@@ -11,7 +11,7 @@ import regex as re
 
 
 class AliasResolver:
-    def __init__(self, tool: GalaxyToolDefinition):
+    def __init__(self, xmltool: XMLToolDefinition):
         self.TokenFactory = TokenFactory(tool=tool)
         self.register: AliasRegister = AliasRegister()
 

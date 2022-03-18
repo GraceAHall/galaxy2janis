@@ -1,127 +1,52 @@
 
 
-from __future__ import annotations
+
+from command.cmdstr.ConstructTracker import ConstructTracker
+from xmltool.metadata import Metadata
 from typing import Optional, Tuple
-
-from tool.tool_definition import GalaxyToolDefinition
-from tool.metadata import Metadata
-
 from command.cmdstr.CommandStatement import CommandStatement
-from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
-from command.alias.AliasResolver import AliasResolver
-from command.regex.scanners import get_statement_delims
 from command.cmdstr.utils import global_align
-from command.regex.utils import get_quoted_sections
+from xmltool.metadata import Metadata
+from command.cmdstr.utils import split_lines
+
 
 class DynamicCommandString:
     def __init__(self, source: str, statements: list[CommandStatement], metadata: Metadata):
         self.source = source
         self.statements = statements
         self.tool_statement: CommandStatement = get_best_statement(self.statements, metadata)
+        self.preprocessing: list[CommandStatement] = []
+        self.postprocessing: list[CommandStatement] = []
 
+    def get_text(self) -> str:
+        """pieces back together the overall cmdline string from statements and delims"""
+        out: str = ''
+        for statement in self.statements:
+            if statement.end_delim:
+                out += f'{statement.cmdline} {statement.end_delim}\n'
+            else:
+                out += statement.cmdline
+        return out
 
-class DynamicCommandStringFactory:
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.tool = tool
+    def get_constant_text(self) -> str:
+        out: str = ''
+        tracker = ConstructTracker()
+        text = self.get_text()
+        for line in split_lines(text):
+            tracker.update(line)
+            if not tracker.is_within_construct():
+                out += f'{line}\n'
+        return out
 
-    def create(self, source: str, raw_string: str) -> DynamicCommandString:
-        simple_str = self.simplify_raw_string(source, raw_string)
-        statements = self.create_statements(simple_str)
-        #statements = self.resolve_statement_aliases(statements)
-        statements = self.set_statement_tokens(statements)
-        esource = DynamicCommandString(source, statements, self.tool.metadata)
-        return esource
+    def get_positional(self) -> str:
+        raise NotImplementedError()
+    
+    def get_flag(self) -> str:
+        raise NotImplementedError()
+    
+    def get_option(self) -> str:
+        raise NotImplementedError()
 
-    def simplify_raw_string(self, source: str, the_string: str) -> str:
-        strategy_map = {
-            'test': TestCommandSimplifier(),
-            'xml': XMLCommandSimplifier(),
-        }
-        strategy = strategy_map[source]
-        return strategy.simplify(the_string)
-
-    def create_statements(self, the_string: str) -> list[CommandStatement]:
-        return split_to_statements(the_string)
-
-    def resolve_statement_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
-        ar = AliasResolver(self.tool)
-        for cmd_statement in statements:
-            ar.extract(cmd_statement)
-        for cmd_statement in statements:
-            ar.resolve(cmd_statement)
-        return statements
-        
-    def set_statement_tokens(self, statements: list[CommandStatement]) -> list[CommandStatement]:
-        for cmd_statement in statements:
-            cmd_statement.set_tokens(self.tool)
-        return statements
-
-   
-
-def split_to_statements(the_string: str) -> list[CommandStatement]:
-    """
-    splits a string into individual command line statements.
-    these are delimited by &&, ||, | etc
-    """
-    statements: list[str] = []
-    delims: list[Optional[str]] = []
-
-    quoted_sections = get_quoted_sections(the_string)
-    delim_matches = get_statement_delims(the_string)
-    delim_matches.sort(key=lambda x: x.start())
-
-    for m in reversed(delim_matches):
-        if quoted_sections[m.start()] == False and quoted_sections[m.end()] == False:
-            delim: str = m[0]
-            left_split = the_string[:m.start()]
-            right_split = the_string[m.end():]
-
-            # working in reverse, so prepend new statements and delims
-            statements = [right_split] + statements
-            delims = [delim] + delims # type: ignore
-
-            # update the string to only be to the left of the split
-            the_string = left_split
-
-    # add final remaining statment (actually is the first statement)
-    # add a None to the end of delims to shift the alignment of stmts and delims
-    # last statement doesnt have trailing delim as command ends
-    statements = [the_string] + statements
-    delims.append(None)
-
-    return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
-
-def split_to_statements_old(the_string: str) -> list[CommandStatement]:
-    """
-    splits a string into individual command line statements.
-    these are delimited by &&, ||, | etc
-    """
-    # TODO HERE
-    statements: list[str] = []
-    delims: list[Optional[str]] = []
-
-    matches = get_statement_delims(the_string)
-    matches.sort(key=lambda x: x.start())
-
-    for m in reversed(matches):
-        delim: Optional[str] = m[0] # type: ignore
-        left_split = the_string[:m.start()]
-        right_split = the_string[m.end():]
-
-        # working in reverse, so prepend new statements and delims
-        statements = [right_split] + statements
-        delims = [delim] + delims
-
-        # update the string to only be to the left of the split
-        the_string = left_split
-
-    # add final remaining statment (actually is the first statement)
-    # add a None to the end of delims to shift the alignment of stmts and delims
-    # last statement doesnt have trailing delim as command ends
-    statements = [the_string] + statements
-    delims.append(None)
-
-    return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 def get_best_statement(statements: list[CommandStatement], metadata: Metadata) -> CommandStatement:
     if len(statements) == 1:
@@ -182,4 +107,7 @@ def choose_best(gxref_counts: list[Tuple[int, int]], req_sims: list[Tuple[int, f
 
     # TODO statment with most flags? statement with redirect? statement firstword is not in list of known linux commands (except in cases like where the tool is actually 'awk')?
     return None
+
+
+
 

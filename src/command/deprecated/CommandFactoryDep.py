@@ -4,7 +4,7 @@ from command.deprecated.IterationContextDep import IterationContext
 
 from command.Command import Command
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 
 from command.epath.ExecutionPath import ExecutionPath
@@ -21,12 +21,12 @@ from command.components.CommandComponent import CommandComponent
 class CommandFactory:
     epath_iterator: GreedyEPathAnnotator
     
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.tool = tool
+    def __init__(self, xmltool: XMLToolDefinition):
+        self.xmltool = xmltool
         self.command = Command()
         self.iter_context = IterationContext()
         self.cmdstrs: list[DynamicCommandString] = []
-        self.component_factory = CommandComponentFactory(tool)
+        self.component_factory = CommandComponentFactory(xmltool)
         self.has_non_xml_sources = False
 
     def create(self, cmdstrs: list[DynamicCommandString]) -> Command:
@@ -57,7 +57,7 @@ class CommandFactory:
 
     def infer_components_using_param_arguments(self, epath: ExecutionPath) -> None:
         iterator = GreedyEPathAnnotator(epath)
-        for param in self.tool.list_inputs():
+        for param in self.xmltool.list_inputs():
             if param.argument:
                 component = iterator.search(param.argument)
                 if component:

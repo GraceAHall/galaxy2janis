@@ -4,7 +4,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import Optional
-from .StepMetadata import StepMetadata
+from .StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
 from .StepInput import StepInput
 from .StepOutput import StepOutput
 
@@ -49,6 +49,7 @@ class WorkflowStep(ABC):
 
 @dataclass
 class InputDataStep(WorkflowStep):
+    metadata: InputDataStepMetadata
     optional: bool
     is_collection: bool
     collection_type: Optional[str]
@@ -58,6 +59,7 @@ class InputDataStep(WorkflowStep):
 
 @dataclass
 class ToolStep(WorkflowStep):
+    metadata: ToolStepMetadata
     # scatter?
 
     def get_uri(self) -> str:

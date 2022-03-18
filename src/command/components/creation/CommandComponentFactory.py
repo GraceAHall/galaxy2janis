@@ -4,7 +4,7 @@
 
 from abc import ABC, abstractmethod
 
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
@@ -139,8 +139,8 @@ class CommandComponentFactory:
     just to avoid passing around a lot
     """
     
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.wordifier = CommandWordifier(tool) # for annoying option/bool params (have many possible values)
+    def __init__(self, xmltool: XMLToolDefinition):
+        self.wordifier = CommandWordifier(xmltool) # for annoying option/bool params (have many possible values)
 
     def cast_to_flag(self, option: Option) -> Flag:
         spawner = FlagComponentSpawner()

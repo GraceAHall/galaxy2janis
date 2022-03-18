@@ -2,8 +2,8 @@
 
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
-from tool.param.OutputParam import OutputParam
-from tool.parsing.selectors import SelectorType
+from xmltool.param.OutputParam import OutputParam
+from xmltool.parsing.selectors import SelectorType
 from janis.DatatypeRegister import DatatypeRegister, JanisDatatype
 
 default_import_str = """

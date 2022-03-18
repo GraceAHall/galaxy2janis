@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from command.tokens.Tokens import Token, TokenType
 from command.regex import scanners as scanners
 from command.regex.utils import get_base_variable
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.tool_definition import XMLToolDefinition
 
 
 class TokenOrderingStrategy(ABC):
@@ -53,8 +53,8 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
 
 
 class TokenFactory:
-    def __init__(self, tool: GalaxyToolDefinition):
-        self.tool = tool    
+    def __init__(self, xmltool: XMLToolDefinition):
+        self.xmltool = xmltool    
         self.generic_scanners = [
             (scanners.get_keyval_pairs, TokenType.KV_PAIR),
             (scanners.get_quoted_numbers, TokenType.QUOTED_NUM),
@@ -128,10 +128,10 @@ class TokenFactory:
         
         for m, varname in zip(matches, base_vars):
             if varname:
-                if self.tool.get_input(varname):
-                    tokens.append(Token(m, TokenType.GX_INPUT, gxvar=self.tool.get_input(varname)))
-                elif self.tool.get_output(varname):
-                    tokens.append(Token(m, TokenType.GX_OUTPUT, gxvar=self.tool.get_output(varname)))
+                if self.xmltool.get_input(varname):
+                    tokens.append(Token(m, TokenType.GX_INPUT, gxvar=self.xmltool.get_input(varname)))
+                elif self.xmltool.get_output(varname):
+                    tokens.append(Token(m, TokenType.GX_OUTPUT, gxvar=self.xmltool.get_output(varname)))
                 else:
                     tokens.append(Token(m, TokenType.ENV_VAR))
         return tokens

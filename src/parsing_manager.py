@@ -171,9 +171,9 @@ class Reporter:
 
         print('\nSTATUSES')
         tool_statuses = list(self.tool_statuses.items())
-        passes = [tool for tool, status in tool_statuses if status == 'PASS']
-        warns = [tool for tool, status in tool_statuses if status == 'WARN']
-        errors = [tool for tool, status in tool_statuses if status == 'ERROR']
+        passes = [tool for xmltool, status in tool_statuses if status == 'PASS']
+        warns = [tool for xmltool, status in tool_statuses if status == 'WARN']
+        errors = [tool for xmltool, status in tool_statuses if status == 'ERROR']
         print(f'PASS:\t{len(passes)}')
         print(f'WARN:\t{len(warns)}')
         print(f'ERROR:\t{len(errors)}')

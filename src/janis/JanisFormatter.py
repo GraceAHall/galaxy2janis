@@ -3,9 +3,8 @@
 
 from typing import Optional
 
-from startup.ExeSettings import ToolExeSettings
-from tool.param.Param import Param
-from tool.tool_definition import GalaxyToolDefinition
+from xmltool.param.Param import Param
+from xmltool.tool_definition import XMLToolDefinition
 from containers.Container import Container
 
 from command.infer import Command
@@ -18,7 +17,7 @@ from command.components.Positional import Positional
 from janis.DatatypeRegister import DatatypeRegister
 from janis.ImportHandler import ImportHandler
 from janis.TagFormatter import TagFormatter
-from tool.parsing.selectors import Selector, SelectorType
+from xmltool.parsing.selectors import Selector, SelectorType
 
 from janis.formatting_snippets import (
     path_append_snippet,
@@ -36,10 +35,10 @@ selector_map: dict[SelectorType, str] = {
 
 
 class JanisFormatter:
-    def __init__(self, esettings: ToolExeSettings):
-        self.datatype_formatter = DatatypeRegister(esettings)
-        self.import_handler = ImportHandler(self.datatype_formatter)
+    def __init__(self):
+        self.datatype_formatter = DatatypeRegister()
         self.tag_formatter = TagFormatter()
+        self.import_handler = ImportHandler(self.datatype_formatter)
 
     def format_path_appends(self) -> str:
         return path_append_snippet
@@ -103,13 +102,13 @@ class JanisFormatter:
             doc=opt.get_docstring()
         )
 
-    def format_outputs(self, tool: GalaxyToolDefinition, command: Command) -> str:
+    def format_outputs(self, xmltool: XMLToolDefinition, command: Command) -> str:
         out_str: str = ''
         out_str += 'outputs = ['
 
         command_outputs = command.get_outputs()
         command_output_param_names = [o.gxvar.name for o in command_outputs if o.gxvar]
-        tool_output_params = [out for out in tool.list_outputs() if out.name not in command_output_param_names]
+        tool_output_params = [out for out in xmltool.list_outputs() if out.name not in command_output_param_names]
         # TODO FIX THIS AWFUL OUTPUT SHIT
         # galaxy outputs with no reference in <command> section
         # usually use 'from_work_dir' to get file(s)
@@ -175,21 +174,21 @@ class JanisFormatter:
             )
         return None
 
-    def format_commandtool(self, tool: GalaxyToolDefinition, command: Command, container: Container) -> str:
+    def format_commandtool(self, xmltool: XMLToolDefinition, command: Command, container: Container) -> str:
         base_positionals = command.get_base_positionals()
         base_command = [p.get_default_value() for p in base_positionals]
-        name: str = self.tag_formatter.format(tool.metadata.id)
+        name: str = xmltool.metadata.id
 
         return command_tool_builder_snippet(
             toolname=name,
             base_command=base_command,
             container=container.url,
-            version=tool.metadata.version, # should this be based on get_main_requirement()?
-            help=tool.metadata.help
+            version=xmltool.metadata.version, # should this be based on get_main_requirement()?
+            help=xmltool.metadata.help
         )
 
-    def format_translate_func(self, tool: GalaxyToolDefinition) -> str:
-        name: str = self.tag_formatter.format(tool.metadata.id)
+    def format_translate_func(self, xmltool: XMLToolDefinition) -> str:
+        name: str = xmltool.metadata.id
         return translate_snippet(name)
 
     def format_imports(self) -> str:

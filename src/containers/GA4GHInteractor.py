@@ -9,9 +9,9 @@ import json
 
 class GA4CHInteractor:
 
-    def search(self, tool: Optional[str]=None, version: Optional[dict[str, str]]=None) -> Any:
-        if tool:
-            return self.request_tool_data(tool)
+    def search(self, toolname: Optional[str]=None, version: Optional[dict[str, str]]=None) -> Any:
+        if toolname:
+            return self.request_tool_data(toolname)
         elif version:
             return self.request_tool_version_data(version)
         else:
