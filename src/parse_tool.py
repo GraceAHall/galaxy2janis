@@ -15,7 +15,7 @@ from command.infer import infer_command, Command
 from containers.fetch import fetch_container, Container
 from tool.Tool import Tool
 from tool.generate import generate_tool
-from janis.write_definition import write_janis
+from janis_definition.write_definition import write_janis
 
 """
 this file parses a single tool to janis

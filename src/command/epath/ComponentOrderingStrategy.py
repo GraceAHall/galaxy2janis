@@ -15,14 +15,14 @@ from command.components.Positional import Positional
 
 
 
-class PositionAnnotationStrategy(ABC):
+class ComponentOrderingStrategy(ABC):
     @abstractmethod
     def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
         """annotates components with command line positions"""
         ...
 
-
-class SimplifiedPositionAnnotationStrategy(PositionAnnotationStrategy):
+# TODO WTF epath cmd_pos orderings for components vs Command() orderings for components
+class SimplifiedComponentOrderingStrategy(ComponentOrderingStrategy):
     def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
         start_pos_count = self.count_starting_positionals(components)
         self.assign_positional_positions(components, start_pos_count)
@@ -50,7 +50,7 @@ class SimplifiedPositionAnnotationStrategy(PositionAnnotationStrategy):
             comp.cmd_pos = start_pos_count
 
 
-class RealisticPositionAnnotationStrategy(PositionAnnotationStrategy):
+class RealisticComponentOrderingStrategy(ComponentOrderingStrategy):
     def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
         # wayyy more complicated
         # 

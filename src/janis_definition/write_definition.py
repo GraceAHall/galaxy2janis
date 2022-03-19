@@ -2,7 +2,7 @@
 
 
 from typing import Optional
-from janis.JanisFormatter import JanisFormatter
+from janis_definition.JanisFormatter import JanisFormatter
 from startup.ExeSettings import ToolExeSettings
 from xmltool.load import XMLToolDefinition
 from command.infer import Command

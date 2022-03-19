@@ -3,25 +3,31 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Protocol
+from datatypes.JanisDatatype import JanisDatatype
 from xmltool.param.Param import Param
-
+from command.components.TagFormatter import TagFormatter
+from datatypes.formatting import format_janis_str
 
 # defines what a CommandComponent should look like
 class CommandComponent(Protocol):
     gxvar: Optional[Param]
     presence_array: list[bool]
     stage: str
+    cmd_pos: int
     
-    def update(self, incoming: Any):
+    def get_name(self) -> str:
         ...
 
-    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
-        ...
-    
     def get_default_value(self) -> Any:
         ...
+    
+    def get_janis_datatypes(self) -> list[JanisDatatype]:
+        ...
 
-    def get_datatype(self) -> list[str]:
+    def get_janis_datatype_str(self) -> str:
+        ...
+
+    def get_janis_tag(self) -> str:
         ...
     
     def is_optional(self) -> bool:
@@ -29,19 +35,98 @@ class CommandComponent(Protocol):
 
     def is_array(self) -> bool:
         ...
+    
+    def is_stdout(self) -> bool:
+        ...
 
     def get_docstring(self) -> Optional[str]:
         ...
     
+    def update(self, incoming: Any):
+        ...
+
+    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
+        ...
+
 
 
 # this mainly exists because each CommandComponent has the same 
-# update_presence_array method. 
+# update_presence_array and get_janis_tag method. 
 class BaseCommandComponent(ABC):
     gxvar: Optional[Param]
     presence_array: list[bool]
     stage: str
+    cmd_pos: int
+
+    @abstractmethod
+    def get_name(self) -> str:
+        """
+        returns a name for this component. created depending on what
+        information is available to the component
+        """
+        ...
+
+    @abstractmethod
+    def get_default_value(self) -> Any:
+        """
+        gets the default value of the component.
+        uses the components observed values (positionals / options) and
+        galaxy param information if available.
+        """
+        ...
+
+    @abstractmethod
+    def get_janis_datatypes(self) -> list[JanisDatatype]:
+        """gets the janis type for this component"""
+        ...
+
+    def get_janis_datatype_str(self) -> str:
+        """gets the janis datatypes then formats into a string for writing definitions"""
+        datatypes = self.get_janis_datatypes()
+        return format_janis_str(
+            datatypes=datatypes,
+            is_optional=self.is_optional(),
+            is_array=self.is_array(),
+            is_stdout=self.is_stdout()
+        )
+
+    def get_janis_tag(self) -> str:
+        """gets the janis tag for this component"""
+        name = self.get_name()
+        datatypes = self.get_janis_datatypes()
+        datatype = datatypes[0].classname
+        return TagFormatter().format(name, datatype)
     
+    @abstractmethod
+    def is_optional(self) -> bool:
+        """
+        returns whether the component is optional or not.
+        uses galaxy param information if available, otherwise uses the presence array. flags are always optional
+        """
+        ...
+
+    @abstractmethod
+    def is_array(self) -> bool:
+        """
+        returns whether the component is an array or not
+        uses galaxy param information if available.
+        flags components are never arrays.
+        """
+        ...
+    
+    @abstractmethod
+    def is_stdout(self) -> bool:
+        """returns whether the component is stdout. only True for Redirect() CommandComponent"""
+        ...
+
+    @abstractmethod
+    def get_docstring(self) -> Optional[str]:
+        """
+        gets helptext for the component. uses galaxy param if available,
+        otherwise usually just presents the witnessed values as examples. 
+        """
+        ...
+
     @abstractmethod
     def update(self, incoming: Any):
         """
@@ -70,54 +155,7 @@ class BaseCommandComponent(ABC):
                 self.presence_array.append(False)
             else:
                 self.presence_array.append(True)
-    
-    @abstractmethod
-    def get_default_value(self) -> Any:
-        """
-        gets the default value of the component.
-        uses the components observed values (positionals / options) and
-        galaxy param information if available.
-        """
-        ...
 
-    @abstractmethod
-    def get_datatype(self) -> list[str]:
-        """returns the components datatype"""
-        ...
-    
-    @abstractmethod
-    def is_optional(self) -> bool:
-        """
-        returns whether the component is optional or not.
-        uses galaxy param information if available, otherwise uses the presence array. flags are always optional
-        """
-        ...
-
-    @abstractmethod
-    def is_array(self) -> bool:
-        """
-        returns whether the component is an array or not
-        uses galaxy param information if available.
-        flags components are never arrays.
-        """
-        ...
-
-    @abstractmethod
-    def get_docstring(self) -> Optional[str]:
-        """
-        gets helptext for the component. uses galaxy param if available,
-        otherwise usually just presents the witnessed values as examples. 
-        """
-        ...
-
-    @abstractmethod
-    def get_janis_datatype(self) -> str:
-        """gets """
-        ...
-    
-    @abstractmethod
-    def get_janis_tag(self) -> str:
-        ...
 
 
 

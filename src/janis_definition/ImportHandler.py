@@ -1,10 +1,10 @@
 
 
-from typing import Optional
 from command.components.CommandComponent import CommandComponent
 from xmltool.param.OutputParam import OutputParam
 from xmltool.parsing.selectors import SelectorType
-from janis.DatatypeRegister import DatatypeRegister, JanisDatatype
+from datatypes.DatatypeRegister import DatatypeRegister
+from datatypes.JanisDatatype import JanisDatatype
 
 default_import_str = """
 from janis_core import (

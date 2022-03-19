@@ -5,7 +5,7 @@ from typing import Any
 
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.parsing import parse_step
-from workflows.step.Step import WorkflowStep
+from workflows.step.Step import GalaxyWorkflowStep
 
 
 class Workflow:
@@ -14,7 +14,7 @@ class Workflow:
     def __init__(self, workflow_path: str):
         self.tree = self.load_tree(workflow_path)
         self.metadata: WorkflowMetadata = self.parse_metadata()
-        self.steps: list[WorkflowStep] = self.parse_steps()
+        self.steps: list[GalaxyWorkflowStep] = self.parse_steps()
 
     def load_tree(self, path: str) -> dict[str, Any]:
         # TODO should probably check the workflow type (.ga, .ga2)
@@ -32,8 +32,8 @@ class Workflow:
             version=self.tree['version']
         )
 
-    def parse_steps(self) -> list[WorkflowStep]:
-        out: list[WorkflowStep] = []
+    def parse_steps(self) -> list[GalaxyWorkflowStep]:
+        out: list[GalaxyWorkflowStep] = []
         for step_details in self.tree['steps'].values():
             out.append(parse_step(step_details))
         return out

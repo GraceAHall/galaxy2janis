@@ -10,7 +10,7 @@ from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
 
 
 
-class BruteForceCommandFactory:
+class CommandFactory:
     epath_iterator: GreedyEPathAnnotator
     command: Command
     

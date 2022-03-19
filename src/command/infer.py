@@ -6,18 +6,18 @@ from xmltool.tool_definition import XMLToolDefinition
 from command.cmdstr.DynamicCommandString import DynamicCommandString
 from command.cmdstr.DynamicCommandStringFactory import DynamicCommandStringFactory
 from command.Command import Command
-from command.BruteForceCommandFactory import BruteForceCommandFactory
+from command.CommandFactory import CommandFactory
 
 
-def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
-    ci = CommandInferer(gxmanager, xmltool)
+def infer_command_components(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
+    ci = ComponentInferer(gxmanager, xmltool)
     ci.gen_cmd_strings()
-    ci.print_cmdstrs()
     ci.gen_command()
     return ci.command
 
 
-class CommandInferer:
+# class just exists to avoid passing variables
+class ComponentInferer:
     command: Command
     cmdstrs: list[DynamicCommandString] = []
 
@@ -45,7 +45,7 @@ class CommandInferer:
         raise NotImplementedError
    
     def gen_command(self) -> None:
-        factory = BruteForceCommandFactory(self.xmltool)
+        factory = CommandFactory(self.xmltool)
         self.command = factory.create(self.cmdstrs)
 
     def print_cmdstrs(self) -> None:

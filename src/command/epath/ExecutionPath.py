@@ -7,7 +7,7 @@ from typing import Any, Optional
 from command.tokens.Tokens import Token, TokenType
 from command.components.linux_constructs import Tee, Redirect, StreamMerge
 from command.components.CommandComponent import CommandComponent
-from command.epath.PositionAnnotationStrategy import SimplifiedPositionAnnotationStrategy
+from command.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
 
 
 @dataclass
@@ -34,7 +34,7 @@ class ExecutionPath:
 
     def get_components(self) -> list[CommandComponent]:
         components = self.get_component_list()
-        annotation_strategy = SimplifiedPositionAnnotationStrategy()
+        annotation_strategy = SimplifiedComponentOrderingStrategy()
         return annotation_strategy.annotate(components)
 
     def get_component_list(self) -> list[CommandComponent]:

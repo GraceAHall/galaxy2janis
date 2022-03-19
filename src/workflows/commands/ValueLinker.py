@@ -33,10 +33,10 @@ for each Option:
 """
 
 from command.Command import Command
-from workflows.step.Step import WorkflowStep
+from workflows.step.Step import GalaxyWorkflowStep
 
 
 class ValueLinker:
-    def __init__(self, step: WorkflowStep, command: Command)
+    def __init__(self, step: GalaxyWorkflowStep, command: Command)
 
     def link(self) -> 

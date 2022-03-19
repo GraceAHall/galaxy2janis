@@ -10,7 +10,6 @@ from command.components.Option import Option
 from command.components.linux_constructs import Redirect
 from command.components.CommandComponent import CommandComponent
 from xmltool.param.OutputParam import OutputParam
-from xmltool.param.Param import Param
 
 
 
@@ -179,21 +178,23 @@ class Command:
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
-    def get_component_positions(self) -> dict[str, Any]:
-        out: dict[str, Any] = {'positionals': [], 'flags': [], 'options': []}
+    def get_component_positions(self) -> list[Tuple[int, CommandComponent]]:
+        out: list[Tuple[int, CommandComponent]] = []
+
         options_pos: int = self.get_options_position()
         for flag in self.get_flags():
-            out['flags'].append((options_pos, flag))
+            out.append((options_pos, flag))
         for option in self.get_options():
-            out['options'].append((options_pos, option))
+            out.append((options_pos, option))
         
         cmd_pos: int = 1
         for positional in self.get_non_base_positionals():
             if cmd_pos == options_pos:
                 cmd_pos += 1
-            out['positionals'].append((cmd_pos, positional))
+            out.append((cmd_pos, positional))
             cmd_pos += 1
-        
+
+        out.sort(key=lambda x: x[0])
         return out
 
     def get_options_position(self) -> int:

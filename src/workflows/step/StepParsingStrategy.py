@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from .Step import WorkflowStep, InputDataStep, ToolStep
+from .Step import GalaxyWorkflowStep, InputDataStep, ToolStep
 from .StepInput import StepInput, init_connection_step_input, init_static_step_input, init_userdefined_step_input
 from .StepOutput import StepOutput, init_step_output
 from .StepMetadata import init_inputdatastep_metadata, init_toolstep_metadata
@@ -16,8 +16,8 @@ class StepParsingStrategy(ABC):
     step: dict[str, Any]
 
     @abstractmethod
-    def parse(self, step: dict[str, Any])  -> WorkflowStep:
-        """parses galaxy step in json format to WorkflowStep"""
+    def parse(self, step: dict[str, Any])  -> GalaxyWorkflowStep:
+        """parses galaxy step in json format to GalaxyWorkflowStep"""
         ...
 
     @abstractmethod

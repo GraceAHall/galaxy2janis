@@ -95,14 +95,11 @@ class BoolParam(InputParam):
         self.falsevalue: str = ''
         self.datatypes: list[str] = ['Boolean']
 
-    def get_default(self) -> bool:
-        return self.checked
-    
-    def get_value(self) -> str:
+    def get_default(self) -> str:
         if self.checked:
             return self.truevalue
         return self.falsevalue
-
+    
     def get_docstring(self) -> str:
         docstring = self.generic_get_docstring()
         bool_values = [self.truevalue, self.falsevalue]
@@ -138,10 +135,9 @@ class SelectParam(InputParam):
         for option in self.options:
             if option.selected:
                 return option.value
-        
         if len(self.options) > 0:
             return self.options[0].value
-        return None        
+        return ''        
 
     def get_docstring(self) -> str:
         docstring = self.generic_get_docstring()

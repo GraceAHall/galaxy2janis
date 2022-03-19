@@ -1,7 +1,7 @@
 
 
 
-class WorkflowStepCommandLoader:
+class GalaxyWorkflowStepCommandLoader:
     """
     loads a valid command string from the combination of a galaxy tool and 
     workflow step parameter dict

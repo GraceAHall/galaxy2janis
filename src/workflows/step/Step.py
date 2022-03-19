@@ -30,7 +30,7 @@ w.step(
 
 ### step types 
 @dataclass
-class WorkflowStep(ABC):
+class GalaxyWorkflowStep(ABC):
     metadata: StepMetadata
     inputs: list[StepInput]
     outputs: list[StepOutput]
@@ -48,7 +48,7 @@ class WorkflowStep(ABC):
         raise RuntimeError(f'could not find output {query_name}')
 
 @dataclass
-class InputDataStep(WorkflowStep):
+class InputDataStep(GalaxyWorkflowStep):
     metadata: InputDataStepMetadata
     optional: bool
     is_collection: bool
@@ -58,7 +58,7 @@ class InputDataStep(WorkflowStep):
         return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.inputs])
 
 @dataclass
-class ToolStep(WorkflowStep):
+class ToolStep(GalaxyWorkflowStep):
     metadata: ToolStepMetadata
     # scatter?
 

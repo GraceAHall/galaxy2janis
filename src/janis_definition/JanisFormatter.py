@@ -14,12 +14,12 @@ from command.components.Flag import Flag
 from command.components.Option import Option
 from command.components.Positional import Positional
 
-from janis.DatatypeRegister import DatatypeRegister
-from janis.ImportHandler import ImportHandler
-from janis.TagFormatter import TagFormatter
+from datatypes.DatatypeRegister import DatatypeRegister
+from janis_definition.ImportHandler import ImportHandler
+from command.components.TagFormatter import TagFormatter
 from xmltool.parsing.selectors import Selector, SelectorType
 
-from janis.formatting_snippets import (
+from janis_definition.formatting_snippets import (
     path_append_snippet,
     tool_input_snippet,
     tool_output_snippet,

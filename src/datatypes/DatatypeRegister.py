@@ -1,23 +1,11 @@
 
 
 
-
 from dataclasses import dataclass
 from typing import Optional
-from command.components.CommandComponent import CommandComponent
-from command.components.linux_constructs import Redirect
 import yaml
 
-from xmltool.param.Param import Param
-
-
-@dataclass
-class JanisDatatype:
-    format: str
-    source: str
-    classname: str
-    extensions: Optional[str]
-    import_path: str
+from .JanisDatatype import JanisDatatype
 
 
 @dataclass
@@ -35,65 +23,9 @@ class DatatypeRegister:
         self.load_yaml_to_dtype_map()
         #self.ext_to_raw_map = self.index_by_ext(self.format_datatype_map)
 
-    def get(self, param: Optional[Param]=None, component: Optional[CommandComponent]=None) -> str:
-        if param:
-            data = self.extract_details_param(param)
-        elif component:
-            data = self.extract_details_component(component)
-        else:
-            raise RuntimeError('u gotta supply either a Param() or CommandComponent() to DatatypeRegister.get() bro')
-        return self.format_janis_str(data)
-
-    def extract_details_param(self, param: Param) -> DatatypeDetails:
-        return DatatypeDetails(
-            self.cast_types(param.datatypes),
-            param.is_optional(),
-            param.is_array(),
-            False
-        )
-
-    def extract_details_component(self, component: CommandComponent) -> DatatypeDetails:
-        return DatatypeDetails(
-            self.cast_types(component.get_datatype()),
-            component.is_optional(),
-            component.is_array(),
-            True if isinstance(component, Redirect) else False
-        )
-
-    def cast_types(self, datatypes: list[str]) -> list[JanisDatatype]:
-        out: list[JanisDatatype] = [] 
-        for dtype in datatypes:
-            if dtype in self.dtype_map:
-                out.append(self.dtype_map[dtype])
-        return out
-
-    def format_janis_str(self, details: DatatypeDetails) -> str:
-        if len(details.datatypes) > 1:
-            dtype = ', '.join([x.classname for x in details.datatypes])
-            dtype = "UnionType(" + dtype + ")"
-        else:
-            dtype = details.datatypes[0].classname
-        
-        # not array not optional
-        if not details.is_optional and not details.is_array:
-            out_str = f'{dtype}'
-
-        # array and not optional
-        elif not details.is_optional and details.is_array:
-            out_str = f'Array({dtype})'
-        
-        # not array and optional
-        elif details.is_optional and not details.is_array:
-            out_str = f'{dtype}(optional=True)'
-        
-        # array and optional
-        elif details.is_optional and details.is_array:
-            out_str = f'Array({dtype}(), optional=True)'
-
-        # Stdout wrapper
-        if details.is_stdout:
-            out_str = f'Stdout({out_str})'
-        return out_str
+    def get(self, datatype: str) -> Optional[JanisDatatype]:
+        if datatype in self.dtype_map:
+            return self.dtype_map[datatype]
 
     def load_yaml_to_dtype_map(self) -> None:
         """

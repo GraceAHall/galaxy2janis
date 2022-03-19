@@ -3,12 +3,12 @@
 from typing import Any
 import json
 
-from .Step import WorkflowStep
+from .Step import GalaxyWorkflowStep
 from .StepParsingStrategy import StepParsingStrategy, InputDataStepParsingStrategy, ToolStepParsingStrategy
 
 
 ### parsing galaxy to steps -----------
-def parse_step(step: dict[str, Any]) -> WorkflowStep:
+def parse_step(step: dict[str, Any]) -> GalaxyWorkflowStep:
     strategy = select_strategy(step)
     return strategy.parse(step)
 
