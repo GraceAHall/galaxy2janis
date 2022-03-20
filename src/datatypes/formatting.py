@@ -6,7 +6,7 @@
 from datatypes.JanisDatatype import JanisDatatype
 
 
-def format_janis_str(datatypes: list[JanisDatatype], is_optional: bool, is_array: bool, is_stdout: bool) -> str:
+def format_janis_str(datatypes: list[JanisDatatype], is_optional: bool, is_array: bool) -> str:
     if len(datatypes) > 1:
         dtype = ', '.join([x.classname for x in datatypes])
         dtype = "UnionType(" + dtype + ")"
@@ -29,7 +29,4 @@ def format_janis_str(datatypes: list[JanisDatatype], is_optional: bool, is_array
     elif is_optional and is_array:
         out_str = f'Array({dtype}(), optional=True)'
 
-    # Stdout wrapper
-    if is_stdout:
-        out_str = f'Stdout({out_str})'
     return out_str

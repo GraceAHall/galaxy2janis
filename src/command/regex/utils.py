@@ -11,7 +11,6 @@ from command.regex.expressions import (
     OPERATOR
 )
 
-
 def is_variable_substr(match: re.Match[str]) -> bool:
     """check to see if within a variable. ie file_input is within $file_input"""
     var_matches = scanners.get_variables(match.string)
@@ -41,7 +40,6 @@ def split_variable_assignment(line: str) -> Tuple[str, str]:
     right = line[operator_end:].strip()
     return left, right
 
-
 def get_base_variable(match: re.Match[str]) -> Optional[str]:
     """trims function calls, attributes from variable matches"""
     text: str = match[0]
@@ -50,7 +48,6 @@ def get_base_variable(match: re.Match[str]) -> Optional[str]:
     if text != '':
         return text
     return None
-
 
 def strip_method_calls(text: str, match: re.Match[str]) -> str:
     """
@@ -66,7 +63,6 @@ def strip_method_calls(text: str, match: re.Match[str]) -> str:
             # is cheetah func call.  
             text = ''
     return text
-
 
 def strip_common_attributes(text: str) -> str:
     return text
@@ -90,7 +86,6 @@ def strip_common_attributes(text: str) -> str:
             text = strip_common_attributes(text)
     return text
 
-
 def get_unpaired_quotes_start(the_string: str) -> int:
     # find all quotes
     matches = re.finditer(QUOTES, the_string)
@@ -102,7 +97,6 @@ def get_unpaired_quotes_start(the_string: str) -> int:
         if quotes_mask[loc] != 1:
             return loc
     return -1
-
 
 def find_unquoted(the_string: str, pattern: str) -> Tuple[int, int]:
     """
@@ -122,7 +116,6 @@ def find_unquoted(the_string: str, pattern: str) -> Tuple[int, int]:
                 # return position of first unquoted match
                 return start, end
     return -1, -1
-
 
 def get_quoted_sections(the_string: str):
     # find the areas of the string which are quoted

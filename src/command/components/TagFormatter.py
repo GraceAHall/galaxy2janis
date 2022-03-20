@@ -19,6 +19,8 @@ class TagFormatter:
 
     def format(self, the_string: str, datatype: Optional[str]=None) -> str:
         the_string = the_string.lower()
+        if datatype:
+            datatype = datatype.lower()
         the_string = self.replace_non_alphanumeric(the_string)
         the_string = self.handle_prohibited_key(the_string)
         the_string = self.handle_short_tag(the_string, datatype)
@@ -32,6 +34,8 @@ class TagFormatter:
         """
         the_string = the_string.strip('\\/-$')
         the_string = the_string.replace('-', '_')
+        the_string = the_string.replace('.', '_')
+        the_string = the_string.replace('|', '_')
         the_string = the_string.replace('/', '_')
         the_string = the_string.replace('\\', '_')
         the_string = the_string.replace('"', '')

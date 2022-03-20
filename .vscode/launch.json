@@ -77,6 +77,32 @@
             ]
         },
         {
+            "name": "quast",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/quast", 
+                "--xml", "quast.xml",
+            ]
+        },
+        {
+            "name": "prokka",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/prokka", 
+                "--xml", "prokka.xml",
+            ]
+        },
+        {
             "name": "simple workflow",
             "type": "python",
             "request": "launch",

@@ -26,15 +26,15 @@ class TokenType(Enum):
     LINUX_STREAM_MERGE = auto()
     START_STATEMENT = auto()
     EXCISION        = auto()
-    END_SENTINEL    = auto()
+    END_STATEMENT    = auto()
     UNKNOWN         = auto()
 
 
 class Token:
-    def __init__(self, match: re.Match[str], token_type: TokenType, gxvar: Optional[Param]=None):
+    def __init__(self, match: re.Match[str], token_type: TokenType, gxparam: Optional[Param]=None):
         self.match = match
         self.type = token_type
-        self.gxvar = gxvar
+        self.gxparam = gxparam
         
         self.position: Optional[int] = None
         self.in_conditional: bool = False
@@ -53,5 +53,5 @@ class Token:
         return self.match.end()
 
     def __repr__(self) -> str:
-        return f'Token: {self.text}, gxvar: {self.gxvar}'
+        return f'Token: {self.text}, gxparam: {self.gxparam}'
 

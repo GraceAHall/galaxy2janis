@@ -38,7 +38,7 @@ def init_inputdatastep_metadata(step: dict[str, Any]) -> InputDataStepMetadata:
 def init_toolstep_metadata(step: dict[str, Any]) -> ToolStepMetadata:
     return ToolStepMetadata(
         step_id=step['id'],
-        tool_name=step['name'],
+        tool_name=step['tool_shed_repository']['name'],
         label=step['label'],
         owner=step['tool_shed_repository']['owner'],
         changeset_revision=step['tool_shed_repository']['changeset_revision'],

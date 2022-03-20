@@ -4,7 +4,8 @@ from typing import Any, Optional
 
 path_append_snippet = """
 import sys
-sys.path.append('/home/grace/work/pp/gxtool2janis')"""
+sys.path.append('/home/grace/work/pp/gxtool2janis')
+"""
 
 def tool_input_snippet(
     tag: str,
@@ -31,16 +32,15 @@ def tool_input_snippet(
 def tool_output_snippet(
     tag: str,
     datatype: str,
-    selector_type: Optional[str]=None,
-    selector_contents: Optional[str]=None,
+    selector: Optional[str],
     doc: Optional[str]=None
 ) -> str:
     out_str: str = ''
     out_str += '\n\tToolOutput(\n'
     out_str += f"\t\t'{tag}',\n"
     out_str += f"\t\t{datatype},\n"
-    out_str +=  f"\t\tselector={selector_type}('{selector_contents}'),\n" \
-                if selector_type and selector_contents else ''
+    if selector:
+        out_str += f"\t\tselector={selector},\n" 
     out_str += f'\t\tdoc="{doc}",\n' if doc else ''
     out_str += '\t)'
     return out_str
@@ -61,7 +61,7 @@ def command_tool_builder_snippet(
     container="{container}",
     version="{version}",
     doc=\"\"\"{str(help)}\"\"\"
-)"""
+)\n"""
 # missing from command_tool_builder_snippet()
 #out_str += f'\tfriendly_name="{friendly_name}",\n'
 #out_str += f'\targuments="{arguments}",\n'
@@ -82,5 +82,5 @@ def translate_snippet(toolname: str) -> str:
 if __name__ == "__main__":
     {toolname}().translate(
         "wdl", to_console=True
-    )
+    )\n
 """

@@ -1,7 +1,7 @@
 
 
 from xmltool.tool_definition import XMLToolDefinition
-from command.cmdstr.CommandStatement import CommandStatement
+from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.regex.utils import split_variable_assignment, is_variable_substr, is_string_substr
 from command.regex.scanners import get_simple_strings, get_custom
 from command.tokens.Tokens import TokenType as tt
@@ -15,14 +15,14 @@ class AliasResolver:
         self.TokenFactory = TokenFactory(tool=tool)
         self.register: AliasRegister = AliasRegister()
 
-    def extract(self, statement: CommandStatement) -> None:
-        """extracts all aliases present in the CommandStatement"""
+    def extract(self, statement: DynamicCommandStatement) -> None:
+        """extracts all aliases present in the DynamicCommandStatement"""
         lines = self.get_lines(statement)
         for line in lines:
             if self.is_alias_line(line):
                 self.update(line)
 
-    def get_lines(self, statement: CommandStatement) -> list[str]:
+    def get_lines(self, statement: DynamicCommandStatement) -> list[str]:
         lines = statement.cmdline.split('\n')
         return [ln.strip() for ln in lines]
     
@@ -82,13 +82,13 @@ class AliasResolver:
                     if self.string_is_polite(dest.text):
                         self.register.add(source.text, dest.text, line)
                 case tt.LINUX_TEE | tt.LINUX_REDIRECT | tt.LINUX_STREAM_MERGE | \
-                    tt.START_STATEMENT | tt.END_SENTINEL:
+                    tt.START_STATEMENT | tt.END_STATEMENT:
                         pass
                 case _:
                     self.register.add(source.text, dest.text, line)
 
-    def resolve(self, statement: CommandStatement) -> None:
-        """resolves all words/subwords in the CommandStatement which have aliases"""
+    def resolve(self, statement: DynamicCommandStatement) -> None:
+        """resolves all words/subwords in the DynamicCommandStatement which have aliases"""
         raw_lines = self.get_lines(statement)
         resolved_lines = [self.resolve_line(ln) for ln in raw_lines]
         statement.cmdline = self.join_lines(resolved_lines)

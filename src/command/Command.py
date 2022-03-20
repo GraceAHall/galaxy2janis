@@ -3,11 +3,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Callable, Tuple
+from command.cmdstr.CommandString import CommandString
 
-from command.components.Positional import Positional
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.linux_constructs import Redirect
+from command.components.inputs import Positional, Flag, Option
+from command.components.outputs import RedirectOutput
 from command.components.CommandComponent import CommandComponent
 from xmltool.param.OutputParam import OutputParam
 
@@ -15,7 +14,7 @@ from xmltool.param.OutputParam import OutputParam
 
 class Updater(ABC):
     command: Command
-    incoming: Positional | Flag | Option | Redirect
+    incoming: Positional | Flag | Option | RedirectOutput
     
     @abstractmethod
     def update(self, command: Command, incoming: Any) -> None:
@@ -128,11 +127,11 @@ class OptionUpdater(Updater):
         self.command.options[prefix] = self.incoming
 
 
-class RedirectUpdater(Updater):
+class RedirectOutputUpdater(Updater):
     command: Command
-    incoming: Redirect
+    incoming: RedirectOutput
 
-    def update(self, command: Command, incoming: Redirect) -> None:
+    def update(self, command: Command, incoming: RedirectOutput) -> None:
         self.command = command
         self.incoming = incoming
         if self.should_merge():
@@ -155,11 +154,12 @@ class RedirectUpdater(Updater):
 
 
 class Command:
-    def __init__(self):
+    def __init__(self, xmlcmdstr: CommandString):
+        self.xmlcmdstr: CommandString = xmlcmdstr
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
-        self.redirect: Optional[Redirect] = None
+        self.redirect: Optional[RedirectOutput] = None
 
     def update(self, incoming: CommandComponent) -> None:
         updater = self.select_updater(incoming)
@@ -173,29 +173,24 @@ class Command:
                 return FlagUpdater()
             case Option():
                 return OptionUpdater()
-            case Redirect():
-                return RedirectUpdater()
+            case RedirectOutput():
+                return RedirectOutputUpdater()
             case _:
                 raise RuntimeError(f'must pass CommandComponent to Command.update(). received {type(incoming)}')
 
-    def get_component_positions(self) -> list[Tuple[int, CommandComponent]]:
-        out: list[Tuple[int, CommandComponent]] = []
-
+    def set_cmd_positions(self) -> None:
         options_pos: int = self.get_options_position()
         for flag in self.get_flags():
-            out.append((options_pos, flag))
+            flag.cmd_pos = options_pos
         for option in self.get_options():
-            out.append((options_pos, option))
+            option.cmd_pos = options_pos
         
-        cmd_pos: int = 1
+        pos_ptr: int = 1
         for positional in self.get_non_base_positionals():
-            if cmd_pos == options_pos:
-                cmd_pos += 1
-            out.append((cmd_pos, positional))
-            cmd_pos += 1
-
-        out.sort(key=lambda x: x[0])
-        return out
+            if pos_ptr == options_pos:
+                pos_ptr += 1
+            positional.cmd_pos = pos_ptr
+            pos_ptr += 1
 
     def get_options_position(self) -> int:
         """
@@ -223,10 +218,9 @@ class Command:
         return components
 
     def get_outputs(self) -> list[CommandComponent]:
+        # just returns redirect component if present.
+        # other outputs are handled by ToolFactory
         components: list[CommandComponent] = []
-        for comp in self.get_inputs():
-            if comp.gxvar and isinstance(comp.gxvar, OutputParam):
-                components.append(comp)
         if self.redirect:
             components.append(self.redirect)
         return components
@@ -234,7 +228,7 @@ class Command:
     def get_base_positionals(self) -> list[Positional]:
         positionals = self.get_positionals()
         positionals = [p for p in positionals if p.before_opts]
-        positionals = [p for p in positionals if not p.gxvar]
+        positionals = [p for p in positionals if not p.gxparam]
         positionals = [p for p in positionals if p.has_single_value()]
         return positionals
 

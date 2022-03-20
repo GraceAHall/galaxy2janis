@@ -1,0 +1,13 @@
+
+
+
+test/data/tools/quast/quast.xmls
+listed as an Option not a Flag:
+ToolInput(
+    'circos',
+    Boolean,
+    prefix='--circos',
+    position=2,
+    default="",
+    doc="Generage Circos plot Plot Circos version of Icarus contig alignment viewer. possible values: --circos",
+),

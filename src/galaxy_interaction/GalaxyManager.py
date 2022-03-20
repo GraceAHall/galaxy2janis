@@ -75,7 +75,7 @@ class GalaxyManager:
         return valid_cmdstrs
 
     def get_xml_cmdstr(self, tooldef: XMLToolDefinition) -> str:
-        # create DynamicCommandString for tooldef.command
+        # create CommandString for tooldef.command
         xcl = XMLCommandLoader(tooldef)
         return xcl.load()
 

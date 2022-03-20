@@ -8,13 +8,9 @@ from xmltool.tool_definition import XMLToolDefinition
 
 from command.cmdstr.CommandWord import CommandWord
 from command.cmdstr.CommandWordifier import CommandWordifier
-from command.components.creation.ComponentSpawner import init_spawner
-
-
 from command.components.CommandComponent import CommandComponent
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.Positional import Positional
+from command.components.inputs import Positional, Flag, Option
+from command.components.inputs.InputComponentFactory import init_spawner
 
 
 
@@ -37,7 +33,7 @@ class SingleComponentCreationStrategy(ComponentCreationStrategy):
     def create(self) -> list[CommandComponent]:
         """creates list of command components using cword and nword"""
         new_component = self.make_component()
-        new_component = self.transfer_gxvars(new_component)
+        new_component = self.transfer_gxparams(new_component)
         return [new_component]
 
     def make_component(self) -> CommandComponent:
@@ -46,17 +42,17 @@ class SingleComponentCreationStrategy(ComponentCreationStrategy):
     
     
     
-    def transfer_gxvars(self, component: CommandComponent) -> CommandComponent:
+    def transfer_gxparams(self, component: CommandComponent) -> CommandComponent:
         match component:
             case Flag():
-                component.gxvar = self.cword.gxvar
+                component.gxparam = self.cword.gxparam
             case Option():
-                if self.cword.gxvar:
-                    component.gxvar = self.cword.gxvar
-                elif self.nword.gxvar:
-                    component.gxvar = self.nword.gxvar
+                if self.cword.gxparam:
+                    component.gxparam = self.cword.gxparam
+                elif self.nword.gxparam:
+                    component.gxparam = self.nword.gxparam
             case Positional():
-                component.gxvar = self.cword.gxvar
+                component.gxparam = self.cword.gxparam
             case _:
                 pass
         return component
@@ -84,7 +80,7 @@ class MultipleComponentCreationStrategy(ComponentCreationStrategy):
         #efork = ExecutionPath(self.cword, self.nword, self.wordifier)
         for path in efork.forks():
             path_components = self.iter_words(path)
-            path_components = self.transfer_gxvars(path_components)
+            path_components = self.transfer_gxparams(path_components)
             components += path_components
         return components
 
@@ -104,27 +100,27 @@ class MultipleComponentCreationStrategy(ComponentCreationStrategy):
             i += step_size
         return out
     
-    def transfer_gxvars(self, components: list[CommandComponent]) -> list[CommandComponent]:
+    def transfer_gxparams(self, components: list[CommandComponent]) -> list[CommandComponent]:
         """
         because the second cmdword (nword) value is truncated to a single word,
-        we know that the only way a gxvar could originate from the nword value is 
+        we know that the only way a gxparam could originate from the nword value is 
         if the last component is an option.
         example: 
         cword = --db, nword = $adv.db
         cword gets expanded to '--db', and $adv.db expands to ['card', 'resfinder']
         then the executionpaths are:
         --db card,   --db resfinder
-        in these situations, the card and resfinder came from nword's gxvar ($adv.db)
-        all other situations, just move the gxvar from cword to the component. 
+        in these situations, the card and resfinder came from nword's gxparam ($adv.db)
+        all other situations, just move the gxparam from cword to the component. 
         """
-        # can attempt to transfer cword's gxvar to 
+        # can attempt to transfer cword's gxparam to 
         for component in components:
-            component.gxvar = self.cword.gxvar
+            component.gxparam = self.cword.gxparam
         
         # last component
         if isinstance(components[-1], Option):
-            if not components[-1].gxvar:
-                components[-1].gxvar = self.nword.gxvar
+            if not components[-1].gxparam:
+                components[-1].gxparam = self.nword.gxparam
 
         return components
  
@@ -143,7 +139,7 @@ class CommandComponentFactory:
         self.wordifier = CommandWordifier(xmltool) # for annoying option/bool params (have many possible values)
 
     def cast_to_flag(self, option: Option) -> Flag:
-        spawner = FlagComponentSpawner()
+        spawner = FlagComponentFactory()
         return spawner.create_from_opt(option)
 
     def create(self, cword: CommandWord, nword: CommandWord) -> list[CommandComponent]:

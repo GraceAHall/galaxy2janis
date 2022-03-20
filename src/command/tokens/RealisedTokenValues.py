@@ -5,7 +5,6 @@
 
 from typing import Optional
 
-
 from xmltool.tool_definition import XMLToolDefinition
 from xmltool.param.Param import Param
 
@@ -17,15 +16,16 @@ from command.epath.utils import is_bool_select
 
 
 class RealisedTokenValues:
-    def __init__(self, values: list[list[Token]], original: Optional[Token]=None):
+    def __init__(self, values: list[list[Token]], original: Token):
         self.tlists = values
+        self.original = original
         if original:
             self.set_context_from_original_token(original)
         
     def set_context_from_original_token(self, source: Token) -> None:
         for tlist in self.tlists:
             for token in tlist:
-                token.gxvar = source.gxvar
+                token.gxparam = source.gxparam
                 token.in_conditional = source.in_conditional
                 token.in_loop = source.in_loop
 
@@ -37,6 +37,9 @@ class RealisedTokenValues:
                         token.in_conditional = True
                     if levels['loop'] > 0:
                         token.in_loop = True
+
+    def get_original_token(self) -> Token:
+        return self.original
     
     def get_default_token(self) -> Token:
         return self.tlists[0][0]
@@ -46,7 +49,7 @@ class RealisedTokenValues:
 
     def get_gx_reference(self) -> Optional[Param]:
         # every token will have the same gx object
-        return self.get_default_token().gxvar
+        return self.get_default_token().gxparam
     
     def __repr__(self) -> str:
         strvalues: list[str] = []
@@ -61,6 +64,9 @@ class RealisedTokenValueifier:
         self.tracker = ConstructTracker()
         self.factory = TokenFactory(xmltool)
         self.tokens: list[RealisedTokenValues] = []
+
+    def tokenify_word(self, text: str) -> Token:
+        return self.factory.create(text)
 
     def tokenify(self, the_string: str) -> list[RealisedTokenValues]:
         self.refresh_attrs()
@@ -115,7 +121,7 @@ class RealisedTokenValueifier:
         out: list[RealisedTokenValues] = []
         for token in tokens:
             if is_bool_select(token):
-                vals_as_text: list[str] = token.gxvar.get_all_values(nonempty=True) #type: ignore
+                vals_as_text: list[str] = token.gxparam.get_all_values(nonempty=True) #type: ignore
                 vals_as_tlists = [self.tokenify_line(text) for text in vals_as_text]
                 out.append(RealisedTokenValues(values=vals_as_tlists, original=token))
             else:

@@ -1,9 +1,11 @@
 
 
-
-from abc import ABC
+from __future__ import annotations
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
+
+from tool.Tool import Tool
 from .StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
 from .StepInput import StepInput
 from .StepOutput import StepOutput
@@ -35,6 +37,10 @@ class GalaxyWorkflowStep(ABC):
     inputs: list[StepInput]
     outputs: list[StepOutput]
 
+    @abstractmethod
+    def generate_workflow_step(self) -> str:
+        ...
+
     def get_output(self, query_name: str) -> StepOutput:
         for output in self.outputs:
             if output.name == query_name:
@@ -54,12 +60,16 @@ class InputDataStep(GalaxyWorkflowStep):
     is_collection: bool
     collection_type: Optional[str]
 
+    def generate_workflow_step(self) -> str:
+        raise NotImplementedError
+
     def __repr__(self) -> str:
         return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.inputs])
 
-@dataclass
+
 class ToolStep(GalaxyWorkflowStep):
     metadata: ToolStepMetadata
+    tool: Optional[Tool] = None
     # scatter?
 
     def get_uri(self) -> str:
@@ -67,6 +77,9 @@ class ToolStep(GalaxyWorkflowStep):
     
     def get_tool_name(self) -> str:
         return self.metadata.tool_name
+    
+    def generate_workflow_step(self) -> str:
+        raise NotImplementedError
 
     def __repr__(self) -> str:
         return f'(ToolStep) step{self.metadata.step_id} - {self.get_tool_name()}'

@@ -3,13 +3,13 @@
 from galaxy_interaction import GalaxyManager
 from xmltool.tool_definition import XMLToolDefinition
 
-from command.cmdstr.DynamicCommandString import DynamicCommandString
-from command.cmdstr.DynamicCommandStringFactory import DynamicCommandStringFactory
+from command.cmdstr.CommandString import CommandString
+from command.cmdstr.CommandStringFactory import CommandStringFactory
 from command.Command import Command
 from command.CommandFactory import CommandFactory
 
 
-def infer_command_components(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
+def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
     ci = ComponentInferer(gxmanager, xmltool)
     ci.gen_cmd_strings()
     ci.gen_command()
@@ -19,12 +19,12 @@ def infer_command_components(gxmanager: GalaxyManager, xmltool: XMLToolDefinitio
 # class just exists to avoid passing variables
 class ComponentInferer:
     command: Command
-    cmdstrs: list[DynamicCommandString] = []
+    cmdstrs: list[CommandString] = []
 
     def __init__(self, gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> None:
         self.gxmanager = gxmanager
         self.xmltool = xmltool
-        self.cmdstr_factory = DynamicCommandStringFactory(self.xmltool)
+        self.cmdstr_factory = CommandStringFactory(self.xmltool)
 
     def gen_cmd_strings(self) -> None:
         self.gen_test_cmdstrs()
@@ -55,10 +55,10 @@ class ComponentInferer:
         print('\nCommand strings being fed for inference ------------------------')
         print('\nTests:\n')
         for cmdstr in test_cmdstrs:
-            cmdstr.tool_statement.print_execution_paths()
+            cmdstr.main.print_execution_paths()
         print('\n\nXml:\n')
         for cmdstr in xml_cmdstrs:
-            cmdstr.tool_statement.print_execution_paths()
+            cmdstr.main.print_execution_paths()
         print()
 
 

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 from xmltool.metadata import Metadata
+from xmltool.param.OutputParam import OutputParam
 from xmltool.param.Param import Param
 from xmltool.param.InputRegister import InputRegister
 from xmltool.param.OutputRegister import OutputRegister
@@ -28,7 +29,6 @@ class XMLToolDefinition:
     inputs: InputRegister
     outputs: OutputRegister
     tests: TestRegister
-    
 
     def get_input(self, query: str, strategy: str='default') -> Optional[Param]:
         return self.inputs.get(query.lstrip('$'), strategy=strategy)

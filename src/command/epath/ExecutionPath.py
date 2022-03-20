@@ -3,9 +3,11 @@
 #from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Optional
+from command.components.outputs.OutputComponentFactory import OutputComponentFactory
 
 from command.tokens.Tokens import Token, TokenType
-from command.components.linux_constructs import Tee, Redirect, StreamMerge
+from command.components.outputs import RedirectOutput
+from command.components.linux import Tee, StreamMerge
 from command.components.CommandComponent import CommandComponent
 from command.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
 
@@ -24,7 +26,7 @@ class ExecutionPath:
     def __init__(self, tokens: list[Token]):
         self.positions: list[EPathPosition] = self.init_positions(tokens)
         self.stream_merges: list[StreamMerge] = []
-        self.redirect: Optional[Redirect] = None
+        self.redirect: Optional[CommandComponent] = None
         self.tees: Optional[Tee] = None
         self.tokens_to_excise: list[int] = []
         self.set_attrs()
@@ -42,7 +44,7 @@ class ExecutionPath:
         gets the CommandComponents in this EPath. 
         preserves ordering
         """
-        ignore = [Tee, Redirect, StreamMerge]
+        ignore = [Tee, RedirectOutput, StreamMerge]
         out: list[CommandComponent] = []
         for position in self.positions:
             component = position.component
@@ -79,17 +81,18 @@ class ExecutionPath:
     def handle_redirect(self, position: EPathPosition) -> None:
         """
         handles an identified redirect. 
-        creates Redirect() and marks corresponding CommandWords for removal
+        creates RedirectOutput() and marks corresponding CommandWords for removal
         """
         ptr = position.ptr
         redirect_token = self.positions[ptr].token
         outfile_token = self.positions[ptr + 1].token
+        factory = OutputComponentFactory()
 
         if redirect_token and outfile_token:
-            redirect = Redirect(redirect_token, outfile_token)
-            self.redirect = redirect
+            redirect = factory.create_redirect_output((redirect_token, outfile_token))
             self.annotate_position_with_component(ptr, redirect)
             self.annotate_position_with_component(ptr + 1, redirect)
+            self.redirect = redirect
                     
     def set_tee(self) -> None:
         for position in self.positions:

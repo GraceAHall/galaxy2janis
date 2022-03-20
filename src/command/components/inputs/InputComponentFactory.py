@@ -4,29 +4,29 @@
 from abc import ABC, abstractmethod
 
 from command.components.CommandComponent import CommandComponent
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.Positional import Positional
 from command.tokens.Tokens import Token
+from .Flag import Flag
+from .Option import Option
+from .Positional import Positional
 
 
-class ComponentSpawner(ABC):
+class InputComponentFactory(ABC):
     @abstractmethod
     def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> CommandComponent:
         """creates a specific CommandComponent"""
         ...
 
-class FlagComponentSpawner(ComponentSpawner):
+class FlagComponentFactory(InputComponentFactory):
     def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Flag:
         return Flag(prefix=ctoken.text)
 
     def spawn_from_opt(self, option: Option) -> Flag:
         flag = Flag(prefix=option.prefix)
-        gxvar = option.gxvar if option.gxvar_attachment == 1 else None
-        flag.gxvar = gxvar
+        gxparam = option.gxparam if option.gxparam_attachment == 1 else None
+        flag.gxparam = gxparam
         return flag
 
-class OptionComponentSpawner(ComponentSpawner):
+class OptionComponentFactory(InputComponentFactory):
     def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Option:
         return Option(
             prefix=ctoken.text,
@@ -35,19 +35,19 @@ class OptionComponentSpawner(ComponentSpawner):
             delim=delim
         )
 
-class PositionalComponentSpawner(ComponentSpawner):
+class PositionalComponentFactory(InputComponentFactory):
     def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Positional:
         return Positional(value=ctoken.text, epath_id=epath_id)
         
 
 
 spawners = {
-    'option': OptionComponentSpawner(),
-    'flag': FlagComponentSpawner(),
-    'positional': PositionalComponentSpawner()
+    'option': OptionComponentFactory(),
+    'flag': FlagComponentFactory(),
+    'positional': PositionalComponentFactory()
 }
 
-def spawn_component(comp_type: str, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> CommandComponent:
+def spawn_input_component(comp_type: str, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> CommandComponent:
     spawner = spawners[comp_type]
     return spawner.spawn(ctoken, ntokens, epath_id, delim=delim)
 

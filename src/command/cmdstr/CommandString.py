@@ -4,28 +4,54 @@
 from command.cmdstr.ConstructTracker import ConstructTracker
 from xmltool.metadata import Metadata
 from typing import Optional, Tuple
-from command.cmdstr.CommandStatement import CommandStatement
+from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.cmdstr.utils import global_align
 from xmltool.metadata import Metadata
 from command.cmdstr.utils import split_lines
+from command.tokens.Tokens import Token
 
+class CommandString:
+    source: str
+    main: DynamicCommandStatement
+    preprocessing: list[DynamicCommandStatement]
+    postprocessing: list[DynamicCommandStatement]
 
-class DynamicCommandString:
-    def __init__(self, source: str, statements: list[CommandStatement], metadata: Metadata):
+    def __init__(self, source: str, statements: list[DynamicCommandStatement], metadata: Metadata):
         self.source = source
-        self.statements = statements
-        self.tool_statement: CommandStatement = get_best_statement(self.statements, metadata)
-        self.preprocessing: list[CommandStatement] = []
-        self.postprocessing: list[CommandStatement] = []
+        self.set_statements(statements, metadata)
+
+    def set_statements(self, statements: list[DynamicCommandStatement], metadata: Metadata):
+        self.preprocessing = []
+        self.postprocessing = []
+        
+        main_index = infer_main_tool_statement(statements, metadata)
+        for i, statement in enumerate(statements):
+            if i < main_index:
+                self.preprocessing.append(statement)
+            elif i == main_index:
+                self.main = statement
+            else:
+                self.postprocessing.append(statement)
+
+    def get_original_tokens(self) -> list[Token]:
+        """gets the original tokenized form of the command string"""
+        out: list[Token] = []
+        for statement in self.preprocessing:
+            out += statement.get_tokens()
+        out += self.main.get_tokens()
+        for statement in self.postprocessing:
+            out += statement.get_tokens()
+        return out
 
     def get_text(self) -> str:
         """pieces back together the overall cmdline string from statements and delims"""
         out: str = ''
-        for statement in self.statements:
-            if statement.end_delim:
-                out += f'{statement.cmdline} {statement.end_delim}\n'
-            else:
-                out += statement.cmdline
+        for segment in [self.preprocessing, [self.main], self.postprocessing]:
+            for statement in segment:
+                if statement.end_delim:
+                    out += f'{statement.cmdline} {statement.end_delim}\n'
+                else:
+                    out += statement.cmdline
         return out
 
     def get_constant_text(self) -> str:
@@ -48,36 +74,36 @@ class DynamicCommandString:
         raise NotImplementedError()
 
 
-def get_best_statement(statements: list[CommandStatement], metadata: Metadata) -> CommandStatement:
+def infer_main_tool_statement(statements: list[DynamicCommandStatement], metadata: Metadata) -> int:
     if len(statements) == 1:
-        return statements[0]
+        return 0
     
     gxref_counts = get_gxref_counts(statements)
     req_similarities = get_requirement_similarities(statements, metadata)
     best = choose_best(gxref_counts, req_similarities)
     # return clear best or fallback to final statement
     if best:
-        return statements[best]
-    return statements[-1]
+        return best
+    return len(statements) - 1 # the last statement
 
-def get_gxref_counts(statements: list[CommandStatement]) -> list[Tuple[int, int]]:
+def get_gxref_counts(statements: list[DynamicCommandStatement]) -> list[Tuple[int, int]]:
     out: list[Tuple[int, int]] = []
     for i, statement in enumerate(statements):
         out.append((i, statement.get_galaxy_reference_count()))
     out.sort(key=lambda x: x[1], reverse=True)
     return out
 
-def get_requirement_similarities(statements: list[CommandStatement], metadata: Metadata) -> list[Tuple[int, float]]:
+def get_requirement_similarities(statements: list[DynamicCommandStatement], metadata: Metadata) -> list[Tuple[int, float]]:
     main_requirement = metadata.get_main_requirement().get_text()
     raw_similarities = get_raw_similarities(statements, main_requirement)
     adj_similarities = adjust_similarities(raw_similarities, main_requirement)
     return adj_similarities
 
-def get_raw_similarities(statements: list[CommandStatement], mainreq: str) -> dict[int, float]:
+def get_raw_similarities(statements: list[DynamicCommandStatement], mainreq: str) -> dict[int, float]:
     return {i: get_firstword_similarity(stmt, mainreq) for i, stmt in enumerate(statements)}
 
-def get_firstword_similarity(statement: CommandStatement, main_requirement: str) -> float:
-    if len(statement.tokens) == 0:
+def get_firstword_similarity(statement: DynamicCommandStatement, main_requirement: str) -> float:
+    if len(statement.realised_tokens) == 0:
         return 0
     else:
         return global_align(statement.get_first_word(), main_requirement)

@@ -3,7 +3,7 @@
 from command.Command import Command 
 
 from xmltool.tool_definition import XMLToolDefinition
-from command.cmdstr.DynamicCommandString import DynamicCommandString
+from command.cmdstr.CommandString import CommandString
 
 from command.epath.ExecutionPath import ExecutionPath
 from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
@@ -11,16 +11,15 @@ from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
 
 
 class CommandFactory:
-    epath_iterator: GreedyEPathAnnotator
     command: Command
     
     def __init__(self, xmltool: XMLToolDefinition):
         self.xmltool = xmltool
         self.epath_count: int = 0
-        self.cmdstrs: list[DynamicCommandString] = []
+        self.cmdstrs: list[CommandString] = []
         self.has_non_xml_sources = False
 
-    def create(self, cmdstrs: list[DynamicCommandString]) -> Command:
+    def create(self, cmdstrs: list[CommandString]) -> Command:
         self.set_attrs(cmdstrs)
         self.feed_cmdstrs(source='xml')
         self.feed_cmdstrs(source='test')
@@ -28,15 +27,16 @@ class CommandFactory:
         self.cleanup()
         return self.command
 
-    def set_attrs(self, cmdstrs: list[DynamicCommandString]) -> None:
-        self.command = Command()
-        self.has_non_xml_sources = True if any([source.source != 'xml' for source in cmdstrs]) else False
+    def set_attrs(self, cmdstrs: list[CommandString]) -> None:
+        self.has_non_xml_sources = True if any([cmd.source != 'xml' for cmd in cmdstrs]) else False
         self.cmdstrs = cmdstrs
+        xmlcmd = [cmd for cmd in cmdstrs if cmd.source == 'xml'][0]
+        self.command = Command(xmlcmd)
 
     def feed_cmdstrs(self, source: str) -> None:
         active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
         for cmdstr in active_cmdstrs:
-            for epath in cmdstr.tool_statement.get_execution_paths():
+            for epath in cmdstr.main.get_execution_paths():
                 self.feed(epath)
 
     def feed(self, epath: ExecutionPath) -> None:

@@ -30,15 +30,15 @@ class CommandWord:
         return self.token.text
 
     @property
-    def gxvar(self) -> Optional[Param]:
-        return self.token.gxvar
+    def gxparam(self) -> Optional[Param]:
+        return self.token.gxparam
     
     def __repr__(self) -> str:
-        return f'CommandWord(value={self.text}, token={self.token.type}, gxvar={self.gxvar})'
+        return f'CommandWord(value={self.text}, token={self.token.type}, gxparam={self.gxparam})'
 
     def get_values(self) -> list[str]:
         if component_utils.word_is_bool_select(self):
-            return self.token.gxvar.get_all_values(nonempty=True) # type: ignore
+            return self.token.gxparam.get_all_values(nonempty=True) # type: ignore
         return [self.token.text]
 
 

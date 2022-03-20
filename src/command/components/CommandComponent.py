@@ -10,10 +10,9 @@ from datatypes.formatting import format_janis_str
 
 # defines what a CommandComponent should look like
 class CommandComponent(Protocol):
-    gxvar: Optional[Param]
+    gxparam: Optional[Param]
     presence_array: list[bool]
-    stage: str
-    cmd_pos: int
+    datatypes: list[JanisDatatype]
     
     def get_name(self) -> str:
         ...
@@ -21,8 +20,6 @@ class CommandComponent(Protocol):
     def get_default_value(self) -> Any:
         ...
     
-    def get_janis_datatypes(self) -> list[JanisDatatype]:
-        ...
 
     def get_janis_datatype_str(self) -> str:
         ...
@@ -36,16 +33,13 @@ class CommandComponent(Protocol):
     def is_array(self) -> bool:
         ...
     
-    def is_stdout(self) -> bool:
-        ...
-
     def get_docstring(self) -> Optional[str]:
         ...
     
-    def update(self, incoming: Any):
+    def update(self, incoming: Any) -> None:
         ...
 
-    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
+    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False) -> None:
         ...
 
 
@@ -53,10 +47,9 @@ class CommandComponent(Protocol):
 # this mainly exists because each CommandComponent has the same 
 # update_presence_array and get_janis_tag method. 
 class BaseCommandComponent(ABC):
-    gxvar: Optional[Param]
+    gxparam: Optional[Param]
     presence_array: list[bool]
-    stage: str
-    cmd_pos: int
+    datatypes: list[JanisDatatype] = []
 
     @abstractmethod
     def get_name(self) -> str:
@@ -75,26 +68,18 @@ class BaseCommandComponent(ABC):
         """
         ...
 
-    @abstractmethod
-    def get_janis_datatypes(self) -> list[JanisDatatype]:
-        """gets the janis type for this component"""
-        ...
-
     def get_janis_datatype_str(self) -> str:
         """gets the janis datatypes then formats into a string for writing definitions"""
-        datatypes = self.get_janis_datatypes()
         return format_janis_str(
-            datatypes=datatypes,
+            datatypes=self.datatypes,
             is_optional=self.is_optional(),
-            is_array=self.is_array(),
-            is_stdout=self.is_stdout()
+            is_array=self.is_array()
         )
 
     def get_janis_tag(self) -> str:
         """gets the janis tag for this component"""
         name = self.get_name()
-        datatypes = self.get_janis_datatypes()
-        datatype = datatypes[0].classname
+        datatype = self.datatypes[0].classname
         return TagFormatter().format(name, datatype)
     
     @abstractmethod
@@ -113,11 +98,6 @@ class BaseCommandComponent(ABC):
         flags components are never arrays.
         """
         ...
-    
-    @abstractmethod
-    def is_stdout(self) -> bool:
-        """returns whether the component is stdout. only True for Redirect() CommandComponent"""
-        ...
 
     @abstractmethod
     def get_docstring(self) -> Optional[str]:
@@ -128,7 +108,7 @@ class BaseCommandComponent(ABC):
         ...
 
     @abstractmethod
-    def update(self, incoming: Any):
+    def update(self, incoming: Any) -> None:
         """
         updates this component with information from another similar component. 
         also sets the component as being present in the cmdstr being parsed.
@@ -140,7 +120,7 @@ class BaseCommandComponent(ABC):
         """
         ...
 
-    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False):
+    def update_presence_array(self, cmdstr_index: int, fill_false: bool=False) -> None:
         """
         sets the presence of the component in the current cmdstr being parsed.
         This is quite tricky logic, dont change

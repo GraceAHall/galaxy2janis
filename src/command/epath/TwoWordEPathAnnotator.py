@@ -1,15 +1,15 @@
 
 
 from typing import Iterable, Tuple
-from command.cmdstr.DynamicCommandString import DynamicCommandString
+from command.cmdstr.CommandString import CommandString
 from command.tokens.Tokens import Token
 
 class TwoWordEPathAnnotator:
     """
-    iterates through a DynamicCommandString, yielding the current tokens being assessed.
-    keeps track of the location we are in the DynamicCommandString
+    iterates through a CommandString, yielding the current tokens being assessed.
+    keeps track of the location we are in the CommandString
 
-    Example DynamicCommandString:
+    Example CommandString:
     fastqc --in1 input1.fastq --mode fast report.txt ...
     
     0           1             2             3           4           5
@@ -31,10 +31,10 @@ class TwoWordEPathAnnotator:
     }
     """
 
-    def iter(self, cmdstr: DynamicCommandString) -> Iterable[Tuple[Token, list[Token]]]:
+    def iter(self, cmdstr: CommandString) -> Iterable[Tuple[Token, list[Token]]]:
         raise NotImplementedError
 
-    # def next(self, cmdstmt: CommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
+    # def next(self, cmdstmt: DynamicCommandStatement, disallow: list[type[CommandComponent]]=[]) -> None:
     #     """
     #     iterate through command words (with next word for context)
     #     each pair of words may actually yield more than one component.

@@ -16,7 +16,7 @@ def flatten_multiline_strings(cmdstr: str) -> str:
     return cmdstr
 
 def translate_variable_markers(cmdstr: str) -> str:
-    return cmdstr.replace("gxvar_", "$")
+    return cmdstr.replace("gxparam_", "$")
 
 def standardise_variable_format(cmdstr: str) -> str:
     """standardises different forms of a galaxy variable ${var}, $var etc"""

@@ -3,15 +3,13 @@
 from abc import ABC, abstractmethod
 from command.components.CommandComponent import CommandComponent
 
-from command.components.Flag import Flag
-from command.components.Option import Option
-from command.components.Positional import Positional
+from command.components.inputs import Positional, Flag, Option
 
 
 # def get_base_positionals(self) -> list[Positional]:
 #     positionals = self.get_positionals()
 #     positionals = [p for p in positionals if p.stage == 'pre_options']
-#     return [p for p in positionals if not p.gxvar and p.has_single_value()]
+#     return [p for p in positionals if not p.gxparam and p.has_single_value()]
 
 
 

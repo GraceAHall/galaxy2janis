@@ -76,7 +76,7 @@ class TokenFactory:
 
     def spawn_end_sentinel(self) -> Token:
         matches = scanners.get_all('end')
-        return Token(matches[0], TokenType.END_SENTINEL)
+        return Token(matches[0], TokenType.END_STATEMENT)
 
     def spawn_kv_linker(self, delim: str) -> Token:
         matches = scanners.get_all(delim)
@@ -129,9 +129,9 @@ class TokenFactory:
         for m, varname in zip(matches, base_vars):
             if varname:
                 if self.xmltool.get_input(varname):
-                    tokens.append(Token(m, TokenType.GX_INPUT, gxvar=self.xmltool.get_input(varname)))
+                    tokens.append(Token(m, TokenType.GX_INPUT, gxparam=self.xmltool.get_input(varname)))
                 elif self.xmltool.get_output(varname):
-                    tokens.append(Token(m, TokenType.GX_OUTPUT, gxvar=self.xmltool.get_output(varname)))
+                    tokens.append(Token(m, TokenType.GX_OUTPUT, gxparam=self.xmltool.get_output(varname)))
                 else:
                     tokens.append(Token(m, TokenType.ENV_VAR))
         return tokens

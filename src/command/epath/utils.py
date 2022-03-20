@@ -1,8 +1,7 @@
 
 
 
-from command.components.Flag import Flag
-from command.components.Option import Option
+from command.components.inputs import Flag, Option
 from command.tokens.Tokens import Token, TokenType
 from xmltool.param.InputParam import BoolParam, SelectParam
 
@@ -11,13 +10,13 @@ NON_VALUE_TOKENTYPES = set([
     TokenType.LINUX_TEE, 
     TokenType.LINUX_REDIRECT,
     TokenType.LINUX_STREAM_MERGE,
-    TokenType.END_SENTINEL,
+    TokenType.END_STATEMENT,
     TokenType.EXCISION,
 ])
 
 def is_bool_select(token: Token) -> bool:
     if token.type == TokenType.GX_INPUT:
-        match token.gxvar:
+        match token.gxparam:
             case BoolParam() | SelectParam():
                 return True
             case _:
@@ -61,7 +60,6 @@ def is_positional(token: Token) -> bool:
 def cast_opt_to_flag(option: Option) -> Flag:
     return Flag(
         prefix=option.prefix,
-        gxvar=option.gxvar,
-        stage=option.stage,
+        gxparam=option.gxparam,
         presence_array=option.presence_array
     )

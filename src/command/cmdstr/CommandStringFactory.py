@@ -6,8 +6,8 @@ from typing import Optional
 
 from xmltool.tool_definition import XMLToolDefinition
 
-from command.cmdstr.DynamicCommandString import DynamicCommandString
-from command.cmdstr.CommandStatement import CommandStatement
+from command.cmdstr.CommandString import CommandString
+from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 #from command.alias.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
@@ -15,15 +15,15 @@ from command.regex.scanners import get_statement_delims
 from command.regex.utils import get_quoted_sections
 
 
-class DynamicCommandStringFactory:
+class CommandStringFactory:
     def __init__(self, xmltool: XMLToolDefinition):
         self.xmltool = xmltool
 
-    def create(self, source: str, raw_string: str) -> DynamicCommandString:
+    def create(self, source: str, raw_string: str) -> CommandString:
         simple_str = self.simplify_raw_string(source, raw_string)
         statements = self.create_statements(simple_str)
         statements = self.set_statement_tokens(statements)
-        esource = DynamicCommandString(source, statements, self.xmltool.metadata)
+        esource = CommandString(source, statements, self.xmltool.metadata)
         return esource
 
     def simplify_raw_string(self, source: str, the_string: str) -> str:
@@ -34,10 +34,10 @@ class DynamicCommandStringFactory:
         strategy = strategy_map[source]
         return strategy.simplify(the_string)
 
-    def create_statements(self, the_string: str) -> list[CommandStatement]:
+    def create_statements(self, the_string: str) -> list[DynamicCommandStatement]:
         return split_to_statements(the_string)
 
-    # def resolve_statement_aliases(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+    # def resolve_statement_aliases(self, statements: list[DynamicCommandStatement]) -> list[DynamicCommandStatement]:
     #     ar = AliasResolver(self.xmltool)
     #     for cmd_statement in statements:
     #         ar.extract(cmd_statement)
@@ -45,14 +45,14 @@ class DynamicCommandStringFactory:
     #         ar.resolve(cmd_statement)
     #     return statements
         
-    def set_statement_tokens(self, statements: list[CommandStatement]) -> list[CommandStatement]:
+    def set_statement_tokens(self, statements: list[DynamicCommandStatement]) -> list[DynamicCommandStatement]:
         for cmd_statement in statements:
-            cmd_statement.set_tokens(self.xmltool)
+            cmd_statement.set_realised_tokens(self.xmltool)
         return statements
 
    
 
-def split_to_statements(the_string: str) -> list[CommandStatement]:
+def split_to_statements(the_string: str) -> list[DynamicCommandStatement]:
     """
     splits a string into individual command line statements.
     these are delimited by &&, ||, | etc
@@ -83,12 +83,12 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
     statements = [the_string] + statements
     delims.append(None)
 
-    return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
+    return [DynamicCommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 
 
 
-# def split_to_statements_old(the_string: str) -> list[CommandStatement]:
+# def split_to_statements_old(the_string: str) -> list[DynamicCommandStatement]:
 #     """
 #     splits a string into individual command line statements.
 #     these are delimited by &&, ||, | etc
@@ -117,5 +117,5 @@ def split_to_statements(the_string: str) -> list[CommandStatement]:
 #     statements = [the_string] + statements
 #     delims.append(None)
 
-#     return [CommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
+#     return [DynamicCommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 

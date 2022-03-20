@@ -1,42 +1,49 @@
 
 
-import json
 from typing import Any
 
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.parsing import parse_step
-from workflows.step.Step import GalaxyWorkflowStep
+from workflows.step.Step import GalaxyWorkflowStep, InputDataStep, ToolStep
+from workflows.io.Output import WorkflowOutput
 
 
 class Workflow:
-    """models a galaxy workflow"""
+    def __init__(self, metadata: WorkflowMetadata, steps: list[GalaxyWorkflowStep]) -> None:
+        self.metadata = metadata
+        self.steps = steps
 
-    def __init__(self, workflow_path: str):
-        self.tree = self.load_tree(workflow_path)
-        self.metadata: WorkflowMetadata = self.parse_metadata()
-        self.steps: list[GalaxyWorkflowStep] = self.parse_steps()
-
-    def load_tree(self, path: str) -> dict[str, Any]:
-        # TODO should probably check the workflow type (.ga, .ga2)
-        # and internal format is valid
-        with open(path, 'r') as fp:
-            return json.load(fp)
-
-    def parse_metadata(self) -> WorkflowMetadata:
-        return WorkflowMetadata(
-            name=self.tree['name'],
-            annotation=self.tree['annotation'],
-            format_version=self.tree['format-version'],
-            tags=self.tree['tags'],
-            uuid=self.tree['uuid'],
-            version=self.tree['version']
-        )
-
-    def parse_steps(self) -> list[GalaxyWorkflowStep]:
-        out: list[GalaxyWorkflowStep] = []
-        for step_details in self.tree['steps'].values():
-            out.append(parse_step(step_details))
+    def get_inputs(self) -> list[InputDataStep]:
+        out: list[InputDataStep] = []
+        for step in self.steps:
+            if isinstance(step, InputDataStep):
+                out.append(step)
         return out
 
+    def get_tool_steps(self) -> list[ToolStep]:
+        out: list[ToolStep] = []
+        for step in self.steps:
+            if isinstance(step, ToolStep):
+                out.append(step)
+        out.sort(key=lambda x: x.metadata.step_id)
+        return out
 
+    def get_outputs(self) -> list[WorkflowOutput]:
+        out: list[WorkflowOutput] = []
+        for step in self.get_tool_steps():
+            for wout in step.metadata.workflow_outputs:
+                out.append(self.init_workflow_output(step, wout))
+        return out
 
+    def init_workflow_output(self, step: ToolStep, wout_details: dict[str, Any]) -> WorkflowOutput:
+        step_output = step.get_output(wout_details['output_name'])
+        name = f'{step.metadata.tool_name}_{wout_details["output_name"]}'
+        return WorkflowOutput(
+            name=name,
+            step=step.metadata.step_id,
+            output_name=wout_details['label'] if wout_details['label'] else name,
+            datatype=step_output.type
+        )
+
+    def to_janis_definition(self) -> str:
+        raise NotImplementedError()
+    

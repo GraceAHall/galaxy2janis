@@ -18,7 +18,7 @@ class DatatypeDetails:
 
 class DatatypeRegister:
     def __init__(self):
-        self.datatype_definitions_path = 'datatypes/gxformat_combined_types.yaml'
+        self.datatype_definitions_path = 'data/datatypes/gxformat_combined_types.yaml'
         self.dtype_map: dict[str, JanisDatatype] = {}
         self.load_yaml_to_dtype_map()
         #self.ext_to_raw_map = self.index_by_ext(self.format_datatype_map)
@@ -52,7 +52,7 @@ class DatatypeRegister:
         self.dtype_map[fmt] = new_type
         self.dtype_map[dtype['classname']] = new_type # two keys per datatype
 
-
+        
 
 
 

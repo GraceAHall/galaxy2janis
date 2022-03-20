@@ -1,8 +1,6 @@
 
 from typing import Any, Optional
-
 from xmltool.param.Param import Param
-from xmltool.parsing.selectors import Selector
 
 
 class OutputParam(Param):
@@ -10,7 +8,7 @@ class OutputParam(Param):
         self.name: str = name
         self.label: str = ''
         self.datatypes: list[str] = []
-        self.selector: Optional[Selector] = None
+        self.wildcard_pattern: Optional[str] = None
 
     def get_default(self) -> Any:
         return None
@@ -28,18 +26,20 @@ class OutputParam(Param):
 
 
 class DataOutputParam(OutputParam):
-    def __init__(self, name: str):
+    def __init__(self, name: str, wildcard_pattern: Optional[str]=None):
         super().__init__(name)
+        self.wildcard_pattern = wildcard_pattern
 
     def is_array(self) -> bool:
-        if self.selector and '*' in self.selector.contents:
+        if self.wildcard_pattern and '*' in self.wildcard_pattern:
             return True
         return False
 
 
 class CollectionOutputParam(OutputParam):
-    def __init__(self, name: str):
+    def __init__(self, name: str, wildcard_pattern: Optional[str]=None):
         super().__init__(name)
+        self.wildcard_pattern = wildcard_pattern
         self.collection_type: str = 'list'
 
     def is_array(self) -> bool:

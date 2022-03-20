@@ -18,7 +18,7 @@ def generate_input_dataset(app: MockApp, varname: str, filepath: str) -> JobToIn
     creates a dataset association. 
     this process creates a dataset and updates the sql database model.
     """
-    #varrep = 'gxvar_' + varname
+    #varrep = 'gxparam_' + varname
     app.dataset_counter += 1
     return JobToInputDatasetAssociation(
         name=varname, 

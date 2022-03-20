@@ -6,7 +6,8 @@
 """
 Need:
 workflow step
-command string text -> DynamicCommandString.get_constant_text()
+tool 
+command string text -> CommandString.get_constant_text()
 Command() components
 
 

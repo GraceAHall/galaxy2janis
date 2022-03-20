@@ -46,7 +46,7 @@ class TestCommandInference(unittest.TestCase):
         target_flags = ['--noheader']
         for prefix in target_flags:
             flag = cmd.flags[prefix]
-            self.assertIsNotNone(flag.gxvar)
+            self.assertIsNotNone(flag.gxparam)
             self.assertEquals(flag.prefix, prefix)
             self.assertEquals(flag.is_optional(), True)
     
@@ -57,19 +57,19 @@ class TestCommandInference(unittest.TestCase):
             '--db': {
                 'delim': '=',
                 'default': 'resfinder',
-                'has_gxvar': True,
+                'has_gxparam': True,
                 'is_optional': False
             },
             '--minid': {
                 'delim': '=',
                 'default': '80',
-                'has_gxvar': True,
+                'has_gxparam': True,
                 'is_optional': False
             },
             '--mincov': {
                 'delim': '=',
                 'default': '80',
-                'has_gxvar': True,
+                'has_gxparam': True,
                 'is_optional': False
             }
         }
@@ -77,19 +77,19 @@ class TestCommandInference(unittest.TestCase):
             option = cmd.options[prefix]
             self.assertEquals(option.delim, details['delim'])
             self.assertEquals(option.get_default_value(), details['default'])
-            self.assertEquals(option.gxvar is not None, details['has_gxvar'])
+            self.assertEquals(option.gxparam is not None, details['has_gxparam'])
             self.assertEquals(option.is_optional(), details['is_optional'])
 
     def test_command_stdout(self) -> None:
         redirect: Any = self.command.redirect
         self.assertIsNotNone(redirect)
-        self.assertIsNotNone(redirect.gxvar)
+        self.assertIsNotNone(redirect.gxparam)
         self.assertEquals(redirect.file.text, '$report')
 
 
 
 
-# RAW_CMDSTR = "ln -sf 'gxvar_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > 'gxvar_report'"
+# RAW_CMDSTR = "ln -sf 'gxparam_file_input' file_input &&  abricate file_input  --minid=80.0 --mincov=80.0 --db=resfinder > 'gxparam_report'"
 
 # STATEMENT0_STR = "ln -sf '$file_input' file_input"
 # STATEMENT1_STR = "abricate $file_input  --minid=80.0 --mincov=80.0 --db=resfinder > '$report'"
@@ -111,7 +111,7 @@ class TestCommandInference(unittest.TestCase):
 # ]
 
 
-# class TestCreateDynamicCommandString(unittest.TestCase):
+# class TestCreateCommandString(unittest.TestCase):
 #     """
 #     tests whether CommandStatments are being correctly set up 
 #     """
@@ -120,7 +120,7 @@ class TestCommandInference(unittest.TestCase):
 #         esettings: ToolExeSettings = load_tool_settings(args) 
 #         gxmanager: GalaxyManager = load_manager(esettings)
 #         xmltool: XMLToolDefinition = load_xmltool(gxmanager)
-#         self.factory = DynamicCommandStringFactory(xmltool)
+#         self.factory = CommandStringFactory(xmltool)
 
 #     def test_basic_overall_creation(self) -> None:
 #         cmdstr = self.factory.create('test', RAW_CMDSTR)

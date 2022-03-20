@@ -9,15 +9,15 @@ from command.tokens.Tokens import Token, TokenType
 
 from command.Command import Command
 from command.components.CommandComponent import CommandComponent
-from command.epath.ComponentSpawner import spawn_component
+from command.components.inputs import spawn_input_component 
 import command.epath.utils as component_utils
 
 
 """
-iterates through a DynamicCommandString, yielding the current tokens being assessed.
-keeps track of the location we are in the DynamicCommandString
+iterates through a ExecutionPath, yielding the current tokens being assessed.
+keeps track of the location we are in the ExecutionPath
 
-Example DynamicCommandString:
+Example ExecutionPath:
 abricate $sample_name --no-header --minid=80 --db = card
 
 0            1             2            3           4          5        6           7          8
@@ -92,8 +92,8 @@ class GreedyEPathAnnotator:
             ctype= 'positional'
 
         stop = self.pos + 1
-        component = spawn_component(ctype, ctoken, vtokens, epath_id=self.epath.id, delim=delim)
-        self.transfer_gxvar_to_component(start, stop, component)
+        component = spawn_input_component(ctype, ctoken, vtokens, epath_id=self.epath.id, delim=delim)
+        self.transfer_gxparam_to_component(start, stop, component)
         self.update_epath(start, stop, component)
 
     def format_option(self) -> Tuple[str, list[Token]]:
@@ -121,11 +121,11 @@ class GreedyEPathAnnotator:
                 ntoken = self.epath.positions[self.pos + 1].token
         return out
 
-    def transfer_gxvar_to_component(self, start: int, stop: int, component: CommandComponent) -> None:
+    def transfer_gxparam_to_component(self, start: int, stop: int, component: CommandComponent) -> None:
         for i in range(start, stop):
-            epath_gxvar = self.epath.positions[i].token.gxvar
-            if epath_gxvar:
-                component.gxvar = epath_gxvar
+            epath_gxparam = self.epath.positions[i].token.gxparam
+            if epath_gxparam:
+                component.gxparam = epath_gxparam
                 break
 
     def update_epath(self, start: int, stop: int, component: CommandComponent) -> None:
