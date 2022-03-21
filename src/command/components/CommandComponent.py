@@ -19,7 +19,6 @@ class CommandComponent(Protocol):
 
     def get_default_value(self) -> Any:
         ...
-    
 
     def get_janis_datatype_str(self) -> str:
         ...

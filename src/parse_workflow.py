@@ -22,13 +22,13 @@ def parse_workflow(wsettings: WorkflowExeSettings):
     workflow = factory.create(wsettings.get_workflow_path())
 
     # generate a tool definition for each tool step
-    for step in workflow.get_tool_steps():
+    for step in workflow.steps.values():
         args = make_parse_tool_args(step, wsettings)
         tsettings: ToolExeSettings = load_tool_settings(args)
         step.tool = parse_tool(tsettings)
-        print()
 
     # write a definition for the workflow
+    workflow.assign_step_values()
     print(workflow.to_janis_definition())
 
 

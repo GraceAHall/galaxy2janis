@@ -35,6 +35,7 @@ class TagFormatter:
         the_string = the_string.strip('\\/-$')
         the_string = the_string.replace('-', '_')
         the_string = the_string.replace('.', '_')
+        the_string = the_string.replace(' ', '_')
         the_string = the_string.replace('|', '_')
         the_string = the_string.replace('/', '_')
         the_string = the_string.replace('\\', '_')

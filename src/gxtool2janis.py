@@ -11,7 +11,7 @@ from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from startup.settings import load_workflow_settings
 from startup.ExeSettings import WorkflowExeSettings
-from janis_definition.write_definition import write_definition
+from janis.write_definition import write_definition
 """
 gxtool2janis program entry point
 parses cli settings then hands execution to other files based on command

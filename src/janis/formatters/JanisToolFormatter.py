@@ -7,26 +7,18 @@ from xmltool.metadata import Metadata
 from containers.Container import Container
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
-from janis_definition.ImportHandler import ImportHandler
-from janis_definition.formatting_snippets import (
-    path_append_snippet,
-    tool_input_snippet,
-    tool_output_snippet,
-    command_tool_builder_snippet,
-    translate_snippet
-)
-
+from janis.imports.ImportHandler import ImportHandler
+import janis.snippets.tool_snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
-class JanisFormatter:
+class JanisToolFormatter:
     def __init__(self):
         self.import_handler = ImportHandler()
 
     def format_path_appends(self) -> str:
-        return path_append_snippet
+        return snippets.path_append_snippet()
 
     def format_inputs(self, inputs: list[CommandComponent]) -> str:
-        # TODO relook get_component_positions()
         positionals = [x for x in inputs if isinstance(x, Positional)]
         flags = [x for x in inputs if isinstance(x, Flag)]
         options = [x for x in inputs if isinstance(x, Option)]
@@ -51,7 +43,7 @@ class JanisFormatter:
         return out_str
    
     def format_positional_input(self, positional: Positional) -> str:
-        return tool_input_snippet(
+        return snippets.tool_input_snippet(
             tag=positional.get_janis_tag(),
             datatype=positional.get_janis_datatype_str(),
             position=positional.cmd_pos,
@@ -59,7 +51,7 @@ class JanisFormatter:
         )
 
     def format_flag_input(self, flag: Flag) -> str:
-        return tool_input_snippet(
+        return snippets.tool_input_snippet(
             tag=flag.get_janis_tag(),
             datatype=flag.get_janis_datatype_str(),
             position=flag.cmd_pos,
@@ -69,7 +61,7 @@ class JanisFormatter:
     
     def format_option_input(self, opt: Option) -> str:
         default_value = self.get_wrapped_default_value(opt)
-        return tool_input_snippet(
+        return snippets.tool_input_snippet(
             tag=opt.get_janis_tag(),
             datatype=opt.get_janis_datatype_str(),
             position=opt.cmd_pos,
@@ -99,7 +91,7 @@ class JanisFormatter:
         return out_str
 
     def format_output(self, output: CommandComponent) -> str:
-        return tool_output_snippet(
+        return snippets.tool_output_snippet(
             tag=output.get_janis_tag(),
             datatype=output.get_janis_datatype_str(),
             selector=output.get_selector_str() if not isinstance(output, RedirectOutput) else None, # type: ignore
@@ -107,7 +99,7 @@ class JanisFormatter:
         )
 
     def format_commandtool(self, metadata: Metadata, base_command: list[str], container: Optional[Container]) -> str:
-        return command_tool_builder_snippet(
+        return snippets.command_tool_builder_snippet(
             toolname=metadata.id,
             base_command=base_command,
             container=container.url if container else MISSING_CONTAINER_STRING,
@@ -116,7 +108,7 @@ class JanisFormatter:
         )
 
     def format_translate_func(self, metadata: Metadata) -> str:
-        return translate_snippet(metadata.id)
+        return snippets.translate_snippet(metadata.id)
 
     def format_imports(self) -> str:
         return self.import_handler.imports_to_string()

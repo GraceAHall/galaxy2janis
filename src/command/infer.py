@@ -19,12 +19,12 @@ def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Comma
 # class just exists to avoid passing variables
 class ComponentInferer:
     command: Command
-    cmdstrs: list[CommandString] = []
 
     def __init__(self, gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> None:
         self.gxmanager = gxmanager
         self.xmltool = xmltool
         self.cmdstr_factory = CommandStringFactory(self.xmltool)
+        self.cmdstrs: list[CommandString] = []
 
     def gen_cmd_strings(self) -> None:
         self.gen_test_cmdstrs()

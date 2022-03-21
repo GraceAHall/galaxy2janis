@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Callable, Tuple
+from typing import Any, Optional, Callable
 from command.cmdstr.CommandString import CommandString
 
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput
 from command.components.CommandComponent import CommandComponent
-from xmltool.param.OutputParam import OutputParam
 
 
 

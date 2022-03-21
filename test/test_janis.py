@@ -9,7 +9,7 @@ from mock.mock_tool import MOCK_TOOL
 from mock.mock_command import MOCK_COMMAND
 from mock.mock_container import MOCK_CONTAINER
 
-from janis_definition.write_definition import write_janis
+from janis.write_definition import write_janis
 
 class TestJanisFormatting(unittest.TestCase):
 

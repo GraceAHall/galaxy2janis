@@ -1,10 +1,6 @@
 
 
 
-
-
-
-
 from dataclasses import dataclass
 
 
@@ -21,11 +17,11 @@ eg
 w.output("out", source=w.sortsam.out)
 """
 
-
 @dataclass
 class WorkflowOutput:
-    name: str
-    step: int
     datatype: str
-    output_name: str
+    source: str
+
+
+
 

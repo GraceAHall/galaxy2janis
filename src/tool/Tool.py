@@ -8,7 +8,7 @@ from command.cmdstr.CommandString import CommandString
 from command.components.CommandComponent import CommandComponent
 from containers.Container import Container
 from xmltool.metadata import Metadata
-from janis_definition.JanisFormatter import JanisFormatter
+from janis.formatters.JanisToolFormatter import JanisToolFormatter
 
 
 @dataclass
@@ -33,7 +33,7 @@ class Tool:
         raise NotImplementedError
 
     def to_janis_definition(self) -> str:
-        formatter = JanisFormatter()
+        formatter = JanisToolFormatter()
         str_path = formatter.format_path_appends()
         str_inputs = formatter.format_inputs(self.get_inputs())
         str_outputs = formatter.format_outputs(self.get_outputs())

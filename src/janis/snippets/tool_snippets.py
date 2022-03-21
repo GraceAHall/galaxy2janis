@@ -2,7 +2,9 @@
 
 from typing import Any, Optional
 
-path_append_snippet = """
+
+def path_append_snippet() -> str:
+    return """
 import sys
 sys.path.append('/home/grace/work/pp/gxtool2janis')
 """
