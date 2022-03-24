@@ -9,7 +9,7 @@ from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
 from xmltool.load import load_xmltool, XMLToolDefinition
 
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from xmltool.requirements import CondaRequirement
 
 from xmltool.param.Param import Param
@@ -61,7 +61,7 @@ class TestGalaxyIngestion(unittest.TestCase):
 
     def test_metadata(self) -> None:
         xmltool = self.xmltool
-        self.assertIsInstance(xmltool.metadata, Metadata)
+        self.assertIsInstance(xmltool.metadata, ToolXMLMetadata)
         self.assertEquals(xmltool.metadata.id, 'abricate')
         self.assertEquals(xmltool.metadata.name, 'ABRicate')
         self.assertEquals(xmltool.metadata.version, '1.0.1')

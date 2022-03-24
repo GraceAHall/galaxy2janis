@@ -4,8 +4,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from xmltool.metadata import Metadata
-from xmltool.param.OutputParam import OutputParam
+from xmltool.metadata import ToolXMLMetadata
 from xmltool.param.Param import Param
 from xmltool.param.InputRegister import InputRegister
 from xmltool.param.OutputRegister import OutputRegister
@@ -24,7 +23,7 @@ class XMLToolDefinition:
     Does not depend on lower level representations or parsing.
     Permits storing and retreiving data about the tool.
     """
-    metadata: Metadata
+    metadata: ToolXMLMetadata
     command: str
     inputs: InputRegister
     outputs: OutputRegister

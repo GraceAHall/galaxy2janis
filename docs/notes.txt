@@ -2,6 +2,179 @@
 
 
 
+####################################################
+please set all values in 'configfile.txt'
+please .........
+####################################################
+
+
+
+
+
+configfile.txt/yml/json
+- INPUT_READS1
+- INPUT_READS2
+- INPUT_READS3
+- FASTQC_MODE
+
+
+step1.py
+from configfile import INPUT_READS1, FASTQC_MODE
+
+
+
+simple_workflow
+    - workflow.py
+    - steps
+        - step1.py
+        - step2.py
+    - tools
+        - fastqc.py
+        - quast.py
+        
+
+workflow.py
+
+from steps/step1.py import STEP1_FASTQC
+
+notes
+
+inputs = []
+
+
+w.input(
+        "STEP1_FASTQC",
+        File,
+        doc="Forward reads"
+)
+w.input(
+        "STEP2_FASTQC",
+        File,
+        doc="Forward reads"
+)
+
+STEP2_FASTQC = aoskd
+
+
+CWL:
+
+config.json
+    {
+        STEP1_FASTQC:__runtime__,
+        STEP1_FASTQC:__runtime__,
+        STEP1_FASTQC:__runtime__,
+    }
+
+
+
+# please set the following
+STEP1_INPUT1        = # SETME
+STEP1_OUTDIR        = # SETME
+STEP1_CONTAMINANTS  = # SETME
+STEP1_ADAPTERS      = # SETME
+STEP1_LIMITS        = # SETME
+STEP1_F_FILE        = # SETME
+
+
+
+steps [
+    STEP1_FASTQC,
+    STEP2_FASTQC,
+    STEP3_MULTIQC
+]
+
+outputs = []
+
+workflow.py
+
+    # input values
+    INPUT_READS1 = #SET
+    INPUT_READS2 = #SET
+    INPUT_READS3 = #SET
+    FASTQC_MODE = #SET
+
+
+
+    # line 102: step2 fastqc
+    input1=RUNTIMEVALUE,
+    outdir=RUNTIMEVALUE,
+    contaminants=RUNTIMEVALUE,    # this is a tabular file. [TOOL INPUT DOCSTRING]
+    adapters=RUNTIMEVALUE,
+    limits=RUNTIMEVALUE,
+    f_file=RUNTIMEVALUE
+
+
+
+
+
+# NOTE ON THESE INPUTS
+# contaminants
+# this is a tabular file. [TOOL INPUT DOCSTRING] 
+
+
+# please set the following
+STEP1_INPUT1        = # SETME
+STEP1_OUTDIR        = # SETME
+STEP1_CONTAMINANTS  = # SETME
+STEP1_ADAPTERS      = # SETME
+STEP1_LIMITS        = # SETME
+STEP1_F_FILE        = # SETME
+
+w.step(
+    "step4_fastqc",
+    fastqc(
+            quiet=False,
+            extract=False,
+            nogroup=false,
+            input1=STEP1_INPUT1,
+            outdir=STEP1_OUTDIR,
+            contaminants=STEP1_CONTAMINANTS,    # this is a tabular file. [TOOL INPUT DOCSTRING]
+            adapters=STEP1_ADAPTERS,
+            limits=STEP1_LIMITS,
+            kmers=7,
+            f_file=STEP1_F_FILE,
+    )
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 CommandString

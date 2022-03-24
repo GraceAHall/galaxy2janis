@@ -1,9 +1,9 @@
 
 
 
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 
-MOCK_METADATA = Metadata(
+MOCK_METADATA = ToolXMLMetadata(
     id='abricate',
     name='ABRicate',
     version='1.0.1',

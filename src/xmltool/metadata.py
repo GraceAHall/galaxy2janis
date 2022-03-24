@@ -12,7 +12,7 @@ from xmltool.requirements import ContainerRequirement, CondaRequirement
 Requirement = ContainerRequirement | CondaRequirement
 
 @dataclass
-class Metadata:
+class ToolXMLMetadata:
     name: str
     id: str
     version: str
@@ -20,7 +20,16 @@ class Metadata:
     help: str
     requirements: list[Requirement]
     citations: list[Citation]
-    creator: Optional[str]
+    creator: Optional[str] = None
+    # TODO
+    url: Optional[str] = None
+    owner: Optional[str] = None
+
+    def set_url(self, owner: str) -> None:
+        self.owner = owner
+
+    def set_owner(self, owner: str) -> None:
+        self.owner = owner
 
     def get_main_requirement(self) -> Requirement:
         """
@@ -47,28 +56,21 @@ class Metadata:
         return scores
              
     def get_main_citation(self) -> str:
-        raise NotImplementedError()
+        biotools_citations = [x for x in self.citations if x.type == 'biotools']
+        doi_citations = [x for x in self.citations if x.type == 'doi']
+        bibtex_citations = [x for x in self.citations if x.type == 'bibtex']
+        if biotools_citations:
+            return biotools_citations[0].text
+        elif doi_citations:
+            return doi_citations[0].text
+        elif bibtex_citations:
+            return bibtex_citations[0].text
+        return 'tool xml missing citation'
 
-    def get_main_citation_old(self) -> str:
-        # TODO UPDATE THIS WITH CitationManager galaxy source
-        doi_citations = [c for c in self.citations if c['type'] == 'doi']
+    def get_doi_citation(self) -> Optional[str]:
+        doi_citations = [x for x in self.citations if x.type == 'doi']
         if len(doi_citations) > 0:
-            doi_citation = doi_citations[0]
-            return str(doi_citation['text'])
-        
-        bibtex_citations = [c for c in self.citations if c['type'] == 'bibtex']
-        if len(bibtex_citations) > 0:
-            bibtex_citation = self.parse_bibtex(bibtex_citations[0])
-            return str(bibtex_citation) 
-        
-        else:
-            return 'tool xml missing citation'
-    
-    def parse_bibtex(self, bibtex_citation: dict[str, str]) -> str:
-        # define and parse using biblib
-        bp = bib.Parser()
-        data = bp.parse(bibtex_citation['text'], log_fp=sys.stderr).get_entries() # type: ignore
+            return doi_citations[0].text
+        return None
 
-        # get the key: value pairs
-        entry = list(data.values())[0]  # type: ignore
-        return str(entry['url']) # type: ignore
+

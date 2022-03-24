@@ -13,6 +13,7 @@ selector_map: dict[Any, str] = {
 default_import_str = """
 from janis_core import (
     CommandToolBuilder, 
+    ToolMetadata,
     ToolInput, 
     ToolOutput,
     Array,

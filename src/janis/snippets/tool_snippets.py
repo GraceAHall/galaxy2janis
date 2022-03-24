@@ -1,12 +1,44 @@
 
 
 from typing import Any, Optional
+from datetime import datetime
+DATE_FORMAT = "%Y-%m-%d"
 
 
 def path_append_snippet() -> str:
     return """
 import sys
 sys.path.append('/home/grace/work/pp/gxtool2janis')
+"""
+
+
+def metadata_snippet(
+    tool_name: str,
+    tool_version: str,
+    url: Optional[str]=None,
+    wrapper_owner: Optional[str]=None,
+    wrapper_creator: Optional[str]=None,
+    doi: Optional[str]=None,
+    citation:Optional[str]=None
+) -> str:
+    doi = f'"{doi}"' if doi else None
+    url = url if url else ''
+    contrib_str = 'gxtool2janis'
+    if wrapper_owner:
+        contrib_str += f', Galaxy Toolshed Username: {wrapper_owner}'
+    if wrapper_creator:
+        contrib_str += f', Galaxy Wrapper Creator: {wrapper_creator}'
+    return f"""
+metadata = ToolMetadata(
+    short_documentation="gxtool2janis translation of '{tool_name}' version '{tool_version}' from Galaxy XML wrapper {url}",
+    contributors="{contrib_str}",
+    dateCreated="{datetime.today().strftime(DATE_FORMAT)}",
+    dateUpdated="{datetime.today().strftime(DATE_FORMAT)}",
+    version=0,
+    doi={doi},
+    citation="{citation}"
+)
+
 """
 
 def tool_input_snippet(
@@ -58,6 +90,7 @@ def command_tool_builder_snippet(
 {toolname} = CommandToolBuilder(
     tool="{toolname}",
     base_command={base_command},
+    metadata=metadata,
     inputs=inputs,
     outputs=outputs,
     container="{container}",
@@ -70,7 +103,6 @@ def command_tool_builder_snippet(
 #out_str += f'\tenv_vars="{env_vars}",\n'
 #out_str += f'\ttool_module="{tool_module}",\n'
 #out_str += f'\ttool_provider="{citation}",\n'
-#out_str += f'\tmetadata="{metadata}",\n'
 #out_str += f'\tcpus="{cpus}",\n'
 #out_str += f'\tmemory="{memory}",\n'
 #out_str += f'\ttime="{time}",\n'

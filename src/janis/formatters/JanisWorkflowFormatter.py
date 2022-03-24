@@ -24,49 +24,48 @@ class JanisWorkflowFormatter:
         )
         return f'{comment}\n{section}\n'
 
-    def format_inputs(self, inputs: list[InputDataStep]) -> str:
+    def format_inputs(self, inputs: dict[str, InputDataStep]) -> str:
         out_str = '# INPUTS\n'
-        for inp in inputs:
-            out_str += self.format_input(inp)
+        for name, inp in inputs.items():
+            out_str += self.format_input(name, inp)
         out_str += '\n'
         return out_str
 
-    def format_input(self, input: InputDataStep) -> str:
+    def format_input(self, name: str, input: InputDataStep) -> str:
         return snippets.workflow_input_snippet(
-            tag=input.get_janis_tag(),
+            tag=name, # TODO tag formatter
             datatype=input.get_janis_datatype_str(),
             # TODO check whether defaults and values can appear here
             doc=input.get_docstring()
         )
 
-    def format_steps(self, steps: list[ToolStep]) -> str:
+    def format_steps(self, steps: dict[str, ToolStep]) -> str:
         out_str = '# STEPS\n'
-        for step in steps:
-            out_str += self.format_step(step)
+        for name, step in steps.items():
+            out_str += self.format_step(name, step)
         out_str += '\n'
         return out_str
     
-    def format_step(self, step: ToolStep) -> str:
+    def format_step(self, name: str, step: ToolStep) -> str:
         return snippets.workflow_step_snippet(
-            tag=step.get_janis_tag(),
+            tag=name, # TODO tag formatter
             tool=step.tool.metadata.id,
             tool_input_values=step.get_input_values(),
             doc=step.get_docstring()
         )
     
-    def format_outputs(self, outputs: list[WorkflowOutput]) -> str:
+    def format_outputs(self, outputs: dict[str, WorkflowOutput]) -> str:
         out_str = '# OUTPUTS\n'
-        for out in outputs:
-            out_str += self.format_output(out)
+        for name, out in outputs.items():
+            out_str += self.format_output(name, out)
         out_str += '\n'
         return out_str
 
-    def format_output(self, output: WorkflowOutput) -> str:
+    def format_output(self, name: str, output: WorkflowOutput) -> str:
         return snippets.workflow_output_snippet(
-            tag=output.name,
+            tag=name,  # TODO tag formatter
             datatype=output.datatype,
-            source=output.source,
-            output_name=output.output_name
+            source=output.source
         )
 
     def format_imports(self) -> str:

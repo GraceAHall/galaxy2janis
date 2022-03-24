@@ -2,7 +2,10 @@
 
 
 
+from dataclasses import dataclass
 
+
+@dataclass
 class Citation:
-    def __init__(self):
-        pass
+    type: str
+    text: str

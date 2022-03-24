@@ -11,14 +11,14 @@ from xmltool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
 from xmltool.param.InputRegister import InputRegister
 from xmltool.param.OutputRegister import OutputRegister
 from xmltool.TestRegister import TestRegister
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from xmltool.requirements import ContainerRequirement, CondaRequirement
 Requirement = ContainerRequirement | CondaRequirement
 
 
 
 class Ingestor(Protocol):
-    def get_metadata(self) -> Metadata:
+    def get_metadata(self) -> ToolXMLMetadata:
         """returns a formatted Metadata using the representation"""
         ...
     

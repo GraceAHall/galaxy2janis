@@ -5,7 +5,7 @@ from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 from startup.ExeSettings import ToolExeSettings
 
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from xmltool.requirements import CondaRequirement, ContainerRequirement
 from xmltool.citations import Citation
 
@@ -17,7 +17,7 @@ from xmltool.param.OutputRegister import OutputRegister
 
 from xmltool.parsing.tests.TestFactory import TestFactory
 from xmltool.TestRegister import TestRegister
-
+from biblib.biblib import bib
 
 Requirement = ContainerRequirement | CondaRequirement
 
@@ -28,19 +28,19 @@ class GalaxyToolIngestor:
         self.esettings = esettings
         self.inputs = InputRegister([])
 
-    def get_metadata(self) -> Metadata:
+    def get_metadata(self, ) -> ToolXMLMetadata:
         """returns a formatted Metadata using the representation"""
         requirements: list[Requirement] = self.get_requirements()
         citations: list[Citation] = self.get_citations()
-        return Metadata(
-            name = str(self.gxtool.name),  #type: ignore
-            id = str(self.gxtool.id),  #type: ignore
-            version = str(self.gxtool.version).split('+galaxy')[0],  #type: ignore
-            description = str(self.gxtool.description),  #type: ignore
-            help = str(self.gxtool.raw_help),  #type: ignore
-            requirements = requirements,
-            citations = citations,
-            creator = self.gxtool.creator  #type: ignore
+        return ToolXMLMetadata(
+            name=str(self.gxtool.name),  #type: ignore
+            id=str(self.gxtool.id),  #type: ignore
+            version=str(self.gxtool.version).split('+galaxy')[0],  #type: ignore
+            description=str(self.gxtool.description),  #type: ignore
+            help=str(self.gxtool.raw_help),  #type: ignore
+            requirements=requirements,
+            citations=citations,
+            creator=self.gxtool.creator  #type: ignore
         )
     
     def get_requirements(self) -> list[Requirement]:
@@ -59,7 +59,53 @@ class GalaxyToolIngestor:
         return [ContainerRequirement(c.identifier) for c in containers] # type: ignore
 
     def get_citations(self) -> list[Citation]:
-        return []
+        citations: list[Citation] = []
+        citations += self.get_biotools_citations()
+        citations += self.get_doi_citations()
+        citations += self.get_bibtex_citations()
+        return citations
+
+    def get_biotools_citations(self) -> list[Citation]: 
+        out: list[Citation] = []
+        for ref in self.gxtool.xrefs:
+            citation = Citation(
+                type='biotools',
+                text=f"https://bio.tools/{ref['value']}"
+            )
+            out.append(citation)
+        return out
+
+    def get_doi_citations(self) -> list[Citation]:
+        out: list[Citation] = []
+        for elem in self.gxtool.tool_source.xml_tree.findall('citations'):
+            for ref in elem.findall('citation'):
+                if ref.attrib['type'] == 'doi':
+                    citation = Citation(
+                        type='doi',
+                        text=f"https://doi.org/{ref.text}"
+                    )
+                    out.append(citation)
+        return out
+        
+    def get_bibtex_citations(self) -> list[Citation]:
+        out: list[Citation] = []
+        for elem in self.gxtool.tool_source.xml_tree.findall('citations'):
+            for ref in elem.findall('citation'):
+                if ref.attrib['type'] == 'bibtex':
+                    citation = Citation(
+                        type='bibtex',
+                        text=self.parse_bibtex(ref.text)
+                    )
+                    out.append(citation)
+        return out
+    
+    def parse_bibtex(self, bibtex_citation: dict[str, str]) -> str:
+        # define and parse using biblib
+        bp = bib.Parser()
+        data = bp.parse(bibtex_citation).get_entries() # type: ignore
+        # get each citation key: value pair
+        entry = list(data.values())[0]  # type: ignore
+        return str(entry['url']) # type: ignore
 
     def get_command(self) -> str:
         """returns the tool xml command"""

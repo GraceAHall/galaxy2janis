@@ -3,7 +3,6 @@
 
 from dataclasses import dataclass
 from typing import Optional
-from runtime.Logger import Logger
 
 @dataclass
 class WorkflowExeSettings:
@@ -11,24 +10,37 @@ class WorkflowExeSettings:
     parent_outdir: Optional[str] = None
     container_cachedir: str = 'container_uri_cache.json'
 
-    def get_workflow_path(self) -> str:
+    def get_galaxy_workflow_path(self) -> str:
         if self.workflow:
             return self.workflow
         raise RuntimeError('cannot be called unless self.workflow has a value')
     
-    def get_parent_outdir(self) -> str:
+    def get_container_cache_path(self) -> str:
+        return self.container_cachedir
+    
+    def get_outdir(self) -> str:
         if self.parent_outdir:
             # if set by user
             return self.parent_outdir
         else:
             # return the workflow file basename
-            filepath = self.get_workflow_path()
+            filepath = self.get_galaxy_workflow_path()
             filepath = filepath.rsplit('/', 1)[-1].rsplit('.', 1)[0]
             filepath = filepath.replace('-', '_')
-            return f'{filepath}_tools'
+            return filepath
+
+    def get_janis_workflow_path(self) -> str:
+        raise NotImplementedError()
     
-    def get_container_cache_path(self) -> str:
-        return self.container_cachedir
+    def get_janis_workflow_configfile_path(self) -> str:
+        raise NotImplementedError()
+
+    def get_janis_tools_dir(self) -> str:
+        raise NotImplementedError()
+
+    def get_janis_steps_dir(self) -> str:
+        raise NotImplementedError()
+
 
 
 @dataclass

@@ -8,7 +8,7 @@ w = WorkflowBuilder("alignmentWorkflow")
 def path_append_snippet() -> str:
     return """
 import sys
-sys.path.append('/home/grace/work/pp/gxtool2janis')
+sys.path.append('homegraceworkppgxtool2janis')
 """
 
 
@@ -54,6 +54,25 @@ def workflow_input_snippet(
     out_str += f',\n\tdoc="{doc}"' if doc else ''
     out_str += '\n)'
     return out_str
+
+
+
+"""
+working dir 
+tools
+    - parsed fastqc
+    - parsed ...
+simple_workflow.py
+steps
+    - step1_fastqc.py -> toolsfastqc
+        step1 preprocess
+        step1 main
+        step1 postprocess
+    - step1_fastqc.py
+    - step1_fastqc.py
+
+"""
+
 
 
 # STEPS
@@ -123,3 +142,4 @@ def workflow_output_snippet(
     out_str += f',\n\tdoc="{doc}"' if doc else ''
     out_str += '\n)\n'
     return out_str
+

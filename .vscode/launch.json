@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "rip galaxy types",
             "type": "python",
@@ -100,6 +101,19 @@
                 "tool",
                 "--dir", "test/data/tools/prokka", 
                 "--xml", "prokka.xml",
+            ]
+        },
+        {
+            "name": "fastp",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/fastp", 
+                "--xml", "fastp.xml",
             ]
         },
         {

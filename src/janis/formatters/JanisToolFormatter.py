@@ -3,7 +3,7 @@
 
 from typing import Optional
 from command.components.outputs.RedirectOutput import RedirectOutput
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from containers.Container import Container
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
@@ -11,12 +11,24 @@ from janis.imports.ImportHandler import ImportHandler
 import janis.snippets.tool_snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
+
 class JanisToolFormatter:
     def __init__(self):
         self.import_handler = ImportHandler()
 
     def format_path_appends(self) -> str:
         return snippets.path_append_snippet()
+    
+    def format_metadata(self, metadata: ToolXMLMetadata) -> str:
+        return snippets.metadata_snippet(
+            tool_name=metadata.id,
+            tool_version=metadata.version,
+            url=metadata.url,
+            wrapper_owner=metadata.owner,
+            wrapper_creator=metadata.creator,
+            doi=metadata.get_doi_citation(),
+            citation=metadata.get_main_citation()
+        )
 
     def format_inputs(self, inputs: list[CommandComponent]) -> str:
         positionals = [x for x in inputs if isinstance(x, Positional)]
@@ -98,7 +110,7 @@ class JanisToolFormatter:
             doc=output.get_docstring()
         )
 
-    def format_commandtool(self, metadata: Metadata, base_command: list[str], container: Optional[Container]) -> str:
+    def format_commandtool(self, metadata: ToolXMLMetadata, base_command: list[str], container: Optional[Container]) -> str:
         return snippets.command_tool_builder_snippet(
             toolname=metadata.id,
             base_command=base_command,
@@ -107,7 +119,7 @@ class JanisToolFormatter:
             help=metadata.help
         )
 
-    def format_translate_func(self, metadata: Metadata) -> str:
+    def format_translate_func(self, metadata: ToolXMLMetadata) -> str:
         return snippets.translate_snippet(metadata.id)
 
     def format_imports(self) -> str:

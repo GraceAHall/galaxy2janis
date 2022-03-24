@@ -7,13 +7,13 @@ from typing import Optional
 from command.cmdstr.CommandString import CommandString
 from command.components.CommandComponent import CommandComponent
 from containers.Container import Container
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from janis.formatters.JanisToolFormatter import JanisToolFormatter
 
 
 @dataclass
 class Tool:
-    metadata: Metadata
+    metadata: ToolXMLMetadata
     xmlcmdstr: CommandString
     inputs: list[CommandComponent]
     outputs: list[CommandComponent]
@@ -35,12 +35,13 @@ class Tool:
     def to_janis_definition(self) -> str:
         formatter = JanisToolFormatter()
         str_path = formatter.format_path_appends()
+        str_metadata = formatter.format_metadata(self.metadata)
         str_inputs = formatter.format_inputs(self.get_inputs())
         str_outputs = formatter.format_outputs(self.get_outputs())
         str_commandtool = formatter.format_commandtool(self.metadata, self.base_command, self.container)
         str_translate = formatter.format_translate_func(self.metadata) 
         str_imports = formatter.format_imports()
-        return str_path + str_imports + str_inputs + str_outputs + str_commandtool + str_translate
+        return str_path + str_imports + str_metadata + str_inputs + str_outputs + str_commandtool + str_translate
 
 
 

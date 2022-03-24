@@ -1,7 +1,6 @@
 
 
 from dataclasses import dataclass
-from typing import Any
 
 from janis.formatters.JanisWorkflowFormatter import JanisWorkflowFormatter
 from workflows.step.StepInput import ConnectionStepInput, StaticStepInput, UserDefinedStepInput
@@ -56,5 +55,10 @@ class Workflow:
 
     def to_janis_definition(self) -> str:
         formatter = JanisWorkflowFormatter()
-        raise NotImplementedError()
-    
+        str_path = formatter.format_path_appends()
+        str_builder = formatter.format_workflow_builder(self.metadata)
+        str_inputs = formatter.format_inputs(self.inputs)
+        str_steps = formatter.format_steps(self.steps)
+        str_outputs = formatter.format_outputs(self.outputs)
+        str_imports = formatter.format_imports()
+        return str_path + str_imports + str_builder + str_inputs + str_steps + str_outputs

@@ -2,11 +2,11 @@
 
 
 from command.cmdstr.ConstructTracker import ConstructTracker
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from typing import Optional, Tuple
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.cmdstr.utils import global_align
-from xmltool.metadata import Metadata
+from xmltool.metadata import ToolXMLMetadata
 from command.cmdstr.utils import split_lines
 from command.tokens.Tokens import Token
 
@@ -16,11 +16,11 @@ class CommandString:
     preprocessing: list[DynamicCommandStatement]
     postprocessing: list[DynamicCommandStatement]
 
-    def __init__(self, source: str, statements: list[DynamicCommandStatement], metadata: Metadata):
+    def __init__(self, source: str, statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata):
         self.source = source
         self.set_statements(statements, metadata)
 
-    def set_statements(self, statements: list[DynamicCommandStatement], metadata: Metadata):
+    def set_statements(self, statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata):
         self.preprocessing = []
         self.postprocessing = []
         
@@ -74,7 +74,7 @@ class CommandString:
         raise NotImplementedError()
 
 
-def infer_main_tool_statement(statements: list[DynamicCommandStatement], metadata: Metadata) -> int:
+def infer_main_tool_statement(statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata) -> int:
     if len(statements) == 1:
         return 0
     
@@ -93,7 +93,7 @@ def get_gxref_counts(statements: list[DynamicCommandStatement]) -> list[Tuple[in
     out.sort(key=lambda x: x[1], reverse=True)
     return out
 
-def get_requirement_similarities(statements: list[DynamicCommandStatement], metadata: Metadata) -> list[Tuple[int, float]]:
+def get_requirement_similarities(statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata) -> list[Tuple[int, float]]:
     main_requirement = metadata.get_main_requirement().get_text()
     raw_similarities = get_raw_similarities(statements, main_requirement)
     adj_similarities = adjust_similarities(raw_similarities, main_requirement)
