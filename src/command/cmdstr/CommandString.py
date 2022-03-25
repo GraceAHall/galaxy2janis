@@ -2,11 +2,11 @@
 
 
 from command.cmdstr.ConstructTracker import ConstructTracker
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from typing import Optional, Tuple
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.cmdstr.utils import global_align
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.cmdstr.utils import split_lines
 from command.tokens.Tokens import Token
 

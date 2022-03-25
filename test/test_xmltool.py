@@ -9,7 +9,7 @@ from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import load_manager, GalaxyManager
 from xmltool.load import load_xmltool, XMLToolDefinition
 
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.requirements import CondaRequirement
 
 from xmltool.param.Param import Param

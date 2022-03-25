@@ -1,6 +1,4 @@
 
-
-
 from janis.imports.ImportHandler import ImportHandler
 import janis.snippets.workflow_snippets as snippets
 from workflows.io.Output import WorkflowOutput
@@ -12,8 +10,21 @@ class JanisWorkflowFormatter:
     def __init__(self):
         self.import_handler = ImportHandler()
 
+    def format_top_note(self, metadata: WorkflowMetadata) -> str:
+        return snippets.gxtool2janis_note_snippet(
+            workflow_name=metadata.name,
+            workflow_version=metadata.version
+        )
+
     def format_path_appends(self) -> str:
         return snippets.path_append_snippet()
+
+    def format_metadata(self, metadata: WorkflowMetadata) -> str:
+        return snippets.metadata_snippet(
+            tags=metadata.tags,
+            annotation=metadata.annotation,
+            version=metadata.version
+        )
 
     def format_workflow_builder(self, metadata: WorkflowMetadata) -> str:
         comment = '# WORKFLOW DECLARATION'

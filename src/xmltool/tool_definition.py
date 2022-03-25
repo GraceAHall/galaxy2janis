@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.param.Param import Param
 from xmltool.param.InputRegister import InputRegister
 from xmltool.param.OutputRegister import OutputRegister

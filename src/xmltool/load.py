@@ -11,7 +11,7 @@ from xmltool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
 from xmltool.param.InputRegister import InputRegister
 from xmltool.param.OutputRegister import OutputRegister
 from xmltool.TestRegister import TestRegister
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.requirements import ContainerRequirement, CondaRequirement
 Requirement = ContainerRequirement | CondaRequirement
 

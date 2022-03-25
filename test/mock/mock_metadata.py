@@ -1,7 +1,7 @@
 
 
 
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 
 MOCK_METADATA = ToolXMLMetadata(
     id='abricate',

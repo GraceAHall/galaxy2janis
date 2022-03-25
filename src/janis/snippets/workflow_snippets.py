@@ -2,13 +2,51 @@
 
 from typing import Any, Optional, Tuple
 from janis_core import WorkflowBuilder
+from datetime import datetime
+DATE_FORMAT = "%Y-%m-%d"
+
 w = WorkflowBuilder("alignmentWorkflow")
 
+def gxtool2janis_note_snippet(
+    workflow_name: str,
+    workflow_version: str,
+) -> str:
+    return f"""
+# NOTE
+# This is an automated translation of the '{workflow_name}' version '{workflow_version}' workflow. 
+# Translation was performed by the gxtool2janis program (in-development)
+
+"""
 
 def path_append_snippet() -> str:
     return """
 import sys
-sys.path.append('homegraceworkppgxtool2janis')
+sys.path.append('/home/grace/work/pp/gxtool2janis')
+"""
+
+def metadata_snippet(
+    tags: list[str],
+    annotation: str,
+    version: str,
+    doi: Optional[str]=None,
+    citation:Optional[str]=None
+) -> str:
+    doi = f'"{doi}"' if doi else None
+    citation = f'"{citation}"' if citation else None
+    url = url if url else ''
+    contributors = ['gxtool2janis']
+    return f"""
+metadata = WorkflowMetadata(
+    short_documentation="{annotation}",
+    contributors={contributors},
+    keywords={tags},
+    dateCreated="{datetime.today().strftime(DATE_FORMAT)}",
+    dateUpdated="{datetime.today().strftime(DATE_FORMAT)}",
+    version={version},
+    doi={doi},
+    citation={citation}
+)
+
 """
 
 
@@ -24,7 +62,7 @@ def workflow_builder_snippet(
 ) -> str:
     out_str: str = ''
     out_str += 'w = WorkflowBuilder(\n'
-    out_str += f'\t"{tag}",\n'
+    out_str += f'\t"{tag}"\n'
     out_str += f',\n\tfriendly_name="{friendly_name}"' if friendly_name else ''
     out_str += f',\n\tversion="{version}"' if version else ''
     out_str += f',\n\tdoc="{doc}"' if doc else ''
@@ -52,7 +90,7 @@ def workflow_input_snippet(
     out_str += f',\n\tdefault={default}' if default else ''
     out_str += f',\n\tvalue={value}' if value else ''
     out_str += f',\n\tdoc="{doc}"' if doc else ''
-    out_str += '\n)'
+    out_str += '\n)\n'
     return out_str
 
 
@@ -143,3 +181,12 @@ def workflow_output_snippet(
     out_str += '\n)\n'
     return out_str
 
+
+def translate_snippet(toolname: str) -> str:
+    return f"""
+
+if __name__ == "__main__":
+    w.translate("cwl", **args)
+    w.translate("wdl", **args)
+
+"""

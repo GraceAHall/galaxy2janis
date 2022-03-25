@@ -41,10 +41,8 @@ class WorkflowFactory:
         return WorkflowMetadata(
             name=self.tree['name'],
             annotation=self.tree['annotation'],
-            format_version=self.tree['format-version'],
-            tags=self.tree['tags'],
-            uuid=self.tree['uuid'],
-            version=self.tree['version']
+            version=self.tree['version'],
+            tags=self.tree['tags']
         )
 
     def parse_steps(self) -> list[GalaxyWorkflowStep]:

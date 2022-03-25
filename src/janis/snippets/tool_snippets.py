@@ -4,39 +4,62 @@ from typing import Any, Optional
 from datetime import datetime
 DATE_FORMAT = "%Y-%m-%d"
 
+def gxtool2janis_note_snippet(
+    tool_name: str,
+    tool_version: str,
+) -> str:
+    return f"""
+# NOTE
+# This is an automated translation of the '{tool_name}' version '{tool_version}' tool from a Galaxy XML tool wrapper.  
+# Translation was performed by the gxtool2janis program (in-development)
+
+"""
 
 def path_append_snippet() -> str:
     return """
 import sys
 sys.path.append('/home/grace/work/pp/gxtool2janis')
+
 """
 
 
+"""
+short_documentation=None,
+version=None,
+"""
+
+# NOTE: keywords can be taken from edam topics / operations
 def metadata_snippet(
-    tool_name: str,
-    tool_version: str,
-    url: Optional[str]=None,
+    description: str,
+    version: str,
+    help: str,
+    keywords: list[str]=[],
     wrapper_owner: Optional[str]=None,
     wrapper_creator: Optional[str]=None,
     doi: Optional[str]=None,
-    citation:Optional[str]=None
+    url: Optional[str]=None,
+    citation: Optional[str]=None,
 ) -> str:
     doi = f'"{doi}"' if doi else None
+    citation = f'"{citation}"' if citation else None
     url = url if url else ''
-    contrib_str = 'gxtool2janis'
+    contributors = ['gxtool2janis']
     if wrapper_owner:
-        contrib_str += f', Galaxy Toolshed Username: {wrapper_owner}'
+        contributors += [f'Wrapper owner: galaxy toolshed user {wrapper_owner}']
     if wrapper_creator:
-        contrib_str += f', Galaxy Wrapper Creator: {wrapper_creator}'
+        contributors += [f'Wrapper creator: {wrapper_creator}']
     return f"""
 metadata = ToolMetadata(
-    short_documentation="gxtool2janis translation of '{tool_name}' version '{tool_version}' from Galaxy XML wrapper {url}",
-    contributors="{contrib_str}",
+    short_documentation="{description}",
+    keywords={keywords},
+    contributors={contributors},
     dateCreated="{datetime.today().strftime(DATE_FORMAT)}",
     dateUpdated="{datetime.today().strftime(DATE_FORMAT)}",
-    version=0,
+    version="{version}",
     doi={doi},
-    citation="{citation}"
+    citation={citation},
+    documentationUrl=None,
+    documentation=\"\"\"{str(help)}\"\"\"
 )
 
 """
@@ -84,19 +107,19 @@ def command_tool_builder_snippet(
     toolname: str, 
     base_command: list[str], 
     container: str, 
-    version: str, 
-    help: str) -> str:
+    version: str) -> str:
     return f"""
 {toolname} = CommandToolBuilder(
     tool="{toolname}",
-    base_command={base_command},
-    metadata=metadata,
-    inputs=inputs,
-    outputs=outputs,
-    container="{container}",
     version="{version}",
-    doc=\"\"\"{str(help)}\"\"\"
-)\n"""
+    metadata=metadata,
+    container="{container}",
+    base_command={base_command},
+    inputs=inputs,
+    outputs=outputs
+)
+
+"""
 # missing from command_tool_builder_snippet()
 #out_str += f'\tfriendly_name="{friendly_name}",\n'
 #out_str += f'\targuments="{arguments}",\n'

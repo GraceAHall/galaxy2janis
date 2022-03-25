@@ -11,6 +11,8 @@ from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from startup.settings import load_workflow_settings
 from startup.ExeSettings import WorkflowExeSettings
+from file_io.write import write_tool, write_workflow
+
 """
 gxtool2janis program entry point
 parses cli settings then hands execution to other files based on command
@@ -34,19 +36,13 @@ def load_args() -> dict[str, Optional[str]]:
 def run_tool_mode(args: dict[str, Optional[str]]):
     esettings: ToolExeSettings = load_tool_settings(args) 
     tool = parse_tool(esettings)
-    out_path = esettings.get_janis_definition_path()
-    tool_definition = tool.to_janis_definition()
-    write_file(out_path, tool_definition)
+    write_tool(esettings, tool)
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
     esettings: WorkflowExeSettings = load_workflow_settings(args)
     workflow = parse_workflow(esettings)
+    write_workflow(esettings, workflow)
     
-
-def write_file(path: str, contents: str) -> None:
-    with open(path, 'w') as fp:
-        fp.write(contents)
-
 
 if __name__ == '__main__':
     main()

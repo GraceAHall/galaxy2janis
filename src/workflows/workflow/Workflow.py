@@ -55,10 +55,12 @@ class Workflow:
 
     def to_janis_definition(self) -> str:
         formatter = JanisWorkflowFormatter()
+        str_note = formatter.format_top_note(self.metadata)
         str_path = formatter.format_path_appends()
+        str_metadata = formatter.format_metadata(self.metadata)
         str_builder = formatter.format_workflow_builder(self.metadata)
         str_inputs = formatter.format_inputs(self.inputs)
         str_steps = formatter.format_steps(self.steps)
         str_outputs = formatter.format_outputs(self.outputs)
         str_imports = formatter.format_imports()
-        return str_path + str_imports + str_builder + str_inputs + str_steps + str_outputs
+        return str_note + str_path + str_metadata + str_imports + str_builder + str_inputs + str_steps + str_outputs

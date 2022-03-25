@@ -1,43 +1,14 @@
 
 
 
-
-
-"""
-Need:
-workflow step
-tool 
-command string text -> CommandString.get_constant_text()
-Command() components
-
-
-objective:
-for each Positional:
-    assert not flag or something
-    set the value
-
-for each Flag:
-    if it's in the constant text, assign True
-    if not, assign default value (Flag.get_default_value())
-
-for each Option:
-    if the prefix is in the constant text:
-        if there is a value (Positional) next:
-            if the value is not env_var:
-                assign value
-            elif value is in the Step StaticStepInputs:
-                assign value
-            else:
-                pass
-    assign default value (Positional.get_default_value())
-
-"""
-
+from typing import Optional
 from command.Command import Command
 from workflows.step.Step import GalaxyWorkflowStep
 
 
 class ValueLinker:
-    def __init__(self, step: GalaxyWorkflowStep, command: Command)
+    def __init__(self, step: GalaxyWorkflowStep, command: Command):
+        pass
 
-    def link(self) -> 
+    def link(self) -> Optional[str]:
+        raise NotImplementedError()

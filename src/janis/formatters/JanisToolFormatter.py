@@ -3,7 +3,7 @@
 
 from typing import Optional
 from command.components.outputs.RedirectOutput import RedirectOutput
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from containers.Container import Container
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
@@ -16,17 +16,24 @@ class JanisToolFormatter:
     def __init__(self):
         self.import_handler = ImportHandler()
 
+    def format_top_note(self, metadata: ToolXMLMetadata) -> str:
+        return snippets.gxtool2janis_note_snippet(
+            tool_name=metadata.id,
+            tool_version=metadata.version
+        )
+
     def format_path_appends(self) -> str:
         return snippets.path_append_snippet()
     
     def format_metadata(self, metadata: ToolXMLMetadata) -> str:
         return snippets.metadata_snippet(
-            tool_name=metadata.id,
-            tool_version=metadata.version,
-            url=metadata.url,
+            description=metadata.description,
+            version=metadata.version,
+            help=metadata.help,
             wrapper_owner=metadata.owner,
             wrapper_creator=metadata.creator,
             doi=metadata.get_doi_citation(),
+            url=metadata.url,
             citation=metadata.get_main_citation()
         )
 
@@ -116,7 +123,6 @@ class JanisToolFormatter:
             base_command=base_command,
             container=container.url if container else MISSING_CONTAINER_STRING,
             version=metadata.version, # should this be based on get_main_requirement()?
-            help=metadata.help
         )
 
     def format_translate_func(self, metadata: ToolXMLMetadata) -> str:

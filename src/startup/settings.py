@@ -27,9 +27,8 @@ def load_tool_settings(args: dict[str, Optional[str]]) -> ToolExeSettings:
 
 def handle_downloads(esettings: ToolExeSettings) -> ToolExeSettings:
     if esettings.remote_url:
-        folder = download_repo(esettings.remote_url, esettings.parent_outdir)
-        esettings.xmldir = folder
-        xmls = [x for x in os.listdir(folder) if x.endswith('.xml') and 'macros' not in x]
+        esettings.xmldir = download_repo(esettings.remote_url, esettings.get_download_dir())
+        xmls = [x for x in os.listdir(esettings.xmldir) if x.endswith('.xml') and 'macros' not in x]
         esettings.xmlfile = xmls[0]
     return esettings
     

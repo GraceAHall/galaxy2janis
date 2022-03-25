@@ -24,8 +24,8 @@ def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
     workflow = factory.create(galaxy_workflow_path)
 
     # generate a tool definition for each tool step
-    for step in workflow.steps.values():
-        args = make_parse_tool_args(step, wsettings)
+    for tag, step in workflow.steps.items():
+        args = make_parse_tool_args(tag, step, wsettings)
         tsettings: ToolExeSettings = load_tool_settings(args)
         step.tool = parse_tool(tsettings)
 
@@ -36,14 +36,20 @@ def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
     return workflow
 
 
-def make_parse_tool_args(step: ToolStep, esettings: WorkflowExeSettings) -> dict[str, Optional[str]]:
+def make_parse_tool_args(tag: str, step: ToolStep, esettings: WorkflowExeSettings) -> dict[str, Optional[str]]:
     return {
         'dir': None,
         'xml': None,
         'remote_url': step.get_uri(),
-        'outdir': esettings.get_parent_outdir(),
+        'download_dir': esettings.get_xml_wrappers_dir(),
+        'outdir': f'{esettings.get_janis_tools_dir()}/{tag}',
         'cachedir': esettings.container_cachedir
     }
+
+
+
+
+
 
 
 

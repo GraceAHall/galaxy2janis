@@ -5,7 +5,7 @@ from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 from startup.ExeSettings import ToolExeSettings
 
-from xmltool.metadata import ToolXMLMetadata
+from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.requirements import CondaRequirement, ContainerRequirement
 from xmltool.citations import Citation
 
@@ -105,7 +105,11 @@ class GalaxyToolIngestor:
         data = bp.parse(bibtex_citation).get_entries() # type: ignore
         # get each citation key: value pair
         entry = list(data.values())[0]  # type: ignore
-        return str(entry['url']) # type: ignore
+        if 'url' in entry:
+            return f"{entry['url']}" # type: ignore
+        elif 'author' in entry and 'title' in entry:
+            return f"{entry['author']}.  {entry['title']}"
+        return ''
 
     def get_command(self) -> str:
         """returns the tool xml command"""

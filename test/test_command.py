@@ -84,7 +84,7 @@ class TestCommandInference(unittest.TestCase):
         redirect: Any = self.command.redirect
         self.assertIsNotNone(redirect)
         self.assertIsNotNone(redirect.gxparam)
-        self.assertEquals(redirect.file.text, '$report')
+        self.assertEquals(redirect.file_token.text, '$report')
 
 
 
