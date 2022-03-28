@@ -17,7 +17,7 @@ class Positional(BaseCommandComponent):
         self.before_opts: bool = False
         self.gxparam: Optional[Param] = None
         self.presence_array: list[bool] = []
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(self.epath_id, self.value)
 

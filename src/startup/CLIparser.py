@@ -46,7 +46,7 @@ class CLIparser:
                             type=str)
         parser.add_argument("-o",
                             "--outdir", 
-                            help="parent folder to place output janis definitions. default='parsed/'", 
+                            help="parent folder to place output janis definitions. default = 'parsed/'", 
                             type=str)
         parser.add_argument("-c",
                             "--cachedir", 
@@ -65,7 +65,7 @@ class CLIparser:
                             type=str)
         parser.add_argument("-o",
                             "--outdir", 
-                            help="parent folder to place output janis definitions. default=-w(workflow name)", 
+                            help="parent folder to place output janis definitions. default = 'workflow_name'", 
                             type=str)
         parser.add_argument("-c",
                             "--cachedir", 

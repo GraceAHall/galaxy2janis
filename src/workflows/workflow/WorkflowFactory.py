@@ -12,13 +12,14 @@ from workflows.step.parsing import parse_step
 from workflows.step.Step import GalaxyWorkflowStep, InputDataStep, ToolStep
 from workflows.io.Output import WorkflowOutput
 from command.components.TagFormatter import TagFormatter
+from datatypes.DatatypeAnnotator import DatatypeAnnotator
 #from datatypes.formatting import format_janis_str
-
 
 
 class WorkflowFactory:
     """models a galaxy workflow"""
     tag_formatter: TagFormatter = TagFormatter()
+    datatype_annotator: DatatypeAnnotator = DatatypeAnnotator()
 
     def create(self, workflow_path: str):
         self.tree = self.load_tree(workflow_path)
@@ -56,6 +57,7 @@ class WorkflowFactory:
         for step in self.steps:
             if isinstance(step, ToolStep):
                 tag = self.tag_formatter.format(step.get_name())
+                self.datatype_annotator.annotate(step)
                 assert(tag not in out)
                 out[tag] = step
         return out
@@ -65,6 +67,7 @@ class WorkflowFactory:
         for step in self.steps:
             if isinstance(step, InputDataStep):
                 tag = self.tag_formatter.format(step.get_name())
+                self.datatype_annotator.annotate(step)
                 assert(tag not in out)
                 out[tag] = step
         return out
@@ -76,16 +79,18 @@ class WorkflowFactory:
         for step_tag, step in tool_steps.items():
             for workflow_out in step.metadata.workflow_outputs:
                 step_output = step.get_output(workflow_out['output_name'])
+                output = WorkflowOutput( 
+                    source_step=step_tag,
+                    source_tag=step_output.name,
+                    gx_datatypes=step_output.gx_datatypes
+                )
                 name = f'{step.get_tool_name()}_{workflow_out["output_name"]}'
                 output_tag = self.tag_formatter.format(name)
-                output = WorkflowOutput( 
-                    datatype=step_output.type,
-                    source=f"w.{step_tag}.{step_output.name}",
-                )
+                self.datatype_annotator.annotate(output)
                 out[output_tag] = output
         return out
 
     def init_workflow_output(self, step_tag: str, step: ToolStep, wout_details: dict[str, Any]) -> WorkflowOutput:
-        raise NotImplementedError
+        raise NotImplementedError()
 
 

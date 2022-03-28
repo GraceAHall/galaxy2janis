@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
+from datatypes.JanisDatatype import JanisDatatype
 
 from tool.Tool import Tool
 from .StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
@@ -68,6 +69,9 @@ class InputDataStep(GalaxyWorkflowStep):
     def get_name(self) -> str:
         return f'{self.metadata.step_name}{self.metadata.step_id}'
 
+    def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
+        self.metadata.janis_datatypes = datatypes
+
     def get_janis_datatype_str(self) -> str:
         if self.is_collection:
             return f'Array(File)'
@@ -84,8 +88,15 @@ class InputDataStep(GalaxyWorkflowStep):
 class ToolStep(GalaxyWorkflowStep):
     metadata: ToolStepMetadata
     tool: Optional[Tool] = None
-    input_values: list[Tuple[str, Any]] = field(default_factory=list)
-    # scatter?
+    input_values: dict[str, Any] = field(default_factory=dict)
+
+    def set_definition_path(self, path: str) -> None:
+        self.metadata.tool_definition_path = path
+    
+    def get_definition_path(self) -> str:
+        if self.metadata.tool_definition_path:
+            return self.metadata.tool_definition_path
+        raise RuntimeError('tool_definition_path not set for tool step')
 
     def get_tool_name(self) -> str:
         return self.metadata.tool_name
@@ -96,8 +107,10 @@ class ToolStep(GalaxyWorkflowStep):
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label
 
-    def get_input_values(self) -> list[Tuple[str, Any]]:
-        return self.input_values
+    def get_input_value(self, query: str) -> Any:
+        if query in self.input_values:
+            return self.input_values[query]
+        raise RuntimeError()
 
     def get_uri(self) -> str:
         return self.metadata.get_uri()

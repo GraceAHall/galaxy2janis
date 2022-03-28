@@ -11,3 +11,20 @@ ToolInput(
     default="",
     doc="Generage Circos plot Plot Circos version of Icarus contig alignment viewer. possible values: --circos",
 ),
+
+
+issue:
+- 2 outputs which are the same from filtlong
+solution:
+- only create redirect output (or list it in the final outputs) if the redirect '>' is followed by a token with a reference to a galaxy object.
+
+issue:
+- dynamic selection options (Kraken2 macros.xml)
+  <options from_data_table="kraken2_databases">
+  seems that this is a data manager which is loaded from the specific galaxy instance. 
+- solution - do nothing? ensure that the RealisedTokenValues class can handle these cases and just keeps $gxparam token rather than realising a value? 
+
+issue:
+- greedy parsing too greedy (rgFastQC.xml)
+  [-f fastq|bam|sam]: -f '${format}' '${input_file_sl}'
+  the last two positionals are being taken jointly as the value for -f. the last value is a positional

@@ -9,12 +9,12 @@ class WorkflowSettingsInitialiser:
 
     def init_settings(self, args: dict[str, Optional[str]]) -> WorkflowExeSettings:
         esettings = WorkflowExeSettings(
-            workflow=args['workflow'], 
+            workflow=args['workflow'], # type: ignore
         )
-        # if args['outdir']:
-        #     esettings.outdir = args['outdir']
+        if args['outdir']:
+            esettings.user_outdir = args['outdir']
         if args['cachedir']:
-            esettings.container_cachedir = args['cachedir']
+            esettings.user_container_cachedir = args['cachedir']
         return esettings
 
 
@@ -25,10 +25,10 @@ class ToolSettingsInitialiser:
             xmlfile=args['xml'], 
             xmldir=args['dir'],
             remote_url=args['remote_url'],
-            download_dir=args['download_dir']
+            user_download_dir=args['download_dir']
         )
         if args['outdir']:
-            esettings.outdir = args['outdir']
+            esettings.user_outdir = args['outdir']
         if args['cachedir']:
-            esettings.container_cachedir = args['cachedir']
+            esettings.user_container_cachedir = args['cachedir']
         return esettings

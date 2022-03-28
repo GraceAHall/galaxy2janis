@@ -13,17 +13,19 @@ class Flag(BaseCommandComponent):
         self.cmd_pos: int = -1
         self.gxparam: Optional[Param] = None
         self.presence_array: list[bool] = []
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
         return self.prefix.strip('--').lower().replace('-', '_')
 
-    def get_default_value(self) -> str:
+    def get_default_value(self) -> bool:
         if self.gxparam:
             default = self.gxparam.get_default()
             if self.prefix in default:
-                return str(True)
-        return str(False)
+                return True
+        elif all([self.presence_array]):
+            return True
+        return False
    
     def is_optional(self) -> bool:
         return True

@@ -19,9 +19,9 @@ def gxtool2janis_note_snippet(
 """
 
 def path_append_snippet() -> str:
-    return """
-import sys
+    return """import sys
 sys.path.append('/home/grace/work/pp/gxtool2janis')
+
 """
 
 def metadata_snippet(
@@ -33,10 +33,8 @@ def metadata_snippet(
 ) -> str:
     doi = f'"{doi}"' if doi else None
     citation = f'"{citation}"' if citation else None
-    url = url if url else ''
     contributors = ['gxtool2janis']
-    return f"""
-metadata = WorkflowMetadata(
+    return f"""metadata = WorkflowMetadata(
     short_documentation="{annotation}",
     contributors={contributors},
     keywords={tags},
@@ -62,7 +60,7 @@ def workflow_builder_snippet(
 ) -> str:
     out_str: str = ''
     out_str += 'w = WorkflowBuilder(\n'
-    out_str += f'\t"{tag}"\n'
+    out_str += f'\t"{tag}"'
     out_str += f',\n\tfriendly_name="{friendly_name}"' if friendly_name else ''
     out_str += f',\n\tversion="{version}"' if version else ''
     out_str += f',\n\tdoc="{doc}"' if doc else ''
@@ -127,7 +125,7 @@ w.step(
 def workflow_step_snippet(
     tag: str,
     tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
-    tool_input_values: list[Tuple[str, Any]],
+    tool_input_values: dict[str, Any],
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
@@ -136,7 +134,7 @@ def workflow_step_snippet(
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''
     out_str += f'\t{tool}(\n'
-    for name, value in tool_input_values:
+    for name, value in tool_input_values.items():
         out_str += f'\t\t{name}={value},\n'
     out_str += '\t)'
     out_str += f',\n\tdoc="{doc}"' if doc else ''
@@ -161,9 +159,8 @@ doc: Union[str, OutputDocumentation] = None,
 def workflow_output_snippet(
     tag: str,
     datatype: str,
-    source: str, 
-    # source is either a string which refers to an output of a step, or a Selector. 
-    # No idea why this would be a Selector though? ask richard
+    source_step: str,
+    source_tag: str, 
     output_folder: Optional[str]=None,
     output_name: Optional[str]=None,
     extension: Optional[str]=None,
@@ -173,7 +170,7 @@ def workflow_output_snippet(
     out_str += 'w.output(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\t{datatype},\n'
-    out_str += f'\tsource={source}'
+    out_str += f'\tsource=(w.{source_step}, "{source_tag}")'
     out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
     out_str += f',\n\toutput_name="{output_name}"' if output_name else ''
     out_str += f',\n\textension="{extension}"' if extension else ''

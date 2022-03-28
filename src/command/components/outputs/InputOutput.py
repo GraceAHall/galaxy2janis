@@ -13,7 +13,7 @@ class InputOutput(BaseCommandComponent):
         self.input_component = input_component
         self.gxparam: Optional[Param] = self.input_component.gxparam
         self.presence_array: list[bool] = []
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
         if self.gxparam:

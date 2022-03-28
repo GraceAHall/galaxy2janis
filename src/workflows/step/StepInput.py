@@ -21,7 +21,7 @@ class StaticStepInput(StepInput):
     value: str
 
 @dataclass
-class UserDefinedStepInput(StepInput):
+class RuntimeStepInput(StepInput):
     description: str # not really needed
     value: str = 'USER_DEFINED'
     
@@ -34,7 +34,7 @@ def init_connection_step_input(name: str, details: dict[str, Any]) -> StepInput:
     )
 
 def init_userdefined_step_input(details: dict[str, Any]) -> StepInput:
-    return UserDefinedStepInput(
+    return RuntimeStepInput(
         name=details['name'],
         description=details['description']
     )

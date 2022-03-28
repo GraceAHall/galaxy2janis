@@ -12,12 +12,15 @@ from datatypes.formatting import format_janis_str
 class CommandComponent(Protocol):
     gxparam: Optional[Param]
     presence_array: list[bool]
-    datatypes: list[JanisDatatype]
+    janis_datatypes: list[JanisDatatype]
     
     def get_name(self) -> str:
         ...
 
     def get_default_value(self) -> Any:
+        ...
+
+    def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
         ...
 
     def get_janis_datatype_str(self) -> str:
@@ -41,6 +44,8 @@ class CommandComponent(Protocol):
     def update_presence_array(self, cmdstr_index: int, fill_false: bool=False) -> None:
         ...
 
+    
+
 
 
 # this mainly exists because each CommandComponent has the same 
@@ -48,7 +53,7 @@ class CommandComponent(Protocol):
 class BaseCommandComponent(ABC):
     gxparam: Optional[Param]
     presence_array: list[bool]
-    datatypes: list[JanisDatatype] = []
+    janis_datatypes: list[JanisDatatype] = []
 
     @abstractmethod
     def get_name(self) -> str:
@@ -67,10 +72,13 @@ class BaseCommandComponent(ABC):
         """
         ...
 
+    def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
+        self.janis_datatypes = datatypes
+
     def get_janis_datatype_str(self) -> str:
         """gets the janis datatypes then formats into a string for writing definitions"""
         return format_janis_str(
-            datatypes=self.datatypes,
+            datatypes=self.janis_datatypes,
             is_optional=self.is_optional(),
             is_array=self.is_array()
         )
@@ -78,7 +86,7 @@ class BaseCommandComponent(ABC):
     def get_janis_tag(self) -> str:
         """gets the janis tag for this component"""
         name = self.get_name()
-        datatype = self.datatypes[0].classname
+        datatype = self.janis_datatypes[0].classname
         return TagFormatter().format(name, datatype)
     
     @abstractmethod

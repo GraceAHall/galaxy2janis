@@ -47,7 +47,7 @@ class ToolFactory:
         outputs += self.get_wildcard_outputs()
         for out in outputs:
             self.datatype_annotator.annotate(out)
-        self.verify_outputs(outputs)
+        #self.verify_outputs(outputs)
         return outputs
 
     def get_redirect_outputs(self) -> list[CommandComponent]:

@@ -14,7 +14,7 @@ class WildcardOutput(BaseCommandComponent):
     def __init__(self, gxparam: Param):
         self.gxparam = gxparam
         self.presence_array: list[bool] = []  # this makes no sense
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
         if self.gxparam:

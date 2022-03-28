@@ -56,8 +56,8 @@ class WorkflowFileInitialiser:
     def get_files_to_init(self) -> list[str]:
         out: list[str] = []
         es = self.esettings
-        out.append(es.get_janis_workflow_path())
-        out.append(es.get_janis_workflow_configfile_path())
+        # out.append(es.get_janis_workflow_path())
+        # out.append(es.get_janis_workflow_configfile_path())
         return list(set(out))
 
 
@@ -83,7 +83,7 @@ class ToolFileInitialiser:
     def get_files_to_init(self) -> list[str]:
         es = self.esettings
         return list(set([
-            es.get_logfile_path(),
-            es.get_janis_definition_path()
+            # es.get_logfile_path(),
+            # es.get_janis_definition_path()
         ]))
 

@@ -18,7 +18,7 @@ class Option(BaseCommandComponent):
         self.gxparam: Optional[Param] = None
         self.gxparam_attachment: int = 1
         self.presence_array: list[bool] = []
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: OptionValueRecord = OptionValueRecord()
         self.value_record.add(self.epath_id, self.values)
 

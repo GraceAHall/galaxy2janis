@@ -75,6 +75,7 @@ class InputParamFactory:
         return param
 
     def init_select_param(self, gxparam: GalaxyParam) -> SelectParam:
+        # TODO this could be dynamic options!
         param = SelectParam(str(gxparam.flat_name))
         param.multiple = bool(gxparam.multiple)
         param.options = [   SelectOption(value=opt[1], selected=opt[2], ui_text=opt[0]) 

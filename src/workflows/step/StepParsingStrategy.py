@@ -3,11 +3,11 @@
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 from .Step import GalaxyWorkflowStep, InputDataStep, ToolStep
 from .StepInput import StepInput, init_connection_step_input, init_static_step_input, init_userdefined_step_input
-from .StepOutput import StepOutput, init_step_output
+from .StepOutput import StepOutput, init_input_step_output, init_tool_step_output
 from .StepMetadata import (
     ToolStepMetadata,
     init_inputdatastep_metadata, 
@@ -52,7 +52,7 @@ class InputDataStepParsingStrategy(StepParsingStrategy):
         return [init_userdefined_step_input(inp) for inp in self.step['inputs']]
     
     def get_step_outputs(self) -> list[StepOutput]:
-        return [init_step_output(self.step, {'name': 'output', 'type': 'File'})]
+        return [init_input_step_output(self.step)]
 
     def is_collection(self) -> bool:
         if self.step['type'] == 'data_collection_input':
@@ -127,7 +127,7 @@ class ToolStepParsingStrategy(StepParsingStrategy):
         
 
     def get_step_outputs(self) -> list[StepOutput]:
-        return [init_step_output(self.step, out) for out in self.step['outputs']]
+        return [init_tool_step_output(self.step, out) for out in self.step['outputs']]
 
 
 

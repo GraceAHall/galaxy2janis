@@ -15,7 +15,7 @@ def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
     write_file(tool_path, tool_definition)
 
 def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    write_workflow_tools(esettings, workflow)
+    write_workflow_tools(workflow)
     write_workflow_steps(esettings, workflow)
     write_workflow_config(esettings, workflow)
     write_workflow_definition(esettings, workflow)
@@ -31,9 +31,9 @@ def write_workflow_definition(esettings: WorkflowExeSettings, workflow: Workflow
     workflow_definition = workflow.to_janis_definition()
     write_file(workflow_path, workflow_definition)
 
-def write_workflow_tools(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    for tag, step in workflow.steps.items():
-        tool_path = f'{esettings.get_janis_tools_dir()}/{tag}.py'
+def write_workflow_tools(workflow: Workflow) -> None:
+    for step in workflow.steps.values():
+        tool_path = step.get_definition_path()
         tool_definition = step.tool.to_janis_definition()  # type: ignore
         write_file(tool_path, tool_definition)
 

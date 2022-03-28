@@ -1,8 +1,10 @@
 
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
+
+from datatypes.JanisDatatype import JanisDatatype
 
 
 ### component definitions -----------
@@ -15,7 +17,8 @@ class StepMetadata(ABC):
 
 @dataclass
 class InputDataStepMetadata(StepMetadata):
-    pass
+    gx_datatypes: list[str]
+    janis_datatypes: list[JanisDatatype] = field(default_factory=list)
 
 @dataclass
 class ToolStepMetadata(StepMetadata):
@@ -24,6 +27,7 @@ class ToolStepMetadata(StepMetadata):
     changeset_revision: str
     shed: str
     workflow_outputs: list[dict[str, Any]]
+    tool_definition_path: Optional[str] = None
 
     def get_uri(self) -> str:
         return f'https://{self.shed}/repos/{self.owner}/{self.tool_name}/archive/{self.changeset_revision}.tar.gz'
@@ -34,7 +38,8 @@ def init_inputdatastep_metadata(step: dict[str, Any]) -> InputDataStepMetadata:
     return InputDataStepMetadata(
         step_id=step['id'],
         step_name=step['inputs'][0]['name'],
-        label=step['label']
+        label=step['label'],
+        gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else ['file']
     )
 
 def init_toolstep_metadata(step: dict[str, Any]) -> ToolStepMetadata:

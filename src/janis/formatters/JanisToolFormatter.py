@@ -7,14 +7,14 @@ from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from containers.Container import Container
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
-from janis.imports.ImportHandler import ImportHandler
+from janis.imports.ToolImportHandler import ToolImportHandler
 import janis.snippets.tool_snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
 
 class JanisToolFormatter:
     def __init__(self):
-        self.import_handler = ImportHandler()
+        self.import_handler = ToolImportHandler()
 
     def format_top_note(self, metadata: ToolXMLMetadata) -> str:
         return snippets.gxtool2janis_note_snippet(
@@ -91,7 +91,7 @@ class JanisToolFormatter:
         )
 
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
-        dclasses = [x.classname for x in component.datatypes]
+        dclasses = [x.classname for x in component.janis_datatypes]
         should_quote = False if 'Int' in dclasses or 'Float' in dclasses else True
         default_value = component.get_default_value()
         if should_quote:

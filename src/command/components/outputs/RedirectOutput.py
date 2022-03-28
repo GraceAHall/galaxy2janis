@@ -19,7 +19,7 @@ class RedirectOutput(BaseCommandComponent):
         self.stream: Stream = self.extract_stream()
         self.gxparam: Optional[Param] = self.file_token.gxparam
         self.presence_array: list[bool] = []
-        self.datatypes: list[JanisDatatype] = []
+        self.janis_datatypes: list[JanisDatatype] = []
 
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(0, self.file_token.text)
@@ -40,7 +40,7 @@ class RedirectOutput(BaseCommandComponent):
     def get_janis_datatype_str(self) -> str:
         """gets the janis datatypes then formats into a string for writing definitions"""
         datatype_str = format_janis_str(
-            datatypes=self.datatypes,
+            datatypes=self.janis_datatypes,
             is_optional=self.is_optional(),
             is_array=self.is_array()
         )
