@@ -47,7 +47,8 @@ class Positional(BaseCommandComponent):
     def get_docstring(self) -> Optional[str]:
         if self.gxparam:
             return self.gxparam.get_docstring()
-        return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
+        return ''
+        #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
     def update(self, incoming: Positional) -> None:
         # transfer values

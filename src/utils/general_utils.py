@@ -14,3 +14,16 @@ def global_align(pattern: str, template: str) -> int:
         score = 0
     return score # type: ignore
 
+def is_int(the_string: str) -> bool:
+    if the_string.isdigit():
+        return True
+    return False
+
+def is_float(the_string: str) -> bool:
+    if not is_int(the_string):
+        try:
+            float(the_string)
+            return True
+        except ValueError:
+            pass
+    return False

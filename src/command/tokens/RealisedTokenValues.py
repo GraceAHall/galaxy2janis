@@ -13,7 +13,7 @@ from command.cmdstr.utils import split_lines, split_to_words
 from command.tokens.Tokens import Token, TokenType
 from command.tokens.TokenFactory import TokenFactory
 from command.epath.utils import is_bool_select
-
+import command.tokens.utils as utils
 
 class RealisedTokenValues:
     def __init__(self, values: list[list[Token]], original: Token):
@@ -113,7 +113,7 @@ class RealisedTokenValueifier:
         right_text = str(token.match.group(3))
         return [
             self.factory.create(left_text),
-            self.factory.spawn_kv_linker(delim),
+            utils.spawn_kv_linker(delim),
             self.factory.create(right_text)
         ]
 

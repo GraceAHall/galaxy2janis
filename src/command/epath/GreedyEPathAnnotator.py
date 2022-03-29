@@ -109,17 +109,35 @@ class GreedyEPathAnnotator:
 
     def get_option_values(self) -> list[Token]:
         out: list[Token] = []
-        ntoken = self.epath.positions[self.pos + 1].token
-        values_type = ntoken.type
+
+        # define a max possible end point to consume upto (handles edge cases)
+        final_pos = self.get_greedy_consumption_end()  
+        values_type = self.epath.positions[self.pos+1].token.type
+
         # look at next ntoken to see its probably a value for the option
-        while component_utils.is_positional(ntoken) and ntoken.type == values_type:
-            out.append(ntoken)
+        while self.pos <= final_pos:
             self.pos += 1 
-            if self.pos >= len(self.epath.positions) - 1:
-                break
+            ntoken = self.epath.positions[self.pos].token
+
+            if component_utils.is_positional(ntoken) and ntoken.type == values_type:
+                out.append(ntoken)
             else:
-                ntoken = self.epath.positions[self.pos + 1].token
+                break
+        self.pos -= 1
         return out
+
+    def get_greedy_consumption_end(self) -> int:
+        """
+        define an end point -> tee or redirect or end of positions
+            most cases: end point = len(positions) to the end, first tee, first redirect etc - 2
+            special case: 2nd last position. --files $input1 set end point = the above - 1
+        """
+        # general case
+        final_pos = self.epath.get_end_token_position()
+        # don't eat final position in cases of --mode 'fast' '$inputfile'
+        if self.pos < final_pos - 1:
+            final_pos -= 1
+        return final_pos
 
     def transfer_gxparam_to_component(self, start: int, stop: int, component: CommandComponent) -> None:
         for i in range(start, stop):

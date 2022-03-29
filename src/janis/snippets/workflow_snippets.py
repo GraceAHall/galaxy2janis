@@ -1,8 +1,10 @@
 
 
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 from janis_core import WorkflowBuilder
 from datetime import datetime
+
+
 DATE_FORMAT = "%Y-%m-%d"
 
 w = WorkflowBuilder("alignmentWorkflow")
@@ -125,7 +127,7 @@ w.step(
 def workflow_step_snippet(
     tag: str,
     tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
-    tool_input_values: dict[str, Any],
+    tool_input_values: dict[str, list[Tuple[str, str]]],
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
@@ -134,8 +136,20 @@ def workflow_step_snippet(
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''
     out_str += f'\t{tool}(\n'
-    for name, value in tool_input_values.items():
-        out_str += f'\t\t{name}={value},\n'
+
+    if 'positional' in tool_input_values:
+        out_str += f'\t\t# Positionals\n'
+        for name, value in tool_input_values['positional']:
+            out_str += f'\t\t{name}={value},\n'
+    if 'flag' in tool_input_values:
+        out_str += f'\t\t# Flags (boolean options)\n'
+        for name, value in tool_input_values['flag']:
+            out_str += f'\t\t{name}={value},\n'
+    if 'option' in tool_input_values:
+        out_str += f'\t\t# Options\n'
+        for name, value in tool_input_values['option']:
+            out_str += f'\t\t{name}={value},\n'
+            
     out_str += '\t)'
     out_str += f',\n\tdoc="{doc}"' if doc else ''
     out_str += '\n)\n'

@@ -60,8 +60,11 @@ def link_tool_input_values(workflow: Workflow) -> None:
     linker.link()
 
 def update_tool_components(workflow: Workflow) -> None:
-    # TODO update knowledge of tool components based on linked values - optionality, datatypes
-    pass
+    # TODO update knowledge of tool components based on linked values
+    # - optionality
+    # - datatypes
+    for step in workflow.steps.values():
+        pass
 
 
 

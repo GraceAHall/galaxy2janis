@@ -7,7 +7,6 @@ from typing import Any
 from galaxy.tools.parameters.basic import ToolParameter
 from galaxy.tools.parameters.grouping import Conditional, ConditionalWhen, Section, Repeat
 from galaxy.tools import Tool as GxTool
-from runtime.exceptions import TagNotSupportedError
 
 
 XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
@@ -15,23 +14,22 @@ XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
 class ParamFlattener:
     def __init__(self, inputs: dict[str, Any]):
         self.inputs = inputs
-        self.flat_params: list[ToolParameter] = []   
+        self.flat_params: dict[str, ToolParameter] = {} 
 
     def flatten(self) -> list[ToolParameter]:
         for node in self.inputs.values():
             self.explore_node(node, [])
-        return self.flat_params
+        return list(self.flat_params.values())
 
     def explore_node(self, node: XmlNode, heirarchy: list[str]) -> None:
         heirarchy = deepcopy(heirarchy)
         match node:
             case ToolParameter():
-                prefix = ".".join(heirarchy) + '.' if len(heirarchy) > 0 else ''
-                node.flat_name = f'{prefix}{node.name}'
-                self.flat_params.append(node)
+                self.flatten_param(node, heirarchy)
 
             case Conditional():
                 heirarchy.append(node.name)
+                self.flatten_param(node.test_param, heirarchy)
                 for child in node.cases:
                     self.explore_node(child, heirarchy)
 
@@ -49,7 +47,12 @@ class ParamFlattener:
 
             case _:
                 raise NotImplementedError()
-            
+    
+    def flatten_param(self, param: ToolParameter, heirarchy: list[str]) -> None:
+        prefix = ".".join(heirarchy) + '.' if len(heirarchy) > 0 else ''
+        flat_name = f'{prefix}{param.name}'
+        param.flat_name = flat_name
+        self.flat_params[flat_name] = param
 
 def get_flattened_params(toolrep: GxTool) -> list[ToolParameter]:
     pf = ParamFlattener(toolrep.inputs)

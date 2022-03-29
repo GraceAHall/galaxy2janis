@@ -1,0 +1,68 @@
+
+
+
+
+SOLVED
+
+issue
+- greedy parsing too greedy (rgFastQC.xml)
+  [-f fastq|bam|sam]: -f '${format}' '${input_file_sl}'
+  the last two positionals are being taken jointly as the value for -f. the last value is a positional
+solution
+- added end sentinels to ExecutionPaths
+  last position can only be eaten by an option if the option prefix is the 2nd last position. otherwise it now stops short of the last position. 
+  designated the end point as being up to the end sentinel, or in the case of the above, the end sentinel -1 
+
+issue
+- dynamic selection options (Kraken2 macros.xml)
+  <options from_data_table="kraken2_databases">
+  seems that this is a data manager which is loaded from the specific galaxy instance. 
+solution
+- set selectparam.options = []
+  modified RealisedTokenValues class to not expand selects where they don't have any options. keeps $selectparam var name. works fine.
+
+issue
+tool step input values are empty strings
+should be None?
+    w.step(
+        "step6_multiqc",
+        multiqc(
+            # Options
+            title="",
+            comment="",
+            config="$multiqc_config",
+            filename="report",
+        )
+    )
+solution
+- this was correct behaviour
+
+issue
+- quast tool chosen wrong statement
+solution
+- 0 [int] was being evaluated as False [bool] in conditional statement
+  set the check to 'if val is None' rather than 'if val'
+
+issue 
+- connections are being quoted 
+  simple workflow: notrna="w.step5_create_assemblies_with_unicycler.assembly"
+solution
+- InputValueType enum created. 
+  using this, can decide to quote a value or not when writing janis workflow definition
+
+issue
+- Flag listed as an Option
+  test/data/tools/quast/quast.xml
+    ToolInput(
+        'circos',
+        Boolean,
+        prefix='--circos',
+        position=2,
+        default="",
+        doc="Generage Circos plot Plot Circos version of Icarus contig alignment viewer. possible values: --circos",
+    )
+solution
+- galaxy conditional statements actually hold a SelectToolParameter to do the choice. 
+  The Conditional object has a 'test_param' 
+  this param can actually be accessed in the <command> section as any normal param as it has a value. 
+  these params were added to the XML ingestor parsing process. 

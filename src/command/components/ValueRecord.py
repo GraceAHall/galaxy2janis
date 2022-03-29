@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
 
+import utils.general_utils as utils
 
 
 @dataclass
@@ -45,20 +46,6 @@ class ValueRecord(ABC):
         counts_list.sort(key=lambda x: x[1], reverse=True)
         return counts_list[0][0]
 
-    def is_int(self, the_string: str) -> bool:
-        if the_string.isdigit():
-            return True
-        return False
-
-    def is_float(self, the_string: str) -> bool:
-        if not self.is_int(the_string):
-            try:
-                float(the_string)
-                return True
-            except ValueError:
-                pass
-        return False
-
 
 class PositionalValueRecord(ValueRecord):
     def __init__(self):
@@ -74,12 +61,12 @@ class PositionalValueRecord(ValueRecord):
         return counts
 
     def values_are_ints(self) -> bool:
-        if all([self.is_int(obsval.value) for obsval in self.record]):
+        if all([utils.is_int(obsval.value) for obsval in self.record]):
             return True
         return False
     
     def values_are_floats(self) -> bool:
-        if all([self.is_float(obsval.value) for obsval in self.record]):
+        if all([utils.is_float(obsval.value) for obsval in self.record]):
             return True
         return False
 
@@ -108,13 +95,13 @@ class OptionValueRecord(ValueRecord):
 
     def values_are_ints(self) -> bool:
         for obsval in self.record:
-            if not all([self.is_int(x) for x in obsval.value]):
+            if not all([utils.is_int(x) for x in obsval.value]):
                 return False
         return True
     
     def values_are_floats(self) -> bool:
         for obsval in self.record:
-            if not all([self.is_float(x) for x in obsval.value]):
+            if not all([utils.is_float(x) for x in obsval.value]):
                 return False
         return True
 

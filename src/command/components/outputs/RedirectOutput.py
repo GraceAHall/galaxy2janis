@@ -66,7 +66,8 @@ class RedirectOutput(BaseCommandComponent):
     def get_docstring(self) -> Optional[str]:
         if self.gxparam:
             return self.gxparam.get_docstring()
-        return f'examples: {", ".join(self.value_record.get_unique_values()[:5])}'
+        return ''
+        #return f'examples: {", ".join(self.value_record.get_unique_values()[:5])}'
 
     def update(self, incoming: RedirectOutput):
         # transfer galaxy param reference

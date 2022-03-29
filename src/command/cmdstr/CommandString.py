@@ -82,7 +82,7 @@ def infer_main_tool_statement(statements: list[DynamicCommandStatement], metadat
     req_similarities = get_requirement_similarities(statements, metadata)
     best = choose_best(gxref_counts, req_similarities)
     # return clear best or fallback to final statement
-    if best:
+    if best is not None:
         return best
     return len(statements) - 1 # the last statement
 

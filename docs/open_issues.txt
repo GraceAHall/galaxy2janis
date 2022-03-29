@@ -1,0 +1,14 @@
+
+
+
+
+TODO
+
+
+
+issue:
+- 2 outputs which are the same from filtlong
+solution:
+- only create redirect output (or list it in the final outputs) if the redirect '>' is followed by a token with a reference to a galaxy object.
+
+

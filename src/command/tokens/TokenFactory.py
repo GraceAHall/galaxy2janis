@@ -74,14 +74,6 @@ class TokenFactory:
             'longest':  LongestTokenOrderingStrategy()
         }
 
-    def spawn_end_sentinel(self) -> Token:
-        matches = scanners.get_all('end')
-        return Token(matches[0], TokenType.END_STATEMENT)
-
-    def spawn_kv_linker(self, delim: str) -> Token:
-        matches = scanners.get_all(delim)
-        return Token(matches[0], TokenType.KV_LINKER)
-
     def create(self, word: str, prioritisation: str='priority') -> Token:
         """
         extracts the best token from a word.

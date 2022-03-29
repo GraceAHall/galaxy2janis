@@ -42,7 +42,11 @@ class CLIparser:
                             type=str)
         parser.add_argument("-r",
                             "--remote_url", 
-                            help="toolshed tarball url. downloads tool tarball from from the toolshed and parses.",
+                            help="toolshed tarball url. downloads tool tarball from the toolshed, extracts contents then parses any tool XML files.",
+                            type=str)
+        parser.add_argument("-w",
+                            "--download_dir", 
+                            help="parent folder to place downloaded tool wrapper folders (when using --remote_url). defaults to the current working directory",
                             type=str)
         parser.add_argument("-o",
                             "--outdir", 

@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 
 from janis.formatters.JanisWorkflowFormatter import JanisWorkflowFormatter
-from workflows.step.StepInput import ConnectionStepInput, StaticStepInput, RuntimeStepInput
 
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.Step import InputDataStep, ToolStep

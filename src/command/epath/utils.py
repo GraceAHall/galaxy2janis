@@ -17,8 +17,11 @@ NON_VALUE_TOKENTYPES = set([
 def is_bool_select(token: Token) -> bool:
     if token.type == TokenType.GX_INPUT:
         match token.gxparam:
-            case BoolParam() | SelectParam():
+            case BoolParam():
                 return True
+            case SelectParam():
+                if len(token.gxparam.options) > 0:
+                    return True
             case _:
                 pass
     return False

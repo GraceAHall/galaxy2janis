@@ -91,6 +91,19 @@
             ]
         },
         {
+            "name": "quast-59db8ea8c845",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "simple_workflow/wrappers/quast-59db8ea8c845", 
+                "--xml", "quast.xml",
+            ]
+        },
+        {
             "name": "prokka",
             "type": "python",
             "request": "launch",
@@ -114,6 +127,19 @@
                 "tool",
                 "--dir", "test/data/tools/fastp", 
                 "--xml", "fastp.xml",
+            ]
+        },
+        {
+            "name": "kraken2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/kraken2", 
+                "--xml", "kraken2.xml",
             ]
         },
         {

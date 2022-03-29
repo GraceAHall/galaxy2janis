@@ -1,8 +1,9 @@
 
-from typing import Any
+from typing import Any, Tuple
 from janis.imports.WorkflowImportHandler import WorkflowImportHandler
 import janis.snippets.workflow_snippets as snippets
 from workflows.io.Output import WorkflowOutput
+from workflows.values.InputValue import InputValue, InputValueType
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.Step import InputDataStep, ToolStep
 
@@ -65,12 +66,34 @@ class JanisWorkflowFormatter:
     
     def format_step(self, name: str, step: ToolStep) -> str:
         self.update_imports(name, step)
+        input_values = step.get_input_values()
+        formatted_values = self.format_input_values(input_values)
         return snippets.workflow_step_snippet(
             tag=name, # TODO tag formatter
             tool=step.tool.metadata.id,
-            tool_input_values=step.input_values,
+            tool_input_values=formatted_values,
             doc=step.get_docstring()
         )
+    
+    def format_input_values(self, input_values_dict: dict[str, list[Tuple[str, InputValue]]]) -> dict[str, list[Tuple[str, str]]]:
+        out: dict[str, list[Tuple[str, str]]] = {}
+        for component_type, input_values in input_values_dict.items():
+            if len(input_values) > 0:
+                out[component_type] = []
+                for tag, input_value in input_values:
+                    out[component_type].append((tag, self.wrap_value(input_value)))
+        return out
+
+    def wrap_value(self, inval: InputValue) -> str:
+        if self.should_quote(inval):
+            return f'"{inval.value}"'
+        return str(inval.value)
+
+    def should_quote(self, inval: InputValue) -> bool:
+        quoted_types = [InputValueType.STRING, InputValueType.RUNTIME_VALUE]
+        if inval.valtype in quoted_types:
+            return True
+        return False
 
     def format_outputs(self, outputs: dict[str, WorkflowOutput]) -> str:
         out_str = '# OUTPUTS\n'

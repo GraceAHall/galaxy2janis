@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 from typing import Optional
+from xmltool.param.InputParam import BoolParam
 
 from xmltool.param.Param import Param
 from command.components.CommandComponent import BaseCommandComponent
@@ -20,10 +21,24 @@ class Flag(BaseCommandComponent):
 
     def get_default_value(self) -> bool:
         if self.gxparam:
-            default = self.gxparam.get_default()
-            if self.prefix in default:
+            return self.get_default_from_gxparam()
+        else:
+            return self.get_default_from_presence()
+    
+    def get_default_from_gxparam(self) -> bool:
+        if isinstance(self.gxparam, BoolParam):
+            if self.gxparam.checked and self.gxparam.truevalue == self.prefix:
                 return True
-        elif all([self.presence_array]):
+            elif self.gxparam.checked and self.gxparam.truevalue == "":
+                return False
+            elif not self.gxparam.checked and self.gxparam.falsevalue == self.prefix:
+                return True
+            elif not self.gxparam.checked and self.gxparam.falsevalue == "":
+                return False
+        return False
+    
+    def get_default_from_presence(self) -> bool:
+        if all([self.presence_array]):
             return True
         return False
    

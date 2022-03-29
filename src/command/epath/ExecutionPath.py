@@ -10,7 +10,7 @@ from command.components.outputs import RedirectOutput
 from command.components.linux import Tee, StreamMerge
 from command.components.CommandComponent import CommandComponent
 from command.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
-
+import command.tokens.utils as utils
 
 @dataclass
 class EPathPosition:
@@ -32,7 +32,17 @@ class ExecutionPath:
         self.set_attrs()
 
     def init_positions(self, tokens: list[Token]) -> list[EPathPosition]:
-        return [EPathPosition(i, token) for i, token in enumerate(tokens)]
+        positions = [EPathPosition(i, token) for i, token in enumerate(tokens)]
+        end_sentinel = utils.spawn_end_sentinel()
+        positions.append(EPathPosition(len(positions), end_sentinel))
+        return positions
+
+    def get_end_token_position(self) -> int:
+        end_tokens = [TokenType.END_STATEMENT, TokenType.LINUX_TEE, TokenType.LINUX_REDIRECT]
+        for position in self.positions:
+            if position.token.type in end_tokens:
+                return position.ptr - 1
+        return len(self.positions) - 2  # this will never happen
 
     def get_components(self) -> list[CommandComponent]:
         components = self.get_component_list()

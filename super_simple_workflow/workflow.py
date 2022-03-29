@@ -20,8 +20,8 @@ metadata = WorkflowMetadata(
     short_documentation="Unicycler Assembly",
     contributors=['gxtool2janis'],
     keywords=['assembly'],
-    dateCreated="2022-03-28",
-    dateUpdated="2022-03-28",
+    dateCreated="2022-03-29",
+    dateUpdated="2022-03-29",
     version=1,
     doi=None,
     citation=None
@@ -55,15 +55,17 @@ w.input(
 w.step(
 	"step3_fastqc",
 	fastqc(
+		# Flags (boolean options)
+		nogroup=False,
 		quiet=True,
 		extract=True,
-		nogroup=False,
+		# Options
+		contaminants="RuntimeValue",
+		adapters="RuntimeValue",
+		limits="RuntimeValue",
 		outdir="$html_file.files_path",
-		contaminants="RUNTIMEVALUE",
-		adapters="RUNTIMEVALUE",
-		limits="RUNTIMEVALUE",
-		min_length=None,
 		kmers=7,
+		min_length=None,
 		f_file="fastq html_file",
 	)
 )

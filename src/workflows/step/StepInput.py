@@ -27,6 +27,7 @@ class RuntimeStepInput(StepInput):
     
 
 def init_connection_step_input(name: str, details: dict[str, Any]) -> StepInput:
+    name = name.replace('|', '.')
     return ConnectionStepInput(
         name=name,
         step_id=details['id'],

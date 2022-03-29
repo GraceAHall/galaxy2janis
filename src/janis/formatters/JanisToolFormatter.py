@@ -37,25 +37,21 @@ class JanisToolFormatter:
             citation=metadata.get_main_citation()
         )
 
-    def format_inputs(self, inputs: list[CommandComponent]) -> str:
-        positionals = [x for x in inputs if isinstance(x, Positional)]
-        flags = [x for x in inputs if isinstance(x, Flag)]
-        options = [x for x in inputs if isinstance(x, Option)]
-
+    def format_inputs(self, inputs: dict[str, list[CommandComponent]]) -> str:
         out_str: str = ''
         out_str += 'inputs = ['
         out_str += '\n\t# Positionals'
-        for positional in positionals:
+        for positional in inputs['positionals']:
             self.import_handler.update(positional)
             out_str += f'{self.format_positional_input(positional)},'
 
         out_str += '\n\t# Flags'
-        for flag in flags:
+        for flag in inputs['flags']:
             self.import_handler.update(flag)
             out_str += f'{self.format_flag_input(flag)},'
             
         out_str += '\n\t# Options'
-        for option in options:
+        for option in inputs['options']:
             self.import_handler.update(option)
             out_str += f'{self.format_option_input(option)},'
         out_str += '\n]\n'
