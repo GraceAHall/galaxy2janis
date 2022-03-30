@@ -9,7 +9,7 @@ from xmltool.param.InputParam import (
     SelectParam
 )
 from xmltool.param.OutputParam import OutputParam
-from command.components.outputs.Selector import Selector, SelectorType
+
 
 MOCK_BOOLPARAM1 = BoolParam('adv.no_header')
 MOCK_BOOLPARAM1.argument = '--noheader'
@@ -63,8 +63,3 @@ MOCK_SELECTPARAM1.options = [
 MOCK_OUTPARAM1 = OutputParam('report')
 MOCK_OUTPARAM1.datatypes = ['tabular'] 
 MOCK_OUTPARAM1.label = 'report file'
-MOCK_OUTPARAM1.selector = Selector(
-    SelectorType.INPUT_SELECTOR, 
-    contents='report'
-)
-

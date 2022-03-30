@@ -62,7 +62,7 @@ class CommandFactory:
             self.command.update(component)
 
     def update_redirects(self, epath: ExecutionPath) -> None:
-        if epath.redirect:
+        if epath.redirect and epath.redirect.file_token.gxparam:
             self.command.update(epath.redirect)
    
     def cleanup(self) -> None:

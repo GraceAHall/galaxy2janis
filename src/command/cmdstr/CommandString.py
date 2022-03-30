@@ -75,7 +75,7 @@ class CommandString:
 
 
 def infer_main_tool_statement(statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata) -> int:
-    if len(statements) == 1:
+    if len(statements) <= 1:
         return 0
     
     gxref_counts = get_gxref_counts(statements)

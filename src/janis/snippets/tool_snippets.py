@@ -79,9 +79,9 @@ def tool_input_snippet(
     out_str += f"\t\t{datatype},\n"
     out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
     out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''
-    out_str += f"\t\tposition={position},\n" if position else ''
-    out_str += f"\t\tdefault={default},\n" if default else ''
-    out_str += f'\t\tdoc="{doc}",\n' if doc else ''
+    out_str += f"\t\tposition={position},\n"
+    out_str += f"\t\tdefault={default},\n"
+    out_str += f'\t\tdoc="{doc}",\n'
     out_str += '\t)'
     return out_str
     

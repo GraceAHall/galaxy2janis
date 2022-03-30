@@ -7,6 +7,7 @@ from datatypes.JanisDatatype import JanisDatatype
 from xmltool.param.Param import Param
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
+import command.components.inputs.utils as utils
 
 
 class Positional(BaseCommandComponent):
@@ -30,11 +31,13 @@ class Positional(BaseCommandComponent):
         return pseudo_name.strip('$')
     
     def get_default_value(self) -> str:
-        # get default from galaxy param if available
-        if self.gxparam:
-            return self.gxparam.get_default()
-        # otherwise, most commonly witnessed option value
-        return self.value_record.get_most_common_value()
+        """gets the default value for this component"""
+        if utils.datatypes_permit_default(self.janis_datatypes):
+            if self.gxparam:
+                default = self.gxparam.get_default()
+            else:
+                default = self.value_record.get_most_common_value()
+        return utils.sanitise_default_value(default)
 
     def is_optional(self) -> bool:
         if all(self.presence_array):

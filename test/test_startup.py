@@ -69,7 +69,7 @@ class TestToolExeSettings(unittest.TestCase):
         self.assertEquals(true_path, esettings_xml_path)
     
     def test_get_logfile_path(self) -> None:
-        true_path = 'parsed/abricate/abricate.log'
+        true_path = 'parsed/abricate.log'
         esettings_log_path = self.esettings.get_logfile_path()
         self.assertEquals(true_path, esettings_log_path)
 

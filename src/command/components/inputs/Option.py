@@ -7,6 +7,8 @@ from xmltool.param.InputParam import SelectParam
 from xmltool.param.Param import Param
 from command.components.ValueRecord import OptionValueRecord
 from command.components.CommandComponent import BaseCommandComponent
+import command.components.inputs.utils as utils
+
 
 class Option(BaseCommandComponent):
     def __init__(self, prefix: str, values: list[str], epath_id: int, delim: str) -> None:
@@ -21,16 +23,19 @@ class Option(BaseCommandComponent):
         self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: OptionValueRecord = OptionValueRecord()
         self.value_record.add(self.epath_id, self.values)
+        #self.forced_optionality: Optional[bool] = None
 
     def get_name(self) -> str:
         return self.prefix.strip('--').lower().replace('-', '_')
 
     def get_default_value(self) -> Optional[str]:
-        # get default from galaxy param if available
-        if self.gxparam:
-            return self.gxparam.get_default()
-        # otherwise, most commonly witnessed option value
-        return self.value_record.get_most_common_value()
+        """gets the default value for this component"""
+        if utils.datatypes_permit_default(self.janis_datatypes):
+            if self.gxparam:
+                default = self.gxparam.get_default()
+            else:
+                default = self.value_record.get_most_common_value()
+        return utils.sanitise_default_value(default)
         
     def is_optional(self) -> bool:
         if all(self.presence_array):

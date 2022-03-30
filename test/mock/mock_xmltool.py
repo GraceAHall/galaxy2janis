@@ -7,7 +7,7 @@ from xmltool.TestRegister import TestRegister
 from .mock_metadata import MOCK_METADATA
 
 
-MOCK_TOOL = XMLToolDefinition(
+MOCK_XMLTOOL = XMLToolDefinition(
     metadata=MOCK_METADATA,
     command='',
     inputs=InputRegister([]),

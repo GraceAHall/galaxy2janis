@@ -9,6 +9,7 @@ from workflows.step.Step import ToolStep
 from workflows.values.InputValue import InputValue, InputValueType
 from workflows.values.value_types import select_input_value_type
 from workflows.step.StepInput import (
+    StepInput,
     ConnectionStepInput,
     RuntimeStepInput,
     StaticStepInput
@@ -65,7 +66,9 @@ class StaticValueLinkingStrategy(LinkingStrategy):
         'False': False,
         'true': True,
         'True': True,
-        'null': None
+        'null': None,
+        'none': None,
+        'None': None
     }
 
     def __init__(self, component: CommandComponent, step_input: StaticStepInput):
@@ -83,34 +86,61 @@ class StaticValueLinkingStrategy(LinkingStrategy):
         return value
     
     def get_valtype(self) -> InputValueType:
-        return select_input_value_type(self.component, self.get_value())
+        value = self.get_value()
+        if value == 'RuntimeValue':
+            return InputValueType.RUNTIME_VALUE
+        else:
+            return select_input_value_type(self.component, value)
 
 
-class DefaultValueLinkingStrategy(LinkingStrategy):
-    def __init__(self, component: CommandComponent):
-        self.component = component
+# class DefaultValueLinkingStrategy(LinkingStrategy):
+#     def __init__(self, component: CommandComponent):
+#         self.component = component
 
-    def get_value(self) -> Any:
-        return self.component.get_default_value()
+#     def get_value(self) -> Any:
+#         return self.component.get_default_value()
     
-    def get_valtype(self) -> InputValueType:
-        return select_input_value_type(self.component, self.get_value())
+#     def get_valtype(self) -> InputValueType:
+#         return select_input_value_type(self.component, self.get_value())
 
 
+"""
 
-def select_linking_strategy(component: CommandComponent, step: ToolStep, workflow: Workflow) -> LinkingStrategy:
-    if component.gxparam:
-        query = component.gxparam.name
-        step_input = step.get_input(query)
-        if step_input:
-            match step_input:
-                case ConnectionStepInput():
-                    return ConnectionLinkingStrategy(component, step_input, workflow)
-                case RuntimeStepInput():
-                    return RuntimeLinkingStrategy() 
-                case StaticStepInput():
-                    return StaticValueLinkingStrategy(component, step_input)
-                case _:
-                    return RuntimeLinkingStrategy()
-    return DefaultValueLinkingStrategy(component)
+workflow end:
+
+replace all $env_vars with RuntimeValue
+
+detect which connection inputs have not been touched
+    - mark each connection input as being linked on the fly
+    - write note if any werent linked properly. see unicycler fq1="$fq1"
+    - list likely candidates for this value
+
+ask Richard:
+- quast fungus="" workflow step
+
+String options should have None instead of "" for step values?
+>>> bool("")
+False
+
+
+Tool end:
+disallow defaults for File inputs. -> done on the tool parsing end.
+- don't want sitations where we have 'in1' default = 'input.fq' or 'fastq' etc
+
+
+"""
+
+
+def select_linking_strategy(component: CommandComponent, step_input: StepInput, workflow: Workflow) -> LinkingStrategy:
+    if step_input:
+        match step_input:
+            case ConnectionStepInput():
+                return ConnectionLinkingStrategy(component, step_input, workflow)
+            case RuntimeStepInput():
+                return RuntimeLinkingStrategy() 
+            case StaticStepInput():
+                return StaticValueLinkingStrategy(component, step_input)
+            case _:
+                return RuntimeLinkingStrategy()
+    raise RuntimeError(f'cannot find galaxy step input for gxparam {query}')
     

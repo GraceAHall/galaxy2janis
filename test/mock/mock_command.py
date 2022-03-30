@@ -2,6 +2,8 @@
 
 from command.infer import Command
 
+
+from .mock_commandstring import MOCK_CMDSTR1
 from .mock_commandcomponents import (
     MOCK_POSIT1,
     MOCK_POSIT2,
@@ -12,7 +14,7 @@ from .mock_commandcomponents import (
     MOCK_REDIRECT1
 )
 
-MOCK_COMMAND = Command()
+MOCK_COMMAND = Command(MOCK_CMDSTR1)
 MOCK_COMMAND.positionals = {
     0: MOCK_POSIT1,
     1: MOCK_POSIT2

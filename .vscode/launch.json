@@ -130,6 +130,19 @@
             ]
         },
         {
+            "name": "filtlong",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/filtlong", 
+                "--xml", "filtlong.xml",
+            ]
+        },
+        {
             "name": "kraken2",
             "type": "python",
             "request": "launch",

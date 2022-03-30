@@ -26,7 +26,7 @@ class ExecutionPath:
     def __init__(self, tokens: list[Token]):
         self.positions: list[EPathPosition] = self.init_positions(tokens)
         self.stream_merges: list[StreamMerge] = []
-        self.redirect: Optional[CommandComponent] = None
+        self.redirect: Optional[RedirectOutput] = None
         self.tees: Optional[Tee] = None
         self.tokens_to_excise: list[int] = []
         self.set_attrs()

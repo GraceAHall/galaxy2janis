@@ -71,6 +71,7 @@ class JanisToolFormatter:
             datatype=flag.get_janis_datatype_str(),
             position=flag.cmd_pos,
             prefix=flag.prefix,
+            default=flag.get_default_value(),
             doc=flag.get_docstring()
         )
     
@@ -87,12 +88,18 @@ class JanisToolFormatter:
         )
 
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
-        dclasses = [x.classname for x in component.janis_datatypes]
-        should_quote = False if 'Int' in dclasses or 'Float' in dclasses else True
         default_value = component.get_default_value()
-        if should_quote:
+        if self.should_quote(component):
             return f'"{default_value}"'
         return default_value
+    
+    def should_quote(self, component: CommandComponent) -> bool:
+        dclasses = [x.classname for x in component.janis_datatypes]
+        if 'Int' in dclasses or 'Float' in dclasses:
+            return False
+        if component.get_default_value() is None:
+            return False
+        return True
 
     def format_outputs(self, outputs: list[CommandComponent]) -> str:
         out_str: str = ''
