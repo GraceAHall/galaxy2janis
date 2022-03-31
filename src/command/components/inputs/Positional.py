@@ -32,12 +32,15 @@ class Positional(BaseCommandComponent):
     
     def get_default_value(self) -> str:
         """gets the default value for this component"""
-        if utils.datatypes_permit_default(self.janis_datatypes):
-            if self.gxparam:
-                default = self.gxparam.get_default()
-            else:
-                default = self.value_record.get_most_common_value()
-        return utils.sanitise_default_value(default)
+        #if utils.datatypes_permit_default(self.janis_datatypes):
+        if self.gxparam:
+            default = self.gxparam.get_default()
+        elif self.value_record.get_observed_env_var():
+            default = self.value_record.get_observed_env_var()
+        else:
+            default = self.value_record.get_most_common_value()
+        return default
+        #return utils.sanitise_default_value(default)
 
     def is_optional(self) -> bool:
         if all(self.presence_array):

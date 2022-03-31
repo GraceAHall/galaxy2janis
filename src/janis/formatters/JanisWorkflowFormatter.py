@@ -3,7 +3,7 @@ from typing import Any, Tuple
 from janis.imports.WorkflowImportHandler import WorkflowImportHandler
 import janis.snippets.workflow_snippets as snippets
 from workflows.io.Output import WorkflowOutput
-from workflows.values.InputValue import InputValue, InputValueType
+from workflows.step.values.InputValue import InputValue, InputValueType
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.Step import InputDataStep, ToolStep
 
@@ -90,7 +90,7 @@ class JanisWorkflowFormatter:
         return str(inval.value)
 
     def should_quote(self, inval: InputValue) -> bool:
-        quoted_types = [InputValueType.STRING, InputValueType.RUNTIME_VALUE]
+        quoted_types = [InputValueType.STRING, InputValueType.RUNTIME]
         if inval.valtype in quoted_types:
             return True
         return False

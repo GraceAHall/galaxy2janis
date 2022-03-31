@@ -12,6 +12,8 @@ from command.components.inputs.Positional import Positional
 from containers.Container import Container
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from janis.formatters.JanisToolFormatter import JanisToolFormatter
+from xmltool.param.InputParamRegister import InputParamRegister
+from xmltool.param.Param import Param
 
 
 @dataclass
@@ -22,9 +24,16 @@ class Tool:
     outputs: list[CommandComponent]
     container: Optional[Container]
     base_command: list[str]
+    gxparam_register: InputParamRegister
 
     def get_inputs(self) -> list[CommandComponent]:
         return self.inputs
+
+    def get_gxparam(self, query: str) -> Param:
+        param = self.gxparam_register.get(query, strategy='lca')
+        if not param:
+            raise RuntimeError(f'no gxparam named {query}')
+        return param
 
     def get_input(self, query_tag: str) -> Optional[CommandComponent]:
         for inp in self.inputs:

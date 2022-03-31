@@ -6,8 +6,8 @@ from typing import Any, Optional
 
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.param.Param import Param
-from xmltool.param.InputRegister import InputRegister
-from xmltool.param.OutputRegister import OutputRegister
+from xmltool.param.InputParamRegister import InputParamRegister
+from xmltool.param.OutputParamRegister import OutputParamRegister
 from xmltool.TestRegister import TestRegister
 from janis_core.tool.test_classes import TTestCase
 from xmltool.requirements import ContainerRequirement, CondaRequirement
@@ -25,8 +25,8 @@ class XMLToolDefinition:
     """
     metadata: ToolXMLMetadata
     command: str
-    inputs: InputRegister
-    outputs: OutputRegister
+    inputs: InputParamRegister
+    outputs: OutputParamRegister
     tests: TestRegister
 
     def get_input(self, query: str, strategy: str='default') -> Optional[Param]:

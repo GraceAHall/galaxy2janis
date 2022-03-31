@@ -10,7 +10,7 @@ from xmltool.param.ParamRegister import (
     LCASearchStrategy
 )
 
-class InputRegister(ParamRegister):
+class InputParamRegister(ParamRegister):
     def __init__(self, params: list[Param]):
         self.inputs: dict[str, Param] = dict()
         for param in params:

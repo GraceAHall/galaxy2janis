@@ -4,7 +4,7 @@ from typing import Optional
 from runtime.exceptions import AttributeNotSupportedError, ParamNotSupportedError
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 
-from xmltool.param.InputRegister import InputRegister
+from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.Param import Param
 
 from xmltool.parsing.datasets import fetch_datatype
@@ -21,7 +21,7 @@ FACTORY = {
 
 class OutputParamFactory:
 
-    def produce(self, gxout: GxOutput, inputs: InputRegister) -> Param:
+    def produce(self, gxout: GxOutput, inputs: InputParamRegister) -> Param:
         self.assert_supported(gxout)
         p_class = FACTORY[gxout.output_type]
         param = p_class(gxout.name)

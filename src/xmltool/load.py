@@ -8,8 +8,8 @@ from typing import Protocol
 
 from xmltool.tool_definition import XMLToolDefinition
 from xmltool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
-from xmltool.param.InputRegister import InputRegister
-from xmltool.param.OutputRegister import OutputRegister
+from xmltool.param.InputParamRegister import InputParamRegister
+from xmltool.param.OutputParamRegister import OutputParamRegister
 from xmltool.TestRegister import TestRegister
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.requirements import ContainerRequirement, CondaRequirement
@@ -30,11 +30,11 @@ class Ingestor(Protocol):
         """returns a formatted list of Requirements using the representation"""
         ...
     
-    def get_inputs(self) -> InputRegister:
+    def get_inputs(self) -> InputParamRegister:
         """returns a formatted list of params using the representation"""
         ...
     
-    def get_outputs(self) -> OutputRegister:
+    def get_outputs(self) -> OutputParamRegister:
         """returns a formatted list of outputs using the representation"""
         ...
     

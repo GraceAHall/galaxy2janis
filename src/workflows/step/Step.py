@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Optional, Tuple
+from dataclasses import dataclass
+from typing import Optional
 from datatypes.JanisDatatype import JanisDatatype
 
 from tool.Tool import Tool
-from .StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
-from .StepInput import StepInput
-from .StepOutput import StepOutput
-from workflows.values.InputValue import InputValue, InputValueType
+from workflows.step.inputs.StepInput import StepInput
+from workflows.step.metadata.StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
+from workflows.step.inputs.StepInputRegister import StepInputRegister
+from workflows.step.outputs.StepOutput import StepOutput
+from workflows.step.outputs.StepOutputRegister import StepOutputRegister
+from workflows.step.values.InputValueRegister import InputValueRegister
 
 """
 JANIS
@@ -35,8 +37,8 @@ w.step(
 @dataclass
 class GalaxyWorkflowStep(ABC):
     metadata: StepMetadata
-    inputs: list[StepInput]
-    outputs: list[StepOutput]
+    input_register: StepInputRegister
+    output_register: StepOutputRegister
 
     @abstractmethod
     def get_name(self) -> str:
@@ -47,17 +49,13 @@ class GalaxyWorkflowStep(ABC):
     def get_docstring(self) -> Optional[str]:
         ...
 
-    def get_output(self, query_name: str) -> StepOutput:
-        for output in self.outputs:
-            if output.name == query_name:
-                return output
-        raise RuntimeError(f'could not find output {query_name}')
-    
     def get_input(self, query_name: str) -> Optional[StepInput]:
-        for inp in self.inputs:
-            if inp.name == query_name:
-                return inp
-        return None
+        return self.input_register.get(query_name)
+    
+    def get_output(self, query_name: str) -> Optional[StepOutput]:
+        return self.output_register.get(query_name)
+
+
 
 @dataclass
 class InputDataStep(GalaxyWorkflowStep):
@@ -88,7 +86,7 @@ class InputDataStep(GalaxyWorkflowStep):
 class ToolStep(GalaxyWorkflowStep):
     metadata: ToolStepMetadata
     tool: Optional[Tool] = None
-    input_values: dict[str, InputValue] = field(default_factory=dict)
+    values: InputValueRegister = InputValueRegister()
 
     def set_definition_path(self, path: str) -> None:
         self.metadata.tool_definition_path = path
@@ -106,57 +104,6 @@ class ToolStep(GalaxyWorkflowStep):
 
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label
-
-    def get_component_type(self, tag: str) -> str:
-        if self.tool:
-            inp = self.tool.get_input(query_tag=tag)
-            if inp:
-                return type(inp).__name__.lower()
-        raise RuntimeError(f'tool and {tag} input must be known')
-
-    def get_input_values(self) -> dict[str, list[Tuple[str, InputValue]]]:
-        out: dict[str, list[Tuple[str, InputValue]]] = {
-            'positional': [],
-            'flag': [],
-            'option': []
-        }
-        self.populate_input_value_dict(out)
-        self.order_input_value_dict(out)
-        return out
-
-    def populate_input_value_dict(self, out: dict[str, list[Tuple[str, InputValue]]]) -> None:
-        for tag, inputval in self.input_values.items():
-            out[self.get_component_type(tag)].append((tag, inputval))
-
-    def order_input_value_dict(self, out: dict[str, list[Tuple[str, InputValue]]]) -> None:
-        for component_type, input_values in out.items():
-            out[component_type] = self.order_values(input_values)
-
-    def order_values(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        runtime_inputs = self.get_runtime_input_values(input_values)
-        non_runtime_inputs = self.get_nonruntime_input_values(input_values)
-        non_runtime_inputs.sort(key=lambda x: x[0])  # sort non runtime inputs alphabetically based on name
-        return runtime_inputs + non_runtime_inputs
-
-    def get_runtime_input_values(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        out: list[Tuple[str, InputValue]] = []
-        for tag, inputval in input_values:
-            if inputval.valtype == InputValueType.RUNTIME_VALUE:
-                out.append((tag, inputval))
-        return out
-    
-    def get_nonruntime_input_values(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        out: list[Tuple[str, InputValue]] = []
-        for tag, inputval in input_values:
-            if inputval.valtype != InputValueType.RUNTIME_VALUE:
-                out.append((tag, inputval))
-        return out
-
-    # deprecated?
-    # def get_input_value(self, query: str) -> InputValue:
-    #     if query in self.input_values:
-    #         return self.input_values[query]
-    #     raise RuntimeError()
 
     def get_uri(self) -> str:
         return self.metadata.get_uri()

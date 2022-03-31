@@ -30,7 +30,8 @@ class ToolFactory:
             inputs=self.get_inputs(),
             outputs=self.get_outputs(),
             container=self.container,
-            base_command=self.get_base_command()
+            base_command=self.get_base_command(),
+            gxparam_register=self.xmltool.inputs
         )
 
     def get_inputs(self) -> list[CommandComponent]:

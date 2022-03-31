@@ -13,7 +13,7 @@ from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.requirements import CondaRequirement
 
 from xmltool.param.Param import Param
-from xmltool.param.InputRegister import InputRegister
+from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.InputParam import (
     BoolParam,
     IntegerParam, 
@@ -22,7 +22,7 @@ from xmltool.param.InputParam import (
     DataParam,
     SelectParam
 )
-from xmltool.param.OutputRegister import OutputRegister
+from xmltool.param.OutputParamRegister import OutputParamRegister
 from xmltool.param.OutputParam import (
     DataOutputParam,
     CollectionOutputParam 
@@ -79,7 +79,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     
     def test_inputs(self) -> None:
         xmltool = self.xmltool
-        self.assertIsInstance(xmltool.inputs, InputRegister)
+        self.assertIsInstance(xmltool.inputs, InputParamRegister)
         self.assertEquals(len(xmltool.list_inputs()), 5)
 
     def test_input_params(self) -> None:
@@ -103,7 +103,7 @@ class TestGalaxyIngestion(unittest.TestCase):
         
     def test_outputs(self) -> None:
         xmltool = self.xmltool
-        self.assertIsInstance(xmltool.outputs, OutputRegister)
+        self.assertIsInstance(xmltool.outputs, OutputParamRegister)
         self.assertEquals(len(xmltool.list_outputs()), 1)
         
         param = xmltool.get_output('report')
@@ -164,7 +164,7 @@ class TestInputRegister(unittest.TestCase):
             DataParam('section2.param1'),
             BoolParam('section2.param2')
         ]
-        self.register = InputRegister(inputs)
+        self.register = InputParamRegister(inputs)
 
     def test_list(self) -> None:
         self.assertEquals(len(self.register.list()), 5)
@@ -199,7 +199,7 @@ class TestOutputRegister(unittest.TestCase):
             DataOutputParam('param1'),
             CollectionOutputParam('param2'),
         ]
-        self.register = OutputRegister(inputs)
+        self.register = OutputParamRegister(inputs)
 
     def test_list(self) -> None:
         self.assertEquals(len(self.register.list()), 2)

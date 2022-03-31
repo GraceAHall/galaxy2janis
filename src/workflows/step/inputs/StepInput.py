@@ -4,12 +4,18 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
+
+from xmltool.param.Param import Param
 
 
 @dataclass
 class StepInput(ABC):
     name: str
+
+    def __post_init__(self):
+        self.linked: bool = False
+        self.gxparam: Optional[Param] = None
 
 @dataclass
 class ConnectionStepInput(StepInput):

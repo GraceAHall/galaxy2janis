@@ -11,7 +11,7 @@ from xmltool.param.ParamRegister import (
 )
 
 
-class OutputRegister(ParamRegister):
+class OutputParamRegister(ParamRegister):
     def __init__(self, params: list[Param]):
         self.outputs: dict[str, Param] = dict()
         for param in params:

@@ -2,44 +2,44 @@
 
 from abc import ABC, abstractmethod
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
-from xmltool.param.InputRegister import InputRegister
+from xmltool.param.InputParamRegister import InputParamRegister
 
 
 # helper classes 
 class FetchStrategy(ABC):
     @abstractmethod
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         """gets the datatype associated with this galaxy output"""
         ...
 
 class FormatFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         return str(gxout.format).split(',')
 
 class DefaultFormatFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         return str(gxout.default_format).split(',')
 
 class FormatSourceFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         param = inputs.get(gxout.format_source, strategy='lca')
         if param:
             return param.datatypes
         return ['data']
 
 class CollectorFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         coll = gxout.dataset_collector_descriptions[0]
         if coll.default_ext:
             return str(coll.default_ext).split(',')
         return ['data']
 
 class FallbackFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         return ['data']
 
 
-def fetch_datatype(gxout: GxOutput, inputs: InputRegister) -> list[str]:
+def fetch_datatype(gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
     strategy: FetchStrategy = select_fetcher(gxout)
     return strategy.fetch(gxout, inputs)
 

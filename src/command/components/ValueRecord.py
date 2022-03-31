@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 import utils.general_utils as utils
 
@@ -15,6 +15,9 @@ class ObservedValue:
 
 
 class ValueRecord(ABC):
+    def __init__(self):
+        self.record: list[ObservedValue] = []
+
     @abstractmethod
     def add(self, epath_id: int, value: Any) -> None:
         """adds an observed value to the record"""
@@ -40,6 +43,12 @@ class ValueRecord(ABC):
         """returns all unique witnessed values"""
         ...
 
+    def get_observed_env_var(self) -> Optional[str]:
+        for obsval in self.record:
+            if str(obsval.value).startswith('$'):
+                return str(obsval.value)
+        return None
+
     def get_most_common_value(self) -> str:
         counts_dict = self.get_counts()
         counts_list = list(counts_dict.items())
@@ -48,8 +57,6 @@ class ValueRecord(ABC):
 
 
 class PositionalValueRecord(ValueRecord):
-    def __init__(self):
-        self.record: list[ObservedValue] = []
 
     def add(self, epath_id: int, value: Any) -> None:
         self.record.append(ObservedValue(epath_id, value))
@@ -80,8 +87,6 @@ class PositionalValueRecord(ValueRecord):
 
 # should be cmdstr_count, value
 class OptionValueRecord(ValueRecord):
-    def __init__(self):
-        self.record: list[ObservedValue] = []
 
     def add(self, epath_id: int, value: list[str]) -> None:
         self.record.append(ObservedValue(epath_id, value))

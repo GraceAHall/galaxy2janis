@@ -71,11 +71,11 @@ def input_data_step_strategy(input_step: InputDataStep, register: DatatypeRegist
     gx_datatypes = input_step.metadata.gx_datatypes
     janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gx_datatypes]
     input_step.metadata.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gx_datatypes]
-    for output in input_step.outputs:
+    for output in input_step.output_register.list_outputs():
         output.janis_datatypes = janis_datatypes
 
 def tool_step_strategy(tool_step: ToolStep, register: DatatypeRegister) -> None:
-    for output in tool_step.outputs:
+    for output in tool_step.output_register.list_outputs():
         output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in output.gx_datatypes]
 
 def workflow_output_strategy(output: WorkflowOutput, register: DatatypeRegister) -> None:

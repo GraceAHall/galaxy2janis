@@ -3,7 +3,7 @@
 from typing import Any
 import json
 
-from .Step import GalaxyWorkflowStep
+from workflows.step.Step import GalaxyWorkflowStep
 from .StepParsingStrategy import StepParsingStrategy, InputDataStepParsingStrategy, ToolStepParsingStrategy
 
 

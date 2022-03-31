@@ -8,7 +8,7 @@ from typing import Any
 
 from workflows.workflow.Workflow import Workflow
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.parsing import parse_step
+from workflows.step.parsing.parsing import parse_step
 from workflows.step.Step import GalaxyWorkflowStep, InputDataStep, ToolStep
 from workflows.io.Output import WorkflowOutput
 from command.components.TagFormatter import TagFormatter
