@@ -78,7 +78,8 @@ class WorkflowFactory:
 
         for step_tag, step in tool_steps.items():
             for workflow_out in step.metadata.workflow_outputs:
-                step_output = step.get_output(workflow_out['output_name'])
+                step_output = step.get_step_output(workflow_out['output_name'])
+                assert(step_output)
                 output = WorkflowOutput( 
                     source_step=step_tag,
                     source_tag=step_output.name,

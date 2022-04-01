@@ -26,16 +26,17 @@ class Tool:
     base_command: list[str]
     gxparam_register: InputParamRegister
 
-    def get_inputs(self) -> list[CommandComponent]:
-        return self.inputs
-
-    def get_gxparam(self, query: str) -> Param:
+    def get_gxparam(self, query: str) -> Optional[Param]:
         param = self.gxparam_register.get(query, strategy='lca')
         if not param:
-            raise RuntimeError(f'no gxparam named {query}')
+            pass
+            #raise RuntimeError(f'no gxparam named {query}')
         return param
+   
+    def list_inputs(self) -> list[CommandComponent]:
+        return self.inputs
 
-    def get_input(self, query_tag: str) -> Optional[CommandComponent]:
+    def get_input(self, query_tag: str) -> CommandComponent:
         for inp in self.inputs:
             if query_tag == inp.get_janis_tag():
                 return inp
@@ -57,7 +58,7 @@ class Tool:
     def get_options(self) -> list[Option]:
         return [x for x in self.inputs if isinstance(x, Option)]
 
-    def get_outputs(self) -> list[CommandComponent]:
+    def list_outputs(self) -> list[CommandComponent]:
         return self.outputs
 
     def get_preprocessing(self) -> Optional[str]:
@@ -72,7 +73,7 @@ class Tool:
         str_path = formatter.format_path_appends()
         str_metadata = formatter.format_metadata(self.metadata)
         str_inputs = formatter.format_inputs(self.get_inputs_by_component_type())
-        str_outputs = formatter.format_outputs(self.get_outputs())
+        str_outputs = formatter.format_outputs(self.list_outputs())
         str_commandtool = formatter.format_commandtool(self.metadata, self.base_command, self.container)
         str_translate = formatter.format_translate_func(self.metadata) 
         str_imports = formatter.format_imports()

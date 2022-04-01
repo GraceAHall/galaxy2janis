@@ -16,6 +16,11 @@ from command.epath.utils import is_bool_select
 import command.tokens.utils as utils
 
 class RealisedTokenValues:
+    """
+    class exists to expose hidden values within galaxy params
+    each galaxy select param can hold any number of text values,
+    and each text value may have 1 or more words / keyval pairs
+    """
     def __init__(self, values: list[list[Token]], original: Token):
         self.tlists = values
         self.original = original
@@ -42,14 +47,17 @@ class RealisedTokenValues:
         return self.original
     
     def get_default_token(self) -> Token:
-        return self.tlists[0][0]
+        for tlist in self.tlists:
+            if len(tlist) > 0:
+                return tlist[0]
+        return self.get_original_token()
     
     def get_first_word(self) -> str:
-        return self.tlists[0][0].text
+        return self.get_default_token().text
 
     def get_gx_reference(self) -> Optional[Param]:
         # every token will have the same gx object
-        return self.get_default_token().gxparam
+        return self.get_original_token().gxparam
     
     def __repr__(self) -> str:
         strvalues: list[str] = []

@@ -4,7 +4,6 @@
 from abc import ABC, abstractmethod
 
 from command.components.CommandComponent import CommandComponent
-from command.tokens.Tokens import Token
 from .Flag import Flag
 from .Option import Option
 from .Positional import Positional
@@ -12,13 +11,13 @@ from .Positional import Positional
 
 class InputComponentFactory(ABC):
     @abstractmethod
-    def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> CommandComponent:
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
         """creates a specific CommandComponent"""
         ...
 
 class FlagComponentFactory(InputComponentFactory):
-    def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Flag:
-        return Flag(prefix=ctoken.text)
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Flag:
+        return Flag(prefix=ctext)
 
     def spawn_from_opt(self, option: Option) -> Flag:
         flag = Flag(prefix=option.prefix)
@@ -27,17 +26,17 @@ class FlagComponentFactory(InputComponentFactory):
         return flag
 
 class OptionComponentFactory(InputComponentFactory):
-    def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Option:
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Option:
         return Option(
-            prefix=ctoken.text,
-            values=[ntoken.text for ntoken in ntokens],
+            prefix=ctext,
+            values=ntexts,
             epath_id=epath_id,
             delim=delim
         )
 
 class PositionalComponentFactory(InputComponentFactory):
-    def spawn(self, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> Positional:
-        return Positional(value=ctoken.text, epath_id=epath_id)
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Positional:
+        return Positional(value=ctext, epath_id=epath_id)
         
 
 
@@ -47,7 +46,12 @@ spawners = {
     'positional': PositionalComponentFactory()
 }
 
-def spawn_input_component(comp_type: str, ctoken: Token, ntokens: list[Token], epath_id: int, delim: str=' ') -> CommandComponent:
+def spawn_component(comp_type: str, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
     spawner = spawners[comp_type]
-    return spawner.spawn(ctoken, ntokens, epath_id, delim=delim)
+    return spawner.spawn_cmdstr(ctext, ntexts, epath_id, delim=delim)
+
+
+# def spawn_component_from_gxparam(comp_type: str, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
+#     spawner = spawners[comp_type]
+#     return spawner.spawn_gxparam(ctext, ntexts, epath_id, delim=delim)
 

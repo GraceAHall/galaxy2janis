@@ -1,0 +1,7 @@
+
+
+
+
+
+cutadapt macros.xml
+    <param name="single_noindels" type="boolean" truevalue=";noindels" falsevalue="" checked="false" label="Disallow indels for this adapter"/>

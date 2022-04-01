@@ -94,25 +94,6 @@ def workflow_input_snippet(
     return out_str
 
 
-
-"""
-working dir 
-tools
-    - parsed fastqc
-    - parsed ...
-simple_workflow.py
-steps
-    - step1_fastqc.py -> toolsfastqc
-        step1 preprocess
-        step1 main
-        step1 postprocess
-    - step1_fastqc.py
-    - step1_fastqc.py
-
-"""
-
-
-
 # STEPS
 """
 w.step(
@@ -127,7 +108,7 @@ w.step(
 def workflow_step_snippet(
     tag: str,
     tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
-    tool_input_values: dict[str, list[Tuple[str, str]]],
+    tool_input_values: list[Tuple[str, str]],
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
@@ -136,20 +117,8 @@ def workflow_step_snippet(
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''
     out_str += f'\t{tool}(\n'
-
-    if 'positional' in tool_input_values:
-        out_str += f'\t\t# Positionals\n'
-        for name, value in tool_input_values['positional']:
-            out_str += f'\t\t{name}={value},\n'
-    if 'flag' in tool_input_values:
-        out_str += f'\t\t# Flags (boolean options)\n'
-        for name, value in tool_input_values['flag']:
-            out_str += f'\t\t{name}={value},\n'
-    if 'option' in tool_input_values:
-        out_str += f'\t\t# Options\n'
-        for name, value in tool_input_values['option']:
-            out_str += f'\t\t{name}={value},\n'
-            
+    for tag, value in tool_input_values:
+        out_str += f'\t\t{tag}={value},\n'
     out_str += '\t)'
     out_str += f',\n\tdoc="{doc}"' if doc else ''
     out_str += '\n)\n'
@@ -200,4 +169,24 @@ if __name__ == "__main__":
     w.translate("cwl", **args)
     w.translate("wdl", **args)
 
+"""
+
+
+
+"""
+SHAME CORNER
+
+
+    # if 'positional' in tool_input_values:
+    #     out_str += f'\t\t# Positionals\n'
+    #     for name, value in tool_input_values['positional']:
+    #         out_str += f'\t\t{name}={value},\n'
+    # if 'flag' in tool_input_values:
+    #     out_str += f'\t\t# Flags (boolean options)\n'
+    #     for name, value in tool_input_values['flag']:
+    #         out_str += f'\t\t{name}={value},\n'
+    # if 'option' in tool_input_values:
+    #     out_str += f'\t\t# Options\n'
+    #     for name, value in tool_input_values['option']:
+    #         out_str += f'\t\t{name}={value},\n'
 """

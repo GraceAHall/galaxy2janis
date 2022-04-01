@@ -15,6 +15,7 @@ UnionType?
 class JanisWorkflowFormatter:
     def __init__(self):
         self.import_handler = WorkflowImportHandler()
+        self.include_inputs_with_default_value: bool = False # TODO NOTE SHOULD BE CLI RUNTIME SETTING
 
     def format_top_note(self, metadata: WorkflowMetadata) -> str:
         return snippets.gxtool2janis_note_snippet(
@@ -66,22 +67,25 @@ class JanisWorkflowFormatter:
     
     def format_step(self, name: str, step: ToolStep) -> str:
         self.update_imports(name, step)
-        input_values = step.get_input_values()
-        formatted_values = self.format_input_values(input_values)
+        input_values = step.list_tool_values()
+        formatted_values = self.format_tool_values(input_values)
         return snippets.workflow_step_snippet(
-            tag=name, # TODO tag formatter
+            tag=name, # TODO step tag formatter?
             tool=step.tool.metadata.id,
             tool_input_values=formatted_values,
             doc=step.get_docstring()
         )
     
-    def format_input_values(self, input_values_dict: dict[str, list[Tuple[str, InputValue]]]) -> dict[str, list[Tuple[str, str]]]:
-        out: dict[str, list[Tuple[str, str]]] = {}
-        for component_type, input_values in input_values_dict.items():
-            if len(input_values) > 0:
-                out[component_type] = []
-                for tag, input_value in input_values:
-                    out[component_type].append((tag, self.wrap_value(input_value)))
+    def format_tool_values(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, str]]:
+        # provides the final list of tool input tags & values. 
+        # logic for whether to write inputs if they are default, should wrap with quotes etc
+        out: list[Tuple[str, str]] = []
+        for tag, input_value in input_values:
+            if input_value.is_default_value and not self.include_inputs_with_default_value:
+                pass
+            else:
+                text_value = self.wrap_value(input_value)
+                out.append((tag, text_value))
         return out
 
     def wrap_value(self, inval: InputValue) -> str:
@@ -123,7 +127,7 @@ class JanisWorkflowFormatter:
                 pass
     
     def update_imports_for_input_data(self, step: InputDataStep) -> None:
-        for output in step.outputs:
+        for output in step.list_step_outputs():
             self.import_handler.update_datatype_imports(output.janis_datatypes)
     
     def update_imports_for_tool_step(self, name: str, step: ToolStep) -> None:
@@ -132,7 +136,7 @@ class JanisWorkflowFormatter:
         tool_path = tool_path.replace('/', '.')
         tool_name = step.tool.metadata.id
         self.import_handler.update_tool_imports(tool_path, tool_name)
-        for output in step.outputs:
+        for output in step.list_step_outputs():
             self.import_handler.update_datatype_imports(output.janis_datatypes)
 
     def update_imports_for_workflow_output(self, output: WorkflowOutput) -> None:
@@ -141,3 +145,16 @@ class JanisWorkflowFormatter:
     def format_imports(self) -> str:
         return self.import_handler.imports_to_string()
         
+
+"""
+SHAME CORNER
+
+    def format_input_values(self, input_values_dict: dict[str, list[Tuple[str, InputValue]]]) -> dict[str, list[Tuple[str, str]]]:
+        out: dict[str, list[Tuple[str, str]]] = {}
+        for component_type, input_values in input_values_dict.items():
+            if len(input_values) > 0:
+                out[component_type] = []
+                for tag, input_value in input_values:
+                    out[component_type].append((tag, self.wrap_value(input_value)))
+        return out
+"""

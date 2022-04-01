@@ -38,6 +38,7 @@ class ParamFlattener:
                     self.explore_node(child, heirarchy)
 
             case Section():
+                #self.flatten_param(node, heirarchy)
                 heirarchy.append(node.name)
                 for child in node.inputs.values():
                     self.explore_node(child, heirarchy)

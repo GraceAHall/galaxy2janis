@@ -18,13 +18,19 @@ class TagFormatter:
         }
 
     def format(self, the_string: str, datatype: Optional[str]=None) -> str:
-        the_string = the_string.lower()
         if datatype:
             datatype = datatype.lower()
+        the_string = self.format_capitalisation(the_string)
         the_string = self.replace_non_alphanumeric(the_string)
         the_string = self.handle_prohibited_key(the_string)
         the_string = self.handle_short_tag(the_string, datatype)
         the_string = self.encode(the_string)
+        return the_string
+
+    def format_capitalisation(self, the_string: str) -> str:
+        # allow first letter capital, rest lower
+        if len(the_string) > 1:
+            return the_string[0] + the_string[1:].lower()
         return the_string
 
     def replace_non_alphanumeric(self, the_string: str) -> str:
@@ -51,9 +57,9 @@ class TagFormatter:
     def handle_short_tag(self, the_string: str, datatype: Optional[str]) -> str:
         if len(the_string) == 1 and datatype:
             if the_string[0].isnumeric():
-                the_string = f'{datatype.lower()}_{the_string}'
+                the_string = f'{datatype}_{the_string}'
             else:
-                the_string = f'{the_string}_{datatype.lower()}'
+                the_string = f'{the_string}_{datatype}'
         return the_string
 
     def encode(self, the_string: str) -> str:

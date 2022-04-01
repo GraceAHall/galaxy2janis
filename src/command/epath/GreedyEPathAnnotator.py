@@ -9,7 +9,7 @@ from command.tokens.Tokens import Token, TokenType
 
 from command.Command import Command
 from command.components.CommandComponent import CommandComponent
-from command.components.inputs import spawn_input_component 
+from command.components.inputs import spawn_component 
 import command.epath.utils as component_utils
 
 
@@ -92,7 +92,13 @@ class GreedyEPathAnnotator:
             ctype= 'positional'
 
         stop = self.pos + 1
-        component = spawn_input_component(ctype, ctoken, vtokens, epath_id=self.epath.id, delim=delim)
+        component = spawn_component(
+            comp_type=ctype, 
+            ctext=ctoken.text, 
+            ntexts=[token.text for token in vtokens], 
+            epath_id=self.epath.id, 
+            delim=delim
+        )
         self.transfer_gxparam_to_component(start, stop, component)
         self.update_epath(start, stop, component)
 

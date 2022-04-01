@@ -5,29 +5,39 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple
 from workflows.step.inputs.StepInput import StepInput
-from workflows.step.values.InputValue import InputValue
+from workflows.step.values.InputValue import InputValue, InputValueType
 
 
 
 
 class ValueOrderingStrategy(ABC):
     @abstractmethod
-    def order(self, input_values: list[InputValue]) -> list[InputValue]:
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
         """orders input values and returns ordered list"""
         ...
 
 class AlphabeticalStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[InputValue]) -> list[InputValue]:
-        raise NotImplementedError()
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        input_values.sort(key=lambda x: x[0])
+        return input_values
 
 class ComponentTypeStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[InputValue]) -> list[InputValue]:
-        raise NotImplementedError()
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        priorities = {'positional': 0, 'flag': 1, 'option': 2}
+        input_values.sort(key=lambda x: priorities[x[1].comptype])
+        return input_values
 
 class RuntimeNonRuntimeStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[InputValue]) -> list[InputValue]:
-        raise NotImplementedError()
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        runtime = [x for x in input_values if x[1].valtype == InputValueType.RUNTIME]
+        non_runtime = [x for x in input_values if x[1].valtype != InputValueType.RUNTIME]
+        return runtime + non_runtime
 
+class ConnectionNonConnectionStrategy(ValueOrderingStrategy):
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        connection = [x for x in input_values if x[1].valtype == InputValueType.CONNECTION]
+        non_connection = [x for x in input_values if x[1].valtype != InputValueType.CONNECTION]
+        return connection + non_connection
 
 
 
@@ -35,6 +45,14 @@ class InputValueRegister:
     def __init__(self):
         self.values: dict[str, InputValue] = {}
         self.unlinked: list[StepInput] = []
+        # changing the order of the objects below changes the 
+        # ordering priority, as the last ordering method has the highest impact etc
+        self.ordering_strategies = [
+            ComponentTypeStrategy(),
+            AlphabeticalStrategy(),
+            RuntimeNonRuntimeStrategy(),
+            ConnectionNonConnectionStrategy()
+        ]
 
     def get(self, query: str) -> Optional[InputValue]:
         if query in self.values:
@@ -47,7 +65,17 @@ class InputValueRegister:
         self.unlinked.append(step_input)
     
     def list_values(self) -> list[Tuple[str, InputValue]]:
-        return list(self.values.items())
+        values = list(self.values.items())
+        for strategy in self.ordering_strategies:
+            values = strategy.order(values)
+        return values
+
+    def __str__(self) -> str:
+        out_str: str = '\nInputValueRegister -----\n'
+        out_str += f'{"[tag]":>20}{"[value]":>20}{"[type]":>40}\n'
+        for tag, input_value in self.values.items():
+            out_str += f'{tag:>20}{input_value.value:>20}{input_value.valtype:>40}\n'
+        return out_str
 
 
 

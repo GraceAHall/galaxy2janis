@@ -19,9 +19,9 @@ from janis_core import (
     Stdout
 )
 from janis_core.types.common_data_types import File
-from janis_core.types.common_data_types import Float
 from janis_core.types.common_data_types import String
 from janis_core.types.common_data_types import Boolean
+from janis_core.types.common_data_types import Float
 from data.datatypes.galaxy import Tabular
 
 
@@ -29,8 +29,8 @@ metadata = ToolMetadata(
     short_documentation="Mass screening of contigs for antimicrobial and virulence genes",
     keywords=[],
     contributors=['gxtool2janis'],
-    dateCreated="2022-03-30",
-    dateUpdated="2022-03-30",
+    dateCreated="2022-04-01",
+    dateUpdated="2022-04-01",
     version="1.0.1",
     doi=None,
     citation="tool xml missing citation",
@@ -46,6 +46,8 @@ inputs = [
 		'sample_name',
 		File,
 		position=1,
+		default=None,
+		doc="",
 	),
 	# Flags
 	ToolInput(
@@ -53,12 +55,13 @@ inputs = [
 		Boolean(optional=True),
 		prefix='--noheader',
 		position=2,
+		default=False,
 		doc="Suppress header Suppress output file's column headings. possible values: --noheader",
 	),
 	# Options
 	ToolInput(
 		'minid',
-		Float,
+		Float(optional=True),
 		prefix='--minid=',
 		separate_value_from_prefix=False,
 		position=2,
@@ -67,7 +70,7 @@ inputs = [
 	),
 	ToolInput(
 		'mincov',
-		Float,
+		Float(optional=True),
 		prefix='--mincov=',
 		separate_value_from_prefix=False,
 		position=2,

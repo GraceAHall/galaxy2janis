@@ -17,7 +17,7 @@ class Flag(BaseCommandComponent):
         self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
-        return self.prefix.strip('--').lower().replace('-', '_')
+        return self.prefix.strip('--')
 
     def get_default_value(self) -> bool:
         if self.gxparam:

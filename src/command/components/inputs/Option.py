@@ -7,7 +7,6 @@ from xmltool.param.InputParam import SelectParam
 from xmltool.param.Param import Param
 from command.components.ValueRecord import OptionValueRecord
 from command.components.CommandComponent import BaseCommandComponent
-import command.components.inputs.utils as utils
 
 
 class Option(BaseCommandComponent):
@@ -23,10 +22,10 @@ class Option(BaseCommandComponent):
         self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: OptionValueRecord = OptionValueRecord()
         self.value_record.add(self.epath_id, self.values)
-        #self.forced_optionality: Optional[bool] = None
+        self.forced_optionality: Optional[bool] = None
 
     def get_name(self) -> str:
-        return self.prefix.strip('--').lower().replace('-', '_')
+        return self.prefix.strip('--')
 
     def get_default_value(self) -> Optional[str]:
         """gets the default value for this component"""
@@ -41,7 +40,11 @@ class Option(BaseCommandComponent):
         #return utils.sanitise_default_value(default)
         
     def is_optional(self) -> bool:
-        if all(self.presence_array):
+        if self.forced_optionality is not None:
+            return self.forced_optionality
+        elif self.gxparam and self.gxparam.is_optional():
+            return True
+        elif all(self.presence_array):
             return False
         return True
 

@@ -44,7 +44,5 @@ class StepInputRegister:
 
     def assign_gxparams(self, tool: Tool) -> None:
         for step_input in self.register:
-            gxparam = tool.get_gxparam(step_input.name)
-            step_input.gxparam = gxparam
-
+            step_input.gxparam = tool.get_gxparam(step_input.name)
 

@@ -3,7 +3,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
+from command.components.CommandComponent import CommandComponent
 from datatypes.JanisDatatype import JanisDatatype
 
 from tool.Tool import Tool
@@ -12,6 +13,7 @@ from workflows.step.metadata.StepMetadata import InputDataStepMetadata, StepMeta
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
+from workflows.step.values.InputValue import InputValue
 from workflows.step.values.InputValueRegister import InputValueRegister
 
 """
@@ -49,11 +51,17 @@ class GalaxyWorkflowStep(ABC):
     def get_docstring(self) -> Optional[str]:
         ...
 
-    def get_input(self, query_name: str) -> Optional[StepInput]:
+    def get_step_input(self, query_name: str) -> Optional[StepInput]:
         return self.input_register.get(query_name)
     
-    def get_output(self, query_name: str) -> Optional[StepOutput]:
+    def list_step_inputs(self) -> list[StepInput]:
+        return self.input_register.list_inputs()
+    
+    def get_step_output(self, query_name: str) -> Optional[StepOutput]:
         return self.output_register.get(query_name)
+    
+    def list_step_outputs(self) -> list[StepOutput]:
+        return self.output_register.list_outputs()
 
 
 
@@ -96,11 +104,29 @@ class ToolStep(GalaxyWorkflowStep):
             return self.metadata.tool_definition_path
         raise RuntimeError('tool_definition_path not set for tool step')
 
+    def get_name(self) -> str:
+        return f'step{self.metadata.step_id}_{self.metadata.step_name}'
+    
     def get_tool_name(self) -> str:
         return self.metadata.tool_name
 
-    def get_name(self) -> str:
-        return f'step{self.metadata.step_id}_{self.metadata.step_name}'
+    def get_tool_input(self, tag: str) -> CommandComponent:
+        assert(self.tool)
+        return self.tool.get_input(tag)
+
+    def list_tool_inputs(self) -> list[CommandComponent]:
+        assert(self.tool)
+        return self.tool.list_inputs()
+
+    def get_tool_output(self, tag: str) -> CommandComponent:
+        raise NotImplementedError()
+    
+    def list_tool_outputs(self) -> list[CommandComponent]:
+        assert(self.tool)
+        return self.tool.list_outputs()
+    
+    def list_tool_values(self) -> list[Tuple[str, InputValue]]:
+        return self.values.list_values()
 
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label

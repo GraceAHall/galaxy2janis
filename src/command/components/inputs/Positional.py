@@ -21,6 +21,7 @@ class Positional(BaseCommandComponent):
         self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(self.epath_id, self.value)
+        self.forced_optionality: Optional[bool] = None
 
     def get_name(self) -> str:
         # get name from galaxy param if available
@@ -43,7 +44,11 @@ class Positional(BaseCommandComponent):
         #return utils.sanitise_default_value(default)
 
     def is_optional(self) -> bool:
-        if all(self.presence_array):
+        if self.forced_optionality is not None:
+            return self.forced_optionality
+        elif self.gxparam and self.gxparam.is_optional():
+            return True
+        elif all(self.presence_array):
             return False
         return True
 
