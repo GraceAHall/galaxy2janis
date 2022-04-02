@@ -11,7 +11,7 @@ from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.parsing.parsing import parse_step
 from workflows.step.Step import GalaxyWorkflowStep, InputDataStep, ToolStep
 from workflows.io.Output import WorkflowOutput
-from command.components.TagFormatter import TagFormatter
+from tags.TagFormatter import TagFormatter
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 #from datatypes.formatting import format_janis_str
 

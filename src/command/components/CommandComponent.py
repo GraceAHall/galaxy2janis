@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Protocol
 from datatypes.JanisDatatype import JanisDatatype
 from xmltool.param.Param import Param
-from command.components.TagFormatter import TagFormatter
+from tags.TagFormatter import TagFormatter
 from datatypes.formatting import format_janis_str
 
 # defines what a CommandComponent should look like
