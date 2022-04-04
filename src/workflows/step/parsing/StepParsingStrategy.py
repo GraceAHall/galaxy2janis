@@ -51,7 +51,7 @@ class InputDataStepParsingStrategy(StepParsingStrategy):
         )
 
     def get_step_inputs(self) -> StepInputRegister:
-        step_inputs = [init_runtime_step_input(name) for name in self.gxstep['inputs']]
+        step_inputs = [init_runtime_step_input(inp) for inp in self.gxstep['inputs']]
         return StepInputRegister(step_inputs)
     
     def get_step_outputs(self) -> StepOutputRegister:
@@ -118,6 +118,3 @@ class ToolStepParsingStrategy(StepParsingStrategy):
     def get_step_outputs(self) -> StepOutputRegister:
         step_outputs = [init_tool_step_output(self.gxstep, out) for out in self.gxstep['outputs']]
         return StepOutputRegister(step_outputs)
-
-
-

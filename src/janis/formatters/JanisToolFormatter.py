@@ -37,37 +37,41 @@ class JanisToolFormatter:
             citation=metadata.get_main_citation()
         )
 
-    def format_inputs(self, inputs: dict[str, list[CommandComponent]]) -> str:
+    def format_inputs(self, inputs: dict[str, CommandComponent]) -> str:
         out_str: str = ''
+        positionals = {tag: x for tag, x in inputs.items() if isinstance(x, Positional)}
+        flags = {tag: x for tag, x in inputs.items() if isinstance(x, Flag)}
+        options = {tag: x for tag, x in inputs.items() if isinstance(x, Option)}
+
         out_str += 'inputs = ['
         out_str += '\n\t# Positionals'
-        for positional in inputs['positionals']:
+        for tag, positional in positionals.items():
             self.import_handler.update(positional)
-            out_str += f'{self.format_positional_input(positional)},'
+            out_str += f'{self.format_positional_input(tag, positional)},'
 
         out_str += '\n\t# Flags'
-        for flag in inputs['flags']:
+        for tag, flag in flags.items():
             self.import_handler.update(flag)
-            out_str += f'{self.format_flag_input(flag)},'
+            out_str += f'{self.format_flag_input(tag, flag)},'
             
         out_str += '\n\t# Options'
-        for option in inputs['options']:
+        for tag, option in options.items():
             self.import_handler.update(option)
-            out_str += f'{self.format_option_input(option)},'
+            out_str += f'{self.format_option_input(tag, option)},'
         out_str += '\n]\n'
         return out_str
    
-    def format_positional_input(self, positional: Positional) -> str:
+    def format_positional_input(self, tag: str, positional: Positional) -> str:
         return snippets.tool_input_snippet(
-            tag=positional.get_janis_tag(),
+            tag=tag,
             datatype=positional.get_janis_datatype_str(),
             position=positional.cmd_pos,
             doc=positional.get_docstring()
         )
 
-    def format_flag_input(self, flag: Flag) -> str:
+    def format_flag_input(self, tag: str, flag: Flag) -> str:
         return snippets.tool_input_snippet(
-            tag=flag.get_janis_tag(),
+            tag=tag,
             datatype=flag.get_janis_datatype_str(),
             position=flag.cmd_pos,
             prefix=flag.prefix,
@@ -75,10 +79,10 @@ class JanisToolFormatter:
             doc=flag.get_docstring()
         )
     
-    def format_option_input(self, opt: Option) -> str:
+    def format_option_input(self, tag: str, opt: Option) -> str:
         default_value = self.get_wrapped_default_value(opt)
         return snippets.tool_input_snippet(
-            tag=opt.get_janis_tag(),
+            tag=tag,
             datatype=opt.get_janis_datatype_str(),
             position=opt.cmd_pos,
             prefix=opt.prefix if opt.delim == ' ' else opt.prefix + opt.delim,
@@ -101,20 +105,20 @@ class JanisToolFormatter:
             return False
         return True
 
-    def format_outputs(self, outputs: list[CommandComponent]) -> str:
+    def format_outputs(self, outputs: dict[str, CommandComponent]) -> str:
         out_str: str = ''
         out_str += 'outputs = ['
 
-        for output in outputs:
+        for tag, output in outputs.items():
             self.import_handler.update(output)
-            out_str += f'{self.format_output(output)},'
+            out_str += f'{self.format_output(tag, output)},'
         out_str += '\n]\n'
 
         return out_str
 
-    def format_output(self, output: CommandComponent) -> str:
+    def format_output(self, tag: str, output: CommandComponent) -> str:
         return snippets.tool_output_snippet(
-            tag=output.get_janis_tag(),
+            tag=tag,
             datatype=output.get_janis_datatype_str(),
             selector=output.get_selector_str() if not isinstance(output, RedirectOutput) else None, # type: ignore
             doc=output.get_docstring()

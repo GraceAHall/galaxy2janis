@@ -2,6 +2,31 @@
 
 
 
+
+
+
+
+
+TAGS
+during tool parsing:
+- tool_name
+- tool_component
+
+workflow startup
+- create/refresh all workflow stuff
+- create/refresh all tool stuff
+
+tool startup
+- create tool_name, tool_component json if not exists 
+
+
+{
+    fastqc: {
+        
+    }
+
+
+
 ####################################################
 please set all values in 'configfile.txt'
 please .........

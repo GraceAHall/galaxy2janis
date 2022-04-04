@@ -2,24 +2,18 @@
 
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import Any, Optional
 
 import utils.general_utils as utils 
 
 
-@dataclass
-class ObservedValue:
-    epath_id: int
-    value: Any
-
 
 class ValueRecord(ABC):
     def __init__(self):
-        self.record: list[ObservedValue] = []
+        self.record: list[Any] = []
 
     @abstractmethod
-    def add(self, epath_id: int, value: Any) -> None:
+    def add(self, value: Any) -> None:
         """adds an observed value to the record"""
         ...
 
@@ -45,8 +39,8 @@ class ValueRecord(ABC):
 
     def get_observed_env_var(self) -> Optional[str]:
         for obsval in self.record:
-            if str(obsval.value).startswith('$'):
-                return str(obsval.value)
+            if str(obsval).startswith('$'):
+                return str(obsval)
         return None
 
     def get_most_common_value(self) -> str:
@@ -58,27 +52,27 @@ class ValueRecord(ABC):
 
 class PositionalValueRecord(ValueRecord):
 
-    def add(self, epath_id: int, value: Any) -> None:
-        self.record.append(ObservedValue(epath_id, value))
+    def add(self, value: Any) -> None:
+        self.record.append(value)
 
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            counts[obsval.value] += 1
+            counts[obsval] += 1
         return counts
 
     def values_are_ints(self) -> bool:
-        if all([utils.is_int(obsval.value) for obsval in self.record]):
+        if all([utils.is_int(obsval) for obsval in self.record]):
             return True
         return False
     
     def values_are_floats(self) -> bool:
-        if all([utils.is_float(obsval.value) for obsval in self.record]):
+        if all([utils.is_float(obsval) for obsval in self.record]):
             return True
         return False
 
     def get_unique_values(self) -> list[str]:
-        values = list(set([obsval.value for obsval in self.record]))
+        values = list(set([obsval for obsval in self.record]))
         values.sort()
         return values
 
@@ -88,30 +82,30 @@ class PositionalValueRecord(ValueRecord):
 # should be cmdstr_count, value
 class OptionValueRecord(ValueRecord):
 
-    def add(self, epath_id: int, value: list[str]) -> None:
-        self.record.append(ObservedValue(epath_id, value))
+    def add(self, value: list[str]) -> None:
+        self.record.append(value)
 
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            label = ' '.join(obsval.value)
+            label = ' '.join(obsval)
             counts[label] += 1
         return counts
 
     def values_are_ints(self) -> bool:
         for obsval in self.record:
-            if not all([utils.is_int(x) for x in obsval.value]):
+            if not all([utils.is_int(x) for x in obsval]):
                 return False
         return True
     
     def values_are_floats(self) -> bool:
         for obsval in self.record:
-            if not all([utils.is_float(x) for x in obsval.value]):
+            if not all([utils.is_float(x) for x in obsval]):
                 return False
         return True
 
     def get_unique_values(self) -> list[str]:
-        str_vals = [' '.join(obsval.value) for obsval in self.record]
+        str_vals = [' '.join(obsval) for obsval in self.record]
         str_vals = list(set(str_vals))
         str_vals.sort()
         return str_vals

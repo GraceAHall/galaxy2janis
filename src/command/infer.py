@@ -98,8 +98,7 @@ class CommandInferer:
                 component = spawn_component(
                     comp_type='flag', 
                     ctext=gxparam.argument, 
-                    ntexts=[], 
-                    epath_id=-1
+                    ntexts=[] 
                 )
                 component.gxparam = gxparam
                 self.command.update(component)
@@ -108,8 +107,7 @@ class CommandInferer:
                     component = spawn_component(
                         comp_type='option', 
                         ctext=gxparam.argument, 
-                        ntexts=[opt.value], 
-                        epath_id=-1
+                        ntexts=[opt.value]
                     )
                     component.gxparam = gxparam
                     self.command.update(component)
@@ -117,8 +115,7 @@ class CommandInferer:
                 component = spawn_component(
                     comp_type='option', 
                     ctext=gxparam.argument, 
-                    ntexts=[], 
-                    epath_id=-1
+                    ntexts=[]
                 )
                 component.gxparam = gxparam
                 self.command.update(component)

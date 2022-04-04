@@ -11,12 +11,12 @@ from .Positional import Positional
 
 class InputComponentFactory(ABC):
     @abstractmethod
-    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], delim: str=' ') -> CommandComponent:
         """creates a specific CommandComponent"""
         ...
 
 class FlagComponentFactory(InputComponentFactory):
-    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Flag:
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], delim: str=' ') -> Flag:
         return Flag(prefix=ctext)
 
     def spawn_from_opt(self, option: Option) -> Flag:
@@ -26,17 +26,16 @@ class FlagComponentFactory(InputComponentFactory):
         return flag
 
 class OptionComponentFactory(InputComponentFactory):
-    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Option:
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], delim: str=' ') -> Option:
         return Option(
             prefix=ctext,
             values=ntexts,
-            epath_id=epath_id,
             delim=delim
         )
 
 class PositionalComponentFactory(InputComponentFactory):
-    def spawn_cmdstr(self, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> Positional:
-        return Positional(value=ctext, epath_id=epath_id)
+    def spawn_cmdstr(self, ctext: str, ntexts: list[str], delim: str=' ') -> Positional:
+        return Positional(value=ctext)
         
 
 
@@ -46,12 +45,12 @@ spawners = {
     'positional': PositionalComponentFactory()
 }
 
-def spawn_component(comp_type: str, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
+def spawn_component(comp_type: str, ctext: str, ntexts: list[str], delim: str=' ') -> CommandComponent:
     spawner = spawners[comp_type]
-    return spawner.spawn_cmdstr(ctext, ntexts, epath_id, delim=delim)
+    return spawner.spawn_cmdstr(ctext, ntexts, delim=delim)
 
 
-# def spawn_component_from_gxparam(comp_type: str, ctext: str, ntexts: list[str], epath_id: int, delim: str=' ') -> CommandComponent:
+# def spawn_component_from_gxparam(comp_type: str, ctext: str, ntexts: list[str], delim: str=' ') -> CommandComponent:
 #     spawner = spawners[comp_type]
-#     return spawner.spawn_gxparam(ctext, ntexts, epath_id, delim=delim)
+#     return spawner.spawn_gxparam(ctext, ntexts, delim=delim)
 

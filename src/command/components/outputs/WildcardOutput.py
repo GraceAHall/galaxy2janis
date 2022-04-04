@@ -7,14 +7,12 @@ from command.components.CommandComponent import BaseCommandComponent
 from typing import Any, Optional
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from xmltool.param.Param import Param
-from datatypes.JanisDatatype import JanisDatatype
 
 
 class WildcardOutput(BaseCommandComponent):
     def __init__(self, gxparam: Param):
+        super().__init__()
         self.gxparam = gxparam
-        self.presence_array: list[bool] = []  # this makes no sense
-        self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
         if self.gxparam:

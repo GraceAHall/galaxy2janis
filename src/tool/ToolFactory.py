@@ -14,7 +14,6 @@ from containers.fetch import Container
 from xmltool.param.OutputParam import OutputParam
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 
-
 class ToolFactory:
     def __init__(self, xmltool: XMLToolDefinition, command: Command, container: Optional[Container]) -> None:
         self.xmltool = xmltool
@@ -33,6 +32,7 @@ class ToolFactory:
             base_command=self.get_base_command(),
             gxparam_register=self.xmltool.inputs
         )
+        return tool
 
     def get_inputs(self) -> list[CommandComponent]:
         self.command.set_cmd_positions()
@@ -48,7 +48,6 @@ class ToolFactory:
         outputs += self.get_wildcard_outputs()
         for out in outputs:
             self.datatype_annotator.annotate(out)
-        #self.verify_outputs(outputs)
         return outputs
 
     def get_redirect_outputs(self) -> list[CommandComponent]:

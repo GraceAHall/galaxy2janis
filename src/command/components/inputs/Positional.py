@@ -9,10 +9,11 @@ from command.components.CommandComponent import BaseCommandComponent
 
 
 class Positional(BaseCommandComponent):
-    def __init__(self, value: str, epath_id: int=-1) -> None:
+    def __init__(self, value: str) -> None:
+        super().__init__()
         self.before_opts: bool = False
         self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(epath_id, value)
+        self.value_record.add(value)
 
     def get_name(self) -> str:
         # get name from galaxy param if available

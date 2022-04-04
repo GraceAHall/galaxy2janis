@@ -6,7 +6,7 @@ from datatypes.JanisDatatype import JanisDatatype
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput, InputOutput, WildcardOutput
 from workflows.step.Step import InputDataStep, ToolStep
-from workflows.io.Output import WorkflowOutput
+from workflows.io.WorkflowOutput import WorkflowOutput
 
 FALLBACK = JanisDatatype(
     format='file',
@@ -99,6 +99,7 @@ strategy_map = {
     ToolStep: tool_step_strategy,
     WorkflowOutput: workflow_output_strategy,
 }
+
 
 AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | InputDataStep | ToolStep | WorkflowOutput
 

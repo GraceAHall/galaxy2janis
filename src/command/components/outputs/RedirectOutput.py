@@ -12,13 +12,14 @@ from datatypes.formatting import format_janis_str
 
 class RedirectOutput(BaseCommandComponent):
     def __init__(self, tokens: Tuple[Token, Token]):
+        super().__init__()
         self.redirect_token = tokens[0]
         self.file_token = tokens[1]
         self.stream: Stream = self.extract_stream()
-        self.gxparam = self.file_token.gxparam
 
+        self.gxparam = self.file_token.gxparam
         self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(0, self.file_token.text)
+        self.value_record.add(self.file_token.text)
 
     def get_name(self) -> str:
         # get name from galaxy param if available

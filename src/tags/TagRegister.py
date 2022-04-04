@@ -17,10 +17,10 @@ class TagRegister:
         'fastqc': ['uuid1', 'uuid2', 'uuid3']
     }
     """
-    def __init__(self, json_data: dict[str, Any]):
-        self.uuids_basetags: dict[str, str] = json_data['uuids_basetags']
-        self.basetags_uuids: dict[str, list[str]] = json_data['basetags_uuids']
-    
+    def __init__(self):
+        self.uuids_basetags: dict[str, str] = {}
+        self.basetags_uuids: dict[str, list[str]] = {}
+        
     def exists(self, uuid: str) -> bool:
         if uuid in self.uuids_basetags:
             return True
@@ -28,6 +28,8 @@ class TagRegister:
     
     def add(self, basetag: str, uuid: str) -> None:
         self.uuids_basetags[uuid] = basetag
+        if basetag not in self.basetags_uuids:
+            self.basetags_uuids[basetag] = []
         self.basetags_uuids[basetag].append(uuid)
 
     def get(self, uuid: str) -> str:

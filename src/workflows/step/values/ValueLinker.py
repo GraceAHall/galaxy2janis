@@ -10,9 +10,10 @@ from workflows.step.values.component_updates import update_component_from_workfl
 
 # module entry
 def link_step_values(workflow: Workflow):
-    for step in workflow.steps.values():
+    for step in workflow.get_tool_steps().values():
         assert(step.tool)
-        step.input_register.assign_gxparams(step.tool)  # assigns actual Param objects to gxparam field of inputs
+        # assign actual Param objects to gxparam field of inputs
+        step.input_register.assign_gxparams(step.tool)  
         linker = ValueLinker(step, workflow)
         linker.link()
 
@@ -42,10 +43,11 @@ class ValueLinker:
 
     def assign_supplied_values(self) -> None:
         # link tool components to static and connection inputs
-        tool_inputs = self.step.list_tool_inputs()
+        assert(self.step.tool)
+        tool_inputs = self.step.get_tool_inputs().values()
         for component in tool_inputs:
             if self.is_directly_linkable(component):
-                tag = component.get_janis_tag()
+                tag = self.step.tool.tag_manager.get('tool_component', component.get_uuid())
                 query = component.gxparam.name  # type: ignore
                 step_input = self.step.input_register.get(query)
                 value = self.factory.create(component, step_input, self.workflow) # type: ignore
@@ -58,10 +60,11 @@ class ValueLinker:
             update_component_from_workflow_value(component, value)
     
     def assign_default_values(self) -> None:
-        tool_inputs = self.step.list_tool_inputs()
+        assert(self.step.tool)
+        tool_inputs = self.step.get_tool_inputs().values()
         for component in tool_inputs:
             if self.should_assign_default(component):
-                tag = component.get_janis_tag()
+                tag = self.step.tool.tag_manager.get('tool_component', component.get_uuid())
                 value = self.factory.create_default(component)
                 self.register.update(tag, value)
 
@@ -86,9 +89,10 @@ class ValueLinker:
                 self.register.update_unlinked(step_input)
 
     def assert_all_components_assigned(self) -> None:
-        tool_inputs = self.step.list_tool_inputs()
+        assert(self.step.tool)
+        tool_inputs = self.step.get_tool_inputs().values()
         for component in tool_inputs:
-            tag = component.get_janis_tag()
+            tag = self.step.tool.tag_manager.get('tool_component', component.get_uuid())
             if not self.register.get(tag):
                 raise AssertionError(f'tool input "{tag}" has no assigned step value')
 
@@ -108,7 +112,8 @@ class ValueLinker:
         return False
     
     def should_assign_default(self, component: CommandComponent) -> bool:
-        tag = component.get_janis_tag()
+        assert(self.step.tool)
+        tag = self.step.tool.tag_manager.get('tool_component', component.get_uuid())
         if not self.register.get(tag):
             return True
         return False

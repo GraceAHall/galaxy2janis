@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 from command.components.CommandComponent import CommandComponent
 from datatypes.JanisDatatype import JanisDatatype
-
 from tool.Tool import Tool
 from workflows.step.inputs.StepInput import StepInput
 from workflows.step.metadata.StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
@@ -15,8 +14,6 @@ from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
 from workflows.step.values.InputValue import InputValue
 from workflows.step.values.InputValueRegister import InputValueRegister
-from uuid import uuid4
-
 
 """
 JANIS
@@ -44,13 +41,8 @@ class GalaxyWorkflowStep(ABC):
     input_register: StepInputRegister
     output_register: StepOutputRegister
 
-    def __post_init__(self) :
-        self.uuid: str = str(uuid4())
-
-    @abstractmethod
-    def get_name(self) -> str:
-        """gets the name of this step"""
-        ...
+    def get_uuid(self) -> str:
+        return self.metadata.uuid
 
     @abstractmethod
     def get_docstring(self) -> Optional[str]:
@@ -72,13 +64,11 @@ class GalaxyWorkflowStep(ABC):
 
 @dataclass
 class InputDataStep(GalaxyWorkflowStep):
+    """represents a galaxy input data step"""
     metadata: InputDataStepMetadata
     is_optional: bool=False
     is_collection: bool=False
     collection_type: Optional[str]=None # check this doesnt do weird stuff
-
-    def get_name(self) -> str:
-        return f'{self.metadata.step_name}{self.metadata.step_id}'
 
     def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
         self.metadata.janis_datatypes = datatypes
@@ -92,11 +82,12 @@ class InputDataStep(GalaxyWorkflowStep):
         return self.metadata.label
 
     def __repr__(self) -> str:
-        return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.inputs])
+        return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.list_step_inputs()])
 
 
 @dataclass
 class ToolStep(GalaxyWorkflowStep):
+    """represents a galaxy tool step"""
     metadata: ToolStepMetadata
     tool: Optional[Tool] = None
     values: InputValueRegister = InputValueRegister()
@@ -109,9 +100,6 @@ class ToolStep(GalaxyWorkflowStep):
             return self.metadata.tool_definition_path
         raise RuntimeError('tool_definition_path not set for tool step')
 
-    def get_name(self) -> str:
-        return f'step{self.metadata.step_id}_{self.metadata.step_name}'
-    
     def get_tool_name(self) -> str:
         return self.metadata.tool_name
 
@@ -119,16 +107,16 @@ class ToolStep(GalaxyWorkflowStep):
         assert(self.tool)
         return self.tool.get_input(tag)
 
-    def list_tool_inputs(self) -> list[CommandComponent]:
+    def get_tool_inputs(self) -> dict[str, CommandComponent]:
         assert(self.tool)
-        return self.tool.list_inputs()
+        return self.tool.get_inputs()
 
     def get_tool_output(self, tag: str) -> CommandComponent:
         raise NotImplementedError()
     
-    def list_tool_outputs(self) -> list[CommandComponent]:
+    def get_tool_outputs(self) -> dict[str, CommandComponent]:
         assert(self.tool)
-        return self.tool.list_outputs()
+        return self.tool.get_outputs()
     
     def list_tool_values(self) -> list[Tuple[str, InputValue]]:
         return self.values.list_values()

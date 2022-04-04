@@ -8,6 +8,7 @@ from command.components.CommandComponent import BaseCommandComponent
 
 class Flag(BaseCommandComponent):
     def __init__(self, prefix: str) -> None:
+        super().__init__()
         self.prefix = prefix
 
     def get_name(self) -> str:

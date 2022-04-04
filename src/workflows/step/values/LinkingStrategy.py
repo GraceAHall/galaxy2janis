@@ -49,7 +49,7 @@ class ConnectionLinkingStrategy(LinkingStrategy):
     
     def get_value(self) -> Any:
         source_id = self.step_input.step_id
-        source_tag = self.workflow.get_step_tag_by_id(source_id)
+        source_tag = self.workflow.get_step_uuid_by_step_id(source_id)
         source_output = self.step_input.output_name
         return f'w.{source_tag}.{source_output}'
     

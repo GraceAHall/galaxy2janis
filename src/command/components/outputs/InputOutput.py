@@ -8,6 +8,7 @@ from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 class InputOutput(BaseCommandComponent):
     def __init__(self, input_component: CommandComponent):
+        super().__init__()
         self.input_component = input_component
         self.gxparam = self.input_component.gxparam
 
@@ -34,11 +35,11 @@ class InputOutput(BaseCommandComponent):
     def get_docstring(self) -> Optional[str]:
         if self.gxparam:
             return self.gxparam.get_docstring()
-        return f'output created during runtime. file relates to the {self.input_component.get_janis_tag()} input'
+        return f'output created during runtime. file relates to the {self.input_component.get_tag()} input'
 
     def update(self, incoming: InputOutput):
         pass
 
     def get_selector_str(self) -> str:
-        return f'InputSelector("{self.input_component.get_janis_tag()}")'
+        return f'InputSelector("{self.input_component.get_tag()}")'
 

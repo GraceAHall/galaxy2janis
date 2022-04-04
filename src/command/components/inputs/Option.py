@@ -8,12 +8,13 @@ from command.components.CommandComponent import BaseCommandComponent
 
 
 class Option(BaseCommandComponent):
-    def __init__(self, prefix: str, values: list[str], delim: str, epath_id: int=-1) -> None:
+    def __init__(self, prefix: str, values: list[str], delim: str) -> None:
+        super().__init__()
         self.prefix = prefix
         self.delim = delim
         self.gxparam_attachment: int = 1
         self.value_record: OptionValueRecord = OptionValueRecord()
-        self.value_record.add(epath_id, values)
+        self.value_record.add(values)
 
     def get_name(self) -> str:
         return self.prefix.strip('--')

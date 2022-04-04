@@ -96,7 +96,6 @@ class GreedyEPathAnnotator:
             comp_type=ctype, 
             ctext=ctoken.text, 
             ntexts=[token.text for token in vtokens], 
-            epath_id=self.epath.id, 
             delim=delim
         )
         self.transfer_gxparam_to_component(start, stop, component)

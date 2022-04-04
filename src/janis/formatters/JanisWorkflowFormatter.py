@@ -2,10 +2,11 @@
 from typing import Any, Tuple
 from janis.imports.WorkflowImportHandler import WorkflowImportHandler
 import janis.snippets.workflow_snippets as snippets
-from workflows.io.Output import WorkflowOutput
+from workflows.io.WorkflowInput import WorkflowInput
+from workflows.io.WorkflowOutput import WorkflowOutput
 from workflows.step.values.InputValue import InputValue, InputValueType
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.Step import InputDataStep, ToolStep
+from workflows.step.Step import ToolStep
 
 """
 Array?
@@ -15,7 +16,8 @@ UnionType?
 class JanisWorkflowFormatter:
     def __init__(self):
         self.import_handler = WorkflowImportHandler()
-        self.include_inputs_with_default_value: bool = False # TODO NOTE SHOULD BE CLI RUNTIME SETTING
+        self.include_inputs_with_default_value: bool = False 
+        # TODO NOTE ^^^ SHOULD BE CLI RUNTIME SETTING
 
     def format_top_note(self, metadata: WorkflowMetadata) -> str:
         return snippets.gxtool2janis_note_snippet(
@@ -42,35 +44,53 @@ class JanisWorkflowFormatter:
         )
         return f'{comment}\n{section}\n'
 
-    def format_inputs(self, inputs: dict[str, InputDataStep]) -> str:
+    def format_inputs(self, inputs: dict[str, WorkflowInput]) -> str:
         out_str = '# INPUTS\n'
-        for name, inp in inputs.items():
-            out_str += self.format_input(name, inp)
+        for tag, inp in inputs.items():
+            if inp.from_input_step:
+                out_str += self.format_input(tag, inp)
         out_str += '\n'
         return out_str
 
-    def format_input(self, name: str, step: InputDataStep) -> str:
-        self.update_imports(name, step)
+    def format_input(self, tag: str, inp: WorkflowInput) -> str:
+        self.update_imports(tag, inp)
         return snippets.workflow_input_snippet(
-            tag=name, # TODO tag formatter
-            datatype=step.get_janis_datatype_str(),
+            tag=tag,
+            datatype=inp.get_janis_datatype_str(),
             # TODO check whether defaults and values can appear here
-            doc=step.get_docstring()
+            doc=inp.get_docstring()
         )
 
-    def format_steps(self, steps: dict[str, ToolStep]) -> str:
+    def format_steps(self, inputs: dict[str, WorkflowInput], steps: dict[str, ToolStep]) -> str:
         out_str = '# STEPS\n'
-        for name, step in steps.items():
-            out_str += self.format_step(name, step)
+        for step_tag, step in steps.items():
+            out_str += self.format_step(inputs, step_tag, step)
         out_str += '\n'
         return out_str
     
-    def format_step(self, name: str, step: ToolStep) -> str:
-        self.update_imports(name, step)
+    def format_step(self, inputs: dict[str, WorkflowInput], step_tag: str, step: ToolStep) -> str:
+        out_str: str = ''
+        step_inputs = {tag: inp for tag, inp in inputs.items() if inp.step_id == step.metadata.step_id}
+        for tag, inp in step_inputs.items():
+            out_str += self.format_step_input(tag, inp)
+        out_str += self.format_step_body(step_tag, step)
+        return out_str
+
+    def format_step_input(self, tag: str, inp: WorkflowInput) -> str:
+        #self.update_imports(name, step) # TODO
+        return snippets.workflow_input_snippet(
+            tag=tag,
+            datatype=inp.get_janis_datatype_str(),
+            # TODO check whether defaults and values can appear here
+            doc=inp.get_docstring()
+        )
+
+    def format_step_body(self, tag: str, step: ToolStep) -> str:
+        self.update_imports(tag, step)
         input_values = step.list_tool_values()
         formatted_values = self.format_tool_values(input_values)
         return snippets.workflow_step_snippet(
-            tag=name, # TODO step tag formatter?
+            tag=tag, # TODO step tag formatter?
             tool=step.tool.metadata.id,
             tool_input_values=formatted_values,
             doc=step.get_docstring()
@@ -100,6 +120,7 @@ class JanisWorkflowFormatter:
         return False
 
     def format_outputs(self, outputs: dict[str, WorkflowOutput]) -> str:
+        return ''
         out_str = '# OUTPUTS\n'
         for name, out in outputs.items():
             out_str += self.format_output(name, out)
@@ -117,8 +138,8 @@ class JanisWorkflowFormatter:
 
     def update_imports(self, name: str, component: Any) -> None:
         match component:
-            case InputDataStep():
-                self.update_imports_for_input_data(component)
+            case WorkflowInput():
+                self.update_imports_for_workflow_input(component)
             case ToolStep():
                 self.update_imports_for_tool_step(name, component)
             case WorkflowOutput():
@@ -126,9 +147,8 @@ class JanisWorkflowFormatter:
             case _:
                 pass
     
-    def update_imports_for_input_data(self, step: InputDataStep) -> None:
-        for output in step.list_step_outputs():
-            self.import_handler.update_datatype_imports(output.janis_datatypes)
+    def update_imports_for_workflow_input(self, inp: WorkflowInput) -> None:
+        self.import_handler.update_datatype_imports(inp.janis_datatypes)
     
     def update_imports_for_tool_step(self, name: str, step: ToolStep) -> None:
         tool_path = step.get_definition_path()

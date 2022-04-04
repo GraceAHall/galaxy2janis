@@ -4,6 +4,18 @@
 import os
 from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
+default_folders = [
+    'runtimefiles'
+]
+
+default_files = [
+    'runtimefiles/tool_name_tagregister.json',
+    'runtimefiles/tool_component_tagregister.json',
+    'runtimefiles/workflow_name_tagregister.json',
+    'runtimefiles/workflow_step_tagregister.json',
+    'runtimefiles/workflow_input_tagregister.json',
+    'runtimefiles/workflow_output_tagregister.json'
+]
 
 def init_files(filepaths: list[str]) -> None:
     for path in filepaths:
@@ -15,7 +27,10 @@ def init_file(filepath: str) -> None:
         os.remove(filepath)
     # touch file
     with open(filepath, 'w') as fp: # type: ignore
-        pass
+        if filepath.endswith('.json'):
+            fp.write('{}')
+        else:
+            pass
 
 def safe_init_file(filepath: str) -> None:
     if not os.path.exists(filepath):
@@ -43,22 +58,22 @@ class WorkflowFileInitialiser:
         init_cache_dir(self.esettings.get_container_cache_path())
     
     def get_folders_to_init(self) -> list[str]:
-        out: list[str] = []
+        folders: list[str] = default_folders
         es = self.esettings
-        out.append(es.get_outdir())
-        out.append(es.get_xml_wrappers_dir())
-        out.append(es.get_janis_tools_dir())
-        out.append(es.get_janis_steps_dir())
-        out = list(set(out))
-        out.sort(key=lambda x: len(x))
-        return out
+        folders.append(es.get_outdir())
+        folders.append(es.get_xml_wrappers_dir())
+        folders.append(es.get_janis_tools_dir())
+        folders.append(es.get_janis_steps_dir())
+        folders = list(set(folders))
+        folders.sort(key=lambda x: len(x))
+        return folders
 
     def get_files_to_init(self) -> list[str]:
-        out: list[str] = []
+        files: list[str] = default_files
         es = self.esettings
-        # out.append(es.get_janis_workflow_path())
-        # out.append(es.get_janis_workflow_configfile_path())
-        return list(set(out))
+        # files.append(es.get_janis_workflow_path())
+        # files.append(es.get_janis_workflow_configfile_path())
+        return list(set(files))
 
 
 class ToolFileInitialiser:
@@ -73,17 +88,16 @@ class ToolFileInitialiser:
 
     def get_folders_to_init(self) -> list[str]:
         es = self.esettings
-        folders = [
-            es.get_outdir(),     # the subfolder for this tool
-        ]
+        folders: list[str] = default_folders
+        folders.append(es.get_outdir())     # the subfolder for this tool
         folders = list(set([f for f in folders if type(f) is str]))
         folders.sort(key=lambda x: len(x))
         return folders
 
     def get_files_to_init(self) -> list[str]:
+        files: list[str] = default_files
         es = self.esettings
-        return list(set([
-            # es.get_logfile_path(),
-            # es.get_janis_definition_path()
-        ]))
+        #files.append(es.get_logfile_path())
+        #files.append(es.get_janis_definition_path())
+        return list(set(files))
 

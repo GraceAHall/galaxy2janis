@@ -12,6 +12,7 @@ from datatypes.JanisDatatype import JanisDatatype
 @dataclass
 class StepMetadata(ABC):
     step_id: int
+    uuid: str
     step_name: str
     label: Optional[str]
 
@@ -37,6 +38,7 @@ class ToolStepMetadata(StepMetadata):
 def init_inputdatastep_metadata(step: dict[str, Any]) -> InputDataStepMetadata:
     return InputDataStepMetadata(
         step_id=step['id'],
+        uuid=step['uuid'],
         step_name=step['inputs'][0]['name'],
         label=step['label'],
         gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else ['file']
@@ -45,6 +47,7 @@ def init_inputdatastep_metadata(step: dict[str, Any]) -> InputDataStepMetadata:
 def init_toolstep_metadata(step: dict[str, Any]) -> ToolStepMetadata:
     return ToolStepMetadata(
         step_id=step['id'],
+        uuid=step['uuid'],
         step_name=step['name'],
         tool_name=step['tool_shed_repository']['name'],
         label=step['label'],

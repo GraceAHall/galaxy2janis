@@ -84,13 +84,13 @@ def workflow_input_snippet(
     doc: Optional[str]=None
 ) -> str:
     out_str: str = ''
-    out_str += 'w.input(\n'
-    out_str += f'\t"{tag}",\n'
-    out_str += f'\t{datatype}'
-    out_str += f',\n\tdefault={default}' if default else ''
-    out_str += f',\n\tvalue={value}' if value else ''
-    out_str += f',\n\tdoc="{doc}"' if doc else ''
-    out_str += '\n)\n'
+    out_str += f'w.input("{tag}", {datatype})\n'
+    #out_str += f'\t"{tag}",\n'
+    #out_str += f'\t{datatype}'
+    #out_str += f',\n\tdefault={default}' if default else ''
+    #out_str += f',\n\tvalue={value}' if value else ''
+    #out_str += f',\n\tdoc="{doc}"' if doc else ''
+    #out_str += '\n)\n'
     return out_str
 
 
@@ -112,7 +112,7 @@ def workflow_step_snippet(
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
-    out_str: str = ''
+    out_str: str = '\n'
     out_str += 'w.step(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''
@@ -142,8 +142,8 @@ doc: Union[str, OutputDocumentation] = None,
 def workflow_output_snippet(
     tag: str,
     datatype: str,
-    source_step: str,
-    source_tag: str, 
+    source_tag: str,
+    source_output: str, 
     output_folder: Optional[str]=None,
     output_name: Optional[str]=None,
     extension: Optional[str]=None,
@@ -153,7 +153,7 @@ def workflow_output_snippet(
     out_str += 'w.output(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\t{datatype},\n'
-    out_str += f'\tsource=(w.{source_step}, "{source_tag}")'
+    out_str += f'\tsource=(w.{source_tag}, "{source_output}")'
     out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
     out_str += f',\n\toutput_name="{output_name}"' if output_name else ''
     out_str += f',\n\textension="{extension}"' if extension else ''
