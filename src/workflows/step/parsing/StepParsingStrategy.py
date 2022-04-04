@@ -45,7 +45,7 @@ class InputDataStepParsingStrategy(StepParsingStrategy):
             metadata=init_inputdatastep_metadata(self.gxstep),
             input_register=self.get_step_inputs(),
             output_register=self.get_step_outputs(),
-            optional=step['tool_state']['optional'], # TODO check this!
+            is_optional=step['tool_state']['optional'], # TODO check this!
             is_collection=self.is_collection(),
             collection_type=self.get_collection_type()
         )

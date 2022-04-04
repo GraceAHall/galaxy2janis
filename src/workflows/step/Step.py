@@ -15,6 +15,8 @@ from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
 from workflows.step.values.InputValue import InputValue
 from workflows.step.values.InputValueRegister import InputValueRegister
+from uuid import uuid4
+
 
 """
 JANIS
@@ -42,6 +44,9 @@ class GalaxyWorkflowStep(ABC):
     input_register: StepInputRegister
     output_register: StepOutputRegister
 
+    def __post_init__(self) :
+        self.uuid: str = str(uuid4())
+
     @abstractmethod
     def get_name(self) -> str:
         """gets the name of this step"""
@@ -68,8 +73,8 @@ class GalaxyWorkflowStep(ABC):
 @dataclass
 class InputDataStep(GalaxyWorkflowStep):
     metadata: InputDataStepMetadata
-    optional: bool
-    is_collection: bool
+    is_optional: bool=False
+    is_collection: bool=False
     collection_type: Optional[str]=None # check this doesnt do weird stuff
 
     def get_name(self) -> str:

@@ -4,6 +4,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
 from datatypes.JanisDatatype import JanisDatatype
+from uuid import uuid4
 
 @dataclass
 class StepOutput:
@@ -12,6 +13,9 @@ class StepOutput:
     is_wflow_out: bool
     wflow_out_label: Optional[str]
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)
+
+    def __post_init__(self) :
+        self.uuid: str = str(uuid4())
 
 
 def init_input_step_output(step: dict[str, Any]) -> StepOutput:

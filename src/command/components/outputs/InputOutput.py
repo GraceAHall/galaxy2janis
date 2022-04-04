@@ -4,16 +4,12 @@ from __future__ import annotations
 from command.components.CommandComponent import CommandComponent, BaseCommandComponent
 from typing import Any, Optional
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
-from xmltool.param.Param import Param
-from datatypes.JanisDatatype import JanisDatatype
 
 
 class InputOutput(BaseCommandComponent):
     def __init__(self, input_component: CommandComponent):
         self.input_component = input_component
-        self.gxparam: Optional[Param] = self.input_component.gxparam
-        self.presence_array: list[bool] = []
-        self.janis_datatypes: list[JanisDatatype] = []
+        self.gxparam = self.input_component.gxparam
 
     def get_name(self) -> str:
         if self.gxparam:

@@ -6,10 +6,8 @@ from command.components.CommandComponent import BaseCommandComponent
 from command.tokens.Tokens import Token
 from typing import Any, Optional, Tuple
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
-from xmltool.param.Param import Param
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.linux import Stream
-from datatypes.JanisDatatype import JanisDatatype
 from datatypes.formatting import format_janis_str
 
 class RedirectOutput(BaseCommandComponent):
@@ -17,9 +15,7 @@ class RedirectOutput(BaseCommandComponent):
         self.redirect_token = tokens[0]
         self.file_token = tokens[1]
         self.stream: Stream = self.extract_stream()
-        self.gxparam: Optional[Param] = self.file_token.gxparam
-        self.presence_array: list[bool] = []
-        self.janis_datatypes: list[JanisDatatype] = []
+        self.gxparam = self.file_token.gxparam
 
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(0, self.file_token.text)

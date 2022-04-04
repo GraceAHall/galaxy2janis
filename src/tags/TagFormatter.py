@@ -17,9 +17,6 @@ class TagFormatter:
         return tag
 
 
-
-
-
     """
 
 

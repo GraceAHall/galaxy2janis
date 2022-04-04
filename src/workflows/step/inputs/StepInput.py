@@ -5,7 +5,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Optional
-
+from uuid import uuid4
 from xmltool.param.Param import Param
 
 
@@ -16,6 +16,7 @@ class StepInput(ABC):
     def __post_init__(self):
         self.linked: bool = False
         self.gxparam: Optional[Param] = None
+        self.uuid: str = str(uuid4())
 
 @dataclass
 class ConnectionStepInput(StepInput):

@@ -14,6 +14,7 @@ from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from janis.formatters.JanisToolFormatter import JanisToolFormatter
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.Param import Param
+from uuid import uuid4
 
 
 @dataclass
@@ -25,6 +26,7 @@ class Tool:
     container: Optional[Container]
     base_command: list[str]
     gxparam_register: InputParamRegister
+    uuid: str = str(uuid4())
 
     def get_gxparam(self, query: str) -> Optional[Param]:
         param = self.gxparam_register.get(query, strategy='lca')

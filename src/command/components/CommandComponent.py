@@ -7,13 +7,18 @@ from datatypes.JanisDatatype import JanisDatatype
 from xmltool.param.Param import Param
 from tags.TagFormatter import TagFormatter
 from datatypes.formatting import format_janis_str
+from uuid import uuid4
+
 
 # defines what a CommandComponent should look like
 class CommandComponent(Protocol):
+    uuid: str
     gxparam: Optional[Param]
     presence_array: list[bool]
     janis_datatypes: list[JanisDatatype]
-    
+    cmd_pos: int
+    forced_optionality: Optional[bool]
+
     def get_name(self) -> str:
         ...
 
@@ -51,10 +56,14 @@ class CommandComponent(Protocol):
 # this mainly exists because each CommandComponent has the same 
 # update_presence_array and get_janis_tag method. 
 class BaseCommandComponent(ABC):
-    gxparam: Optional[Param]
-    presence_array: list[bool]
-    janis_datatypes: list[JanisDatatype] = []
-
+    def __init__(self):
+        self.uuid: str = str(uuid4())
+        self.gxparam: Optional[Param] = None
+        self.janis_datatypes: list[JanisDatatype] = []
+        self.presence_array: list[bool] = []
+        self.cmd_pos: int = -1
+        self.forced_optionality: Optional[bool] = None
+ 
     @abstractmethod
     def get_name(self) -> str:
         """

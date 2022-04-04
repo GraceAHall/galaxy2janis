@@ -21,35 +21,32 @@ STR_TAGTYPE_MAP = {
     'workflow_output': TagType.WORKFLOW_OUTPUT
 }
 
+
 class TagManager:
 
     def register(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
         ttype = STR_TAGTYPE_MAP[tag_type]
-        basetag = self.format(entity_info) 
-        tag_register = self.load(ttype)
+        basetag = self._format(entity_info) 
+        tag_register = self._load(ttype)
         tag_register.add(basetag, uuid)
-        self.save(ttype, tag_register)
-
-    def format(self, entity_info: dict[str, str]) -> str:
-        return TagFormatter().format(entity_info)
+        self._save(ttype, tag_register)
 
     def get(self, tag_type: str, uuid: str) -> str:
-        # TODO - if uuid not in register, register it?
-        # that way can always call TagManager.get() and it will give us info
         ttype = STR_TAGTYPE_MAP[tag_type]
-        tag_register = self.load(ttype)
-        # if not tag_register.exists(uuid):
-        #     self.register()
+        tag_register = self._load(ttype)
         return tag_register.get(uuid)
+
+    def _format(self, entity_info: dict[str, str]) -> str:
+        return TagFormatter().format(entity_info)
     
-    def load(self, ttype: TagType) -> TagRegister:
+    def _load(self, ttype: TagType) -> TagRegister:
         """loads a dict of tag information from disk"""
         path = FILEPATHS[ttype]
         with open(path, 'r') as fp:
             data = json.load(fp)
             return TagRegister(data)
     
-    def save(self, ttype: TagType, register: TagRegister) -> None:
+    def _save(self, ttype: TagType, register: TagRegister) -> None:
         """saves a dict of tag information to disk"""
         path = FILEPATHS[ttype]
         with open(path, 'w') as fp:

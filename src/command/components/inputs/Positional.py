@@ -3,25 +3,16 @@
 
 from __future__ import annotations
 from typing import Optional
-from datatypes.JanisDatatype import JanisDatatype
-from xmltool.param.Param import Param
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
-import command.components.inputs.utils as utils
+#import command.components.inputs.utils as utils
 
 
 class Positional(BaseCommandComponent):
-    def __init__(self, value: str, epath_id: int) -> None:
-        self.value = value
-        self.epath_id = epath_id
-        self.cmd_pos: int = -1
+    def __init__(self, value: str, epath_id: int=-1) -> None:
         self.before_opts: bool = False
-        self.gxparam: Optional[Param] = None
-        self.presence_array: list[bool] = []
-        self.janis_datatypes: list[JanisDatatype] = []
         self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(self.epath_id, self.value)
-        self.forced_optionality: Optional[bool] = None
+        self.value_record.add(epath_id, value)
 
     def get_name(self) -> str:
         # get name from galaxy param if available

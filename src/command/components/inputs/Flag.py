@@ -3,18 +3,12 @@ from __future__ import annotations
 from typing import Optional
 from xmltool.param.InputParam import BoolParam
 
-from xmltool.param.Param import Param
 from command.components.CommandComponent import BaseCommandComponent
-from datatypes.JanisDatatype import JanisDatatype
 
 
 class Flag(BaseCommandComponent):
     def __init__(self, prefix: str) -> None:
         self.prefix = prefix
-        self.cmd_pos: int = -1
-        self.gxparam: Optional[Param] = None
-        self.presence_array: list[bool] = []
-        self.janis_datatypes: list[JanisDatatype] = []
 
     def get_name(self) -> str:
         return self.prefix.strip('--')
