@@ -3,25 +3,6 @@
 from .TagRegister import TagRegister
 from .TagFormatter import TagFormatter
 
-# FILEPATHS = {
-#     TagType.TOOL_NAME: 'runtimefiles/tool_name_tagregister.json',
-#     TagType.TOOL_COMPONENT: 'runtimefiles/tool_component_tagregister.json',
-#     TagType.WORKFLOW_NAME: 'runtimefiles/workflow_name_tagregister.json',
-#     TagType.WORKFLOW_STEP: 'runtimefiles/workflow_step_tagregister.json',
-#     TagType.WORKFLOW_INPUT: 'runtimefiles/workflow_input_tagregister.json', # includes runtime values
-#     TagType.WORKFLOW_OUTPUT: 'runtimefiles/workflow_output_tagregister.json'
-# }
-
-# STR_TAGTYPE_MAP = {
-#     'tool_name': TagType.TOOL_NAME,
-#     'tool_component': TagType.TOOL_COMPONENT,
-#     'workflow_name': TagType.WORKFLOW_NAME,
-#     'workflow_step': TagType.WORKFLOW_STEP,
-#     'workflow_input': TagType.WORKFLOW_INPUT,
-#     'workflow_output': TagType.WORKFLOW_OUTPUT
-# }
-
-
 
 class TagManager:
     def __init__(self):
@@ -29,28 +10,28 @@ class TagManager:
 
     def register(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
         basetag = TagFormatter().format(entity_info)
-        the_register = self.select_register(tag_type)
+        the_register = self._select_register(tag_type)
         the_register.add(basetag, uuid)
 
-    def select_register(self, tag_type: str) -> TagRegister:
-        return self.registers[tag_type]
-    
     def get(self, tag_type: str, uuid: str) -> str:
-        the_register = self.select_register(tag_type)
+        the_register = self._select_register(tag_type)
         return the_register.get(uuid)
 
+    def _select_register(self, tag_type: str) -> TagRegister:
+        return self.registers[tag_type]
+    
 
 class ToolTagManager(TagManager):
     def __init__(self):
         self.registers = {
             'tool_name': TagRegister(),
-            'tool_component': TagRegister()
+            'tool_input': TagRegister(),
+            'tool_output': TagRegister()
         }
 
 class WorkflowTagManager(TagManager):
     def __init__(self):
         self.registers = {
-            'tool_name': TagRegister(),
             'workflow_name': TagRegister(),
             'workflow_step': TagRegister(),
             'workflow_input': TagRegister(),

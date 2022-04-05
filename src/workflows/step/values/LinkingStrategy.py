@@ -48,10 +48,10 @@ class ConnectionLinkingStrategy(LinkingStrategy):
     workflow: Workflow
     
     def get_value(self) -> Any:
-        source_id = self.step_input.step_id
-        source_tag = self.workflow.get_step_uuid_by_step_id(source_id)
-        source_output = self.step_input.output_name
-        return f'w.{source_tag}.{source_output}'
+        step_id = self.step_input.step_id
+        step_tag = self.workflow.get_step_tag_by_step_id(step_id)
+        step_output = self.step_input.output_name
+        return f'w.{step_tag}.{step_output}'
     
     def get_valtype(self) -> InputValueType:
         return InputValueType.CONNECTION

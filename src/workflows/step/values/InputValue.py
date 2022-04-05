@@ -9,6 +9,7 @@ from xmltool.param.Param import Param
 
 
 class InputValueType(Enum):
+    WORKFLOW_INPUT  = auto()
     CONNECTION      = auto()
     RUNTIME         = auto()
     ENV_VAR         = auto()

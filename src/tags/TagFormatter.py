@@ -24,7 +24,6 @@ filters_map = {
     'tool': [
         filters.format_capitalisation,
     ],
-    'tool_component': [],
     'step': [],
     'runtime_value': []
 }

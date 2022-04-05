@@ -22,8 +22,7 @@ eg w.input("sample_name", String)
 @dataclass
 class WorkflowInput:
     step_id: int
-    step_tag: str
-    input_tag: str
+    input_name: str
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)
     from_input_step: bool = False
 

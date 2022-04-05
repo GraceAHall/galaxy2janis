@@ -40,17 +40,26 @@ class Tool:
 
     def register_tool_tag(self) -> None:
         self.tag_manager.register(
-                tag_type='tool_name',
-                uuid=self.get_uuid(),
-                entity_info={
-                    'name': self.metadata.id
-                }
-            )
+            tag_type='tool_name',
+            uuid=self.get_uuid(),
+            entity_info={
+                'name': self.metadata.id
+            }
+        )
 
     def register_component_tags(self) -> None:
-        for component in self.inputs + self.outputs:
+        for component in self.inputs:
             self.tag_manager.register(
-                tag_type='tool_component',
+                tag_type='tool_input',
+                uuid=component.get_uuid(),
+                entity_info={
+                    'name': component.get_name(),
+                    'datatype': component.janis_datatypes[0].classname
+                }
+            )
+        for component in self.outputs:
+            self.tag_manager.register(
+                tag_type='tool_output',
                 uuid=component.get_uuid(),
                 entity_info={
                     'name': component.get_name(),
@@ -68,27 +77,23 @@ class Tool:
             #raise RuntimeError(f'no gxparam named {query}')
         return param
    
-    def get_input(self, query_tag: str) -> CommandComponent:
+    def get_input(self, query_uuid: str) -> CommandComponent:
         for inp in self.inputs:
-            tag = self.tag_manager.get('tool_component', inp.get_uuid())
-            if query_tag == tag:
+            if query_uuid == inp.get_uuid():
                 return inp
-        raise RuntimeError(f'could not find {query_tag} in tool inputs')
+        raise RuntimeError(f'could not find {query_uuid} in tool inputs')
 
-    def get_inputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get('tool_component', inp.get_uuid()): inp for inp in self.inputs}
+    def list_inputs(self) -> list[CommandComponent]:
+        return self.inputs
 
-    def get_positionals(self) -> list[Positional]:
-        return [x for x in self.inputs if isinstance(x, Positional)]
+    def get_tags_inputs(self) -> dict[str, CommandComponent]:
+        return {self.tag_manager.get('tool_input', inp.get_uuid()): inp for inp in self.inputs}
+    
+    def list_outputs(self) -> list[CommandComponent]:
+        return self.outputs
 
-    def get_flags(self) -> list[Flag]:
-        return [x for x in self.inputs if isinstance(x, Flag)]
-
-    def get_options(self) -> list[Option]:
-        return [x for x in self.inputs if isinstance(x, Option)]
-
-    def get_outputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get('tool_component', out.get_uuid()): out for out in self.outputs}
+    def get_tags_outputs(self) -> dict[str, CommandComponent]:
+        return {self.tag_manager.get('tool_output', out.get_uuid()): out for out in self.outputs}
 
     def get_preprocessing(self) -> Optional[str]:
         raise NotImplementedError
@@ -101,8 +106,8 @@ class Tool:
         str_note = formatter.format_top_note(self.metadata)
         str_path = formatter.format_path_appends()
         str_metadata = formatter.format_metadata(self.metadata)
-        str_inputs = formatter.format_inputs(self.get_inputs())
-        str_outputs = formatter.format_outputs(self.get_outputs())
+        str_inputs = formatter.format_inputs(self.get_tags_inputs())
+        str_outputs = formatter.format_outputs(self.get_tags_outputs())
         str_commandtool = formatter.format_commandtool(self.metadata, self.base_command, self.container)
         str_translate = formatter.format_translate_func(self.metadata) 
         str_imports = formatter.format_imports()

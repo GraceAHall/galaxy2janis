@@ -1,6 +1,7 @@
 
 
 
+from command.components.inputs.Flag import Flag
 from workflows.workflow.Workflow import Workflow
 from command.components.CommandComponent import CommandComponent
 from workflows.step.values.InputValue import InputValue
@@ -35,6 +36,13 @@ class InputValueFactory:
         strategy = RuntimeLinkingStrategy(component)
         value = strategy.link()
         return value
+
+    def create_unlinked_connection(self, step_input: ConnectionStepInput, workflow: Workflow) -> InputValue:
+        component = Flag(prefix='__UNKNOWN__')
+        strategy = ConnectionLinkingStrategy(component, step_input, workflow)
+        value = strategy.link()
+        return value
+
 
     def select_strategy(self, component: CommandComponent, step_input: StepInput, workflow: Workflow) -> LinkingStrategy:
         if step_input:

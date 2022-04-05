@@ -4,7 +4,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Tuple
-from command.components.CommandComponent import CommandComponent
 from datatypes.JanisDatatype import JanisDatatype
 from tool.Tool import Tool
 from workflows.step.inputs.StepInput import StepInput
@@ -48,16 +47,16 @@ class GalaxyWorkflowStep(ABC):
     def get_docstring(self) -> Optional[str]:
         ...
 
-    def get_step_input(self, query_name: str) -> Optional[StepInput]:
+    def get_input(self, query_name: str) -> Optional[StepInput]:
         return self.input_register.get(query_name)
     
-    def list_step_inputs(self) -> list[StepInput]:
+    def list_inputs(self) -> list[StepInput]:
         return self.input_register.list_inputs()
     
-    def get_step_output(self, query_name: str) -> Optional[StepOutput]:
+    def get_output(self, query_name: str) -> StepOutput:
         return self.output_register.get(query_name)
     
-    def list_step_outputs(self) -> list[StepOutput]:
+    def list_outputs(self) -> list[StepOutput]:
         return self.output_register.list_outputs()
 
 
@@ -82,7 +81,7 @@ class InputDataStep(GalaxyWorkflowStep):
         return self.metadata.label
 
     def __repr__(self) -> str:
-        return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.list_step_inputs()])
+        return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.list_inputs()])
 
 
 @dataclass
@@ -103,23 +102,19 @@ class ToolStep(GalaxyWorkflowStep):
     def get_tool_name(self) -> str:
         return self.metadata.tool_name
 
-    def get_tool_input(self, tag: str) -> CommandComponent:
-        assert(self.tool)
-        return self.tool.get_input(tag)
-
-    def get_tool_inputs(self) -> dict[str, CommandComponent]:
-        assert(self.tool)
-        return self.tool.get_inputs()
-
-    def get_tool_output(self, tag: str) -> CommandComponent:
-        raise NotImplementedError()
-    
-    def get_tool_outputs(self) -> dict[str, CommandComponent]:
-        assert(self.tool)
-        return self.tool.get_outputs()
-    
     def list_tool_values(self) -> list[Tuple[str, InputValue]]:
         return self.values.list_values()
+    
+    def get_tool_tags_values(self) -> dict[str, InputValue]:
+        out: dict[str, InputValue] = {}
+        for uuid, input_value in self.list_tool_values():
+            assert(self.tool)
+            component_tag = self.tool.tag_manager.get('tool_input', uuid)
+            out[component_tag] = input_value
+        return out
+    
+    def get_unlinked_values(self, only_connections: bool=True) -> list[str]:
+        return [x.value for x in self.values.list_unlinked()]
 
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label

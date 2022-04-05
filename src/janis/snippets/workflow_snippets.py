@@ -4,6 +4,8 @@ from typing import Optional, Tuple
 from janis_core import WorkflowBuilder
 from datetime import datetime
 
+from workflows.step.values.InputValue import InputValue
+
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -109,6 +111,7 @@ def workflow_step_snippet(
     tag: str,
     tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
     tool_input_values: list[Tuple[str, str]],
+    unlinked_values: list[str],
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
@@ -117,6 +120,8 @@ def workflow_step_snippet(
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''
     out_str += f'\t{tool}(\n'
+    for value in unlinked_values:
+        out_str += f'\t\t#UNKNOWN={value},\n'
     for tag, value in tool_input_values:
         out_str += f'\t\t{tag}={value},\n'
     out_str += '\t)'
@@ -142,8 +147,8 @@ doc: Union[str, OutputDocumentation] = None,
 def workflow_output_snippet(
     tag: str,
     datatype: str,
-    source_tag: str,
-    source_output: str, 
+    step_tag: str,
+    step_output: str, 
     output_folder: Optional[str]=None,
     output_name: Optional[str]=None,
     extension: Optional[str]=None,
@@ -153,7 +158,7 @@ def workflow_output_snippet(
     out_str += 'w.output(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\t{datatype},\n'
-    out_str += f'\tsource=(w.{source_tag}, "{source_output}")'
+    out_str += f'\tsource=(w.{step_tag}, "{step_output}")'
     out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
     out_str += f',\n\toutput_name="{output_name}"' if output_name else ''
     out_str += f',\n\textension="{extension}"' if extension else ''

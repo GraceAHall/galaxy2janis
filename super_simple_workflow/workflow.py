@@ -10,8 +10,8 @@ from janis_core import WorkflowBuilder
 from janis_core import WorkflowMetadata
 
 from janis_core.types.common_data_types import File
-from data.datatypes.galaxy import Html
 from janis_unix.data_types.text import TextFile
+from data.datatypes.galaxy import Html
 
 from super_simple_workflow.tools.fastqc.fastqc import fastqc
 
@@ -35,25 +35,38 @@ w = WorkflowBuilder(
 )
 
 # INPUTS
-w.input("in_forward_reads", File)
-w.input("in_reverse_reads", File)
-w.input("in_long_reads", File)
+w.input("forward_reads", File)
+w.input("reverse_reads", File)
+w.input("long_reads", File)
 
 # STEPS
-w.input("fastqc_adapters", Tabular)
-w.input("fastqc_contaminants", Tabular)
-w.input("fastqc_html_file1", File)
 w.input("fastqc_limits", TextFile)
 w.input("fastqc_outdir", File)
+w.input("fastqc_contaminants", Tabular)
+w.input("fastqc_html_file", File)
+w.input("fastqc_adapters", Tabular)
 
 w.step(
 	"fastqc",
 	fastqc(
-		adapters="RuntimeValue",
-		contaminants="RuntimeValue",
-		html_file1="RuntimeValue",
-		limits="RuntimeValue",
-		outdir="RuntimeValue",
+		#UNKNOWN=w.forward_reads,
+		limits=w.fastqc_limits,
+		outdir=w.fastqc_outdir,
+		contaminants=w.fastqc_contaminants,
+		html_file=w.fastqc_html_file,
+		adapters=w.fastqc_adapters,
 	)
+)
+
+# OUTPUTS
+w.output(
+	"fastqc_html_file",
+	Html,
+	source=(w.fastqc, "html_file")
+)
+w.output(
+	"fastqc_text_file",
+	TextFile,
+	source=(w.fastqc, "text_file")
 )
 

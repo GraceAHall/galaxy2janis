@@ -4,18 +4,19 @@
 import os
 from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
-default_folders = [
-    'runtimefiles'
-]
+default_folders = []
+#     'runtimefiles'
+# ]
 
-default_files = [
-    'runtimefiles/tool_name_tagregister.json',
-    'runtimefiles/tool_component_tagregister.json',
-    'runtimefiles/workflow_name_tagregister.json',
-    'runtimefiles/workflow_step_tagregister.json',
-    'runtimefiles/workflow_input_tagregister.json',
-    'runtimefiles/workflow_output_tagregister.json'
-]
+default_files = []
+#     'runtimefiles/tool_name_tagregister.json',
+#     'runtimefiles/tool_input_tagregister.json',
+#     'runtimefiles/tool_output_tagregister.json',
+#     'runtimefiles/workflow_name_tagregister.json',
+#     'runtimefiles/workflow_step_tagregister.json',
+#     'runtimefiles/workflow_input_tagregister.json',
+#     'runtimefiles/workflow_output_tagregister.json'
+# ]
 
 def init_files(filepaths: list[str]) -> None:
     for path in filepaths:
