@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import uuid4
 
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.WorkflowStep import WorkflowStep, InputDataStep, ToolStep
+from workflows.step.WorkflowStep import WorkflowStep
 from workflows.io.WorkflowOutput import WorkflowOutput
 from workflows.io.WorkflowInput import WorkflowInput
 from tags.TagManager import WorkflowTagManager
@@ -37,12 +37,8 @@ class Workflow:
 
     def add_step(self, step: WorkflowStep) -> None:
         self.steps[step.metadata.step_id] = step
-        if isinstance(step, InputDataStep):
-            tag_type = 'workflow_input_data_step'
-        if isinstance(step, ToolStep):
-            tag_type = 'workflow_step'
         self.tag_manager.register(
-            tag_type=tag_type,
+            tag_type='workflow_step',
             entity=step
         )
     
@@ -76,19 +72,15 @@ class Workflow:
     def get_uuid(self) -> str:
         return self.metadata.uuid
 
-    def list_input_steps(self) -> list[InputDataStep]:
-        return [x for x in self.steps.values() if isinstance(x, InputDataStep)]
-    
-    def list_tool_steps(self) -> list[ToolStep]:
-        return [x for x in self.steps.values() if isinstance(x, ToolStep)]
+    def list_steps(self) -> list[WorkflowStep]:
+        return [x for x in self.steps.values()]
 
-    def get_tool_steps_tags(self) -> dict[str, ToolStep]:
+    def get_tool_steps_tags(self) -> dict[str, WorkflowStep]:
         """used near end of runtime once tags are stable"""
-        out: dict[str, ToolStep] = {}
+        out: dict[str, WorkflowStep] = {}
         for step in self.steps.values():
-            if isinstance(step, ToolStep):
-                tag = self.tag_manager.get(step.get_uuid())
-                out[tag] = step
+            tag = self.tag_manager.get(step.get_uuid())
+            out[tag] = step
         return out
 
     def get_inputs_tags(self) -> dict[str, WorkflowInput]:
@@ -113,7 +105,7 @@ class Workflow:
         str_metadata = formatter.format_metadata(self.metadata)
         str_builder = formatter.format_workflow_builder(self.tag_manager, self.get_uuid(), self.metadata)
         str_inputs = formatter.format_inputs(self.tag_manager, self.inputs)
-        str_steps = formatter.format_steps(self.tag_manager, self.steps)
+        str_steps = formatter.format_steps(self.tag_manager, self.inputs, list(self.steps.values()))
         str_outputs = formatter.format_outputs(self.tag_manager, self.outputs)
         # str_inputs = formatter.format_inputs(self.get_inputs_tags())
         # str_steps = formatter.format_steps(self.get_inputs_tags(), self.get_tool_steps_tags())

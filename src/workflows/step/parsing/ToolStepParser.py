@@ -3,21 +3,19 @@
 from typing import Any
 
 from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.inputs.StepInput import StepInput, init_connection_step_input, init_static_step_input, init_runtime_step_input
+from workflows.step.inputs.StepInput import StepInput, init_connection_step_input, init_static_step_input, init_runtime_step_input, init_workflow_input_step_input
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
 from workflows.step.outputs.StepOutput import init_tool_step_output
-from workflows.step.metadata.StepMetadata import (
-    ToolStepMetadata,
-    init_toolstep_metadata
-)
+from workflows.step.metadata.StepMetadata import StepMetadata
+from workflows.workflow.Workflow import Workflow
 from .ToolStateFlattener import ToolStateFlattener
 
 
 
-
-class ToolStepParsingStrategy:
-    def __init__(self) -> None:
+class ToolStepParser:
+    def __init__(self, workflow: Workflow) -> None:
+        self.workflow = workflow
         self.inputs: dict[str, StepInput] = {}
         self.flattened_tool_state: dict[str, Any] = {}
 
@@ -29,8 +27,18 @@ class ToolStepParsingStrategy:
             output_register=self.get_step_outputs()
         )
 
-    def get_step_metadata(self) -> ToolStepMetadata:
-        return init_toolstep_metadata(self.gxstep)
+    def get_step_metadata(self) -> StepMetadata:
+        return StepMetadata(
+            step_id=self.gxstep['id'],
+            uuid=self.gxstep['uuid'],
+            step_name=self.gxstep['name'],
+            tool_name=self.gxstep['tool_shed_repository']['name'],
+            label=self.gxstep['label'],
+            owner=self.gxstep['tool_shed_repository']['owner'],
+            changeset_revision=self.gxstep['tool_shed_repository']['changeset_revision'],
+            shed=self.gxstep['tool_shed_repository']['tool_shed'],
+            workflow_outputs=self.gxstep['workflow_outputs']
+        )
 
     def get_step_inputs(self) -> StepInputRegister:
         self.inputs = {}
@@ -47,7 +55,11 @@ class ToolStepParsingStrategy:
 
     def parse_connection_inputs(self) -> None:
         for name, details in self.gxstep['input_connections'].items():
-            self.inputs[name] = init_connection_step_input(name, details)
+            step_id = details['id']
+            if self.workflow.get_input(step_id=step_id):
+                self.inputs[name] = init_workflow_input_step_input(name, details)
+            else:
+                self.inputs[name] = init_connection_step_input(name, details)
 
     def parse_static_inputs(self) -> None:
         for name, value in self.flattened_tool_state.items():

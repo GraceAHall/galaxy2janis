@@ -21,11 +21,12 @@ eg w.input("sample_name", String)
 
 @dataclass
 class WorkflowInput:
+    name: str
     step_id: int
-    step_tag: str
-    step_input: str
-    janis_datatypes: list[JanisDatatype] = field(default_factory=list)
+    step_tag: Optional[str]
     is_galaxy_input_step: bool = False
+    gx_datatypes: list[str] = field(default_factory=list)
+    janis_datatypes: list[JanisDatatype] = field(default_factory=list)
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())

@@ -44,17 +44,9 @@ class WorkflowStepStrategy(FormattingStrategy):
         tag = formatters.encode(tag)
         return tag
 
-class WorkflowInputDataStepStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: TaggableEntity) -> str:
-        tag = f'in_{starting_text}'
-        tag = self.format_basic(tag)
-        tag = formatters.encode(tag)
-        return tag
-
 class WorkflowOutputStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: TaggableEntity) -> str:
-        tag = f'out_{starting_text}'
-        tag = self.format_basic(tag)
+        tag = self.format_basic(starting_text)
         tag = formatters.encode(tag)
         return tag
 
@@ -78,48 +70,39 @@ class ToolOutputStrategy(FormattingStrategy):
         return tag
 
 
-
-#TODO HERE MOVE InputDataStep to WorkflowInput
-
-
 def get_starting_text(entity_type: str, entity: TaggableEntity) -> str:
     match entity_type:
         case 'workflow':
             return entity.metadata.name # type: ignore
         case 'workflow_input':
             if entity.is_galaxy_input_step: # type: ignore
-                return entity.step_tag # type: ignore
+                return f'in_{entity.name}' # type: ignore
             else:
-                return f'{entity.step_tag}_{entity.step_input}' # type: ignore
+                return f'{entity.step_tag}_{entity.name}' # type: ignore
         case 'workflow_step':
             return entity.metadata.tool_name # type: ignore
-        case 'workflow_input_data_step':
-            return entity.metadata.step_name # type: ignore
         case 'workflow_output':
-            return f'{entity.step_tag}_{entity.step_output}' # type: ignore
+            return f'out_{entity.step_tag}_{entity.step_output}' # type: ignore
         case 'tool':
             return entity.metadata.id # type: ignore
         case 'tool_input':
             return entity.get_name() # type: ignore
         case 'tool_output':
-            return entity.get_name() # type: ignore
+            return f'out_{entity.get_name()}' # type: ignore
         case _:
             raise RuntimeError()
-
 
 def get_strategy(entity_type: str) -> FormattingStrategy:
     strategy_map = {
         'workflow': WorkflowNameStrategy(),
         'workflow_input': WorkflowInputStrategy(),
         'workflow_step': WorkflowStepStrategy(),
-        'workflow_input_data_step': WorkflowInputDataStepStrategy(),
         'workflow_output': WorkflowOutputStrategy(),
         'tool': ToolNameStrategy(),
         'tool_input': ToolInputStrategy(),
         'tool_output': ToolOutputStrategy(),
     }
     return strategy_map[entity_type]
-
 
 def format_tag(entity_type: str, entity: TaggableEntity) -> str:
     strategy = get_strategy(entity_type)

@@ -15,7 +15,11 @@ class StepInput(ABC):
     def __post_init__(self):
         self.linked: bool = False
         self.gxparam: Optional[Param] = None
-        
+
+
+@dataclass
+class WorkflowInputStepInput(StepInput):
+    step_id: int
 
 @dataclass
 class ConnectionStepInput(StepInput):
@@ -31,6 +35,12 @@ class RuntimeStepInput(StepInput):
     value: str = 'RuntimeValue'
 
 
+def init_workflow_input_step_input(name: str, details: dict[str, Any]) -> StepInput:
+    name = name.replace('|', '.')
+    return WorkflowInputStepInput(
+        gxvarname=name,
+        step_id=details['id']
+    )
 
 def init_connection_step_input(name: str, details: dict[str, Any]) -> StepInput:
     name = name.replace('|', '.')

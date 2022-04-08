@@ -5,7 +5,8 @@ from datatypes.DatatypeRegister import DatatypeRegister
 from datatypes.JanisDatatype import JanisDatatype
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput, InputOutput, WildcardOutput
-from workflows.step.WorkflowStep import InputDataStep, ToolStep
+from workflows.io.WorkflowInput import WorkflowInput
+from workflows.step.WorkflowStep import WorkflowStep
 from workflows.io.WorkflowOutput import WorkflowOutput
 
 FALLBACK = JanisDatatype(
@@ -67,14 +68,10 @@ def wildcard_output_strategy(wildcard_output: WildcardOutput, register: Datatype
         gxtypes = ['file']
     wildcard_output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
 
-def input_data_step_strategy(input_step: InputDataStep, register: DatatypeRegister) -> None:
-    gx_datatypes = input_step.metadata.gx_datatypes
-    janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gx_datatypes]
-    input_step.metadata.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gx_datatypes]
-    for output in input_step.output_register.list_outputs():
-        output.janis_datatypes = janis_datatypes
+def workflow_input_strategy(inp: WorkflowInput, register: DatatypeRegister) -> None:
+    inp.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in inp.gx_datatypes]
 
-def tool_step_strategy(tool_step: ToolStep, register: DatatypeRegister) -> None:
+def tool_step_strategy(tool_step: WorkflowStep, register: DatatypeRegister) -> None:
     for output in tool_step.output_register.list_outputs():
         output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in output.gx_datatypes]
 
@@ -95,13 +92,13 @@ strategy_map = {
     RedirectOutput: redirect_output_strategy,
     InputOutput: input_output_strategy,
     WildcardOutput: wildcard_output_strategy,
-    InputDataStep: input_data_step_strategy,
-    ToolStep: tool_step_strategy,
+    WorkflowInput: workflow_input_strategy,
+    WorkflowStep: tool_step_strategy,
     WorkflowOutput: workflow_output_strategy,
 }
 
 
-AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | InputDataStep | ToolStep | WorkflowOutput
+AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | WorkflowInput | WorkflowStep | WorkflowOutput
 
 class DatatypeAnnotator:
     def __init__(self) -> None:

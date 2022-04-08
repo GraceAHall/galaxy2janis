@@ -27,15 +27,6 @@ class TagManager:
             self.basetags_uuids[basetag] = []
         self.basetags_uuids[basetag].append(uuid)
 
-    # def register_old(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
-    #     if tag_type not in self.permitted_entities:
-    #         raise RuntimeError(f'cannot register a {tag_type}')
-    #     basetag = TagFormatter().format(tag_type, entity_info)
-    #     self.uuids_basetags[uuid] = basetag
-    #     if basetag not in self.basetags_uuids:
-    #         self.basetags_uuids[basetag] = []
-    #     self.basetags_uuids[basetag].append(uuid)
-
     def get(self, uuid: str) -> str:
         basetag = self.uuids_basetags[uuid]
         return self._format_basetag(basetag, uuid)
@@ -60,13 +51,21 @@ class ToolTagManager(TagManager):
 
 class WorkflowTagManager(TagManager):
     permitted_entities: set[str] = set(
-        ['workflow', 'workflow_step', 'workflow_input_data_step', 'workflow_input', 'workflow_output']
+        ['workflow', 'workflow_input', 'workflow_step', 'workflow_output']
     )
 
 
 
 
 
+    # def register_old(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
+    #     if tag_type not in self.permitted_entities:
+    #         raise RuntimeError(f'cannot register a {tag_type}')
+    #     basetag = TagFormatter().format(tag_type, entity_info)
+    #     self.uuids_basetags[uuid] = basetag
+    #     if basetag not in self.basetags_uuids:
+    #         self.basetags_uuids[basetag] = []
+    #     self.basetags_uuids[basetag].append(uuid)
 
 # class  :
 #     def __init__(self):

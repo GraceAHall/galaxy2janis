@@ -2,12 +2,12 @@
 from typing import Any, Tuple
 from janis.imports.WorkflowImportHandler import WorkflowImportHandler
 import janis.snippets.workflow_snippets as snippets
-from tags.TagManager import WorkflowTagManager, ToolTagManager
+from tags.TagManager import WorkflowTagManager
 from workflows.io.WorkflowInput import WorkflowInput
 from workflows.io.WorkflowOutput import WorkflowOutput
-from workflows.step.values.InputValue import InputValue, InputValueType
+from workflows.step.values.InputValue import ConnectionInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.WorkflowStep import ToolStep
+from workflows.step.WorkflowStep import WorkflowStep
 
 """
 Array?
@@ -46,7 +46,7 @@ class JanisWorkflowFormatter:
         )
         return f'{comment}\n{section}\n'
 
-    def format_inputs(self,  wflow_tagman: WorkflowTagManager, inputs: list[WorkflowInput]) -> str:
+    def format_inputs(self, wflow_tagman: WorkflowTagManager, inputs: list[WorkflowInput]) -> str:
         out_str = '# INPUTS\n'
         for inp in inputs:
             uuid = inp.get_uuid()
@@ -65,73 +65,107 @@ class JanisWorkflowFormatter:
             doc=inp.get_docstring()
         )
 
-    def format_steps(self, inputs: dict[str, WorkflowInput], steps: dict[str, ToolStep]) -> str:
+    def format_steps(self, wflow_tagman: WorkflowTagManager, wflow_inputs: list[WorkflowInput], steps: list[WorkflowStep]) -> str:
         out_str = '# STEPS'
-        for step_tag, step in steps.items():
-            out_str += self.format_step(inputs, step_tag, step)
+        for step in steps:
+            out_str += self.format_step(wflow_tagman, wflow_inputs, step)
         out_str += '\n'
         return out_str
     
-    def format_step(self, workflow_inputs: dict[str, WorkflowInput], step_tag: str, step: ToolStep) -> str:
+    def format_step(self, wflow_tagman: WorkflowTagManager, wflow_inputs: list[WorkflowInput], step: WorkflowStep) -> str:
+        tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
         self.step_counter += 1
         out_str: str = '\n'
-        tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
-        out_str += f'# step{self.step_counter}: {tool_tag}\n' # TODO THIS IS A HACK REPLACE WITH TAG_MANAGER
-        step_inputs = [(tag, inp) for tag, inp in workflow_inputs.items() if inp.step_id == step.metadata.step_id]
-        step_inputs.sort(key=lambda x: x[0])
-        for tag, inp in step_inputs:
-            out_str += self.format_step_input(tag, inp)
-        out_str += self.format_step_body(step_tag, tool_tag, step)
+        out_str += f'# step{self.step_counter}: {tool_tag}\n'
+        out_str += self.format_step_workflow_inputs(wflow_tagman, wflow_inputs, step)
+        out_str += self.format_step_body(wflow_tagman, wflow_inputs, step)
         return out_str
 
-    def format_step_input(self, tag: str, inp: WorkflowInput) -> str:
-        self.update_imports(tag, inp)
-        return snippets.workflow_input_snippet(
-            tag=tag,
-            datatype=inp.get_janis_datatype_str(),
-            # TODO check whether defaults and values can appear here
-            doc=inp.get_docstring()
-        )
+    def format_step_workflow_inputs(self, wflow_tagman: WorkflowTagManager, wflow_inputs: list[WorkflowInput], step: WorkflowStep) -> str:
+        # for step workflow inputs - get (tag, inp) 
+        step_wflow_inputs = [inp for inp in wflow_inputs if inp.step_id == step.metadata.step_id]
+        step_wflow_inputs = [(wflow_tagman.get(inp.get_uuid()), inp) for inp in step_wflow_inputs]
+        step_wflow_inputs.sort(key=lambda x: x[0])
+        out_str: str = ''
+        for tag, inp in step_wflow_inputs:
+            self.update_imports(tag, inp)
+            out_str += snippets.workflow_input_snippet(
+                tag=tag,
+                datatype=inp.get_janis_datatype_str(),
+                doc=inp.get_docstring()
+            )
+        return out_str
 
-    def format_step_body(self, step_tag: str, tool_tag: str, step: ToolStep) -> str:
+    def format_step_body(self, wflow_tagman: WorkflowTagManager, wflow_inputs: list[WorkflowInput], step: WorkflowStep) -> str:
+        step_tag = wflow_tagman.get(step.get_uuid())
+        tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
         self.update_imports(tool_tag, step)
-        input_values = step.get_tool_tags_values()
+        linked_values = step.get_tool_tags_values()
+        linked_values = self.format_linked_tool_values(wflow_tagman, linked_values)
         unlinked_values = step.get_unlinked_values()
-        formatted_values = self.format_tool_values(input_values)
+        unlinked_values = self.format_unlinked_tool_values(wflow_tagman, unlinked_values)
         return snippets.workflow_step_snippet(
-            tag=step_tag, # TODO step tag formatter?
+            tag=step_tag,
             tool=tool_tag,
-            tool_input_values=formatted_values,
-            unlinked_values=unlinked_values,
+            linked_values=linked_values,
+            unlinked_values=unlinked_values, 
             doc=step.get_docstring()
         )
     
-    def format_tool_values(self, tags_inputs: list[Tuple[str, InputValue]]) -> list[Tuple[str, str]]:
+    def format_linked_tool_values(self, wflow_tagman: WorkflowTagManager, tags_inputs: list[Tuple[str, InputValue]]) -> list[Tuple[str, str]]:
         # provides the final list of tool input tags & values. 
         # logic for whether to write inputs if they are default, should wrap with quotes etc
         out: list[Tuple[str, str]] = []
-        for tag, input_value in tags_inputs:
+        for comp_tag, input_value in tags_inputs:
             if input_value.is_default_value and not self.include_inputs_with_default_value:
                 pass
             else:
-                wrapped_value = self.wrap_value(input_value)
-                out.append((tag, wrapped_value))
+                formatted_value = self.format_value(wflow_tagman, input_value)
+                out.append((comp_tag, formatted_value))
         return out
 
-    def wrap_value(self, inval: InputValue) -> str:
+    def format_unlinked_tool_values(self, wflow_tagman: WorkflowTagManager, unlinked_values: list[InputValue]) -> list[Tuple[str, str]]:
+        # (gxvarname, text)
+        #UNKNOWN()
+        out: list[Tuple[str, str]] = []
+        for input_value in unlinked_values:
+            tag = f'#UNKNOWN({input_value.gxparam.name})' if input_value.gxparam else '#UNKNOWN'
+            formatted_value = self.format_value(wflow_tagman, input_value)
+            out.append((tag, formatted_value))
+        return out
+
+    def format_value(self, wflow_tagman: WorkflowTagManager, value: InputValue) -> str:
+        match value:
+            case ConnectionInputValue():
+                pass
+            case WorkflowInputInputValue():
+                input_tag = wflow_tagman.get(value.input_uuid)
+                text = f'w.{input_tag}'
+            case StaticInputValue():
+                text = f'{value.value}'
+            case _:
+                pass
+        wrapped_value = self.wrap(text, value)
+        return wrapped_value
+
+
+    def wrap(self, text: str, inval: InputValue) -> str:
         if self.should_quote(inval):
-            return f'"{inval.value}"'
-        return str(inval.value)
+            return f'"{text}"'
+        return text
 
     def should_quote(self, inval: InputValue) -> bool:
-        quoted_types = [InputValueType.STRING, InputValueType.RUNTIME]
-        if inval.valtype in quoted_types:
-            return True
+        if isinstance(inval, StaticInputValue):
+            quoted_types = [InputValueType.STRING, InputValueType.RUNTIME]
+            if inval.valtype in quoted_types:
+                return True
         return False
 
-    def format_outputs(self, outputs: dict[str, WorkflowOutput]) -> str:
+    def format_outputs(self, wflow_tagman: WorkflowTagManager, outputs: list[WorkflowOutput]) -> str:
         out_str = '# OUTPUTS\n'
-        for tag, out in outputs.items():
+        for out in outputs:
+            uuid = out.get_uuid()
+            tag = wflow_tagman.get(uuid)
             out_str += self.format_output(tag, out)
         out_str += '\n'
         return out_str
@@ -149,7 +183,7 @@ class JanisWorkflowFormatter:
         match component:
             case WorkflowInput():
                 self.update_imports_for_workflow_input(component)
-            case ToolStep():
+            case WorkflowStep():
                 self.update_imports_for_tool_step(tag, component)
             case WorkflowOutput():
                 self.update_imports_for_workflow_output(component)
@@ -159,19 +193,19 @@ class JanisWorkflowFormatter:
     def update_imports_for_workflow_input(self, inp: WorkflowInput) -> None:
         self.import_handler.update_datatype_imports(inp.janis_datatypes)
     
-    def update_imports_for_tool_step(self, tool_tag: str, step: ToolStep) -> None:
+    def update_imports_for_tool_step(self, tool_tag: str, step: WorkflowStep) -> None:
         self.update_imports_for_tool_definition(tool_tag, step)
         self.update_imports_for_tool_inputs(step)
         self.update_imports_for_tool_outputs(step)
 
-    def update_imports_for_tool_definition(self, tool_tag: str, step: ToolStep) -> None:
+    def update_imports_for_tool_definition(self, tool_tag: str, step: WorkflowStep) -> None:
         tool_path = step.get_definition_path()
         tool_path = tool_path.rsplit('.py')[0]
         tool_path = tool_path.replace('/', '.')
         tool_tag = tool_tag.rstrip('123456789') # same as getting basetag, just dodgy method
         self.import_handler.update_tool_imports(tool_path, tool_tag)
 
-    def update_imports_for_tool_inputs(self, step: ToolStep) -> None:
+    def update_imports_for_tool_inputs(self, step: WorkflowStep) -> None:
         pass
         # # get uuids of tool components with value
         # for inp in step():
@@ -183,7 +217,7 @@ class JanisWorkflowFormatter:
         # for component in components:
         #     self.import_handler.update_datatype_imports(component.janis_datatypes)
 
-    def update_imports_for_tool_outputs(self, step: ToolStep) -> None:
+    def update_imports_for_tool_outputs(self, step: WorkflowStep) -> None:
         pass
         # # step outputs? this is a little weird
         # for output in step.list_outputs():

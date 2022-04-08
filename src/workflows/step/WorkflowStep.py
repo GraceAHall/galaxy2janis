@@ -1,13 +1,12 @@
 
 
 from __future__ import annotations
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Tuple
-from datatypes.JanisDatatype import JanisDatatype
+
 from tool.Tool import Tool
 from workflows.step.inputs.StepInput import StepInput
-from workflows.step.metadata.StepMetadata import InputDataStepMetadata, StepMetadata, ToolStepMetadata
+from workflows.step.metadata.StepMetadata import StepMetadata
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
@@ -33,19 +32,17 @@ w.step(
 """
 
 
-### step types 
 @dataclass
-class WorkflowStep(ABC):
+class WorkflowStep:
+    """represents a galaxy tool step"""
     metadata: StepMetadata
     input_register: StepInputRegister
     output_register: StepOutputRegister
+    tool: Optional[Tool] = None
+    values: InputValueRegister = InputValueRegister()
 
     def get_uuid(self) -> str:
         return self.metadata.uuid
-
-    @abstractmethod
-    def get_docstring(self) -> Optional[str]:
-        ...
 
     def get_input(self, query_name: str) -> Optional[StepInput]:
         return self.input_register.get(query_name)
@@ -58,18 +55,6 @@ class WorkflowStep(ABC):
     
     def list_outputs(self) -> list[StepOutput]:
         return self.output_register.list_outputs()
-
-
-
-@dataclass
-class ToolStep(WorkflowStep):
-    """represents a galaxy tool step"""
-    metadata: StepMetadata
-    input_register: StepInputRegister
-    output_register: StepOutputRegister
-    metadata: ToolStepMetadata
-    tool: Optional[Tool] = None
-    values: InputValueRegister = InputValueRegister()
 
     def set_definition_path(self, path: str) -> None:
         self.metadata.tool_definition_path = path
@@ -104,4 +89,4 @@ class ToolStep(WorkflowStep):
         return self.metadata.get_uri()
     
     def __repr__(self) -> str:
-        return f'(ToolStep) step{self.metadata.step_id} - {self.get_tool_name()}'
+        return f'(WorkflowStep) step{self.metadata.step_id} - {self.get_tool_name()}'

@@ -10,7 +10,8 @@ from workflows.step.inputs.StepInput import (
     ConnectionStepInput, 
     RuntimeStepInput, 
     StaticStepInput, 
-    StepInput
+    StepInput,
+    WorkflowInputStepInput
 )
 
 from workflows.step.values.InputValue import ConnectionInputValue, InputValue, WorkflowInputInputValue
@@ -37,13 +38,18 @@ def create_runtime(component: CommandComponent) -> InputValue:
     strategy = RuntimeInputValueFactory(component)
     return strategy.create()
 
-def create_workflow_input(component: CommandComponent, inp: WorkflowInput) -> InputValue:
-    strategy = WorkflowInputInputValueFactory(component, inp)
+def create_workflow_input(component: CommandComponent, workflow_input: WorkflowInput) -> InputValue:
+    strategy = WorkflowInputInputValueFactory(component, workflow_input)
     return strategy.create()
 
 def create_unlinked_connection(step_input: ConnectionStepInput, workflow: Workflow) -> InputValue:
     component = Flag(prefix='__UNKNOWN__')
     strategy = ConnectionInputValueFactory(component, step_input, workflow)
+    return strategy.create()
+
+def create_unlinked_workflowinput(workflow_input: WorkflowInput) -> InputValue:
+    component = Flag(prefix='__UNKNOWN__')
+    strategy = WorkflowInputInputValueFactory(component, workflow_input)
     return strategy.create()
 
 

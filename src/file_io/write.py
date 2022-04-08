@@ -32,7 +32,7 @@ def write_workflow_definition(esettings: WorkflowExeSettings, workflow: Workflow
     write_file(workflow_path, workflow_definition)
 
 def write_workflow_tools(workflow: Workflow) -> None:
-    for step in workflow.list_tool_steps():
+    for step in workflow.list_steps():
         tool_path = step.get_definition_path()
         tool_definition = step.tool.to_janis_definition()  # type: ignore
         write_file(tool_path, tool_definition)
