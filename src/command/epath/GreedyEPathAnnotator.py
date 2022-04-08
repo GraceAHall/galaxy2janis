@@ -114,8 +114,6 @@ class GreedyEPathAnnotator:
 
     def get_option_values(self) -> list[Token]:
         out: list[Token] = []
-        if self.epath.positions[self.pos].token.text == '-f':
-            print()
 
         # define a max possible end point to consume upto (handles edge cases)
         final_pos = self.get_greedy_consumption_end()  

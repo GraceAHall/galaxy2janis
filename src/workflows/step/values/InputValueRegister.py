@@ -4,8 +4,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple
-from workflows.step.inputs.StepInput import StepInput
-from workflows.step.values.InputValue import InputValue, InputValueType
+from workflows.step.values.InputValue import ConnectionInputValue, InputValue, RuntimeInputValue, WorkflowInputInputValue
 
 
 
@@ -29,14 +28,20 @@ class ComponentTypeStrategy(ValueOrderingStrategy):
 
 class RuntimeNonRuntimeStrategy(ValueOrderingStrategy):
     def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        runtime = [x for x in input_values if x[1].valtype == InputValueType.RUNTIME]
-        non_runtime = [x for x in input_values if x[1].valtype != InputValueType.RUNTIME]
+        runtime = [x for x in input_values if isinstance(x[1], RuntimeInputValue)]
+        non_runtime = [x for x in input_values if not isinstance(x[1], RuntimeInputValue)]
         return runtime + non_runtime
 
 class ConnectionNonConnectionStrategy(ValueOrderingStrategy):
     def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        connection = [x for x in input_values if x[1].valtype == InputValueType.CONNECTION]
-        non_connection = [x for x in input_values if x[1].valtype != InputValueType.CONNECTION]
+        connection = [x for x in input_values if isinstance(x[1], ConnectionInputValue)]
+        non_connection = [x for x in input_values if not isinstance(x[1], ConnectionInputValue)]
+        return connection + non_connection
+
+class WorkflowInputStrategy(ValueOrderingStrategy):
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        connection = [x for x in input_values if isinstance(x[1], WorkflowInputInputValue)]
+        non_connection = [x for x in input_values if not isinstance(x[1], WorkflowInputInputValue)]
         return connection + non_connection
 
 
@@ -51,6 +56,7 @@ class InputValueRegister:
             ComponentTypeStrategy(),
             AlphabeticalStrategy(),
             RuntimeNonRuntimeStrategy(),
+            WorkflowInputStrategy(),
             ConnectionNonConnectionStrategy()
         ]
 
@@ -76,7 +82,7 @@ class InputValueRegister:
     def __str__(self) -> str:
         out_str: str = '\nInputValueRegister -----\n'
         out_str += f'{"[uuid]":>20}{"[value]":>20}{"[type]":>40}\n'
-        for uuid, input_value in self.values.items():
-            out_str += f'{uuid:>20}{input_value.value:>20}{input_value.valtype:>40}\n'
+        # for uuid, input_value in self.values.items():
+        #     out_str += f'{uuid:>20}{input_value.value:>20}{input_value.valtype:>40}\n'
         return out_str
 

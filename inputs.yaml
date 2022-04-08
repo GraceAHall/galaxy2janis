@@ -1,0 +1,43 @@
+
+
+
+
+# INPUTS
+w.input("forward_reads", File)
+w.input("reverse_reads", File)
+w.input("long_reads", File)
+
+
+
+- inputs:
+  forward_reads: #SET ME
+  reverse_reads: #SET ME
+  long_reads: #SET ME
+  fastqc1_adapters: #SET ME
+  fastqc1_contaminants: #SET ME
+  fastqc1_html_file: #SET ME
+  fastqc1_limits: #SET ME
+  fastqc1_outdir: #SET ME
+
+
+
+
+
+# STEPS
+# step1: fastqc
+w.input("fastqc1_adapters", Tabular)
+w.input("fastqc1_contaminants", Tabular)
+w.input("fastqc1_html_file", File)
+w.input("fastqc1_limits", TextFile)
+w.input("fastqc1_outdir", File)
+w.step(
+	"fastqc1",
+	fastqc(
+		#UNKNOWN=w.forward_reads,
+		limits=w.fastqc1_limits, 
+		outdir=w.fastqc1_outdir,
+		adapters=w.fastqc1_adapters,
+		html_file=w.fastqc1_html_file,
+		contaminants=w.fastqc1_contaminants,
+	)
+)

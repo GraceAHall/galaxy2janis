@@ -1,8 +1,26 @@
 
 
-Html Datatype in workflow outputs not being imported (simple workflow)
+TODO
 
-fungus, eukaryote, k_mer_stats all have default value = "" (simple workflow quast)
+issue
+- '.output' still appears on input connections to InputDataStep even though should be WorkflowInput
+    long=w.long_reads.output
+
+
+
+ONGOING
+issue
+- duplicated tags being registered for individual tool
+    quast:
+    references_list1=w.quast_references_list1
+    k_mer_stats1=""
+    circos1/circos2
+solution
+- pulling command components from both param arguments and formatted cmdstrs resulted in occasional duplications
+- due to bad practise galaxy XML: eg a select param representing a bool flag in the tool
+- ongoing: 
+    - quast references-list
+    - fq11, fq12 - why are these registered more than once?
 
 
 

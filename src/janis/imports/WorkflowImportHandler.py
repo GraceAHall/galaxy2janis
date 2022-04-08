@@ -33,7 +33,7 @@ class WorkflowImportHandler:
     
     def update_datatype_imports(self, janis_types: list[JanisDatatype]) -> None: 
         for jtype in janis_types:
-            if jtype.import_path not in self.class_imports:
+            if jtype.import_path not in self.datatype_imports:
                 self.datatype_imports[jtype.import_path] = set()
             self.datatype_imports[jtype.import_path].add(jtype.classname)
 
@@ -55,10 +55,10 @@ class WorkflowImportHandler:
         return out_str
 
     def _format_accordion(self, import_path: str, import_names: set[str]) -> str:
-        out_str = f'from {import_path} import ('
+        out_str = f'from {import_path} import (\n'
         for import_name in self._set_to_ordered_list(import_names):
-            out_str += f'{import_name}\n'
-        out_str += ')'
+            out_str += f'\t{import_name},\n'
+        out_str += ')\n'
         return out_str
     
     def _format_flat(self, import_path: str, import_names: set[str]) -> str:

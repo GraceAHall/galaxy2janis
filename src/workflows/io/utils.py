@@ -2,7 +2,7 @@
 
 
 from workflows.io.WorkflowInput import WorkflowInput
-from workflows.step.Step import InputDataStep
+from workflows.step.WorkflowStep import InputDataStep
 from workflows.step.outputs.StepOutput import StepOutput
 
 

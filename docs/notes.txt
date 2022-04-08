@@ -1,6 +1,60 @@
 
 
 
+Things which get uuids:
+- workflow          Workflow
+- workflow step     WorkflowStep
+- workflow input    WorkflowInput
+- workflow output   WorkflowOutput
+- tool              Tool
+- tool input        CommandComponent
+- tool output       CommandComponent
+
+
+
+
+
+
+
+
+
+
+Workflow:
+    metadata: WorkflowMetadata
+    steps: dict[int, GalaxyWorkflowStep]
+    inputs: list[WorkflowInput]
+    outputs: list[WorkflowOutput]
+    steps_inputs_uuid_map: dict[str, str]
+
+    def get_input(self, uuid: str) -> Optional[WorkflowInput]:
+
+
+
+Step:
+    metadata: StepMetadata
+    input_register: StepInputRegister
+    output_register: StepOutputRegister
+    tool: Optional[Tool]        (ToolStep)
+    values: InputValueRegister  (ToolStep)
+
+    def get_input(self, query_name: str) -> Optional[StepInput]:
+    def get_input(self, uuid: str) -> Optional[StepInput]:
+
+
+
+
+Tool:
+    metadata: ToolXMLMetadata
+    xmlcmdstr: CommandString
+    gxparam_register: InputParamRegister
+    inputs: list[CommandComponent]
+    outputs: list[CommandComponent]
+    container: Optional[Container]
+    base_command: list[str]
+
+
+
+
 
 
 

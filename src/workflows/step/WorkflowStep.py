@@ -35,7 +35,7 @@ w.step(
 
 ### step types 
 @dataclass
-class GalaxyWorkflowStep(ABC):
+class WorkflowStep(ABC):
     metadata: StepMetadata
     input_register: StepInputRegister
     output_register: StepOutputRegister
@@ -62,31 +62,11 @@ class GalaxyWorkflowStep(ABC):
 
 
 @dataclass
-class InputDataStep(GalaxyWorkflowStep):
-    """represents a galaxy input data step"""
-    metadata: InputDataStepMetadata
-    is_optional: bool=False
-    is_collection: bool=False
-    collection_type: Optional[str]=None # check this doesnt do weird stuff
-
-    def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
-        self.metadata.janis_datatypes = datatypes
-
-    def get_janis_datatype_str(self) -> str:
-        if self.is_collection:
-            return f'Array(File)'
-        return 'File'
-
-    def get_docstring(self) -> Optional[str]:
-        return self.metadata.label
-
-    def __repr__(self) -> str:
-        return f'(InputDataStep) step{self.metadata.step_id} - ' + ', '.join([inp.name for inp in self.list_inputs()])
-
-
-@dataclass
-class ToolStep(GalaxyWorkflowStep):
+class ToolStep(WorkflowStep):
     """represents a galaxy tool step"""
+    metadata: StepMetadata
+    input_register: StepInputRegister
+    output_register: StepOutputRegister
     metadata: ToolStepMetadata
     tool: Optional[Tool] = None
     values: InputValueRegister = InputValueRegister()
@@ -104,17 +84,18 @@ class ToolStep(GalaxyWorkflowStep):
 
     def list_tool_values(self) -> list[Tuple[str, InputValue]]:
         return self.values.list_values()
-    
-    def get_tool_tags_values(self) -> dict[str, InputValue]:
-        out: dict[str, InputValue] = {}
+
+    def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
+        """translates [uuid, value] into [tag, value] for tool input values"""
+        out: list[Tuple[str, InputValue]] = []
         for uuid, input_value in self.list_tool_values():
             assert(self.tool)
-            component_tag = self.tool.tag_manager.get('tool_input', uuid)
-            out[component_tag] = input_value
+            component_tag = self.tool.tag_manager.get(uuid)
+            out.append((component_tag, input_value))
         return out
     
-    def get_unlinked_values(self, only_connections: bool=True) -> list[str]:
-        return [x.value for x in self.values.list_unlinked()]
+    def get_unlinked_values(self, only_connections: bool=False) -> list[InputValue]:
+        return self.values.list_unlinked()
 
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label

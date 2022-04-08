@@ -87,6 +87,6 @@ class DynamicCommandStatement:
         for epath in self.get_execution_paths():
             for position in epath.positions:
                 print(position.token.text, end=' ')
-            print()
+            print('\n')
 
 

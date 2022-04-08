@@ -1,0 +1,78 @@
+fastqc1_adapters:
+  class: File
+  path: null
+fastqc1_contaminants:
+  class: File
+  path: null
+fastqc1_html_file:
+  class: File
+  path: null
+fastqc1_limits:
+  class: File
+  path: null
+fastqc1_outdir:
+  class: File
+  path: null
+fastqc2_adapters:
+  class: File
+  path: null
+fastqc2_contaminants:
+  class: File
+  path: null
+fastqc2_html_file:
+  class: File
+  path: null
+fastqc2_limits:
+  class: File
+  path: null
+fastqc2_outdir:
+  class: File
+  path: null
+forward_reads:
+  class: File
+  path: null
+long_reads:
+  class: File
+  path: null
+multiqc_multiqc_config:
+  class: File
+  path: null
+prokka_gcode: 11
+prokka_genus: Escherichia
+prokka_increment: 10
+prokka_locustag: PROKKA
+prokka_proteins:
+  class: File
+  path: null
+prokka_species: Coli
+prokka_strain: C-1
+quast_labels:
+  class: File
+  path: null
+quast_references_list2:
+  class: File
+  path: null
+quast_skip_unaligned_mis_contigs: true
+reverse_reads:
+  class: File
+  path: null
+unicycler_contamination:
+  class: File
+  path: null
+unicycler_fq11:
+  class: File
+  path: null
+unicycler_fq12:
+  class: File
+  path: null
+unicycler_l_file:
+  class: File
+  path: null
+unicycler_pilon_path:
+  class: File
+  path: null
+unicycler_start_gene_cov: 95.0
+unicycler_start_gene_id: 90.0
+unicycler_start_genes:
+  class: File
+  path: null

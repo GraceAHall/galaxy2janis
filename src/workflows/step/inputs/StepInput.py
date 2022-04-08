@@ -10,7 +10,7 @@ from xmltool.param.Param import Param
 
 @dataclass
 class StepInput(ABC):
-    name: str
+    gxvarname: str
 
     def __post_init__(self):
         self.linked: bool = False
@@ -30,22 +30,24 @@ class StaticStepInput(StepInput):
 class RuntimeStepInput(StepInput):
     value: str = 'RuntimeValue'
 
+
+
 def init_connection_step_input(name: str, details: dict[str, Any]) -> StepInput:
     name = name.replace('|', '.')
     return ConnectionStepInput(
-        name=name,
+        gxvarname=name,
         step_id=details['id'],
         output_name=details['output_name']
     )
 
-def init_runtime_step_input(details: dict[str, str]) -> StepInput:
+def init_runtime_step_input(name: str) -> StepInput:
     return RuntimeStepInput(
-        name=details['name']
+        gxvarname=name
     )
 
 def init_static_step_input(name: str, value: Any) -> StepInput:
     return StaticStepInput(
-        name=name,
+        gxvarname=name,
         value=value
     )
 

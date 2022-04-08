@@ -8,7 +8,7 @@ from command.cmdstr.CommandString import CommandString
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput
 from command.components.CommandComponent import CommandComponent
-
+from command.components.inputs import spawn_component 
 
 
 class Updater(ABC):
@@ -151,18 +151,29 @@ class RedirectOutputUpdater(Updater):
         self.command.redirect = self.incoming
 
 
-
 class Command:
-    def __init__(self, xmlcmdstr: CommandString):
-        self.xmlcmdstr: CommandString = xmlcmdstr
+    xmlcmdstr: CommandString # TODO is this problematic? just type declaration right? 
+
+    def __init__(self):
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
         self.redirect: Optional[RedirectOutput] = None
 
+    def set_xml_cmdstr(self, xmlcmdstr: CommandString) -> None:
+        self.xmlcmdstr = xmlcmdstr
+
     def update(self, incoming: CommandComponent) -> None:
-        updater = self.select_updater(incoming)
-        updater.update(self, incoming)
+        component = self.refine_component(incoming)
+        updater = self.select_updater(component)
+        updater.update(self, component)
+
+    def refine_component(self, incoming: CommandComponent) -> CommandComponent:
+        # migrate incorrect option to flag
+        if isinstance(incoming, Option):
+            if incoming.prefix in self.flags:
+                return spawn_component('flag', ctext=incoming.prefix, ntexts=[])
+        return incoming
 
     def select_updater(self, incoming: CommandComponent) -> Updater:
         match incoming:

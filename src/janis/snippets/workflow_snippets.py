@@ -115,7 +115,7 @@ def workflow_step_snippet(
     scatter: Optional[str]=None,
     doc: Optional[str]=None
 ) -> str:
-    out_str: str = '\n'
+    out_str: str = ''
     out_str += 'w.step(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\tscatter="{scatter}",\n' if scatter else ''

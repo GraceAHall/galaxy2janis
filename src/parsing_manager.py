@@ -162,8 +162,7 @@ class Reporter:
 
 
     def print_report(self) -> None:
-        print()
-        print(f'TOOLS PARSED: {self.tool_count}\n')
+        print(f'\nTOOLS PARSED: {self.tool_count}\n')
 
         print('\nERRORS')
         for error_type, count in self.error_counter.items():

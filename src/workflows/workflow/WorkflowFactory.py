@@ -28,6 +28,7 @@ class WorkflowFactory:
         with open(path, 'r') as fp:
             return json.load(fp)
 
+
     def parse_metadata(self) -> WorkflowMetadata:
         return WorkflowMetadata(
             name=self.tree['name'],
@@ -37,9 +38,42 @@ class WorkflowFactory:
             tags=self.tree['tags']
         )
 
+    def parse_inputs(self) -> None:
+        # each InputDataStep only has a single step input and output
+        for step in workflow.list_input_steps():
+            inp = step.list_inputs()[0]
+            out = step.list_outputs()[0]
+            #entity_info = {'name': inp.name}
+            #name = TagFormatter().format(entity_info)
+            step_id = step.metadata.step_id
+            step_tag = workflow.get_step_tag_by_step_id(step_id)
+            new_input = WorkflowInput(
+                step_id=step_id,
+                step_tag=step_tag,
+                step_input=inp.gxvarname,
+                janis_datatypes=out.janis_datatypes,
+                is_galaxy_input_step=True
+            )
+            workflow.add_input(new_input)
+            #workflow.steps_inputs_uuid_map[step.get_uuid()] = new_input.get_uuid()
+
     def parse_steps(self) -> None:
         for step_details in self.tree['steps'].values():
+            if 
             step = parse_step(step_details)
             self.datatype_annotator.annotate(step)
             self.workflow.add_step(step)
+
+    def set_workflow_outputs(workflow: Workflow) -> None:
+        for step in workflow.list_tool_steps():
+            assert(step.tool)
+            for out in step.list_outputs():
+                if out.is_wflow_out:
+                    step_tag = workflow.tag_manager.get(step.get_uuid())
+                    workflow.add_output(WorkflowOutput(
+                        step_id=step.metadata.step_id,
+                        step_tag=step_tag,
+                        step_output=out.gxvarname,
+                        janis_datatypes=out.janis_datatypes
+                    ))
 

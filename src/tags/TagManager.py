@@ -1,42 +1,67 @@
 
 
-from .TagRegister import TagRegister
-from .TagFormatter import TagFormatter
+from .FormattingStrategy import TaggableEntity, format_tag
 
 
 class TagManager:
+    permitted_entities: set[str]
+
     def __init__(self):
-        self.registers: dict[str, TagRegister] = {}
+        self.uuids_basetags: dict[str, str] = {}
+        self.basetags_uuids: dict[str, list[str]] = {}
 
-    def register(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
-        basetag = TagFormatter().format(entity_info)
-        the_register = self._select_register(tag_type)
-        the_register.add(basetag, uuid)
+    def exists(self, uuid: str) -> bool:
+        if uuid in self.uuids_basetags:
+            return True
+        return False
 
-    def get(self, tag_type: str, uuid: str) -> str:
-        the_register = self._select_register(tag_type)
-        return the_register.get(uuid)
+    def register(self, tag_type: str, entity: TaggableEntity) -> None:
+        if tag_type not in self.permitted_entities:
+            raise RuntimeError(f'cannot register a {tag_type}')
 
-    def _select_register(self, tag_type: str) -> TagRegister:
-        return self.registers[tag_type]
+        basetag = format_tag(tag_type, entity)
+        uuid = entity.get_uuid()
+
+        self.uuids_basetags[uuid] = basetag
+        if basetag not in self.basetags_uuids:
+            self.basetags_uuids[basetag] = []
+        self.basetags_uuids[basetag].append(uuid)
+
+    # def register_old(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
+    #     if tag_type not in self.permitted_entities:
+    #         raise RuntimeError(f'cannot register a {tag_type}')
+    #     basetag = TagFormatter().format(tag_type, entity_info)
+    #     self.uuids_basetags[uuid] = basetag
+    #     if basetag not in self.basetags_uuids:
+    #         self.basetags_uuids[basetag] = []
+    #     self.basetags_uuids[basetag].append(uuid)
+
+    def get(self, uuid: str) -> str:
+        basetag = self.uuids_basetags[uuid]
+        return self._format_basetag(basetag, uuid)
     
+    def get_base_tag(self, uuid: str) -> str:
+        return self.uuids_basetags[uuid]
+
+    def _format_basetag(self, basetag: str, query_uuid: str) -> str:
+        stored_uuids = self.basetags_uuids[basetag]
+        if len(stored_uuids) <= 1:
+            return basetag # only 1 object using this basetag
+        for i, uuid in enumerate(stored_uuids):
+            if uuid == query_uuid:
+                return f'{basetag}{i+1}' # appends '1', '2' etc if basetag is shared by multiple objects
+        raise RuntimeError(f'no tag registered for {query_uuid}')
+
 
 class ToolTagManager(TagManager):
-    def __init__(self):
-        self.registers = {
-            'tool_name': TagRegister(),
-            'tool_input': TagRegister(),
-            'tool_output': TagRegister()
-        }
+    permitted_entities: set[str] = set(
+        ['tool', 'tool_input', 'tool_output']
+    )
 
 class WorkflowTagManager(TagManager):
-    def __init__(self):
-        self.registers = {
-            'workflow_name': TagRegister(),
-            'workflow_step': TagRegister(),
-            'workflow_input': TagRegister(),
-            'workflow_output': TagRegister()
-        }
+    permitted_entities: set[str] = set(
+        ['workflow', 'workflow_step', 'workflow_input_data_step', 'workflow_input', 'workflow_output']
+    )
 
 
 

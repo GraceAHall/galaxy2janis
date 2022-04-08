@@ -2,13 +2,10 @@
 
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 from command.cmdstr.CommandString import CommandString
 from command.components.CommandComponent import CommandComponent
-from command.components.inputs.Flag import Flag
-from command.components.inputs.Option import Option
-from command.components.inputs.Positional import Positional
 from containers.Container import Container
 from tags.TagManager import ToolTagManager
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
@@ -18,54 +15,44 @@ from xmltool.param.Param import Param
 from uuid import uuid4
 
 
-
+# shouldn't really be a dataclass, just annoying to write __init__ method
 @dataclass
 class Tool:
     """
     a Tool() is the final representation of the software tool
     a galaxy XML wrapper is running. Includes metadata, inputs, outputs, a container to execute the tool, base command etc. 
     """
+    uuid: str = field(init=False)
     metadata: ToolXMLMetadata
     xmlcmdstr: CommandString
     gxparam_register: InputParamRegister
-    inputs: list[CommandComponent]
-    outputs: list[CommandComponent]
     container: Optional[Container]
     base_command: list[str]
-    tag_manager: ToolTagManager = ToolTagManager()
+    inputs: list[CommandComponent] = field(default_factory=list)
+    outputs: list[CommandComponent] = field(default_factory=list)
+    tag_manager: ToolTagManager = field(init=False)
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())
-        self.register_tool_tag()
-
-    def register_tool_tag(self) -> None:
+        self.tag_manager: ToolTagManager = ToolTagManager()
         self.tag_manager.register(
-            tag_type='tool_name',
-            uuid=self.get_uuid(),
-            entity_info={
-                'name': self.metadata.id
-            }
+            tag_type='tool',
+            entity=self
         )
 
-    def register_component_tags(self) -> None:
-        for component in self.inputs:
-            self.tag_manager.register(
-                tag_type='tool_input',
-                uuid=component.get_uuid(),
-                entity_info={
-                    'name': component.get_name(),
-                    'datatype': component.janis_datatypes[0].classname
-                }
-            )
-        for component in self.outputs:
-            self.tag_manager.register(
-                tag_type='tool_output',
-                uuid=component.get_uuid(),
-                entity_info={
-                    'name': component.get_name(),
-                    'datatype': component.janis_datatypes[0].classname
-                }
-            )
+    def add_input(self, inp: CommandComponent) -> None:
+        self.inputs.append(inp)
+        self.tag_manager.register(
+            tag_type='tool_input',
+            entity=inp
+        )
+    
+    def add_output(self, out: CommandComponent) -> None:
+        self.outputs.append(out)
+        self.tag_manager.register(
+            tag_type='tool_output',
+            entity=out
+        )
 
     def get_uuid(self) -> str:
         return self.uuid
@@ -87,13 +74,13 @@ class Tool:
         return self.inputs
 
     def get_tags_inputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get('tool_input', inp.get_uuid()): inp for inp in self.inputs}
+        return {self.tag_manager.get(inp.get_uuid()): inp for inp in self.inputs}
     
     def list_outputs(self) -> list[CommandComponent]:
         return self.outputs
 
     def get_tags_outputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get('tool_output', out.get_uuid()): out for out in self.outputs}
+        return {self.tag_manager.get(out.get_uuid()): out for out in self.outputs}
 
     def get_preprocessing(self) -> Optional[str]:
         raise NotImplementedError

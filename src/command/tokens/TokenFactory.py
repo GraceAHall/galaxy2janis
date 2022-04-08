@@ -79,8 +79,6 @@ class TokenFactory:
         extracts the best token from a word.
         where multiple token types are possible, selection can be made 
         """
-        if word == '${GALAXY_SLOTS:-2}':
-            print()
         token_list = self.get_all_tokens(word)
         token_list = self.perform_default_ordering(token_list)
         final_ordering = self.perform_final_ordering(token_list, prioritisation)

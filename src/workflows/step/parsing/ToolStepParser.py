@@ -1,52 +1,29 @@
 
 
+from typing import Any
 
-from abc import ABC, abstractmethod
-
-from typing import Any, Optional
-
-from workflows.step.WorkflowStep import WorkflowStep, InputDataStep, ToolStep
+from workflows.step.WorkflowStep import WorkflowStep
 from workflows.step.inputs.StepInput import StepInput, init_connection_step_input, init_static_step_input, init_runtime_step_input
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
-from workflows.step.outputs.StepOutput import init_input_step_output, init_tool_step_output
+from workflows.step.outputs.StepOutput import init_tool_step_output
 from workflows.step.metadata.StepMetadata import (
     ToolStepMetadata,
-    init_inputdatastep_metadata, 
     init_toolstep_metadata
 )
 from .ToolStateFlattener import ToolStateFlattener
 
 
-class StepParsingStrategy(ABC):
-    step: dict[str, Any]
-
-    @abstractmethod
-    def parse(self, step: dict[str, Any])  -> WorkflowStep:
-        """parses galaxy step in json format to GalaxyWorkflowStep"""
-        ...
-
-    @abstractmethod
-    def get_step_inputs(self) -> StepInputRegister:
-        """creates inputs for this step"""
-        ...
-    
-    @abstractmethod
-    def get_step_outputs(self) -> StepOutputRegister:
-        """creates outputs for this step"""
-        ...
 
 
-
-
-class ToolStepParsingStrategy(StepParsingStrategy):
+class ToolStepParsingStrategy:
     def __init__(self) -> None:
         self.inputs: dict[str, StepInput] = {}
         self.flattened_tool_state: dict[str, Any] = {}
 
-    def parse(self, step: dict[str, Any]) -> ToolStep:
+    def parse(self, step: dict[str, Any]) -> WorkflowStep:
         self.gxstep = step
-        return ToolStep(
+        return WorkflowStep(
             metadata=self.get_step_metadata(),
             input_register=self.get_step_inputs(),
             output_register=self.get_step_outputs()

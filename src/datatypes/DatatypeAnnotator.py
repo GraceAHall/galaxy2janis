@@ -5,7 +5,7 @@ from datatypes.DatatypeRegister import DatatypeRegister
 from datatypes.JanisDatatype import JanisDatatype
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput, InputOutput, WildcardOutput
-from workflows.step.Step import InputDataStep, ToolStep
+from workflows.step.WorkflowStep import InputDataStep, ToolStep
 from workflows.io.WorkflowOutput import WorkflowOutput
 
 FALLBACK = JanisDatatype(

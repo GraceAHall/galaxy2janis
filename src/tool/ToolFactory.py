@@ -23,32 +23,32 @@ class ToolFactory:
         self.datatype_annotator = DatatypeAnnotator() 
 
     def create(self) -> Tool:
-        return Tool(
+        tool = Tool(
             metadata=self.xmltool.metadata,
             xmlcmdstr=self.command.xmlcmdstr,
-            inputs=self.get_inputs(),
-            outputs=self.get_outputs(),
             container=self.container,
             base_command=self.get_base_command(),
             gxparam_register=self.xmltool.inputs
         )
+        self.supply_inputs(tool)
+        self.supply_outputs(tool)
         return tool
 
-    def get_inputs(self) -> list[CommandComponent]:
+    def supply_inputs(self, tool: Tool) -> None:
         self.command.set_cmd_positions()
         inputs = self.command.get_inputs()
         for inp in inputs:
             self.datatype_annotator.annotate(inp)
-        return inputs
+            tool.add_input(inp)
     
-    def get_outputs(self) -> list[CommandComponent]:
+    def supply_outputs(self, tool: Tool) -> None:
         outputs: list[CommandComponent] = []
         outputs += self.get_redirect_outputs()
         outputs += self.get_input_outputs()
         outputs += self.get_wildcard_outputs()
         for out in outputs:
             self.datatype_annotator.annotate(out)
-        return outputs
+            tool.add_output(out)
 
     def get_redirect_outputs(self) -> list[CommandComponent]:
         # already identified in ExecutionPaths

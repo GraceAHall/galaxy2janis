@@ -7,7 +7,7 @@ from datatypes.JanisDatatype import JanisDatatype
 
 @dataclass
 class StepOutput:
-    name: str
+    gxvarname: str
     gx_datatypes: list[str]
     is_wflow_out: bool
     wflow_out_label: Optional[str]
@@ -17,7 +17,7 @@ class StepOutput:
 def init_input_step_output(step: dict[str, Any]) -> StepOutput:
     is_wflow_out, wflow_out_label = get_wflow_out_details(step, 'output')
     return StepOutput(
-        name='output',
+        gxvarname='output',
         gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else ['file'],
         is_wflow_out=is_wflow_out,
         wflow_out_label=wflow_out_label
@@ -26,7 +26,7 @@ def init_input_step_output(step: dict[str, Any]) -> StepOutput:
 def init_tool_step_output(step: dict[str, Any], output: dict[str, Any]) -> StepOutput:
     is_wflow_out, wflow_out_label = get_wflow_out_details(step, output['name'])
     return StepOutput(
-        name=output['name'],
+        gxvarname=output['name'],
         gx_datatypes=[output['type']],
         is_wflow_out=is_wflow_out,
         wflow_out_label=wflow_out_label

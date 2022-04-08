@@ -32,7 +32,6 @@ def parse_tool(esettings: ToolExeSettings):
     command: Command = infer_command(gxmanager, xmltool)
     container: Optional[Container] = fetch_container(esettings, logger, xmltool)
     tool: Tool = generate_tool(xmltool, command, container)
-    tool.register_component_tags()
     return tool
     # except Exception as e:
     #     print(e)

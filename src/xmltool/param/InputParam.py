@@ -113,8 +113,9 @@ class BoolParam(InputParam):
 
     def get_all_values(self, nonempty: bool=False) -> list[str]:
         values = [self.truevalue, self.falsevalue]
+        empty_values = ['', 'none', 'None', 'null']
         if nonempty:
-            values = [v for v in values if v != '']
+            values = [v for v in values if v not in empty_values]
         return values
 
 
@@ -158,8 +159,9 @@ class SelectParam(InputParam):
 
     def get_all_values(self, nonempty: bool=False) -> list[str]:
         values = [opt.value for opt in self.options]
+        empty_values = ['', 'none', 'None', 'null']
         if nonempty:
-            values = [v for v in values if v != '']
+            values = [v for v in values if v not in empty_values]
         return values
     
 
