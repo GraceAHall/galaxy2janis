@@ -9,7 +9,6 @@ from workflows.step.WorkflowStep import WorkflowStep
 from workflows.io.WorkflowOutput import WorkflowOutput
 from workflows.io.WorkflowInput import WorkflowInput
 from tags.TagManager import WorkflowTagManager
-from janis.formatters.JanisWorkflowFormatter import JanisWorkflowFormatter
 
 
 @dataclass
@@ -58,9 +57,13 @@ class Workflow:
 
     def get_input(self, step_id: Optional[int]=None, input_uuid: Optional[str]=None) -> Optional[WorkflowInput]:
         if step_id is not None:
-            return [x for x in self.inputs if x.step_id == step_id][0]
+            relevant_inputs = [x for x in self.inputs if x.step_id == step_id]
+            if relevant_inputs:
+                return relevant_inputs[0]
         elif input_uuid is not None:
-            return [x for x in self.inputs if x.get_uuid() == input_uuid][0]
+            relevant_inputs = [x for x in self.inputs if x.get_uuid() == input_uuid]
+            if relevant_inputs:
+                return relevant_inputs[0]
         else:
             raise RuntimeError('get_input needs to be supplied either step_id or input_uuid')
 
@@ -98,20 +101,6 @@ class Workflow:
             out[tag] = w_output
         return out
     
-    def to_janis_definition(self) -> str:
-        formatter = JanisWorkflowFormatter()
-        str_note = formatter.format_top_note(self.metadata)
-        str_path = formatter.format_path_appends()
-        str_metadata = formatter.format_metadata(self.metadata)
-        str_builder = formatter.format_workflow_builder(self.tag_manager, self.get_uuid(), self.metadata)
-        str_inputs = formatter.format_inputs(self.tag_manager, self.inputs)
-        str_steps = formatter.format_steps(self.tag_manager, self.inputs, list(self.steps.values()))
-        str_outputs = formatter.format_outputs(self.tag_manager, self.outputs)
-        # str_inputs = formatter.format_inputs(self.get_inputs_tags())
-        # str_steps = formatter.format_steps(self.get_inputs_tags(), self.get_tool_steps_tags())
-        # str_outputs = formatter.format_outputs(self.get_outputs_tags())
-        str_imports = formatter.format_imports()
-        return str_note + str_path + str_imports + str_metadata + str_builder + str_inputs + str_steps + str_outputs
 
 
     

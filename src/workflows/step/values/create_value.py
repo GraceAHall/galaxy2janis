@@ -72,6 +72,10 @@ def select_strategy(component: CommandComponent, step_input: StepInput, workflow
                 return RuntimeInputValueFactory(component) 
             case StaticStepInput():
                 return StaticInputValueFactory(component, step_input)
+            case WorkflowInputStepInput():
+                workflow_input = workflow.get_input(step_id=step_input.step_id)
+                assert(workflow_input)
+                return WorkflowInputInputValueFactory(component, workflow_input)
             case _:
                 pass
     raise RuntimeError(f'cannot find galaxy step input for gxparam {step_input.gxvarname}')

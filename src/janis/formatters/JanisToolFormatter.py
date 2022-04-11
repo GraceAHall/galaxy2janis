@@ -1,10 +1,8 @@
 
 
-
-from typing import Optional
 from command.components.outputs.RedirectOutput import RedirectOutput
+from tool.Tool import Tool
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
-from containers.Container import Container
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
 from janis.imports.ToolImportHandler import ToolImportHandler
@@ -13,10 +11,23 @@ MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
 
 class JanisToolFormatter:
-    def __init__(self):
+    def __init__(self, tool: Tool):
+        self.tool = tool
         self.import_handler = ToolImportHandler()
 
-    def format_top_note(self, metadata: ToolXMLMetadata) -> str:
+    def to_janis_definition(self) -> str:
+        str_note = self.format_top_note()
+        str_path = self.format_path_appends()
+        str_metadata = self.format_metadata()
+        str_inputs = self.format_inputs()
+        str_outputs = self.format_outputs()
+        str_commandtool = self.format_commandtool()
+        str_translate = self.format_translate_func() 
+        str_imports = self.format_imports()
+        return str_note + str_path + str_imports + str_metadata + str_inputs + str_outputs + str_commandtool + str_translate
+    
+    def format_top_note(self) -> str:
+        metadata = self.tool.metadata
         return snippets.gxtool2janis_note_snippet(
             tool_name=metadata.id,
             tool_version=metadata.version
@@ -25,7 +36,8 @@ class JanisToolFormatter:
     def format_path_appends(self) -> str:
         return snippets.path_append_snippet()
     
-    def format_metadata(self, metadata: ToolXMLMetadata) -> str:
+    def format_metadata(self) -> str:
+        metadata = self.tool.metadata
         return snippets.metadata_snippet(
             description=metadata.description,
             version=metadata.version,
@@ -37,7 +49,8 @@ class JanisToolFormatter:
             citation=metadata.get_main_citation()
         )
 
-    def format_inputs(self, inputs: dict[str, CommandComponent]) -> str:
+    def format_inputs(self) -> str:
+        inputs = self.tool.get_tags_inputs()
         out_str: str = ''
         positionals = {tag: x for tag, x in inputs.items() if isinstance(x, Positional)}
         flags = {tag: x for tag, x in inputs.items() if isinstance(x, Flag)}
@@ -105,7 +118,8 @@ class JanisToolFormatter:
             return False
         return True
 
-    def format_outputs(self, outputs: dict[str, CommandComponent]) -> str:
+    def format_outputs(self) -> str:
+        outputs = self.tool.get_tags_outputs()
         out_str: str = ''
         out_str += 'outputs = ['
 
@@ -124,16 +138,17 @@ class JanisToolFormatter:
             doc=output.get_docstring()
         )
 
-    def format_commandtool(self, metadata: ToolXMLMetadata, base_command: list[str], container: Optional[Container]) -> str:
+    def format_commandtool(self) -> str:
+        container = self.tool.container
         return snippets.command_tool_builder_snippet(
-            toolname=metadata.id,
-            base_command=base_command,
+            toolname=self.tool.metadata.id,
+            base_command=self.tool.base_command,
             container=container.url if container else MISSING_CONTAINER_STRING,
-            version=metadata.version, # should this be based on get_main_requirement()?
+            version=self.tool.metadata.version, # should this be based on get_main_requirement()?
         )
 
-    def format_translate_func(self, metadata: ToolXMLMetadata) -> str:
-        return snippets.translate_snippet(metadata.id)
+    def format_translate_func(self) -> str:
+        return snippets.translate_snippet(self.tool.metadata.id)
 
     def format_imports(self) -> str:
         return self.import_handler.imports_to_string()

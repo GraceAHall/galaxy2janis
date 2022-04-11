@@ -148,7 +148,7 @@ def workflow_output_snippet(
     tag: str,
     datatype: str,
     step_tag: str,
-    step_output: str, 
+    toolout_tag: str, 
     output_folder: Optional[str]=None,
     output_name: Optional[str]=None,
     extension: Optional[str]=None,
@@ -158,7 +158,7 @@ def workflow_output_snippet(
     out_str += 'w.output(\n'
     out_str += f'\t"{tag}",\n'
     out_str += f'\t{datatype},\n'
-    out_str += f'\tsource=(w.{step_tag}, "{step_output}")'
+    out_str += f'\tsource=(w.{step_tag}, "{toolout_tag}")'
     out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
     out_str += f',\n\toutput_name="{output_name}"' if output_name else ''
     out_str += f',\n\textension="{extension}"' if extension else ''

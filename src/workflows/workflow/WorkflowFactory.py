@@ -53,17 +53,4 @@ class WorkflowFactory:
                 self.datatype_annotator.annotate(workflow_step)
                 self.workflow.add_step(workflow_step)
 
-    def set_outputs(self) -> None:# TODO HERE RAGE
-        for step in self.workflow.list_steps():
-            for out in step.list_outputs():
-                if out.is_wflow_out:
-                    step_tag = self.workflow.tag_manager.get(step.get_uuid())
-                    workflow_output = WorkflowOutput(
-                        step_id=step.metadata.step_id,
-                        step_tag=step_tag,
-                        step_output=out.gxvarname,
-                        tool_out_uuid=
-                        janis_datatypes=out.janis_datatypes
-                    )
-                    self.workflow.add_output(workflow_output)
 

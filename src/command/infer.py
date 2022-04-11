@@ -20,7 +20,6 @@ def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Comma
     return ci.command
 
 
-# class just exists to avoid passing variables
 class CommandInferer:
 
     def __init__(self, gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> None:

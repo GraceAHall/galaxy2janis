@@ -1,6 +1,7 @@
 
 
-from .FormattingStrategy import TaggableEntity, format_tag
+from typing import Any
+from .FormattingStrategy import format_tag
 
 
 class TagManager:
@@ -15,7 +16,7 @@ class TagManager:
             return True
         return False
 
-    def register(self, tag_type: str, entity: TaggableEntity) -> None:
+    def register(self, tag_type: str, entity: Any) -> None:
         if tag_type not in self.permitted_entities:
             raise RuntimeError(f'cannot register a {tag_type}')
 

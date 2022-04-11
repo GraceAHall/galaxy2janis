@@ -36,6 +36,8 @@ class OptionComponentFactory(InputComponentFactory):
 class PositionalComponentFactory(InputComponentFactory):
     def spawn_cmdstr(self, ctext: str, ntexts: list[str], delim: str=' ') -> Positional:
         return Positional(value=ctext)
+
+
         
 
 

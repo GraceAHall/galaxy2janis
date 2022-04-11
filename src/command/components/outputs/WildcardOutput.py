@@ -13,6 +13,7 @@ class WildcardOutput(BaseCommandComponent):
     def __init__(self, gxparam: Param):
         super().__init__()
         self.gxparam = gxparam
+        assert(self.gxparam)
 
     def get_name(self) -> str:
         if self.gxparam:

@@ -17,20 +17,20 @@ from workflows.step.values.InputValue import (
     RuntimeInputValue, 
     StaticInputValue
 )
-import workflows.step.values.create as value_utils
+import workflows.step.values.create_value as value_utils
 
 
 # module entry
-def link_step_values(workflow: Workflow):
+def link_step_input_values(workflow: Workflow):
     for step in workflow.list_steps():
         assert(step.tool)
         # assign actual Param objects to gxparam field of inputs
         step.input_register.assign_gxparams(step.tool)  
-        linker = ValueLinker(step, workflow)
+        linker = InputValueLinker(step, workflow)
         linker.link()
 
 
-class ValueLinker:
+class InputValueLinker:
     def __init__(self, step: WorkflowStep, workflow: Workflow):
         self.step = step
         self.tool: Tool = step.tool # type: ignore
@@ -86,8 +86,9 @@ class ValueLinker:
     
     def assign_unlinked(self) -> None:
         # go through step inputs, checking if any have the 'linked' attribute as false
+        permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
         for step_input in self.step.list_inputs():
-            if not step_input.linked:
+            if not step_input.linked and type(step_input) in permitted_inputs:
                 # workflow inputs
                 if isinstance(step_input, WorkflowInputStepInput):
                     workflow_input = self.workflow.get_input(step_id=step_input.step_id)
@@ -175,6 +176,14 @@ class ValueLinker:
     #     return False
 
     def migrate_runtime_to_workflowinput(self) -> None:
+        """
+        each tool input which is a RuntimeInputValue at this stage should be converted
+        to a WorkflowInputInputValue. A RuntimeInputValue here means that we couldn't link
+        a StepInput to any known ToolInputs (not direcly linkable), or that the StepInput
+        is genuinely specified as a runtimevalue in the workflow. 
+        A WorkflowInput will be created, and the user will have to supply a value for this 
+        input when running the workflow. 
+        """
         for uuid, value in self.valregister.list_values():
             if self.should_migrate_runtime_to_workflowinput(value):
                 component = self.tool.get_input(uuid)

@@ -72,5 +72,4 @@ class ArgumentCommandAnnotator:
     def handle_generic_param(self, gxparam: Param) -> None:
         component = spawn_component('option', ctext=gxparam.argument, ntexts=[])
         component.gxparam = gxparam
-        self.command.update(component)
-    
+        self.command.update(component)    

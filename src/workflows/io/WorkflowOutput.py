@@ -25,11 +25,8 @@ w.output("out", source=w.sortsam.out)
 
 @dataclass
 class WorkflowOutput:
-    step_id: int
     step_tag: str
-    step_output: str
-    tool_out_uuid: str
-    gx_datatypes: list[str] = field(default_factory=list)
+    toolout_tag: str
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)
 
     def __post_init__(self):

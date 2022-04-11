@@ -32,18 +32,17 @@ class TestCommandLoader:
         self.esettings = esettings
         self.test_directory = tempfile.mkdtemp()
         self.dataset_counter: int = 1
-        self.jobfactory = JobFactory(self.esettings)
         
     def load(self, test: ToolTestDescription) -> Optional[str]:
         try:
-            job = self.jobfactory.create(
+            factory = JobFactory(
+                self.esettings,
                 self.app,
                 self.history,
-                self.toolrep,
-                test.required_files, # type: ignore god I hate galaxy no type hinting
-                test.inputs, # type: ignore
-                test.outputs # type: ignore
+                test,
+                self.toolrep
             ) 
+            job = factory.create()
             if job:
                 evaluator = self.setup_evaluator(self.app, self.gxtool, job)
                 command_line, _, __ = evaluator.build()

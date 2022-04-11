@@ -11,6 +11,7 @@ class InputOutput(BaseCommandComponent):
         super().__init__()
         self.input_component = input_component
         self.gxparam = self.input_component.gxparam
+        assert(self.gxparam)
 
     def get_name(self) -> str:
         if self.gxparam:

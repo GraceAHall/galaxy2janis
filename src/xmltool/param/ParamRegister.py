@@ -23,17 +23,17 @@ class ParamRegister(ABC):
 
 class SearchStrategy(ABC):    
     @abstractmethod
-    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
+    def search(self, query: str, params: list[Param]) -> Optional[Param]:
         """searches for a param using some concrete strategy"""
         ...
 
 class DefaultSearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
+    def search(self, query: str, params: list[Param]) -> Optional[Param]:
         """searches for a param using param name"""
-        try:
-            return params[query]
-        except KeyError:
-            return None
+        for param in params:
+            if param.name == query:
+                return param
+        return None
 
 @dataclass
 class LCAParam:
@@ -41,7 +41,7 @@ class LCAParam:
     param: Param
 
 class LCASearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
+    def search(self, query: str, params: list[Param]) -> Optional[Param]:
         """searches for a param using LCA"""
         split_query = query.split('.')
         remaining_params = self.init_datastructure(params)
@@ -55,15 +55,12 @@ class LCASearchStrategy(SearchStrategy):
             remaining_params.sort(key=lambda x: len(x.split_name))
             return remaining_params[0].param
 
-    def init_datastructure(self, params: dict[str, Param]):
-        out: list[LCAParam] = []
-        for param in params.values():
-            out.append(LCAParam(param.name.split('.'), param))
-        return out
+    def init_datastructure(self, params: list[Param]):
+        return [LCAParam(param.name.split('.'), param) for param in params]
         
 
 class FilepathSearchStrategy(SearchStrategy):
-    def search(self, query: str, params: dict[str, Param]) -> Optional[Param]:
+    def search(self, query: str, params: list[Param]) -> Optional[Param]:
         """
         searches for a param by matching the specified 
         from_work_dir path to a given filepath

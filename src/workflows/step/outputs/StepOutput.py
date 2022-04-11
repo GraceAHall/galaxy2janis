@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
+from command.components.CommandComponent import CommandComponent
 from datatypes.JanisDatatype import JanisDatatype
 
 @dataclass
@@ -12,6 +13,7 @@ class StepOutput:
     is_wflow_out: bool
     wflow_out_label: Optional[str]
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)
+    tool_output: Optional[CommandComponent] = None
 
 
 def init_input_step_output(step: dict[str, Any]) -> StepOutput:

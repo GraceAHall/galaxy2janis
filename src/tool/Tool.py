@@ -9,7 +9,6 @@ from command.components.CommandComponent import CommandComponent
 from containers.Container import Container
 from tags.TagManager import ToolTagManager
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
-from janis.formatters.JanisToolFormatter import JanisToolFormatter
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.Param import Param
 from uuid import uuid4
@@ -88,18 +87,6 @@ class Tool:
     def get_postprocessing(self) -> Optional[str]:
         raise NotImplementedError
 
-    def to_janis_definition(self) -> str:
-        formatter = JanisToolFormatter()
-        str_note = formatter.format_top_note(self.metadata)
-        str_path = formatter.format_path_appends()
-        str_metadata = formatter.format_metadata(self.metadata)
-        str_inputs = formatter.format_inputs(self.get_tags_inputs())
-        str_outputs = formatter.format_outputs(self.get_tags_outputs())
-        str_commandtool = formatter.format_commandtool(self.metadata, self.base_command, self.container)
-        str_translate = formatter.format_translate_func(self.metadata) 
-        str_imports = formatter.format_imports()
-        return str_note + str_path + str_imports + str_metadata + str_inputs + str_outputs + str_commandtool + str_translate
-    
 
 
     

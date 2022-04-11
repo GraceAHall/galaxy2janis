@@ -1,0 +1,25 @@
+fastqc_adapters:
+  class: File
+  path: null
+fastqc_contaminants:
+  class: File
+  path: null
+fastqc_html_file:
+  class: File
+  path: null
+fastqc_limits:
+  class: File
+  path: null
+fastqc_nogroup: false
+fastqc_outdir:
+  class: File
+  path: null
+in_forward_reads:
+  class: File
+  path: null
+in_long_reads:
+  class: File
+  path: null
+in_reverse_reads:
+  class: File
+  path: null

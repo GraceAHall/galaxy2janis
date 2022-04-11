@@ -35,9 +35,6 @@ class XMLToolDefinition:
     def list_inputs(self) -> list[Param]:
         return self.inputs.list()
 
-    def dict_inputs(self) -> dict[str, Any]:
-        return self.inputs.to_dict()
-
     def get_output(self, query: str, strategy: str='default') -> Optional[Param]:
         return self.outputs.get(query.lstrip('$'), strategy=strategy)
     

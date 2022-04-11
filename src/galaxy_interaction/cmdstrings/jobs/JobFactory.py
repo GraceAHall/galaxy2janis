@@ -2,17 +2,14 @@
 #from gx_src.tools import Tool as GalaxyTool
 import os
 import json
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
-from galaxy.tool_util.verify.interactor import ToolTestDescription
 from startup.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 import galaxy_interaction.cmdstrings.dataset_utils as dataset_utils
 from galaxy_interaction.mock import MockApp
-from xmltool.param.Param import Param
-from xmltool.param.InputParam import DataParam, DataCollectionParam
-
-from xmltool.tool_definition import XMLToolDefinition
+from galaxy.tool_util.verify.interactor import ToolTestDescription
+from startup.ExeSettings import ToolExeSettings
 
 from galaxy.model import (
     History,
@@ -20,83 +17,61 @@ from galaxy.model import (
     JobParameter
 )
 
-
-"""
-files = {
-    'paramname': {
-        'filepath': 'str',
-        'ftype': 'str',
-    },
-}
-input_values = {
-    'paramname': 'value',
-    'paramname': 'value',
-}
-output_values = {
-    'outname': 'ftype'?
-}
-
-"""
+from xmltool.tool_definition import XMLToolDefinition
 
 
 class JobFactory:
-    app: MockApp
-    history: History
-    xmltool: XMLToolDefinition
-    files: dict[str, Any]
-    input_values: dict[str, Any]
-    output_values: dict[str, Any]
-    job_dict: dict[str, Any]
-
-    def __init__(self, esettings: ToolExeSettings):
+    job: Job 
+    
+    def __init__(self, esettings: ToolExeSettings, app: MockApp, history: History, test: ToolTestDescription, xmltool: XMLToolDefinition):
         self.esettings = esettings
+        self.app = app
+        self.history = history
+        self.test = test
+        self.xmltool = xmltool
+        self.job_dict: dict[str, Any] = {}
     
     def create(
-        self, 
-        app: MockApp,
-        history: History,
-        xmltool: XMLToolDefinition,
-        files: dict[str, Any],
-        input_values: dict[str, Any],
-        output_values: dict[str, Any]
+        self
+        #files: dict[str, Any],
+        #input_values: dict[str, Any],
+        #output_values: dict[str, Any]
     ) -> Optional[Job]:
-        self.refresh_objects(app, history, xmltool)
-        self.refresh_data(files, input_values, output_values)
-        self.set_job_parameters()
-        self.set_job_outputs()
+        self.job = self.init_job()
+        self.set_inputs()
+        self.set_outputs()
         return self.job
 
-    def refresh_objects(self, app: MockApp, history: History, xmltool: XMLToolDefinition) -> None:
-        self.app = app
-        self.xmltool = xmltool
-        self.job = self.init_job(history)
-    
-    def init_job(self, history: History) -> Job:
+    def init_job(self) -> Job:
         job = Job()
-        job.history = history
+        job.history = self.history
         job.history.id = 1337
         return job
-
-    def refresh_data(self, files: dict[str, Any], input_values: dict[str, Any], output_values: dict[str, Any]) -> None:
-        self.files = files
-        self.input_values = input_values
-        self.output_values = output_values
-        self.job_dict: dict[str, Any] = self.xmltool.dict_inputs()
-
-    def set_job_parameters(self) -> None: 
-        self.inject_supplied_input_values()
+        
+    def set_inputs(self) -> None:
+        self.supply_supplied_job_dict_values()
+        self.supply_remaining_job_dict_values()
         self.jsonify_job_dict()
-        self.job.parameters = [JobParameter(name=k, value=v) for k, v in self.job_dict.items()]
+        self.set_job_parameters()
 
-    def inject_supplied_input_values(self) -> None:
-        for pname, pvalue in self.input_values.items():
+    def supply_supplied_job_dict_values(self) -> None:
+        for pname, pvalue in self.test.inputs.items():
             pname = self.format_param_name(pname)     # param name
             pvalue = self.format_param_value(pvalue)  # param value
             self.handle_input_param(pname, pvalue)
 
+    def supply_remaining_job_dict_values(self) -> None:
+        for param in self.xmltool.list_inputs():
+            pname = self.format_param_name(param.name)     # param name
+            pvalue = self.format_param_value(param.get_default())  # param value
+            self.handle_input_param(pname, pvalue)
+        
+    def set_job_parameters(self) -> None: 
+        self.job.parameters = [JobParameter(name=k, value=v) for k, v in self.job_dict.items()]
+
     def format_param_name(self, pname: str) -> str:
         return pname.replace('|', '.') 
-    
+
     def format_param_value(self, pvalue: Any) -> Any:
         # TODO REMOVE THIS ITS A BAD HACK TO AVOID ARRAYS
         if isinstance(pvalue, list):
@@ -110,7 +85,7 @@ class JobFactory:
             self.handle_non_data_param(pname, pvalue)
 
     def is_data_input(self, pvalue: str) -> bool:
-        for filename, _ in self.files:
+        for filename, _ in self.test.required_files:
             if filename == pvalue:
                 return True
         return False
@@ -140,7 +115,8 @@ class JobFactory:
         tree = self.job_dict
         for i, text in enumerate(param_path):
             if i == len(param_path) - 1:
-                tree[text] = value
+                if text not in tree: # don't override existing value
+                    tree[text] = value
             elif text not in tree:
                 tree[text] = {}
                 tree = tree[text]
@@ -152,8 +128,9 @@ class JobFactory:
             if type(val) == dict:
                 self.job_dict[key] = json.dumps(val)  
 
-    def set_job_outputs(self) -> None:
-        for out in self.output_values:
-            output_var = str(out['name'].replace('|', '.'))
-            job_output = dataset_utils.generate_output_dataset(self.app, output_var, out['attributes']['ftype'])
+    def set_outputs(self) -> None:
+        for out in self.test.outputs:
+            param_name = str(self.format_param_name(out['name']))
+            gx_datatype = out['attributes']['ftype']
+            job_output = dataset_utils.generate_output_dataset(self.app, param_name, gx_datatype)
             self.job.output_datasets.append(job_output)

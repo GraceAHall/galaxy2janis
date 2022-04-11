@@ -13,17 +13,16 @@ from xmltool.param.ParamRegister import (
 
 class OutputParamRegister(ParamRegister):
     def __init__(self, params: list[Param]):
-        self.outputs: dict[str, Param] = dict()
+        self.outputs: list[Param] = []
         for param in params:
             self.add(param)
 
     def list(self) -> list[Param]:
-        return list(self.outputs.values())
+        return self.outputs
     
     def add(self, param: Param) -> None:
         """adds a param to register. enforces unique param var names"""
-        if param.name not in self.outputs:
-            self.outputs[param.name] = param            
+        self.outputs.append(param)
 
     def get(self, query: str, strategy: str='default') -> Optional[Param]:
         """performs search using the specified search strategy"""
