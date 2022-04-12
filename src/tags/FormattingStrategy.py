@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
-from command.components.CommandComponent import CommandComponent
 import tags.formatters as formatters
 
 basic_formatters = [
@@ -10,7 +9,6 @@ basic_formatters = [
     formatters.replace_non_alphanumeric,
     formatters.handle_prohibited_key
 ]
-
 
 class FormattingStrategy(ABC):
 
@@ -37,39 +35,6 @@ class ToolInputStrategy(FormattingStrategy):
         tag = formatters.encode(tag)
         return tag
 
-def get_starting_text(entity_type: str, entity: Any) -> str:
-    match entity_type:
-        case 'workflow':
-            return entity.metadata.name # type: ignore
-        case 'workflow_input':
-            if entity.is_galaxy_input_step: # type: ignore
-                return f'in_{entity.name}' # type: ignore
-            else:
-                return f'{entity.step_tag}_{entity.name}' # type: ignore
-        case 'workflow_step':
-            return entity.metadata.tool_name # type: ignore
-        case 'workflow_output':
-            return f'{entity.step_tag}_{entity.toolout_tag}' # type: ignore
-        case 'tool':
-            return entity.metadata.id # type: ignore
-        case 'tool_input':
-            return get_tool_input_name(entity)
-        case 'tool_output':
-            return f'out_{entity.get_name()}' # type: ignore
-        case _:
-            raise RuntimeError()
-
-
-def get_tool_input_name(component: CommandComponent) -> str:
-    default_name = component.get_name()
-    if default_name.isnumeric() and component.gxparam:
-        return component.gxparam.name
-    return default_name
-
-    
-
-
-
 def get_strategy(entity_type: str) -> FormattingStrategy:
     strategy_map = {
         'workflow': GenericFormattingStrategy(),
@@ -82,14 +47,9 @@ def get_strategy(entity_type: str) -> FormattingStrategy:
     }
     return strategy_map[entity_type]
 
-def format_tag(entity_type: str, entity: Any) -> str:
+def format_tag(starting_text: str, entity_type: str, entity: Any) -> str:
     strategy = get_strategy(entity_type)
-    starting_text = get_starting_text(entity_type, entity)
     return strategy.format(starting_text, entity)
-
-
-
-
 
 
 

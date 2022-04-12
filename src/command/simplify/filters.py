@@ -5,6 +5,10 @@ import re
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 
+
+def interpret_raw(cmdstr: str) -> str:
+    return cmdstr.replace('\\', '')
+
 def flatten_multiline_strings(cmdstr: str) -> str:
     matches = scanners.get_quoted_sections(cmdstr)
     for match in matches:

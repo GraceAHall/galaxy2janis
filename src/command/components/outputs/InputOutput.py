@@ -38,8 +38,8 @@ class InputOutput(BaseCommandComponent):
             return self.gxparam.get_docstring()
         return f'output created during runtime. file relates to the {self.input_component.get_tag()} input'
 
-    def update(self, incoming: InputOutput):
-        pass
+    def update(self, incoming: InputOutput) -> None:
+        raise NotImplementedError()
 
     def get_selector_str(self) -> str:
         return f'InputSelector("{self.input_component.get_tag()}")'

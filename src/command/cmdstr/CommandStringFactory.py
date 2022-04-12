@@ -11,7 +11,6 @@ from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
 #from command.alias.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
-
 from command.regex.utils import get_quoted_sections
 
 

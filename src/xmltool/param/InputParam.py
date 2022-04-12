@@ -23,7 +23,7 @@ class InputParam(Param):
 
     def generic_get_docstring(self) -> str:
         if self.helptext and self.label:
-            return self.label + ' ' + self.helptext
+            return self.label + '. ' + self.helptext
         elif self.helptext:
             return self.helptext
         elif self.label:

@@ -1,0 +1,25 @@
+
+
+noteworthy bugs
+
+conditional params (simple_workflow.ga step)
+    unicycler(
+        l_file=w.unicycler_l_file,
+        fastq_input1=w.in_forward_reads,
+        fastq_input2=w.in_reverse_reads,
+        s_fastqsanger=w.in_forward_reads,  
+        pilon_path=w.unicycler_pilon_path,
+        long=w.in_long_reads,
+        start_genes=w.unicycler_start_genes,
+        contamination=w.unicycler_contamination,
+    )
+    fastq_input1 / s_fastqsanger are governed by galaxy XML conditional case. 
+    w.in_forward_reads can be wired to either depending on that case. 
+    currently not evaluating the state of the case.
+
+
+paths with quotes (fastqc)
+    cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
+
+
+

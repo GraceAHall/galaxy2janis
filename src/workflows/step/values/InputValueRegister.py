@@ -44,6 +44,14 @@ class WorkflowInputStrategy(ValueOrderingStrategy):
         non_connection = [x for x in input_values if not isinstance(x[1], WorkflowInputInputValue)]
         return connection + non_connection
 
+class InputOrConnectionStrategy(ValueOrderingStrategy):
+    priority_types = [WorkflowInputInputValue, ConnectionInputValue]
+    
+    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
+        connection = [x for x in input_values if type(x[1]) in self.priority_types]
+        non_connection = [x for x in input_values if type(x[1]) not in self.priority_types]
+        return connection + non_connection
+
 
 
 class InputValueRegister:
@@ -55,9 +63,9 @@ class InputValueRegister:
         self.value_ordering_strategies = [
             ComponentTypeStrategy(),
             AlphabeticalStrategy(),
-            RuntimeNonRuntimeStrategy(),
-            WorkflowInputStrategy(),
-            ConnectionNonConnectionStrategy()
+            InputOrConnectionStrategy(),
+            # WorkflowInputStrategy(),
+            # ConnectionNonConnectionStrategy()
         ]
 
     def get(self, uuid: str) -> Optional[InputValue]:

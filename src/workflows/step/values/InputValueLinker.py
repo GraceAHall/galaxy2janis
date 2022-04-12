@@ -100,9 +100,25 @@ class InputValueLinker:
                 self.valregister.update_unlinked(input_value)
 
     def update_component_knowledge(self) -> None:
+        self.update_components_via_values()
+        self.update_components_via_presence()
+
+    def update_components_via_values(self) -> None:
         for uuid, value in self.valregister.list_values():
             component = self.tool.get_input(uuid)
             update_component_from_workflow_value(component, value)
+    
+    def update_components_via_presence(self) -> None:
+        """
+        if component is not optional, but has default=None and no reference in StepInputs,
+        mark this as optional as its not referred to anywhere. must be optional
+        """
+        for component in self.tool.list_inputs():
+            comp_uuid = component.get_uuid()
+            if not component.is_optional():
+                value = self.valregister.get(comp_uuid)
+                if isinstance(value, DefaultInputValue) and value.valtype == InputValueType.NONE:
+                    component.forced_optionality = True
 
     def migrate_default_to_runtime(self) -> None:
         """
@@ -142,38 +158,6 @@ class InputValueLinker:
             elif str(component.get_default_value()) == value.value:
                 return True
         return False
-
-    # def migrate_connection_to_workflowinput(self) -> None:
-    #     self.migrate_conn_to_winp_linked()
-    #     self.migrate_conn_to_winp_unlinked()
-
-    # def migrate_conn_to_winp_linked(self) -> None:
-    #     for comp_uuid, value in self.valregister.list_values():
-    #         if self.should_migrate_connection_to_workflowinput(value):
-    #             assert(isinstance(value, ConnectionInputValue))
-    #             component = self.tool.get_input(comp_uuid)
-    #             workflow_input = self.workflow.get_input(step_id=value.step_id)
-    #             assert(workflow_input)
-    #             input_value = value_utils.create_workflow_input(component, workflow_input)
-    #             self.valregister.update(comp_uuid, input_value)
-    
-    # def migrate_conn_to_winp_unlinked(self) -> None:
-    #     unlinked: list[InputValue] = []
-    #     for value in self.valregister.list_unlinked():
-    #         if self.should_migrate_connection_to_workflowinput(value):
-    #             assert(isinstance(value, ConnectionInputValue))
-    #             workflow_input = self.workflow.get_input(step_id=value.step_id)
-    #             assert(workflow_input)
-    #             value = value_utils.cast_connection_to_workflowinput(value, workflow_input)
-    #         unlinked.append(value)
-    #     self.valregister.unlinked = unlinked
-
-    # def should_migrate_connection_to_workflowinput(self, value: InputValue) -> bool:
-    #     if isinstance(value, ConnectionInputValue):
-    #         step = self.workflow.steps[value.step_id]
-    #         if isinstance(step, InputDataStep):
-    #             return True
-    #     return False
 
     def migrate_runtime_to_workflowinput(self) -> None:
         """
@@ -218,3 +202,37 @@ class InputValueLinker:
                 raise AssertionError(f'tool input "{component.get_name()}" has no assigned step value')
 
 
+
+
+
+    # def migrate_connection_to_workflowinput(self) -> None:
+    #     self.migrate_conn_to_winp_linked()
+    #     self.migrate_conn_to_winp_unlinked()
+
+    # def migrate_conn_to_winp_linked(self) -> None:
+    #     for comp_uuid, value in self.valregister.list_values():
+    #         if self.should_migrate_connection_to_workflowinput(value):
+    #             assert(isinstance(value, ConnectionInputValue))
+    #             component = self.tool.get_input(comp_uuid)
+    #             workflow_input = self.workflow.get_input(step_id=value.step_id)
+    #             assert(workflow_input)
+    #             input_value = value_utils.create_workflow_input(component, workflow_input)
+    #             self.valregister.update(comp_uuid, input_value)
+    
+    # def migrate_conn_to_winp_unlinked(self) -> None:
+    #     unlinked: list[InputValue] = []
+    #     for value in self.valregister.list_unlinked():
+    #         if self.should_migrate_connection_to_workflowinput(value):
+    #             assert(isinstance(value, ConnectionInputValue))
+    #             workflow_input = self.workflow.get_input(step_id=value.step_id)
+    #             assert(workflow_input)
+    #             value = value_utils.cast_connection_to_workflowinput(value, workflow_input)
+    #         unlinked.append(value)
+    #     self.valregister.unlinked = unlinked
+
+    # def should_migrate_connection_to_workflowinput(self, value: InputValue) -> bool:
+    #     if isinstance(value, ConnectionInputValue):
+    #         step = self.workflow.steps[value.step_id]
+    #         if isinstance(step, InputDataStep):
+    #             return True
+    #     return False

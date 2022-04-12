@@ -7,7 +7,7 @@ from requests import Response
 import json
 
 
-class GA4CHInteractor:
+class GA4GHInteractor:
 
     def search(self, toolname: Optional[str]=None, version: Optional[dict[str, str]]=None) -> Any:
         if toolname:

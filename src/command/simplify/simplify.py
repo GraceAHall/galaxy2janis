@@ -10,6 +10,7 @@ from command.simplify.filters import (
     simplify_galaxy_static_vars,
     simplify_galaxy_dynamic_vars,
     remove_cheetah_comments,
+    interpret_raw
 )
 
 
@@ -30,7 +31,8 @@ class TestCommandSimplifier(CommandSimplifier):
         translate_variable_markers,
         standardise_variable_format,
         simplify_galaxy_dynamic_vars,
-        simplify_sh_constructs
+        simplify_sh_constructs,
+        interpret_raw
     ]
 
 
@@ -41,6 +43,7 @@ class XMLCommandSimplifier(CommandSimplifier):
         simplify_sh_constructs,
         simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
-        remove_cheetah_comments
+        remove_cheetah_comments,
+        interpret_raw
     ]
 

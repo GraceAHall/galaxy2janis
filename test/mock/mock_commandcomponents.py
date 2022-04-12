@@ -21,7 +21,6 @@ from .mock_params import (
 
 MOCK_POSIT1 = Positional(
     value='abricate', 
-    epath_id=0, 
 )
 MOCK_POSIT1.cmd_pos = 0
 MOCK_POSIT1.before_opts = True
@@ -30,7 +29,6 @@ MOCK_POSIT1.value_record = MOCK_VALUERECORD_POSIT1
 
 MOCK_POSIT2 = Positional(
     value='$sample_name', 
-    epath_id=0, 
 )
 MOCK_POSIT2.cmd_pos = 1
 MOCK_POSIT2.before_opts = True
@@ -45,7 +43,6 @@ MOCK_FLAG1.presence_array = [True, True, True]
 MOCK_OPTION1 = Option(
     prefix='--minid', 
     values=['$adv.min_dna_id'], 
-    epath_id=0, 
     delim='=', 
 )
 MOCK_OPTION1.cmd_pos = 2
@@ -56,8 +53,7 @@ MOCK_OPTION1.value_record = MOCK_VALUERECORD_OPT1
 MOCK_OPTION2 = Option(
     prefix='--mincov', 
     values=['$adv.min_cov'], 
-    epath_id=0, 
-    delim='=', 
+    delim='='
 )
 MOCK_OPTION2.cmd_pos = 2
 MOCK_OPTION2.gxparam = MOCK_FLOATPARAM2
@@ -67,8 +63,7 @@ MOCK_OPTION2.value_record = MOCK_VALUERECORD_OPT2
 MOCK_OPTION3 = Option(
     prefix='--db', 
     values=['card'], 
-    epath_id=0, 
-    delim='=', 
+    delim='='
 )
 MOCK_OPTION3.cmd_pos = 2
 MOCK_OPTION3.gxparam = MOCK_SELECTPARAM1

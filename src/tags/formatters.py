@@ -47,9 +47,9 @@ def handle_short_tag(tag: str, entity: Any) -> str:
     if len(tag) == 1 and hasattr(entity, 'janis_datatypes'):
         dtype = entity.janis_datatypes[0].classname
         if tag[0].isnumeric():
-            tag = f"{dtype}_{tag}"
+            tag = f"input_data_{tag}"
         else:
-            tag = f"{tag}_{dtype}"
+            tag = f"{tag}_{dtype.lower()}"
     return tag
 
 def encode(tag: str) -> str:

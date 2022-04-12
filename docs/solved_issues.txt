@@ -5,72 +5,90 @@
 SOLVED
 
 issue
-- alphabetical sort workflow step runtime values w.input('name', datatype)
+    prokka workflow output 'out_out...'
+    w.output(
+        "prokka_out_out_tbl",
+        TextFile,
+        source=(w.prokka, "out_out_tbl")
+    )
+    do we care about out_out? 
+    this is because we prepend 'out_' but the tool output is already called 'out_tbl'. can check if already startswith 'out', but this may lead to issues. 
+solution
+    changed tag formatting to check if the basetag already exists
+
+issue
+    '.output' still appears on input connections to InputDataStep even though should be WorkflowInput
+    long=w.long_reads.output
+solution
+    required huge refactor - InputDataStep was completely removed. replaced by adding a WorkflowInput instead. 
+
+issue
+    alphabetical sort workflow step runtime values w.input('name', datatype)
     w.input("unicycler_fq11", File)
     w.input("unicycler_contamination", Fasta)
     w.input("unicycler_fq12", File)
 solution
-- was just due to list[Tuple[str, InputValue]] being used as dict[str, InputValue] in a function. destroyed normal ordering. 
+    was just due to list[Tuple[str, InputValue]] being used as dict[str, InputValue] in a function. destroyed normal ordering. 
 
 issue 
-- None values appear in step definition - what does this mean? 
+    None values appear in step definition - what does this mean? 
     glimmer=None,
     mgm=None,
 	gene_finding=None
 solution
-- this almost always means use the default value. changed behaviour to reflect.
+    this almost always means use the default value. changed behaviour to reflect.
 
 issue
-- scores="", kmers="", fungus, eukaryote, k_mer_stats all have default value = "" (simple workflow quast)
+    scores="", kmers="", fungus, eukaryote, k_mer_stats all have default value = "" (simple workflow quast)
 solution
-- was just bug in translating gx values into python
+    was just bug in translating gx values into python
 
 issue
-- Html, Tabular Datatype in workflow outputs not being imported (simple workflow)
+    Html, Tabular Datatype in workflow outputs not being imported (simple workflow)
 solution
-- just was simple variable name bug
+    just was simple variable name bug
 
 issue
-- from simple_workflow.tools.fastqc1.fastqc1 import fastqc1
+    from simple_workflow.tools.fastqc1.fastqc1 import fastqc1
 solution
-- TagManager now has .get_base_tag() method which just returns the basetag with no digits on the end
+    TagManager now has .get_base_tag() method which just returns the basetag with no digits on the end
 
 issue
-- create_assemblies_with_unicycler filename and folder name but unicycler tool name
+    create_assemblies_with_unicycler filename and folder name but unicycler tool name
 solution
-- simple workflow step parser change
+    simple workflow step parser change
 
 issue
-- f_file="fastq html_file"  (fastqc)
-  wtf? even if this is the default value for the galaxy param, shouldn't it have been split into individual tokens in the ExecutionPath? 
+    f_file="fastq html_file"  (fastqc)
+    wtf? even if this is the default value for the galaxy param, shouldn't it have been split into individual tokens in the ExecutionPath? 
 solution
-- was another issue with GreedyEPathAnnotator. now fixed. 
+    was another issue with GreedyEPathAnnotator. now fixed. 
 
 issue
-- 2 outputs which are the same from filtlong
+    2 outputs which are the same from filtlong
 solution
-- only create redirect output (or list it in the final outputs) if the redirect '>' is followed by a token with a reference to a galaxy object.
+    only create redirect output (or list it in the final outputs) if the redirect '>' is followed by a token with a reference to a galaxy object.
 
 issue
-- greedy parsing too greedy (rgFastQC.xml)
-  [-f fastq|bam|sam]: -f '${format}' '${input_file_sl}'
-  the last two positionals are being taken jointly as the value for -f. the last value is a positional
+    greedy parsing too greedy (rgFastQC.xml)
+    [-f fastq|bam|sam]: -f '${format}' '${input_file_sl}'
+    the last two positionals are being taken jointly as the value for -f. the last value is a positional
 solution
-- added end sentinels to ExecutionPaths
-  last position can only be eaten by an option if the option prefix is the 2nd last position. otherwise it now stops short of the last position. 
-  designated the end point as being up to the end sentinel, or in the case of the above, the end sentinel -1 
+    added end sentinels to ExecutionPaths
+    last position can only be eaten by an option if the option prefix is the 2nd last position. otherwise it now stops short of the last position. 
+    designated the end point as being up to the end sentinel, or in the case of the above, the end sentinel -1 
 
 issue
-- dynamic selection options (Kraken2 macros.xml)
-  <options from_data_table="kraken2_databases">
-  seems that this is a data manager which is loaded from the specific galaxy instance. 
+    dynamic selection options (Kraken2 macros.xml)
+    <options from_data_table="kraken2_databases">
+    seems that this is a data manager which is loaded from the specific galaxy instance. 
 solution
-- set selectparam.options = []
-  modified RealisedTokenValues class to not expand selects where they don't have any options. keeps $selectparam var name. works fine.
+    set selectparam.options = []
+    modified RealisedTokenValues class to not expand selects where they don't have any options. keeps $selectparam var name. works fine.
 
 issue
-tool step input values are empty strings
-should be None?
+    tool step input values are empty strings
+    should be None?
     w.step(
         "step6_multiqc",
         multiqc(
@@ -82,34 +100,34 @@ should be None?
         )
     )
 solution
-- this was correct behaviour
+    this was correct behaviour
 
 issue
-- quast tool chosen wrong statement
+    quast tool chosen wrong statement
 solution
-- 0 [int] was being evaluated as False [bool] in conditional statement
-  set the check to 'if val is None' rather than 'if val'
+    0 [int] was being evaluated as False [bool] in conditional statement
+    set the check to 'if val is None' rather than 'if val'
 
 issue 
-- connections are being quoted 
-  simple workflow: notrna="w.step5_create_assemblies_with_unicycler.assembly"
+    connections are being quoted 
+    simple workflow: notrna="w.step5_create_assemblies_with_unicycler.assembly"
 solution
-- InputValueType enum created. 
-  using this, can decide to quote a value or not when writing janis workflow definition
+    InputValueType enum created. 
+    using this, can decide to quote a value or not when writing janis workflow definition
 
 issue
-- Flag listed as an Option
-  test/data/tools/quast/quast.xml
-    ToolInput(
-        'circos',
-        Boolean,
-        prefix='--circos',
-        position=2,
-        default="",
-        doc="Generage Circos plot Plot Circos version of Icarus contig alignment viewer. possible values: --circos",
-    )
+    Flag listed as an Option
+    test/data/tools/quast/quast.xml
+        ToolInput(
+            'circos',
+            Boolean,
+            prefix='--circos',
+            position=2,
+            default="",
+            doc="Generage Circos plot Plot Circos version of Icarus contig alignment viewer. possible values: --circos",
+        )
 solution
-- galaxy conditional statements actually hold a SelectToolParameter to do the choice. 
-  The Conditional object has a 'test_param' 
-  this param can actually be accessed in the <command> section as any normal param as it has a value. 
-  these params were added to the XML ingestor parsing process. 
+    galaxy conditional statements actually hold a SelectToolParameter to do the choice. 
+    The Conditional object has a 'test_param' 
+    this param can actually be accessed in the <command> section as any normal param as it has a value. 
+    these params were added to the XML ingestor parsing process. 

@@ -2,7 +2,7 @@
 
 
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 #import command.components.inputs.utils as utils
@@ -23,7 +23,7 @@ class Positional(BaseCommandComponent):
         pseudo_name = self.value_record.get_most_common_value()
         return pseudo_name.strip('$')
     
-    def get_default_value(self) -> str:
+    def get_default_value(self) -> Any:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
         if self.gxparam:

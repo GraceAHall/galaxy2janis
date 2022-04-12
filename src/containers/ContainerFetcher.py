@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
-from containers.GA4GHInteractor import GA4CHInteractor
+from containers.GA4GHInteractor import GA4GHInteractor
 from containers.VersionMatcher import VersionMatcher
 from utils.general_utils import global_align
 
@@ -23,7 +23,7 @@ class BiocontainerFetcher(ABC):
     individual builds not supported, except in the case of of 'container' requirements as it just directly grabs the url from the requirement text 
     """
     def __init__(self) -> None:
-        self.ga4gh_interactor = GA4CHInteractor()
+        self.ga4gh_interactor = GA4GHInteractor()
         self.version_matcher = VersionMatcher()
 
     @abstractmethod

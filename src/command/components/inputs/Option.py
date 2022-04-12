@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 from xmltool.param.InputParam import SelectParam
 
 from command.components.ValueRecord import OptionValueRecord
@@ -19,7 +19,7 @@ class Option(BaseCommandComponent):
     def get_name(self) -> str:
         return self.prefix.strip('--')
 
-    def get_default_value(self) -> Optional[str]:
+    def get_default_value(self) -> Optional[Any]:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
         if self.gxparam:

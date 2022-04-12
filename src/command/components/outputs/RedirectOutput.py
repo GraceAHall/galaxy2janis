@@ -20,7 +20,6 @@ class RedirectOutput(BaseCommandComponent):
         self.gxparam = self.file_token.gxparam
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(self.file_token.text)
-        assert(self.gxparam)
 
     def get_name(self) -> str:
         # get name from galaxy param if available

@@ -3,8 +3,10 @@
 TODO
 
 issue
-- '.output' still appears on input connections to InputDataStep even though should be WorkflowInput
-    long=w.long_reads.output
+    quast - missing 'r_fasta' parameter in workflow step
+    find a better way to mark things as optional?
+solution
+    if a CommandComponent is not Optional and has default=None, but is not linked to a StepInput, can assume it is therefore Optional. 
 
 
 

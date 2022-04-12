@@ -1,7 +1,17 @@
 
 
 from typing import Any
+
+from command.components.CommandComponent import CommandComponent
 from .FormattingStrategy import format_tag
+
+
+def get_tool_input_name(component: CommandComponent) -> str:
+    default_name = component.get_name()
+    if default_name.isnumeric() and component.gxparam:
+        return component.gxparam.name.rsplit('.', 1)[-1]
+    return default_name
+
 
 
 class TagManager:
@@ -11,7 +21,7 @@ class TagManager:
         self.uuids_basetags: dict[str, str] = {}
         self.basetags_uuids: dict[str, list[str]] = {}
 
-    def exists(self, uuid: str) -> bool:
+    def uuid_exists(self, uuid: str) -> bool:
         if uuid in self.uuids_basetags:
             return True
         return False
@@ -20,7 +30,8 @@ class TagManager:
         if tag_type not in self.permitted_entities:
             raise RuntimeError(f'cannot register a {tag_type}')
 
-        basetag = format_tag(tag_type, entity)
+        starting_text = self._get_starting_text(tag_type, entity)
+        basetag = format_tag(starting_text, tag_type, entity)
         uuid = entity.get_uuid()
 
         self.uuids_basetags[uuid] = basetag
@@ -44,6 +55,43 @@ class TagManager:
                 return f'{basetag}{i+1}' # appends '1', '2' etc if basetag is shared by multiple objects
         raise RuntimeError(f'no tag registered for {query_uuid}')
 
+    def _get_starting_text(self, entity_type: str, entity: Any) -> str:
+        match entity_type:
+            case 'workflow':
+                return entity.metadata.name # type: ignore
+            case 'workflow_input':
+                if entity.is_galaxy_input_step: # type: ignore
+                    return f'in_{entity.name}' # type: ignore
+                else:
+                    return f'{entity.step_tag}_{entity.name}' # type: ignore
+            case 'workflow_step':
+                return entity.metadata.tool_name # type: ignore
+            case 'workflow_output':
+                return f'{entity.step_tag}_{entity.toolout_tag}' # type: ignore
+            case 'tool':
+                return entity.metadata.id # type: ignore
+            case 'tool_input':
+                return get_tool_input_name(entity)
+            case 'tool_output':
+                basetag = entity.get_name()
+                if basetag.startswith('out_') and basetag not in self.basetags_uuids:
+                    return basetag
+                else:
+                    return f'out_{basetag}'
+            case _:
+                raise RuntimeError()
+
+    def _generate_all_tags(self) -> set[str]:
+        tags: set[str] = set()
+        for basetag, uuid_list in self.basetags_uuids.items():
+            if len(uuid_list) == 1:
+                tags.add(basetag)
+            else:
+                for i in range(len(uuid_list)):
+                    tags.add(f'{basetag}{i+1}')
+        return tags
+
+
 
 class ToolTagManager(TagManager):
     permitted_entities: set[str] = set(
@@ -57,7 +105,12 @@ class WorkflowTagManager(TagManager):
 
 
 
-
+    
+    # def tag_exists(self, tag: str) -> bool:
+    #     all_tags = self._generate_all_tags()
+    #     if tag in all_tags:
+    #         return True
+    #     return False
 
     # def register_old(self, tag_type: str, uuid: str, entity_info: dict[str, str]) -> None:
     #     if tag_type not in self.permitted_entities:
