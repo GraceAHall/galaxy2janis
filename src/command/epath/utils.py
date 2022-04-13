@@ -35,9 +35,10 @@ def is_flag(ctoken: Token, ntoken: Token) -> bool:
     return False
 
 def looks_like_a_flag(token: Token) -> bool:
+    allowed_prefix_types = [TokenType.RAW_STRING, TokenType.RAW_NUM]
     if token.type == TokenType.FORCED_PREFIX:
         return True
-    if token.type == TokenType.RAW_STRING and token.text.startswith('-'):
+    if token.type in allowed_prefix_types and token.text.startswith('-'):
         return True
     return False
 

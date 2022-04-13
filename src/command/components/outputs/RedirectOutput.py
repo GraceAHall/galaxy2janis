@@ -84,9 +84,9 @@ class RedirectOutput(BaseCommandComponent):
             case _:
                 return Stream.STDOUT
 
-    def get_selector_str(self) -> str:
-        if self.extract_stream() == Stream.STDOUT:
-            return 'Stdout()'
-        else:
-            return 'Stderr()'
+    # def get_selector_str(self) -> str:
+    #     if self.extract_stream() == Stream.STDOUT:
+    #         return 'Stdout()'
+    #     else:
+    #         return 'Stderr()'
 

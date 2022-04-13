@@ -38,32 +38,7 @@
                 "--xml", "abricate.xml",
             ]
         },
-        {
-            "name": "fastqc",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/fastqc", 
-                "--xml", "rgFastQC.xml",
-            ]
-        },
-        {
-            "name": "multiqc",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/multiqc", 
-                "--xml", "multiqc.xml",
-            ]
-        },
+        
         {
             "name": "unicycler",
             "type": "python",
@@ -155,6 +130,32 @@
                 "--xml", "kraken2.xml",
             ]
         },
+        // MEDIUM WORKFLOW TOOLS
+        {
+            "name": "medium_workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/medium_workflow.ga"
+            ]
+        },
+        {
+            "name": "fastqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/fastqc", 
+                "--xml", "rgFastQC.xml",
+            ]
+        },
         {
             "name": "cutadapt",
             "type": "python",
@@ -168,6 +169,124 @@
                 "--xml", "cutadapt.xml",
             ]
         },
+        {
+            "name": "hisat2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/hisat2", 
+                "--xml", "hisat2.xml",
+            ]
+        },
+        {
+            "name": "featurecounts",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/featurecounts", 
+                "--xml", "featurecounts.xml",
+            ]
+        },
+        {
+            "name": "picard_MarkDuplicates",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/picard", 
+                "--xml", "picard_MarkDuplicates.xml",
+            ]
+        },
+        {
+            "name": "samtools_idxstats",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/samtools_idxstats", 
+                "--xml", "samtools_idxstats.xml",
+            ]
+        },
+        {
+            "name": "geneBody_coverage",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/rseqc", 
+                "--xml", "geneBody_coverage.xml",
+            ]
+        },
+        {
+            "name": "infer_experiment",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/rseqc", 
+                "--xml", "infer_experiment.xml",
+            ]
+        },
+        {
+            "name": "read_distribution",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/rseqc", 
+                "--xml", "read_distribution.xml",
+            ]
+        },
+        {
+            "name": "collection_column_join",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/collection_column_join", 
+                "--xml", "collection_column_join.xml",
+            ]
+        },
+        {
+            "name": "multiqc",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/multiqc", 
+                "--xml", "multiqc.xml",
+            ]
+        },
+        
         {
             "name": "simple workflow",
             "type": "python",
@@ -204,6 +323,7 @@
                 "test/data/workflows/characterisation_workflow.ga"
             ]
         },
+        
         
     ]
 }

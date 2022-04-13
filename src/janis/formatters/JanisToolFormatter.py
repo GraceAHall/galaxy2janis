@@ -1,6 +1,9 @@
 
 
+from typing import Optional
+from command.components.outputs.InputOutput import InputOutput
 from command.components.outputs.RedirectOutput import RedirectOutput
+from command.components.outputs.WildcardOutput import WildcardOutput
 from tool.Tool import Tool
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.components.CommandComponent import CommandComponent
@@ -79,8 +82,14 @@ class JanisToolFormatter:
             tag=tag,
             datatype=positional.get_janis_datatype_str(),
             position=positional.cmd_pos,
-            doc=positional.get_docstring()
+            doc=self.format_docstring(positional)
         )
+
+    def format_docstring(self, component: CommandComponent) -> Optional[str]:
+        raw_doc = component.get_docstring()
+        if raw_doc:
+            return raw_doc.replace('"', "'")
+        return None
 
     def format_flag_input(self, tag: str, flag: Flag) -> str:
         return snippets.tool_input_snippet(
@@ -89,7 +98,7 @@ class JanisToolFormatter:
             position=flag.cmd_pos,
             prefix=flag.prefix,
             default=flag.get_default_value(),
-            doc=flag.get_docstring()
+            doc=self.format_docstring(flag)
         )
     
     def format_option_input(self, tag: str, opt: Option) -> str:
@@ -101,7 +110,7 @@ class JanisToolFormatter:
             prefix=opt.prefix if opt.delim == ' ' else opt.prefix + opt.delim,
             kv_space=True if opt.delim == ' ' else False,
             default=default_value,
-            doc=opt.get_docstring()
+            doc=self.format_docstring(opt)
         )
 
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
@@ -131,12 +140,26 @@ class JanisToolFormatter:
         return out_str
 
     def format_output(self, tag: str, output: CommandComponent) -> str:
+        selector_str = self.format_selector_str(output)
         return snippets.tool_output_snippet(
             tag=tag,
             datatype=output.get_janis_datatype_str(),
-            selector=output.get_selector_str() if not isinstance(output, RedirectOutput) else None, # type: ignore
-            doc=output.get_docstring()
+            selector=selector_str,
+            doc=self.format_docstring(output)
         )
+    
+    def format_selector_str(self, output: CommandComponent) -> Optional[str]:
+        match output: 
+            case RedirectOutput():
+                return None
+            case InputOutput():
+                input_comp_uuid = output.input_component.get_uuid()
+                input_comp_tag = self.tool.tag_manager.get(input_comp_uuid)
+                return f'InputSelector("{input_comp_tag}")'
+            case WildcardOutput():
+                return f'WildcardSelector("{output.gxparam.wildcard_pattern}")'
+            case _:
+                pass
 
     def format_commandtool(self) -> str:
         container = self.tool.container

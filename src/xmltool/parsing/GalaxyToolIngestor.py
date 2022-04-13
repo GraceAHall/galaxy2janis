@@ -15,7 +15,7 @@ from xmltool.parsing.OutputParamFactory import OutputParamFactory
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.OutputParamRegister import OutputParamRegister
 
-from xmltool.parsing.tests.TestFactory import TestFactory
+#from xmltool.parsing.tests.TestFactory import TestFactory
 from xmltool.TestRegister import TestRegister
 from biblib.biblib import bib
 

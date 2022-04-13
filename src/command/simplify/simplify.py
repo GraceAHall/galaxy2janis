@@ -10,6 +10,7 @@ from command.simplify.filters import (
     simplify_galaxy_static_vars,
     simplify_galaxy_dynamic_vars,
     remove_cheetah_comments,
+    replace_backticks,
     interpret_raw
 )
 
@@ -23,6 +24,7 @@ class CommandSimplifier:
     def map_filters(self, cmdstr: str) -> str:
         for filter_func in self.filters:
             cmdstr = filter_func(cmdstr)
+        print(cmdstr)
         return cmdstr
 
 
@@ -32,6 +34,7 @@ class TestCommandSimplifier(CommandSimplifier):
         standardise_variable_format,
         simplify_galaxy_dynamic_vars,
         simplify_sh_constructs,
+        replace_backticks,
         interpret_raw
     ]
 
@@ -44,6 +47,7 @@ class XMLCommandSimplifier(CommandSimplifier):
         simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
         remove_cheetah_comments,
+        replace_backticks,
         interpret_raw
     ]
 

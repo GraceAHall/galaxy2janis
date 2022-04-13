@@ -1,5 +1,5 @@
 
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 from janis.imports.WorkflowImportHandler import WorkflowImportHandler
 import janis.snippets.workflow_snippets as snippets
 from workflows.io.WorkflowInput import WorkflowInput
@@ -31,7 +31,6 @@ class JanisWorkflowFormatter:
         str_outputs = self.format_outputs()
         str_imports = self.format_imports()
         return str_note + str_path + str_imports + str_metadata + str_builder + str_inputs + str_steps + str_outputs
-
 
     def format_top_note(self) -> str:
         metadata = self.workflow.metadata
@@ -77,8 +76,14 @@ class JanisWorkflowFormatter:
             tag=tag,
             datatype=inp.get_janis_datatype_str(),
             # TODO check whether defaults and values can appear here
-            doc=inp.get_docstring()
+            doc=self.format_docstring(inp)
         )
+
+    def format_docstring(self, entity: WorkflowStep | WorkflowInput | WorkflowOutput) -> Optional[str]:
+        raw_doc = entity.get_docstring()
+        if raw_doc:
+            return raw_doc.replace('"', "'")
+        return None
 
     def format_steps(self, ) -> str:
         out_str = '# STEPS'
@@ -107,7 +112,7 @@ class JanisWorkflowFormatter:
             out_str += snippets.workflow_input_snippet(
                 tag=tag,
                 datatype=inp.get_janis_datatype_str(),
-                doc=inp.get_docstring()
+                doc=self.format_docstring(inp)
             )
         return out_str
 
@@ -124,7 +129,7 @@ class JanisWorkflowFormatter:
             tool=tool_tag,
             linked_values=linked_values,
             unlinked_values=unlinked_values, 
-            doc=step.get_docstring()
+            doc=self.format_docstring(step)
         )
     
     def format_linked_tool_values(self, tags_inputs: list[Tuple[str, InputValue]]) -> list[Tuple[str, str]]:

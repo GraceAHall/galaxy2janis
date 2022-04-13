@@ -3,31 +3,7 @@
 TODO
 
 issue
-    quast - missing 'r_fasta' parameter in workflow step
-    find a better way to mark things as optional?
-solution
-    if a CommandComponent is not Optional and has default=None, but is not linked to a StepInput, can assume it is therefore Optional. 
-
-
-
-ONGOING
-issue
-- duplicated tags being registered for individual tool
-    quast:
-    references_list1=w.quast_references_list1
-    k_mer_stats1=""
-    circos1/circos2
-solution
-- pulling command components from both param arguments and formatted cmdstrs resulted in occasional duplications
-- due to bad practise galaxy XML: eg a select param representing a bool flag in the tool
-- ongoing: 
-    - quast references-list
-    - fq11, fq12 - why are these registered more than once?
-
-
-
-
-
-
-
+    duplicate toolinput [bug]: references_list1 / references_list2 (quast)
+    duplicate toolinput [bug]: max_ref_num1 / max_ref_num2 (quast)
+    duplicate toolinput [bug]: discard_untrimmed1 / discard_untrimmed2 (cutadapt)
 

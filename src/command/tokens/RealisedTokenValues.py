@@ -10,10 +10,9 @@ from xmltool.param.Param import Param
 
 from command.cmdstr.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
-from command.tokens.Tokens import Token, TokenType
+from command.tokens.Tokens import Token
 from command.tokens.TokenFactory import TokenFactory
 from command.epath.utils import is_bool_select
-import command.tokens.utils as utils
 
 class RealisedTokenValues:
     """
@@ -73,9 +72,6 @@ class RealisedTokenValueifier:
         self.factory = TokenFactory(xmltool)
         self.tokens: list[RealisedTokenValues] = []
 
-    def tokenify_word(self, text: str) -> Token:
-        return self.factory.create(text)
-
     def tokenify(self, the_string: str) -> list[RealisedTokenValues]:
         self.refresh_attrs()
         for line in split_lines(the_string):
@@ -102,28 +98,32 @@ class RealisedTokenValueifier:
     
     def tokenify_line(self, line: str) -> list[Token]:
         words = split_to_words(line)
-        tokens = [self.factory.create(text) for text in words]
-        tokens = self.expand_kvpairs(tokens)
+        tokens: list[Token] = []
+        for word in words:
+            tokens += self.tokenify_word(word)
         return tokens
 
-    def expand_kvpairs(self, tokens: list[Token]) -> list[Token]:
-        out: list[Token] = []
-        for token in tokens:
-            if token.type == TokenType.KV_PAIR:
-                out += self.split_kv_token(token)
-            else:
-                out.append(token)
-        return out
+    def tokenify_word(self, text: str) -> list[Token]:
+        return self.factory.create(text)
 
-    def split_kv_token(self, token: Token) -> list[Token]:
-        left_text = str(token.match.group(1))
-        delim = str(token.match.group(2))
-        right_text = str(token.match.group(3))
-        return [
-            self.factory.create(left_text),
-            utils.spawn_kv_linker(delim),
-            self.factory.create(right_text)
-        ]
+        # def expand_kvpairs(self, tokens: list[Token]) -> list[Token]:
+    #     out: list[Token] = []
+    #     for token in tokens:
+    #         if token.type == TokenType.KV_PAIR:
+    #             out += self.split_kv_token(token)
+    #         else:
+    #             out.append(token)
+    #     return out
+
+    # def split_kv_token(self, token: Token) -> list[Token]:
+    #     left_text = str(token.match.group(1))
+    #     delim = str(token.match.group(2))
+    #     right_text = str(token.match.group(3))
+    #     return [
+    #         self.factory.create(left_text),
+    #         utils.spawn_kv_linker(delim),
+    #         self.factory.create(right_text)
+    #     ]
 
     def get_realised_values(self, tokens: list[Token]) -> list[RealisedTokenValues]:
         out: list[RealisedTokenValues] = []

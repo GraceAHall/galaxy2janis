@@ -44,6 +44,8 @@ class GreedyEPathAnnotator:
         self.xmltool = xmltool
         self.command = command
         self.pos = 0
+        print(epath)
+        print()
 
     def annotate_epath(self) -> ExecutionPath:
         self.annotate_via_param_args()
@@ -79,6 +81,9 @@ class GreedyEPathAnnotator:
         ctoken = self.epath.positions[self.pos].token
         ntoken = self.epath.positions[self.pos + 1].token
 
+        # if ctoken.text == '-1':
+        #     print()
+
         ctype: str = ''
         delim: str = ' ' # this is really bad because it defines the default delim! should be on the option class not here.
         vtokens: list[Token] = []
@@ -113,6 +118,22 @@ class GreedyEPathAnnotator:
         return ' '
 
     def get_option_values(self) -> list[Token]:
+        if self.is_kv_pair():
+            return self.get_single_value()
+        else:
+            return self.get_multiple_values()
+
+    def is_kv_pair(self) -> bool:
+        if self.epath.positions[self.pos].token.type == TokenType.KV_LINKER:
+            return True
+        return False
+     
+    def get_single_value(self) -> list[Token]:
+        self.pos += 1
+        ntoken = self.epath.positions[self.pos].token
+        return [ntoken]
+
+    def get_multiple_values(self) -> list[Token]:
         out: list[Token] = []
 
         # define a max possible end point to consume upto (handles edge cases)

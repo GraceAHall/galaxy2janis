@@ -13,7 +13,7 @@ from command.regex.expressions import (
 
 def is_variable_substr(match: re.Match[str]) -> bool:
     """check to see if within a variable. ie file_input is within $file_input"""
-    var_matches = scanners.get_variables(match.string)
+    var_matches = scanners.get_variables_fmt1(match.string)
     for vm in var_matches:
         if is_contained_match(match, vm):
             return True
@@ -43,11 +43,27 @@ def split_variable_assignment(line: str) -> Tuple[str, str]:
 def get_base_variable(match: re.Match[str]) -> Optional[str]:
     """trims function calls, attributes from variable matches"""
     text: str = match[0]
+    text = strip_quotes(text)
+    text = strip_braces(text)
     text = strip_method_calls(text, match)
     text = strip_common_attributes(text)
     if text != '':
         return text
     return None
+
+def strip_quotes(text: str) -> str:
+    text = text.replace('"', '')
+    text = text.replace("'", '')
+    return text
+
+def strip_braces(text: str) -> str:
+    if text[1] == '{':
+        text = text[0] + text[2:]
+    if text[-1] == '}':
+        text = text[:-1]
+    # text = text.replace('{', '')
+    # text = text.replace('}', '')
+    return text
 
 def strip_method_calls(text: str, match: re.Match[str]) -> str:
     """

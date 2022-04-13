@@ -85,36 +85,3 @@ def split_to_statements(the_string: str) -> list[DynamicCommandStatement]:
     return [DynamicCommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
 
 
-
-
-# def split_to_statements_old(the_string: str) -> list[DynamicCommandStatement]:
-#     """
-#     splits a string into individual command line statements.
-#     these are delimited by &&, ||, | etc
-#     """
-#     statements: list[str] = []
-#     delims: list[Optional[str]] = []
-
-#     matches = get_statement_delims(the_string)
-#     matches.sort(key=lambda x: x.start())
-
-#     for m in reversed(matches):
-#         delim: Optional[str] = m[0] # type: ignore
-#         left_split = the_string[:m.start()]
-#         right_split = the_string[m.end():]
-
-#         # working in reverse, so prepend new statements and delims
-#         statements = [right_split] + statements
-#         delims = [delim] + delims
-
-#         # update the string to only be to the left of the split
-#         the_string = left_split
-
-#     # add final remaining statment (actually is the first statement)
-#     # add a None to the end of delims to shift the alignment of stmts and delims
-#     # last statement doesnt have trailing delim as command ends
-#     statements = [the_string] + statements
-#     delims.append(None)
-
-#     return [DynamicCommandStatement(stmt, end_delim=delim) for stmt, delim in zip(statements, delims)]
-

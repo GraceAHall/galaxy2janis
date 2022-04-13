@@ -4,6 +4,51 @@
 
 SOLVED
 
+
+issue
+    tricky text:
+        > '"Module \'${repeat.software_cond.software}: \'$pattern\' not found in the file \'$identifier\'"'
+        > READ_NAME_REGEX='${ str( $read_name_regex ) }'
+        > _JAVA_OPTIONS=\${_JAVA_OPTIONS:-'-Xmx2048m -Xms256m'} && (picard_MarkDuplicates)
+        > cannot find 'metrics_file' (tool test evaulation)(picard_MarkDuplicates)
+solution
+    large reworking of line splitting (now shlex), KEYVAL_PAIRS and regex patterns surrounding these issues
+
+issue
+    picard_MarkDuplicates bash script being interpreted as positionals
+solution
+    replaced `backtick sections` with __BACKTICK_SHELL_STATEMENT__
+    temp fix. 
+
+issue
+    READ_NAME_REGEX='${ str( $read_name_regex ) }'
+solution
+    removed spaced from within variables (${hello there} -> ${hellothere}) 
+    this is probably bad. 
+    only an issue really because its part of a KEY=VALUE pair, which takes priority. 
+
+issue
+    samtools_idxstats was selecting wrong statement as tool statement
+solution
+    created MainStatementInferrer to properly handle selecting correct tool statement
+
+issue
+    hisat2 - ERROR:galaxy.util.dbkeys:ERROR: Unable to read builds file: [Errno 2] No such file or directory: 'tool-data/shared/ucsc/builds.txt.sample'
+solution
+    added the tool-data folder from galaxy source to workdir
+
+issue
+    hisat2 tool input '11', '12', '21', '22'
+solution
+    hisat2 option '-1 ${reads1}' is interpreted as [RAW_NUM, ENV_VAR]
+    RAW_NUM was not permitted to be considered a prefix - changed to allow this now. 
+
+issue
+    quast - missing 'r_fasta' parameter in workflow step
+    find a better way to mark things as optional?
+solution
+    if a CommandComponent is not Optional and has default=None, but is not linked to a StepInput, can assume it is therefore Optional. 
+
 issue
     prokka workflow output 'out_out...'
     w.output(

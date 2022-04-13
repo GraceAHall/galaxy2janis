@@ -1,3 +1,6 @@
+
+
+
 tools
 *.pyc
 __pycache__
@@ -7,13 +10,17 @@ parsed/*/*.py
 parsed/*/*.log
 galaxy_types/
 venv/
-src/galaxy/
 test/data/
 test/rubbish/
-
+tool-data
+*.tmp
 richard_questions.txt
 TODO.txt
 galaxy_requirements.txt
 requirements.txt
 edge_cases.txt
 simple_workflow/
+medium_workflow/
+
+
+

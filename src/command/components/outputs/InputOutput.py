@@ -41,6 +41,3 @@ class InputOutput(BaseCommandComponent):
     def update(self, incoming: InputOutput) -> None:
         raise NotImplementedError()
 
-    def get_selector_str(self) -> str:
-        return f'InputSelector("{self.input_component.get_tag()}")'
-

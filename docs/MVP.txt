@@ -1,8 +1,36 @@
 
 
-noteworthy bugs
 
-conditional params (simple_workflow.ga step)
+TOOL PARSING
+
+Minor
+- 'File' type or 'String' type should be default? what about ENV_VARS?
+- tag formatting [not bug]: u_int1 (-u) / u_int2 (-U) (cutadapt)
+- tag formatting [not bug]: out_out11, out_out12, out_out21, out_out22
+- paths with quotes (fastqc)
+    cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
+
+
+Major
+- should create a file containing tricky text, and ensure that the text
+  is being assigned correct tokens
+- featurecounts tool cannot load itself into galaxy representation
+    <options from_data_table="featurecounts_anno">
+        <filter type="data_meta" key="dbkey" ref="alignment" column="dbkey"/>
+    </options>
+    I believe this is a parsing issue, rather than needing to get galaxy server db info. 
+    Not sure how to fix.
+    see the following files in the featurecounts XML dir: 
+        - tool_data_table_conf.xml.sample
+        - tool_data_table_conf.xml.test
+        - tool-data/featurecounts_anno.loc.sample
+        - tool-data/gene_sets.loc.sample
+
+
+
+WORKLFOW PARSING
+
+- conditional params (simple_workflow.ga step)
     unicycler(
         l_file=w.unicycler_l_file,
         fastq_input1=w.in_forward_reads,
@@ -16,10 +44,4 @@ conditional params (simple_workflow.ga step)
     fastq_input1 / s_fastqsanger are governed by galaxy XML conditional case. 
     w.in_forward_reads can be wired to either depending on that case. 
     currently not evaluating the state of the case.
-
-
-paths with quotes (fastqc)
-    cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
-
-
 

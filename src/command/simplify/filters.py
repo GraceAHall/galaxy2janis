@@ -2,9 +2,18 @@
 
 
 import re
+import shlex
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 
+
+def replace_backticks(cmdstr: str) -> str:
+    matches = scanners.get_backtick_sections(cmdstr)
+    for match in matches:
+        old_section = match[0]
+        new_section = '__BACKTICK_SHELL_STATEMENT__'
+        cmdstr = cmdstr.replace(old_section, new_section)
+    return cmdstr
 
 def interpret_raw(cmdstr: str) -> str:
     return cmdstr.replace('\\', '')
@@ -25,10 +34,7 @@ def translate_variable_markers(cmdstr: str) -> str:
 def standardise_variable_format(cmdstr: str) -> str:
     """standardises different forms of a galaxy variable ${var}, $var etc"""
     cmdlines: list[str] = split_lines(cmdstr)
-    outlines: list[str] = []
-    for line in cmdlines:
-        line = [standardise_var(word) for word in line.split(' ')]
-        outlines.append(' '.join(line))
+    outlines: list[str] = [remove_var_braces(line) for line in cmdlines]
     return join_lines(outlines)
 
 def split_lines(cmdstr: str) -> list[str]:
@@ -40,21 +46,24 @@ def split_lines(cmdstr: str) -> list[str]:
 def join_lines(cmdlines: list[str]) -> str:
     return '\n'.join(cmdlines)
 
-def standardise_var(text: str) -> str:
+def remove_var_braces(text: str) -> str:
     """
     modifies cmd word to ensure the $var format is present, rather than ${var}
     takes a safe approach using regex and resolving all vars one by one
     """
-    if text == '':
-        return text
-    matches = re.finditer(r'\$\{[\w.]+\}', text)
-    matches = [[m[0], m.start(), m.end()] for m in matches]
-    if len(matches) > 0:
-        m = matches[0]
-        # this is cursed but trust me it removes the curly braces for the match span
-        text = text[:m[1] + 1] + text[m[1] + 2: m[2] - 1] + text[m[2]:]
-        text = standardise_var(text)
-    return text  
+    return text
+    # if text == '':
+    #     return text
+    # matches = scanners.get_variables_fmt2(text)
+    # if len(matches) > 0:
+    #     m = matches[0]
+    #     # this is cursed but trust me it removes the curly braces for the match span
+    #     old_segment = text[m.start(): m.end()]
+    #     new_segment = old_segment[0] + old_segment[2: -1]
+    #     new_segment = new_segment.replace(' ', '')
+    #     text = text.replace(old_segment, new_segment)
+    #     text = remove_var_braces(text)
+    # return text  
 
 def simplify_sh_constructs(cmdstr: str) -> str:
     """

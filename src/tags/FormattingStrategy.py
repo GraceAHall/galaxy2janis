@@ -16,22 +16,22 @@ class FormattingStrategy(ABC):
     def format(self, starting_text: str, entity: Any) -> str:
         ...
 
-    def format_basic(self, tag: str) -> str:
+    def format_basic(self, tag: str, entity: Any) -> str:
         for formatter in basic_formatters:
-            tag = formatter(tag)
+            tag = formatter(tag, entity)
         return tag
 
 
 class GenericFormattingStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
+        tag = self.format_basic(starting_text, entity)
         tag = formatters.encode(tag)
         return tag
 
 class ToolInputStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
         tag = formatters.handle_short_tag(starting_text, entity)
-        tag = self.format_basic(tag)
+        tag = self.format_basic(tag, entity)
         tag = formatters.encode(tag)
         return tag
 

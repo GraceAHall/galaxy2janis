@@ -43,9 +43,4 @@ class WildcardOutput(BaseCommandComponent):
     def update(self, incoming: WildcardOutput):
         pass
 
-    def get_selector_str(self) -> str:
-        if self.gxparam and self.gxparam.wildcard_pattern:  # type: ignore
-            return f'WildcardSelector("{self.gxparam.wildcard_pattern}")'  # type: ignore
-        else:
-            raise RuntimeError()
 

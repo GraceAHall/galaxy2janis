@@ -1,29 +1,18 @@
 
 import shlex
-from command.components.CommandComponent import CommandComponent
-
-
-mystr = "hello, 'this is\n a crime' and I don't like it"
-
-sh = shlex.shlex(mystr)
-sh.whitespace = ' \t\n\r'
-sh.whitespace_split = True
-sp_text = list(sh)
-print(sp_text)
 
 
 
+test1 = 'READ_NAME_REGEX=\'${str ( $read_name_regex ) }\''
+test2 = '"Module \'${repeat.software_cond.software}: \'$pattern\' not found in the file \'$identifier\'"'
+test3 = 'READ_NAME_REGEX = \'${str ( $read_name_regex ) }\''
+test4 = 'READ_NAME_REGEX = ${str ( $read_name_regex ) }'
 
-
-from command.components.inputs import Positional, Flag, Option
-
-def myfunc(component: CommandComponent) -> None:
-    pass
-
-myposit = Positional('', 0)
-myflag = Flag('')
-myopt = Option('', [], 0)
-
-myfunc(myposit)
-myfunc(myflag)
-myfunc(myopt)
+print(shlex.split(test1))
+print()
+print(shlex.split(test2))
+print()
+print(shlex.split(test3))
+print()
+print(shlex.split(test4))
+print()
