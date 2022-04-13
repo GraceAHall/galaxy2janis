@@ -286,19 +286,6 @@
                 "--xml", "multiqc.xml",
             ]
         },
-        
-        {
-            "name": "simple workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/simple_workflow.ga"
-            ]
-        },
         {
             "name": "super simple workflow",
             "type": "python",
@@ -312,6 +299,30 @@
             ]
         },
         {
+            "name": "simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/simple_workflow.ga"
+            ]
+        },
+        {
+            "name": "hard workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/hard_workflow.ga"
+            ]
+        },
+        {
             "name": "characterisation workflow",
             "type": "python",
             "request": "launch",
@@ -321,6 +332,32 @@
             "args": [
                 "workflow",
                 "test/data/workflows/characterisation_workflow.ga"
+            ]
+        },
+        {
+            "name": "nanoplot",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/nanoplot", 
+                "--xml", "nanoplot.xml",
+            ]
+        },
+        {
+            "name": "kraken2tax",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/kraken2tax", 
+                "--xml", "kraken2tax.xml",
             ]
         },
         

@@ -6,7 +6,7 @@ from typing import Any, Optional
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 #import command.components.inputs.utils as utils
-
+import command.regex.scanners as scanners
 
 class Positional(BaseCommandComponent):
     def __init__(self, value: str) -> None:
@@ -68,6 +68,13 @@ class Positional(BaseCommandComponent):
         if len(counts) == 1:
             return True
         return False
+    
+    def values_are_variables(self) -> bool:
+        str_values = self.value_record.get_unique_values()
+        for val in str_values:
+            if not scanners.get_variables_fmt1(val) and not scanners.get_variables_fmt2(val):
+                return False
+        return True
 
     def __str__(self) -> str:
         return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'

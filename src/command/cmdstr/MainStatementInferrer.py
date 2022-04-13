@@ -39,10 +39,13 @@ class MainStatementInferrer:
             record.gxrefs = record.statement.get_galaxy_reference_count()
         
     def set_mainreq_similarities(self) -> None:
+        banned_command_starters = ['cp', 'ln', 'mv']
         max_possible_score = global_align(self.main_requirement, self.main_requirement)
         for record in self.metric_records:
             if len(record.statement.realised_tokens) == 0:
                 record.reqsim = 0
+            elif record.statement.get_first_word() in banned_command_starters:
+                record.reqsim = -99999.9 # HACK
             else:
                 raw_similarity = global_align(record.statement.get_first_word(), self.main_requirement)
                 record.reqsim = raw_similarity / max_possible_score

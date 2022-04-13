@@ -1,47 +1,18 @@
 
 
 
-TOOL PARSING
+Before MVP
+Definite
+- basic array handling (single item)
+- top 20 most common galaxy tools parsed correctly
+- three workflows parsed, can be translated by janis to wdl/cwl
+- logging: mark areas for user to complete / provide messages
 
-Minor
-- 'File' type or 'String' type should be default? what about ENV_VARS?
-- tag formatting [not bug]: u_int1 (-u) / u_int2 (-U) (cutadapt)
-- tag formatting [not bug]: out_out11, out_out12, out_out21, out_out22
-- paths with quotes (fastqc)
-    cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
-
-
-Major
-- should create a file containing tricky text, and ensure that the text
-  is being assigned correct tokens
-- featurecounts tool cannot load itself into galaxy representation
-    <options from_data_table="featurecounts_anno">
-        <filter type="data_meta" key="dbkey" ref="alignment" column="dbkey"/>
-    </options>
-    I believe this is a parsing issue, rather than needing to get galaxy server db info. 
-    Not sure how to fix.
-    see the following files in the featurecounts XML dir: 
-        - tool_data_table_conf.xml.sample
-        - tool_data_table_conf.xml.test
-        - tool-data/featurecounts_anno.loc.sample
-        - tool-data/gene_sets.loc.sample
+Maybe
+- janis tool test parsing and evaluation functions (from xml to janis definition)
+- arrays properly
 
 
 
-WORKLFOW PARSING
 
-- conditional params (simple_workflow.ga step)
-    unicycler(
-        l_file=w.unicycler_l_file,
-        fastq_input1=w.in_forward_reads,
-        fastq_input2=w.in_reverse_reads,
-        s_fastqsanger=w.in_forward_reads,  
-        pilon_path=w.unicycler_pilon_path,
-        long=w.in_long_reads,
-        start_genes=w.unicycler_start_genes,
-        contamination=w.unicycler_contamination,
-    )
-    fastq_input1 / s_fastqsanger are governed by galaxy XML conditional case. 
-    w.in_forward_reads can be wired to either depending on that case. 
-    currently not evaluating the state of the case.
 

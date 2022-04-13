@@ -35,6 +35,8 @@ class InputParamFactory:
                 param = self.init_data_param(gxparam)
             case 'data_collection':
                 param = self.init_data_collection_param(gxparam)
+            case 'data_column':
+                param = self.init_int_param(gxparam)
             case _:
                 raise ParamNotSupportedError(f'unknown param type: {str(gxparam.type)}')
         
@@ -55,9 +57,12 @@ class InputParamFactory:
 
     def init_int_param(self, gxparam: GalaxyParam) -> IntegerParam:
         param = IntegerParam(str(gxparam.flat_name))
-        param.value = gxparam.value
-        param.min = gxparam.min
-        param.max = gxparam.max
+        if hasattr(gxparam, 'value'):
+            param.value = gxparam.value
+        if hasattr(gxparam, 'min'):
+            param.min = gxparam.min
+        if hasattr(gxparam, 'max'):
+            param.max = gxparam.max
         return param
 
     def init_float_param(self, gxparam: GalaxyParam) -> FloatParam:

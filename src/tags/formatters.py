@@ -16,7 +16,7 @@ def replace_non_alphanumeric(tag: str, entity: Any) -> str:
     to satisfy janis tag requirements
     to avoid janis reserved keywords
     """
-    tag = tag.strip('\\/-$')
+    tag = tag.strip('\\/-${}')
     tag = tag.replace('-', '_')
     tag = tag.replace('(', '')
     tag = tag.replace(')', '')

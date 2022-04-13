@@ -1,0 +1,102 @@
+
+
+TOOL PARSING
+
+Minor (mostly formatting and cleanliness)
+- samtools_idxstats ew
+    ToolInput(
+		'input_@_file',
+		File,
+		prefix='-@',
+		position=1,
+		default="$addthreads",
+		doc="None",
+	),
+- 'File' type or 'String' type should be default? what about ENV_VARS?
+- tag formatting [not bug]: u_int1 (-u) / u_int2 (-U) (cutadapt)
+- tag formatting [not bug]: out_out11, out_out12, out_out21, out_out22
+- paths with quotes (fastqc)
+    cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
+
+Intermediate (has an impact on number of inputs/outputs, may break tool in some way)
+- challenging <command> text at start of main tool statement (nanoplot)
+    $reads_temp.append("read_" + str($i) + "." + str($extension))
+    potential solution 1 - if evaluated tests, these will start with correct word 
+    potential solution 2 - ignore any words before first RAW_STRING?
+- 'argument' attribute written incorrectly - causes 2 inputs
+    see quast references_list1, references_list2
+    maybe could check if the prefix is in the command? 
+    could also ensure argument starts with '--', then check again? 
+- multiple prefixes for option (hisat2)
+    ToolInput(
+		'trim51',
+		Int(optional=True),
+		prefix='-5',
+		position=2,
+		default=0,
+		doc="Trim 5' end. Trim N bases from 5' (left) end of each read before alignment, default: 0",
+	),
+    ToolInput(
+		'trim52',
+		Int(optional=True),
+		prefix='--trim5',
+		position=2,
+		default=0,
+		doc="Trim 5' end. Trim N bases from 5' (left) end of each read before alignment, default: 0",
+	)
+- WildcardSelector for outputs, but XML also references $output in <command> (cutadapt)
+    ToolOutput(
+		'out_out11',
+		Array(FastqSanger),
+		selector=InputSelector("output_fastqsanger"),
+		doc="Read 1 Output",
+	),
+    ToolOutput(
+		'out_out12',
+		Array(FastqSanger),
+		selector=WildcardSelector("out1*"),
+		doc="Read 1 Output",
+	)
+
+
+Major (program execution fails, tool definitely non-functional)
+- Kraken2Tax
+
+- should create a file containing tricky text, and ensure that the text
+  is being assigned correct tokens
+- featurecounts.xml tool cannot load itself into galaxy representation
+    <options from_data_table="featurecounts_anno">
+        <filter type="data_meta" key="dbkey" ref="alignment" column="dbkey"/>
+    </options>
+    I believe this is a parsing issue, rather than needing to get galaxy server db info. 
+    Not sure how to fix.
+    see the following files in the featurecounts XML dir: 
+        - tool_data_table_conf.xml.sample
+        - tool_data_table_conf.xml.test
+        - tool-data/featurecounts_anno.loc.sample
+        - tool-data/gene_sets.loc.sample
+
+
+
+WORKLFOW PARSING
+
+Minor (mostly formatting and cleanliness)
+
+intermediate (has an impact on number of inputs/outputs, may break workflow in some way)
+- conditional params (simple_workflow.ga step)
+    unicycler(
+        l_file=w.unicycler_l_file,
+        fastq_input1=w.in_forward_reads,
+        fastq_input2=w.in_reverse_reads,
+        s_fastqsanger=w.in_forward_reads,  
+        pilon_path=w.unicycler_pilon_path,
+        long=w.in_long_reads,
+        start_genes=w.unicycler_start_genes,
+        contamination=w.unicycler_contamination,
+    )
+    fastq_input1 / s_fastqsanger are governed by galaxy XML conditional case. 
+    w.in_forward_reads can be wired to either depending on that case. 
+    currently not evaluating the state of the case.
+
+Major (program execution fails)
+

@@ -6,6 +6,16 @@ SOLVED
 
 
 issue
+    ENV_VAR positionals being allowed as base command
+solution
+    changed get_base_command() method. 
+
+issue
+    'data_column' galaxy params
+"solution"
+    pretend they're just IntegerParams and parse accordingly
+
+issue
     tricky text:
         > '"Module \'${repeat.software_cond.software}: \'$pattern\' not found in the file \'$identifier\'"'
         > READ_NAME_REGEX='${ str( $read_name_regex ) }'

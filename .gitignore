@@ -1,6 +1,5 @@
 
 
-
 tools
 *.pyc
 __pycache__
@@ -19,8 +18,12 @@ TODO.txt
 galaxy_requirements.txt
 requirements.txt
 edge_cases.txt
+
+super_simple_workflow/
 simple_workflow/
 medium_workflow/
+hard_workflow/
+characterisation_workflow/
 
 
 

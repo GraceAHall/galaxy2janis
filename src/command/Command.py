@@ -237,10 +237,17 @@ class Command:
 
     def get_base_positionals(self) -> list[Positional]:
         positionals = self.get_positionals()
-        positionals = [p for p in positionals if p.before_opts]
-        positionals = [p for p in positionals if not p.gxparam]
-        positionals = [p for p in positionals if p.has_single_value()]
-        return positionals
+        out: list[Positional] = []
+        for p in positionals:
+            if p.before_opts and not p.gxparam and p.has_single_value() and not p.values_are_variables():
+                out.append(p)
+            else:
+                break
+        # positionals = [p for p in positionals if p.before_opts]
+        # positionals = [p for p in positionals if not p.gxparam]
+        # positionals = [p for p in positionals if p.has_single_value()]
+        # positionals = [p for p in positionals if not p.values_are_variables()]
+        return out
 
     def get_non_base_positionals(self) -> list[Positional]:
         base_positionals = self.get_base_positionals()
