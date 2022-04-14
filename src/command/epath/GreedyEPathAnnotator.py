@@ -44,13 +44,21 @@ class GreedyEPathAnnotator:
         self.xmltool = xmltool
         self.command = command
         self.pos = 0
-        print(epath)
-        print()
 
     def annotate_epath(self) -> ExecutionPath:
+        self.mark_ignore_tokens()
         self.annotate_via_param_args()
         self.annotate_via_iteration()
         return self.epath
+
+    def mark_ignore_tokens(self) -> None:
+        ignore_tokens = [
+            TokenType.FUNCTION_CALL,
+            TokenType.BACKTICK_SHELL_STATEMENT,
+        ]
+        for position in self.epath.positions:
+            if position.token.type in ignore_tokens:
+                position.ignore = True
         
     def annotate_via_param_args(self) -> None:
         arguments: list[str] = [param.argument for param in self.xmltool.list_inputs() if param.argument]
@@ -143,8 +151,9 @@ class GreedyEPathAnnotator:
         # look at next ntoken to see its probably a value for the option
         while self.pos < final_pos:
             ntoken = self.epath.positions[self.pos + 1].token
+            nntoken = self.epath.positions[self.pos + 2].token
 
-            if component_utils.is_positional(ntoken) and ntoken.type == values_type:
+            if component_utils.is_positional(ntoken) and ntoken.type == values_type and nntoken.type != TokenType.KV_LINKER:
                 out.append(ntoken)
                 self.pos += 1 
             else:

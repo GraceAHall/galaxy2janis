@@ -28,17 +28,32 @@ class ToolStepParser:
         )
 
     def get_step_metadata(self) -> StepMetadata:
-        return StepMetadata(
-            step_id=self.gxstep['id'],
-            uuid=self.gxstep['uuid'],
-            step_name=self.gxstep['name'],
-            tool_name=self.gxstep['tool_shed_repository']['name'],
-            label=self.gxstep['label'],
-            owner=self.gxstep['tool_shed_repository']['owner'],
-            changeset_revision=self.gxstep['tool_shed_repository']['changeset_revision'],
-            shed=self.gxstep['tool_shed_repository']['tool_shed'],
-            workflow_outputs=self.gxstep['workflow_outputs']
-        )
+        if 'tool_shed_repository' not in self.gxstep:
+            return StepMetadata(
+                step_id=self.gxstep['id'],
+                uuid=self.gxstep['uuid'],
+                step_name=self.gxstep['name'],
+                tool_id=self.gxstep['tool_id'],
+                workflow_outputs=self.gxstep['workflow_outputs'],
+                is_inbuilt=True,
+                label=self.gxstep['label'],
+                owner=None,
+                changeset_revision=None,
+                shed=None,
+            )
+        else:
+            return StepMetadata(
+                step_id=self.gxstep['id'],
+                uuid=self.gxstep['uuid'],
+                step_name=self.gxstep['name'],
+                tool_id=self.gxstep['tool_shed_repository']['name'],
+                workflow_outputs=self.gxstep['workflow_outputs'],
+                is_inbuilt=False,
+                label=self.gxstep['label'],
+                owner=self.gxstep['tool_shed_repository']['owner'],
+                changeset_revision=self.gxstep['tool_shed_repository']['changeset_revision'],
+                shed=self.gxstep['tool_shed_repository']['tool_shed'],
+            )
 
     def get_step_inputs(self) -> StepInputRegister:
         self.inputs = {}

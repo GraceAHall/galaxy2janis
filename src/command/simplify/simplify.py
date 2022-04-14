@@ -10,6 +10,7 @@ from command.simplify.filters import (
     simplify_galaxy_static_vars,
     simplify_galaxy_dynamic_vars,
     remove_cheetah_comments,
+    replace_function_calls,
     replace_backticks,
     interpret_raw
 )
@@ -24,7 +25,6 @@ class CommandSimplifier:
     def map_filters(self, cmdstr: str) -> str:
         for filter_func in self.filters:
             cmdstr = filter_func(cmdstr)
-        print(cmdstr)
         return cmdstr
 
 
@@ -42,12 +42,13 @@ class TestCommandSimplifier(CommandSimplifier):
 class XMLCommandSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         flatten_multiline_strings,
+        remove_cheetah_comments,
+        replace_function_calls,
+        replace_backticks,
         standardise_variable_format,
         simplify_sh_constructs,
         simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
-        remove_cheetah_comments,
-        replace_backticks,
         interpret_raw
     ]
 

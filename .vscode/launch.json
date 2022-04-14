@@ -92,19 +92,6 @@
             ]
         },
         {
-            "name": "fastp",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/fastp", 
-                "--xml", "fastp.xml",
-            ]
-        },
-        {
             "name": "filtlong",
             "type": "python",
             "request": "launch",
@@ -323,18 +310,6 @@
             ]
         },
         {
-            "name": "characterisation workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/characterisation_workflow.ga"
-            ]
-        },
-        {
             "name": "nanoplot",
             "type": "python",
             "request": "launch",
@@ -345,6 +320,70 @@
                 "tool",
                 "--dir", "test/data/tools/nanoplot", 
                 "--xml", "nanoplot.xml",
+            ]
+        },
+        {
+            "name": "fastp",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/fastp", 
+                "--xml", "fastp.xml",
+            ]
+        },
+        {
+            "name": "minimap2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/minimap2", 
+                "--xml", "minimap2.xml",
+            ]
+        },
+        {
+            "name": "samtools_view",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/samtools_view", 
+                "--xml", "samtools_view.xml",
+            ]
+        },
+        {
+            "name": "bowtie2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/bowtie2", 
+                "--xml", "bowtie2_wrapper.xml",
+            ]
+        },
+        {
+            "name": "characterisation workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/characterisation_workflow.ga"
             ]
         },
         {

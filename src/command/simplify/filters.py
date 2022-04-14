@@ -2,10 +2,17 @@
 
 
 import re
-import shlex
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 
+
+def replace_function_calls(cmdstr: str) -> str:
+    matches = scanners.get_function_calls(cmdstr)
+    for match in matches:
+        old_section = match[0]
+        new_section = '__FUNCTION_CALL__'
+        cmdstr = cmdstr.replace(old_section, new_section)
+    return cmdstr
 
 def replace_backticks(cmdstr: str) -> str:
     matches = scanners.get_backtick_sections(cmdstr)

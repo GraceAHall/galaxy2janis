@@ -9,6 +9,7 @@ import regex as re
 from xmltool.param.Param import Param
 
 class TokenType(Enum):
+    FUNCTION_CALL   = auto()
     GX_INPUT        = auto()
     GX_OUTPUT       = auto()
     GX_KW_DYNAMIC   = auto()
@@ -17,6 +18,7 @@ class TokenType(Enum):
     KV_PAIR         = auto()
     KV_LINKER       = auto()
     FORCED_PREFIX   = auto()
+    BACKTICK_SHELL_STATEMENT = auto()
     QUOTED_STRING   = auto()
     QUOTED_NUM      = auto()
     RAW_STRING      = auto()

@@ -135,7 +135,7 @@ class ExecutionPath:
     def __str__(self) -> str:
         out: str = ''
         for position in self.positions:
-            out += f'{str(position.ptr):<3}{position.token.text[:39]:<40}{position.token.type:<32}{str(type(position.component))[:49]:<50}\n'
+            out += f'{str(position.ptr):<3}{position.token.text[:39]:<40}{position.token.type:<35}\n'
         return out
 
 

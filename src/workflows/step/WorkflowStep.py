@@ -65,7 +65,7 @@ class WorkflowStep:
         raise RuntimeError('tool_definition_path not set for tool step')
 
     def get_tool_name(self) -> str:
-        return self.metadata.tool_name
+        return self.metadata.tool_id
 
     def list_tool_values(self) -> list[Tuple[str, InputValue]]:
         return self.values.list_values()

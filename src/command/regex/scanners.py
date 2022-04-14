@@ -6,6 +6,8 @@ import regex as re
 from command.regex.expressions import (
     VARIABLES_FMT1,
     VARIABLES_FMT2,
+    FUNCTION_CALL_FMT1,
+    FUNCTION_CALL_FMT2,
     QUOTED_STRINGS, 
     QUOTED_NUMBERS, 
     BACKTICK_SECTIONS,
@@ -72,6 +74,11 @@ def get_variables_fmt1(the_string: str) -> list[re.Match[str]]:
 def get_variables_fmt2(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(VARIABLES_FMT2, the_string)
     return [m for m in matches]
+
+def get_function_calls(the_string: str) -> list[re.Match[str]]:
+    matches = [m for m in re.finditer(FUNCTION_CALL_FMT1, the_string)]
+    matches += [m for m in re.finditer(FUNCTION_CALL_FMT2, the_string)]
+    return matches
 
 def get_redirects(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(SH_REDIRECT, the_string)

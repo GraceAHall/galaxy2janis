@@ -3,6 +3,10 @@
 TOOL PARSING
 
 Minor (mostly formatting and cleanliness)
+input_t_int -> t_int? cleaner?
+in general, I think janis should allow single letter tags, even single digit. 
+currently the ToolInput prefix is much more informative than the janis tag. 
+
 - samtools_idxstats ew
     ToolInput(
 		'input_@_file',
@@ -19,10 +23,15 @@ Minor (mostly formatting and cleanliness)
     cp '/tmp/tmppzuicyfk/working/dataset_28_files'/*/fastqc_data.txt output.txt
 
 Intermediate (has an impact on number of inputs/outputs, may break tool in some way)
-- challenging <command> text at start of main tool statement (nanoplot)
-    $reads_temp.append("read_" + str($i) + "." + str($extension))
-    potential solution 1 - if evaluated tests, these will start with correct word 
-    potential solution 2 - ignore any words before first RAW_STRING?
+- minimap2 
+    -k19 -m200 
+    no separation between prefix and value when value is int
+    these are being identified as Flags rather than Options
+    in general, I think janis should allow single letter tags.
+    even single digit. 
+    currently the prefix is much more informative than the janis tag. 
+- minimap2
+    too many positionals being created
 - 'argument' attribute written incorrectly - causes 2 inputs
     see quast references_list1, references_list2
     maybe could check if the prefix is in the command? 
@@ -60,11 +69,26 @@ Intermediate (has an impact on number of inputs/outputs, may break tool in some 
 
 
 Major (program execution fails, tool definitely non-functional)
-- Kraken2Tax
-
-- should create a file containing tricky text, and ensure that the text
+- !important should create a file containing tricky text, and ensure that the text
   is being assigned correct tokens
-- featurecounts.xml tool cannot load itself into galaxy representation
+- challenging <command> text   (minimap2, bowtie2)
+    lots of python expressions in the <command> section
+    (minimap2) $reads_temp.append("read." + str($extension)) -> 3 positional CommandComponents
+    ['$reads_temp.append(read.', '+', '$extension))']
+    (bowtie2) $format_read_group("PL:", $rg_pl, '"', arg='--rg ')
+    solutions:
+
+    need better way of identifying these and just marking them as PYTHON_EXPRESSION or something
+
+- __ZIP_COLLECTION__
+    Apparently zips/unzips each file in the array, so the output is the same as the input but 
+    everything is zipped. 
+    This is one of apparently multiple inbuilt tools. 
+    They aren't kept online - they're in the local galaxy tool dir lib/galaxy/tools/ 
+    Can write a funciton which opens each XML and if the tool ids match, select this wrapper and move it to the wrappers folder. 
+    proceed as usual. 
+
+- featurecounts, samtools_view tool cannot load itself into galaxy representation
     <options from_data_table="featurecounts_anno">
         <filter type="data_meta" key="dbkey" ref="alignment" column="dbkey"/>
     </options>

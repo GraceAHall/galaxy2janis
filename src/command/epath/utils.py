@@ -7,6 +7,8 @@ from xmltool.param.InputParam import BoolParam, SelectParam
 
 
 NON_VALUE_TOKENTYPES = set([
+    TokenType.FUNCTION_CALL, 
+    TokenType.BACKTICK_SHELL_STATEMENT, 
     TokenType.LINUX_TEE, 
     TokenType.LINUX_REDIRECT,
     TokenType.LINUX_STREAM_MERGE,

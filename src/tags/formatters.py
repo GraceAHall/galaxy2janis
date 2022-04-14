@@ -1,7 +1,7 @@
 
 
 from typing import Any
-
+from command.components.inputs.Flag import Flag
 
 
 
@@ -46,9 +46,12 @@ def handle_prohibited_key(tag: str, entity: Any) -> str:
 
 def handle_short_tag(tag: str, entity: Any) -> str:
     if len(tag) == 1:
-        tag = f"input_{tag}"
-        if hasattr(entity, 'janis_datatypes'):
-            tag = append_datatype(tag, entity)
+        if isinstance(entity, Flag):
+            tag = f'{tag}_flag'
+        else:
+            tag = f"input_{tag}"
+            if hasattr(entity, 'janis_datatypes'):
+                tag = append_datatype(tag, entity)
     return tag
 
 def append_datatype(tag: str, entity: Any) -> str:

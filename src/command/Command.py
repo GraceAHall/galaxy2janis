@@ -173,6 +173,10 @@ class Command:
         if isinstance(incoming, Option):
             if incoming.prefix in self.flags:
                 return spawn_component('flag', ctext=incoming.prefix, ntexts=[])
+        # migrate incorrect flag to option
+        if isinstance(incoming, Flag):
+            if incoming.prefix in self.options:
+                return spawn_component('option', ctext=incoming.prefix, ntexts=[])
         return incoming
 
     def select_updater(self, incoming: CommandComponent) -> Updater:

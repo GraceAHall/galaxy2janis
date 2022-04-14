@@ -21,8 +21,8 @@ class CmdstrCommandAnnotator:
 
     def annotate(self) -> None:
         self.set_attrs()
-        self.feed_cmdstrs(source='xml')
         self.feed_cmdstrs(source='test')
+        self.feed_cmdstrs(source='xml')
         self.feed_cmdstrs(source='workflow')
         self.cleanup()
 
@@ -35,6 +35,7 @@ class CmdstrCommandAnnotator:
         active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
         for cmdstr in active_cmdstrs:
             for epath in cmdstr.main.get_execution_paths():
+                print(epath)
                 self.feed(epath)
 
     def feed(self, epath: ExecutionPath) -> None:

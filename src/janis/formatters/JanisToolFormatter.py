@@ -55,23 +55,30 @@ class JanisToolFormatter:
     def format_inputs(self) -> str:
         inputs = self.tool.get_tags_inputs()
         out_str: str = ''
-        positionals = {tag: x for tag, x in inputs.items() if isinstance(x, Positional)}
-        flags = {tag: x for tag, x in inputs.items() if isinstance(x, Flag)}
-        options = {tag: x for tag, x in inputs.items() if isinstance(x, Option)}
+
+        # separating CommandComponent types
+        positionals = [(tag, x) for tag, x in inputs.items() if isinstance(x, Positional)]
+        flags = [(tag, x) for tag, x in inputs.items() if isinstance(x, Flag)]
+        options = [(tag, x) for tag, x in inputs.items() if isinstance(x, Option)]
+
+        # sorting
+        positionals.sort(key=lambda x: x[1].cmd_pos)
+        flags.sort()
+        options.sort()
 
         out_str += 'inputs = ['
         out_str += '\n\t# Positionals'
-        for tag, positional in positionals.items():
+        for tag, positional in positionals:
             self.import_handler.update(positional)
             out_str += f'{self.format_positional_input(tag, positional)},'
 
         out_str += '\n\t# Flags'
-        for tag, flag in flags.items():
+        for tag, flag in flags:
             self.import_handler.update(flag)
             out_str += f'{self.format_flag_input(tag, flag)},'
             
         out_str += '\n\t# Options'
-        for tag, option in options.items():
+        for tag, option in options:
             self.import_handler.update(option)
             out_str += f'{self.format_option_input(tag, option)},'
         out_str += '\n]\n'

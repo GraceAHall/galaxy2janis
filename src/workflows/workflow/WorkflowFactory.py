@@ -5,7 +5,6 @@
 
 import json
 from typing import Any
-from workflows.io.WorkflowOutput import WorkflowOutput
 
 from workflows.workflow.Workflow import Workflow
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata

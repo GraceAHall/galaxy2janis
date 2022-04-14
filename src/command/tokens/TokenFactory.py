@@ -32,6 +32,8 @@ class LongestTokenOrderingStrategy(TokenOrderingStrategy):
 class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
     def order(self, token_list: list[Token]) -> list[Token]:
         priorities: dict[TokenType, int] = {
+            TokenType.FUNCTION_CALL: 0,
+            TokenType.BACKTICK_SHELL_STATEMENT: 0,
             TokenType.GX_KW_DYNAMIC: 1,
             TokenType.GX_KW_STATIC: 2,
             TokenType.KV_PAIR: 3,
@@ -144,9 +146,17 @@ class TokenFactory:
     def get_all_tokens(self, the_string: str) -> list[Token]:
         """gets all the possible token interpretations of the_string"""  
         tokens: list[Token] = []
+        tokens += self.get_dunder_token(the_string)
         tokens += self.get_generic_tokens(the_string)
         tokens += self.get_variable_tokens(the_string)
         return tokens
+
+    def get_dunder_token(self, the_string: str) -> list[Token]:
+        if the_string == '__FUNCTION_CALL__':
+            return [token_utils.spawn_function_call()]
+        if the_string == '__BACKTICK_SHELL_STATEMENT__':
+            return [token_utils.spawn_backtick_section()]
+        return []
 
     def get_generic_tokens(self, the_string: str) -> list[Token]:
         """gets all tokens except galaxy/env variables"""
