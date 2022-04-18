@@ -286,6 +286,18 @@
             ]
         },
         {
+            "name": "super simple workflow builtin tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/super_simple_workflow_builtin_tool.ga"
+            ]
+        },
+        {
             "name": "simple workflow",
             "type": "python",
             "request": "launch",
@@ -295,6 +307,18 @@
             "args": [
                 "workflow",
                 "test/data/workflows/simple_workflow.ga"
+            ]
+        },
+        {
+            "name": "simple workflow builtin tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/simple_workflow_builtin_tool.ga"
             ]
         },
         {
@@ -372,6 +396,32 @@
                 "tool",
                 "--dir", "test/data/tools/bowtie2", 
                 "--xml", "bowtie2_wrapper.xml",
+            ]
+        },
+        {
+            "name": "seqtk_sample",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/seqtk", 
+                "--xml", "seqtk_sample.xml",
+            ]
+        },
+        {
+            "name": "zip_collection",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "/home/grace/work/pp/gxtool2janis/venv/lib/python3.10/site-packages/galaxy/tools", 
+                "--xml", "zip_collection.xml",
             ]
         },
         {

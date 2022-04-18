@@ -103,7 +103,7 @@ class JobFactory:
             raise RuntimeError(f'test data {filename} could not be found at {data_path}')
 
     def get_test_data_path(self, filename: str) -> str:
-        return f'{self.esettings.get_tool_test_dir()}/{filename}'
+        return f'{self.esettings.xmldir}/test-data/{filename}'
 
     def file_exists(self, filepath: str) -> bool:
         if os.path.exists(filepath):

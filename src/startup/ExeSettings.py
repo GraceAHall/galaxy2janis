@@ -61,11 +61,6 @@ class ToolExeSettings:
             return f'{self.xmldir}/{self.xmlfile}'
         raise RuntimeError('cannot be called until xmldir and xmlfile are set.')            
 
-    def get_tool_test_dir(self) -> str:
-        if self.xmldir:
-            return f'{self.xmldir}/test-data'
-        raise RuntimeError('cannot be called until xmldir is set.')            
-
     def get_outdir(self) -> str:
         """
         gets the path to the runtime outdir.

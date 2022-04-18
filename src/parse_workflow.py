@@ -2,15 +2,15 @@
 
 # classes
 from startup.ExeSettings import WorkflowExeSettings
-from workflows.io.WorkflowOutput import WorkflowOutput
 from workflows.workflow.WorkflowFactory import WorkflowFactory
 from workflows.workflow.Workflow import Workflow
 
 # modules
 from workflows.step.values.InputValueLinker import link_step_input_values
 from workflows.step.outputs.OutputLinker import link_step_outputs_tool_outputs
-from workflows.step.tools.assign import set_tools, set_tool_paths
-
+from workflows.step.tools.assign import set_tools
+from workflows.step.tools.assign import set_tool_paths
+from workflows.io.io import set_outputs
 
 
 """
@@ -34,21 +34,7 @@ def init_workflow(wsettings: WorkflowExeSettings) -> Workflow:
     workflow = factory.create(galaxy_workflow_path)
     return workflow
 
-def set_outputs(workflow: Workflow) -> None:
-    for step in workflow.list_steps():
-        for stepout in step.list_outputs():
-            if stepout.is_wflow_out:
-                toolout = stepout.tool_output
-                assert(step.tool)
-                assert(toolout)
-                step_tag = workflow.tag_manager.get(step.get_uuid())
-                toolout_tag = step.tool.tag_manager.get(toolout.get_uuid())
-                workflow_output = WorkflowOutput(
-                    step_tag=step_tag,
-                    toolout_tag=toolout_tag,
-                    janis_datatypes=stepout.janis_datatypes
-                )
-                workflow.add_output(workflow_output)
+
 
 
 

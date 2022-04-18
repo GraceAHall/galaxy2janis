@@ -34,21 +34,17 @@ from galaxy.util import XML
 from galaxy.tools.parameters import params_from_strings # for MockTool
 from galaxy.tool_util.parser.output_objects import ToolOutput
 from galaxy.tool_util.biotools import BiotoolsMetadataSource
-from galaxy.tools.data import ToolDataTableManager
 #from galaxy.datatypes.registry import example_datatype_registry_for_sample
+
 # terrible stuff from galaxy. not planning on a refactor.
 
-from startup.settings import ToolExeSettings
-
-
-
 class MockApp(di.Container):
-    def __init__(self, esettings: ToolExeSettings, config=None, **kwargs):
+    def __init__(self, config=None, **kwargs):
         super().__init__()
         self[BasicApp] = self
         self[MinimalManagerApp] = self
         self[StructuredApp] = self
-        self.config = config or MockAppConfig(esettings, **kwargs)
+        self.config = config or MockAppConfig(**kwargs)
         self.security = self.config.security
         self[idencoding.IdEncodingHelper] = self.security
         self.name = kwargs.get('name', 'galaxy')
@@ -69,7 +65,7 @@ class MockApp(di.Container):
         #     use_messaging=False,
         #     assign_handler=lambda *args, **kwargs: None
         # )
-        self.tool_data_tables = self.grace_init_data_tables()
+        self.tool_data_tables = {}
         self.dataset_collections_service = None
         self.container_finder = NullContainerFinder()
         self._toolbox_lock = MockLock()
@@ -88,16 +84,6 @@ class MockApp(di.Container):
         def url_for(*args, **kwds):
             return "/mock/url"
         self.url_for = url_for
-
-    def grace_init_data_tables(self) -> ToolDataTableManager | dict[str, str]:
-        # Initialize tool data tables using the config defined by self.config.tool_data_table_config_path.
-        if self.config.tool_data_path and self.config.tool_data_table_config_path:
-            return ToolDataTableManager(
-                tool_data_path=self.config.tool_data_path,
-                config_filename=self.config.tool_data_table_config_path,
-                other_config_dict=self.config
-            )
-        return {}
 
     def init_datatypes(self):
         # config = Bunch(sniff_compressed_dynamic_datatypes_default=True)
@@ -126,7 +112,7 @@ class MockAppConfig(Bunch):
     class MockSchema(Bunch):
         pass
 
-    def __init__(self, esettings: ToolExeSettings, root=None, **kwargs):
+    def __init__(self, root=None, **kwargs):
         Bunch.__init__(self, **kwargs)
         if not root:
             root = tempfile.mkdtemp()
@@ -142,13 +128,8 @@ class MockAppConfig(Bunch):
         self.file_path = os.path.join(self.data_dir, 'files')
         self.jobs_directory = os.path.join(self.data_dir, 'jobs_directory')
         self.new_file_path = os.path.join(self.data_dir, 'tmp')
-
-        # grace altered
-        self.tool_data_path = None
-        self.tool_data_table_config_path = None
+        self.tool_data_path = os.path.join(root, 'tool-data')
         self.tool_dependency_dir = None
-        self.set_tool_data_attrs(esettings)
-
         self.metadata_strategy = 'legacy'
 
         self.object_store_config_file = ''
@@ -200,14 +181,6 @@ class MockAppConfig(Bunch):
         self.edam_panel_views = ''
 
         self.config_file = None
-
-    def set_tool_data_attrs(self, esettings: ToolExeSettings) -> None:
-        tool_data = f'{esettings.xmldir}/tool-data'
-        tool_data_table_conf = f'{esettings.xmldir}/tool_data_table_conf.xml.sample'
-        if os.path.exists(tool_data):
-            self.tool_data_path = tool_data
-        if os.path.exists(tool_data_table_conf):
-            self.tool_data_table_config_path = tool_data_table_conf
 
     @property
     def config_dict(self):

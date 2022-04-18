@@ -3,6 +3,21 @@
 TODO
 
 issue
+    bandage image shlex - no closing quotation
+    create launch profile and debug. 
+
+issue
+    blank value for default attribute (bowtie2_wrapper)
+    ToolInput(
+		'rg',
+		Int(optional=True),
+		prefix='--rg',
+		position=1,
+		default=,
+		doc="None",
+	),
+
+issue
     duplicate toolinput [bug]: references_list1 / references_list2 (quast)
     duplicate toolinput [bug]: max_ref_num1 / max_ref_num2 (quast)
     duplicate toolinput [bug]: discard_untrimmed1 / discard_untrimmed2 (cutadapt)

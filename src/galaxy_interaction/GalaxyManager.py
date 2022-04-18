@@ -84,7 +84,7 @@ class GalaxyManager:
         
     def _init_app(self) -> MockApp:
         # basic details
-        app = MockApp()
+        app = MockApp(self.esettings)
         app.job_search = None
         app.object_store = MockObjectStore()
         # config

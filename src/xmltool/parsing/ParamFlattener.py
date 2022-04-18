@@ -4,7 +4,7 @@
 from copy import deepcopy
 from typing import Any
 
-from galaxy.tools.parameters.basic import ToolParameter
+from galaxy.tools.parameters.basic import ToolParameter, HiddenToolParameter
 from galaxy.tools.parameters.grouping import Conditional, ConditionalWhen, Section, Repeat
 
 XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
@@ -22,6 +22,9 @@ class ParamFlattener:
     def explore_node(self, node: XmlNode, heirarchy: list[str]) -> None:
         heirarchy = deepcopy(heirarchy)
         match node:
+            case HiddenToolParameter():
+                pass
+
             case ToolParameter():
                 self.flatten_param(node, heirarchy)
 

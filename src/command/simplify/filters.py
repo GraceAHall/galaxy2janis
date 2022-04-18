@@ -7,12 +7,16 @@ import command.regex.scanners as scanners
 
 
 def replace_function_calls(cmdstr: str) -> str:
-    matches = scanners.get_function_calls(cmdstr)
-    for match in matches:
-        old_section = match[0]
-        new_section = '__FUNCTION_CALL__'
-        cmdstr = cmdstr.replace(old_section, new_section)
-    return cmdstr
+    cmdlines = split_lines(cmdstr)
+    out: list[str] = []
+    for line in cmdlines:
+        matches = scanners.get_function_calls(line)
+        for match in matches:
+            old_section = match[0]
+            new_section = '__FUNCTION_CALL__'
+            line = line.replace(old_section, new_section)
+        out.append(line)
+    return join_lines(out)
 
 def replace_backticks(cmdstr: str) -> str:
     matches = scanners.get_backtick_sections(cmdstr)

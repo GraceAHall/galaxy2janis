@@ -36,7 +36,7 @@ class CollectorFetchStrategy(FetchStrategy):
 
 class FallbackFetchStrategy(FetchStrategy):
     def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
-        return ['data']
+        return ['file']
 
 
 def fetch_datatype(gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
@@ -74,8 +74,9 @@ def has_format_source(gxout: GxOutput) -> bool:
     return False
     
 def has_dataset_collector(gxout: GxOutput) -> bool:
-    if len(gxout.dataset_collector_descriptions) > 0:
-        return True
+    if gxout.dynamic_structure:
+        if len(gxout.dataset_collector_descriptions) > 0:
+            return True
     return False
 
 
