@@ -15,7 +15,6 @@ class Version:
             match = matches[0]
             return match[0] # type: ignore
         raise RuntimeError()
-        return ''
 
     def get_numeric_levels(self, fill_size: int=0) -> list[int]:
         numeric_version = self.get_numeric()

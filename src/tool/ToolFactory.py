@@ -46,6 +46,7 @@ class ToolFactory:
         outputs += self.get_redirect_outputs()
         outputs += self.get_input_outputs()
         outputs += self.get_wildcard_outputs()
+        outputs += self.get_unknown_outputs(outputs)
         for out in outputs:
             self.datatype_annotator.annotate(out)
             tool.add_output(out)
@@ -74,6 +75,18 @@ class ToolFactory:
         for gxparam in self.xmltool.list_outputs():
             if gxparam.wildcard_pattern:
                 out.append(self.output_factory.create_wildcard_output(gxparam))
+        return out
+    
+    def get_unknown_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:
+        out: list[CommandComponent] = []
+        for gxparam in self.xmltool.list_outputs():
+            has_output_component = False
+            for output in known_outputs:
+                if output.gxparam == gxparam:
+                    has_output_component = True
+                    break
+            if not has_output_component:
+                out.append(self.output_factory.create_unknown_output(gxparam))
         return out
 
     def verify_outputs(self, outputs: list[CommandComponent]) -> None:

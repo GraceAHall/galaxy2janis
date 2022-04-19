@@ -1,6 +1,7 @@
 
 
 
+from command.components.outputs.UnknownOutput import UnknownOutput
 from datatypes.DatatypeRegister import DatatypeRegister
 from datatypes.JanisDatatype import JanisDatatype
 from command.components.inputs import Positional, Flag, Option
@@ -92,6 +93,7 @@ strategy_map = {
     RedirectOutput: redirect_output_strategy,
     InputOutput: input_output_strategy,
     WildcardOutput: wildcard_output_strategy,
+    UnknownOutput: wildcard_output_strategy,
     WorkflowInput: workflow_input_strategy,
     WorkflowStep: tool_step_strategy,
     WorkflowOutput: workflow_output_strategy,

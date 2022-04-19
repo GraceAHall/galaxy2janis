@@ -12,6 +12,7 @@ from command.simplify.filters import (
     remove_cheetah_comments,
     replace_function_calls,
     replace_backticks,
+    remove_empty_quotes,
     interpret_raw
 )
 
@@ -35,6 +36,7 @@ class TestCommandSimplifier(CommandSimplifier):
         simplify_galaxy_dynamic_vars,
         simplify_sh_constructs,
         replace_backticks,
+        remove_empty_quotes,
         interpret_raw
     ]
 
@@ -49,6 +51,7 @@ class XMLCommandSimplifier(CommandSimplifier):
         simplify_sh_constructs,
         simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
+        remove_empty_quotes,
         interpret_raw
     ]
 

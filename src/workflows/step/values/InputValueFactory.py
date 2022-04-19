@@ -63,17 +63,7 @@ class RuntimeInputValueFactory(InputValueFactory):
 @dataclass
 class StaticInputValueFactory(InputValueFactory):
     step_input: StaticStepInput
-    value_translations = {
-        'false': False,
-        'False': False,
-        'true': True,
-        'True': True,
-        'null': None,
-        'none': None,
-        'None': None,
-        '': None
-    }
-
+    
     def create(self) -> StaticInputValue:
         return StaticInputValue(
             value=self.get_value(),
@@ -83,15 +73,8 @@ class StaticInputValueFactory(InputValueFactory):
         )
 
     def get_value(self) -> Any:
-        gx_value = self.step_input.value
-        value = self.standardise_value(gx_value)
-        return value
+        return self.step_input.value
 
-    def standardise_value(self, value: Any) -> Any:
-        if value in self.value_translations:
-            return self.value_translations[value]
-        return value
-    
     def get_valtype(self) -> InputValueType:
         value = self.get_value()
         return select_input_value_type(self.component, value)

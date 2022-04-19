@@ -4,6 +4,7 @@ from typing import Tuple
 from .RedirectOutput import RedirectOutput
 from .InputOutput import InputOutput
 from .WildcardOutput import WildcardOutput
+from .UnknownOutput import UnknownOutput
 
 from command.tokens.Tokens import Token
 from command.components.CommandComponent import CommandComponent
@@ -19,6 +20,9 @@ class OutputComponentFactory:
     
     def create_wildcard_output(self, gxparam: Param) -> WildcardOutput:
         return WildcardOutput(gxparam)
+
+    def create_unknown_output(self, gxparam: Param) -> UnknownOutput:
+        return UnknownOutput(gxparam)
 
 
 # class OutputComponentFactory:

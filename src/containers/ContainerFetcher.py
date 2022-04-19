@@ -10,6 +10,16 @@ from utils.general_utils import global_align
 from containers.Container import Container
 from xmltool.requirements import Requirement
 
+
+image_presets = {
+    'python': {
+        'image_name': 'https://hub.docker.com/_/ubuntu',
+        'image_type': 'Docker',
+        'registry_host': 'hub.docker.com/'
+    }
+}
+
+
 @dataclass
 class SimilarityScore:
     score: float
@@ -49,24 +59,36 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
     def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
         # get tool information from api request
         self.set_attributes(tool_id, tool_version, requirement)
-        query_name = self.requirement.get_text()
-        api_results = self.ga4gh_interactor.search(toolname=query_name)
+       
+        image = self.get_image_preset()
+        if not image:
+            image = self.get_image_GA4GH()
+        
+        if image:
+            return Container(
+                galaxy_id=self.tool_id,
+                galaxy_version=self.tool_version,
+                url=image['image_name'],
+                image_type=image['image_type'],
+                registry_host=image['registry_host'],
+                requirement_id=self.requirement.get_text(),
+                requirement_version=self.requirement.get_version()
+            )
+        return None
 
+    def get_image_preset(self) -> Optional[dict[str, str]]:
+        name = self.requirement.get_text()
+        if name in image_presets:
+            return image_presets[name]
+        return None
+            
+    def get_image_GA4GH(self) -> Optional[dict[str, str]]:
+        name = self.requirement.get_text()
+        api_results = self.ga4gh_interactor.search(toolname=name)
         if api_results:
             tool_version_data = self.get_tool_version_data(api_results)
-
             if tool_version_data:
-                image = self.select_image(tool_version_data)
-                return Container(
-                    galaxy_id=self.tool_id,
-                    galaxy_version=self.tool_version,
-                    url=image['image_name'],
-                    image_type=image['image_type'],
-                    registry_host=image['registry_host'],
-                    requirement_id=self.requirement.get_text(),
-                    requirement_version=self.requirement.get_version()
-                )
-
+                return self.select_image(tool_version_data)
         return None
 
     def set_attributes(self, tool_id: str, tool_version: str, requirement: Requirement) -> None:

@@ -3,10 +3,6 @@
 TODO
 
 issue
-    bandage image shlex - no closing quotation
-    create launch profile and debug. 
-
-issue
     blank value for default attribute (bowtie2_wrapper)
     ToolInput(
 		'rg',

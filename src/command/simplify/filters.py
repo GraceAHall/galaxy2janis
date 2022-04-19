@@ -76,6 +76,11 @@ def remove_var_braces(text: str) -> str:
     #     text = remove_var_braces(text)
     # return text  
 
+def remove_empty_quotes(cmdstr: str) -> str:
+    cmdstr = cmdstr.replace('""', '')
+    cmdstr = cmdstr.replace("''", '')
+    return cmdstr
+
 def simplify_sh_constructs(cmdstr: str) -> str:
     """
     this function standardises the different equivalent 
@@ -94,7 +99,7 @@ def simplify_galaxy_static_vars(cmdstr: str) -> str:
     modifies galaxy reserved words to relevant format. only $__tool_directory__ for now. 
     There is a scanner for this, but the actual substitutions might be different. 
     """
-    cmdstr = re.sub(r"['\"]?\$__tool_directory__['\"]?/", "", cmdstr)
+    cmdstr = re.sub(r"\$__tool_directory__/", "", cmdstr)
     return cmdstr
 
 def simplify_galaxy_dynamic_vars(cmdstr: str) -> str:

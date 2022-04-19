@@ -425,6 +425,45 @@
             ]
         },
         {
+            "name": "bandage image",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/bandage", 
+                "--xml", "bandage_image.xml",
+            ]
+        },
+        {
+            "name": "bandage info",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/bandage", 
+                "--xml", "bandage_info.xml",
+            ]
+        },
+        {
+            "name": "fasta_filter_by_length",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/fasta_filter_by_length", 
+                "--xml", "fasta_filter_by_length.xml",
+            ]
+        },
+        {
             "name": "characterisation workflow",
             "type": "python",
             "request": "launch",

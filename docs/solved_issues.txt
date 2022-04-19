@@ -4,6 +4,13 @@
 
 SOLVED
 
+issue
+    linking step outputs to tool outputs
+    some outputs are created after main tool statement. 
+    this would be fine if there was a wildcard expression to collect the output, but sometimes they're InputOutputs or RedirectOutputs. ie there is no collection method, and they are referenced in the <command> section. 
+solution
+    TEMPORARY FIX: created a function to detect and create these tool outputs. added UnknownOutput class to hold these. they are like WildcardOutputs except the detect pattern is '__UNKNOWN_OUTPUT__'
+
 
 issue
     ENV_VAR positionals being allowed as base command
