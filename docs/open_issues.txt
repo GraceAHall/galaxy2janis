@@ -2,6 +2,16 @@
 
 TODO
 
+
+issue
+    mismatch between janis tool tags and tool import statements
+    picard_markduplicates vs picard_MarkDuplicates
+    rseqc_genebody_coverage vs rseqc_geneBody_coverage
+
+issue 
+    fastqc contaminants1 contaminants2
+    should be just single Option rather than a Positional and an Option
+
 issue
     blank value for default attribute (bowtie2_wrapper)
     ToolInput(

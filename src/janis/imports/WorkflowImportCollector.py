@@ -1,6 +1,7 @@
 
 
 from datatypes.JanisDatatype import JanisDatatype
+from workflows.workflow.Workflow import Workflow
 
 
 default_class_imports = {
@@ -15,11 +16,62 @@ default_datatype_imports = {
     ])
 }
 
-class WorkflowImportHandler:
+class WorkflowImportCollector:
     def __init__(self):
         self.class_imports: dict[str, set[str]] = default_class_imports
         self.tool_imports: dict[str, set[str]] = {}
         self.datatype_imports: dict[str, set[str]] = default_datatype_imports 
+
+    def collect(self, workflow: Workflow) -> None:
+        raise NotImplementedError()
+
+    def update_imports(self, tag: str, component: Any) -> None:
+        match component:
+            case WorkflowInput():
+                self.update_imports_for_workflow_input(component)
+            case WorkflowStep():
+                self.update_imports_for_tool_step(tag, component)
+            case WorkflowOutput():
+                self.update_imports_for_workflow_output(component)
+            case _:
+                pass
+    
+    def update_imports_for_workflow_input(self, inp: WorkflowInput) -> None:
+        self.import_handler.update_datatype_imports(inp.janis_datatypes)
+    
+    def update_imports_for_tool_step(self, tool_tag: str, step: WorkflowStep) -> None:
+        self.update_imports_for_tool_definition(tool_tag, step)
+        self.update_imports_for_tool_inputs(step)
+        self.update_imports_for_tool_outputs(step)
+
+    def update_imports_for_tool_definition(self, tool_tag: str, step: WorkflowStep) -> None:
+        tool_path = step.get_definition_path()
+        tool_path = tool_path.rsplit('.py')[0]
+        tool_path = tool_path.replace('/', '.')
+        tool_tag = tool_tag.rstrip('123456789') # same as getting basetag, just dodgy method
+        self.import_handler.update_tool_imports(tool_path, tool_tag)
+
+    def update_imports_for_tool_inputs(self, step: WorkflowStep) -> None:
+        pass
+        # # get uuids of tool components with value
+        # for inp in step():
+        # assert(step.tool)
+        # component_uuids = [uuid for uuid, _ in step.list_tool_values()]
+        # # get component for each uuid
+        # components = [c for c in step.tool.inputs if c.get_uuid() in component_uuids]
+        # # get datatypes of that component and update
+        # for component in components:
+        #     self.import_handler.update_datatype_imports(component.janis_datatypes)
+
+    def update_imports_for_tool_outputs(self, step: WorkflowStep) -> None:
+        pass
+        # # step outputs? this is a little weird
+        # for output in step.list_outputs():
+        #     self.import_handler.update_datatype_imports(output.janis_datatypes)
+
+    def update_imports_for_workflow_output(self, output: WorkflowOutput) -> None:
+        self.import_handler.update_datatype_imports(output.janis_datatypes)
+
 
     def update_class_imports(self, import_path: str, import_name: str) -> None: 
         if import_path not in self.class_imports:

@@ -3,11 +3,13 @@
 from typing import Any
 from command.components.CommandComponent import CommandComponent
 from command.components.outputs import InputOutput, WildcardOutput
+from command.components.outputs.UnknownOutput import UnknownOutput
 from datatypes.JanisDatatype import JanisDatatype
 
 selector_map: dict[Any, str] = {
     InputOutput: 'from janis_core import InputSelector',
     WildcardOutput: 'from janis_core import WildcardSelector',
+    UnknownOutput: 'from janis_core import WildcardSelector',
 }
 
 default_import_str = """
@@ -23,6 +25,10 @@ from janis_core import (
 )
 """
 
+
+SelectorOutputs = InputOutput | WildcardOutput | UnknownOutput
+
+
 class ToolImportHandler:
     def __init__(self):
         self.datatype_imports: set[str] = set() 
@@ -30,7 +36,7 @@ class ToolImportHandler:
     
     def update(self, component: CommandComponent) -> None:
         self.update_datatype_imports(component.janis_datatypes)
-        if isinstance(component, InputOutput) or isinstance(component, WildcardOutput):
+        if isinstance(component, SelectorOutputs):
             self.update_selector_imports(component)
 
     def update_datatype_imports(self, janis_types: list[JanisDatatype]) -> None: 
@@ -38,7 +44,7 @@ class ToolImportHandler:
             import_str = f'from {jtype.import_path} import {jtype.classname}'
             self.datatype_imports.add(import_str)
 
-    def update_selector_imports(self, comp: InputOutput | WildcardOutput) -> None:
+    def update_selector_imports(self, comp: SelectorOutputs) -> None:
         import_path = selector_map[type(comp)]
         self.selector_imports.add(import_path)
 

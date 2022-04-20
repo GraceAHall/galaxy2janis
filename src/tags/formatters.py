@@ -27,6 +27,7 @@ def replace_non_alphanumeric(tag: str, entity: Any) -> str:
     tag = tag.replace('\\', '_')
     tag = tag.replace('"', '')
     tag = tag.replace("'", '')
+    tag = tag.replace("@", 'at')
     return tag
 
 prohibited_keys = {

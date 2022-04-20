@@ -15,50 +15,47 @@ workflow unicycler_training_imported_from_uploaded_file {
     File fastqc1_contaminants
     File fastqc1_html_file
     File fastqc1_limits
-    File fastqc1_outdir
     Boolean? fastqc1_nogroup = false
     File fastqc2_adapters
     File fastqc2_contaminants
     File fastqc2_html_file
     File fastqc2_limits
-    File fastqc2_outdir
     Boolean? fastqc2_nogroup = false
     File unicycler_contamination
     File unicycler_input_l_file
     File unicycler_pilon_path
     File unicycler_start_genes
     Boolean? unicycler_no_rotate = false
-    Float? unicycler_start_gene_id = 90.0
+    Boolean? unicycler_no_correct = false
     Boolean? unicycler_no_pilon = false
     Boolean? unicycler_largest_component = false
-    Boolean? unicycler_no_correct = false
+    Float? unicycler_start_gene_id = 90.0
     Float? unicycler_start_gene_cov = 95.0
     File multiqc_config
     File quast_labels
     File quast_references_list2
-    Boolean? quast_strict_na = false
-    Boolean? quast_circos = false
-    Boolean? quast_large = false
-    Boolean? quast_fragmented = false
-    Boolean? quast_rna_finding = false
-    Boolean? quast_split_scaffolds = false
-    Boolean? quast_conserved_genes_finding = false
     Boolean? quast_use_all_alignments = false
-    Boolean? quast_upper_bound_assembly = false
+    Boolean? quast_fragmented = false
+    Boolean? quast_large = false
     Boolean? quast_skip_unaligned_mis_contigs = true
+    Boolean? quast_upper_bound_assembly = false
+    Boolean? quast_split_scaffolds = false
+    Boolean? quast_circos = false
+    Boolean? quast_conserved_genes_finding = false
+    Boolean? quast_strict_na = false
+    Boolean? quast_rna_finding = false
     File prokka_proteins
-    String? prokka_genus = "Escherichia"
     String? prokka_species = "Coli"
-    Int? prokka_increment = 10
+    String? prokka_genus = "Escherichia"
     String? prokka_strain = "C-1"
     String? prokka_locustag = "PROKKA"
+    Int? prokka_increment = 10
   }
   call F.fastqc as fastqc1 {
     input:
       html_file=fastqc1_html_file,
       nogroup=select_first([fastqc1_nogroup, false]),
       adapters=fastqc1_adapters,
-      outdir=fastqc1_outdir,
       contaminants=fastqc1_contaminants,
       limits=fastqc1_limits
   }
@@ -67,26 +64,25 @@ workflow unicycler_training_imported_from_uploaded_file {
       html_file=fastqc2_html_file,
       nogroup=select_first([fastqc2_nogroup, false]),
       adapters=fastqc2_adapters,
-      outdir=fastqc2_outdir,
       contaminants=fastqc2_contaminants,
       limits=fastqc2_limits
   }
   call U.unicycler as unicycler {
     input:
-      no_correct=select_first([unicycler_no_correct, false]),
       largest_component=select_first([unicycler_largest_component, false]),
-      no_rotate=select_first([unicycler_no_rotate, false]),
+      no_correct=select_first([unicycler_no_correct, false]),
       no_pilon=select_first([unicycler_no_pilon, false]),
+      no_rotate=select_first([unicycler_no_rotate, false]),
+      contamination=unicycler_contamination,
       fastq_input1=in_forward_reads,
       fastq_input2=in_reverse_reads,
+      input_l_file=unicycler_input_l_file,
       input_s_fastqsanger=in_forward_reads,
       long=in_long_reads,
-      start_genes=unicycler_start_genes,
-      start_gene_id=select_first([unicycler_start_gene_id, 90.0]),
-      start_gene_cov=select_first([unicycler_start_gene_cov, 95.0]),
-      contamination=unicycler_contamination,
       pilon_path=unicycler_pilon_path,
-      input_l_file=unicycler_input_l_file
+      start_gene_cov=select_first([unicycler_start_gene_cov, 95.0]),
+      start_gene_id=select_first([unicycler_start_gene_id, 90.0]),
+      start_genes=unicycler_start_genes
   }
   call M.multiqc as multiqc {
     input:
@@ -94,28 +90,28 @@ workflow unicycler_training_imported_from_uploaded_file {
   }
   call Q.quast as quast {
     input:
-      split_scaffolds=select_first([quast_split_scaffolds, false]),
-      large=select_first([quast_large, false]),
       circos=select_first([quast_circos, false]),
-      rna_finding=select_first([quast_rna_finding, false]),
       conserved_genes_finding=select_first([quast_conserved_genes_finding, false]),
-      use_all_alignments=select_first([quast_use_all_alignments, false]),
       fragmented=select_first([quast_fragmented, false]),
-      upper_bound_assembly=select_first([quast_upper_bound_assembly, false]),
-      strict_na=select_first([quast_strict_na, false]),
+      large=select_first([quast_large, false]),
+      rna_finding=select_first([quast_rna_finding, false]),
       skip_unaligned_mis_contigs=select_first([quast_skip_unaligned_mis_contigs, true]),
-      references_list2=quast_references_list2,
-      labels=quast_labels
+      split_scaffolds=select_first([quast_split_scaffolds, false]),
+      strict_na=select_first([quast_strict_na, false]),
+      upper_bound_assembly=select_first([quast_upper_bound_assembly, false]),
+      use_all_alignments=select_first([quast_use_all_alignments, false]),
+      labels=quast_labels,
+      references_list2=quast_references_list2
   }
   call P.prokka as prokka {
     input:
-      locustag=select_first([prokka_locustag, "PROKKA"]),
-      increment=select_first([prokka_increment, 10]),
       genus=select_first([prokka_genus, "Escherichia"]),
-      species=select_first([prokka_species, "Coli"]),
-      strain=select_first([prokka_strain, "C-1"]),
+      increment=select_first([prokka_increment, 10]),
+      locustag=select_first([prokka_locustag, "PROKKA"]),
+      notrna=unicycler.out_assembly,
       proteins=prokka_proteins,
-      notrna=unicycler.out_assembly
+      species=select_first([prokka_species, "Coli"]),
+      strain=select_first([prokka_strain, "C-1"])
   }
   output {
     File fastqc1_out_html_file = fastqc1.out_html_file

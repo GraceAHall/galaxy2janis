@@ -74,7 +74,7 @@ class TagManager:
                 return get_tool_input_name(entity)
             case 'tool_output':
                 basetag = entity.get_name()
-                if basetag.startswith('out_') and basetag not in self.basetags_uuids:
+                if basetag.startswith('out') and basetag not in self.basetags_uuids:
                     return basetag
                 else:
                     return f'out_{basetag}'

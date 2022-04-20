@@ -131,6 +131,18 @@
             ]
         },
         {
+            "name": "long_read_characterisation_minimap2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/long_read_characterisation_minimap2.ga"
+            ]
+        },
+        {
             "name": "fastqc",
             "type": "python",
             "request": "launch",
@@ -141,6 +153,19 @@
                 "tool",
                 "--dir", "test/data/tools/fastqc", 
                 "--xml", "rgFastQC.xml",
+            ]
+        },
+        {
+            "name": "awk",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/text_processing", 
+                "--xml", "awk.xml",
             ]
         },
         {

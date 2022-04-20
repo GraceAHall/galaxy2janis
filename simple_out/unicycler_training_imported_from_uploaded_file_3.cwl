@@ -21,8 +21,6 @@ inputs:
   type: File
 - id: fastqc1_limits
   type: File
-- id: fastqc1_outdir
-  type: File
 - id: fastqc1_nogroup
   doc: |-
     Disable grouping of bases for reads >50bp. Using this option will cause fastqc to crash and burn if you use it on really long reads, and your plots may end up a ridiculous size. You have been warned!. possible values: --nogroup
@@ -35,8 +33,6 @@ inputs:
 - id: fastqc2_html_file
   type: File
 - id: fastqc2_limits
-  type: File
-- id: fastqc2_outdir
   type: File
 - id: fastqc2_nogroup
   doc: |-
@@ -56,10 +52,11 @@ inputs:
     Do not rotate completed replicons to start at a standard gene.. Unicycler uses TBLASTN to search for dnaA or repA alleles in each completed replicon. If one is found, the sequence is rotated and/or flipped so that it begins with that gene encoded on the forward strand. This provides consistently oriented assemblies and reduces the risk that a gene will be split across the start and end of the sequence.. possible values: --no_rotate
   type: boolean
   default: false
-- id: unicycler_start_gene_id
-  doc: The minimum required BLAST percent identity for a start gene search
-  type: float
-  default: 90.0
+- id: unicycler_no_correct
+  doc: |-
+    Skip SPAdes error correction step. This option turns off SPAdes error correction. Generally it is highly recommended to use correction.. possible values: --no_correct
+  type: boolean
+  default: false
 - id: unicycler_no_pilon
   doc: |-
     Do not use Pilon to polish the final assembly.. Unicycler uses Pilon tool for polishing final assembly.. possible values: --no_pilon
@@ -70,11 +67,10 @@ inputs:
     Only keep the largest connected component of the assembly graph. possible values: false, true
   type: boolean
   default: false
-- id: unicycler_no_correct
-  doc: |-
-    Skip SPAdes error correction step. This option turns off SPAdes error correction. Generally it is highly recommended to use correction.. possible values: --no_correct
-  type: boolean
-  default: false
+- id: unicycler_start_gene_id
+  doc: The minimum required BLAST percent identity for a start gene search
+  type: float
+  default: 90.0
 - id: unicycler_start_gene_cov
   doc: The minimum required BLAST percent coverage for a start gene search
   type: float
@@ -85,18 +81,9 @@ inputs:
   type: File
 - id: quast_references_list2
   type: File
-- id: quast_strict_na
+- id: quast_use_all_alignments
   doc: |-
-    Break contigs at every misassembly event (including local ones) to compute NAx and NGAx statistics?. By default, QUAST breaks contigs only at extensive misassemblies (not local ones).. possible values: --strict-NA
-  type: boolean
-  default: false
-- id: quast_circos
-  doc: 'Draw Circos plot?. possible values: --circos'
-  type: boolean
-  default: false
-- id: quast_large
-  doc: |-
-    Is genome large (> 100 Mbp)?. Use optimal parameters for evaluation of large genomes. Affects speed and accuracy. In particular, imposes --eukaryote --min-contig 3000 --min-alignment 500 --extensive-mis-size 7000 (can be overridden manually with the corresponding options). In addition, this mode tries to identify misassemblies caused by transposable elements and exclude them from the number of misassemblies.. possible values: --large
+    Use all alignments as in QUAST v.1.*. to compute genome fraction, # genomic features, # operons metrics?. By default, QUAST v.2.0 and higher filters out ambiguous and redundant alignments, keeping only one alignment per contig (or one set of non-overlapping or slightly overlapping alignments). possible values: --use-all-alignments
   type: boolean
   default: false
 - id: quast_fragmented
@@ -104,29 +91,9 @@ inputs:
     Use all alignments as in QUAST v.1.*. to compute genome fraction, # genomic features, # operons metrics?. By default, QUAST v.2.0 and higher filters out ambiguous and redundant alignments, keeping only one alignment per contig (or one set of non-overlapping or slightly overlapping alignments). possible values: --fragmented
   type: boolean
   default: false
-- id: quast_rna_finding
+- id: quast_large
   doc: |-
-    Enables ribosomal RNA gene finding?. By default, we assume that the genome is prokaryotic, and Barrnap uses the bacterial database for rRNA prediction. If the genome is eukaryotic (fungal), use --eukaryote (--fungus) option to force Barrnap to work with the eukaryotic (fungal) database. . possible values: --rna-finding
-  type: boolean
-  default: false
-- id: quast_split_scaffolds
-  doc: |-
-    Are assemblies scaffolds rather than contigs?. QUAST will add split versions of assemblies to the comparison. Assemblies are split by continuous fragments of N's of length >= 10. If broken version is equal to the original assembly (i.e. nothing was split) it is not included in the comparison.. possible values: --split-scaffolds
-  type: boolean
-  default: false
-- id: quast_conserved_genes_finding
-  doc: |-
-    Enables search for Universal Single-Copy Orthologs using BUSCO?. By default, we assume that the genome is prokaryotic, and BUSCO uses the bacterial database of orthologs. If the genome is eukaryotic (fungal), use --eukaryote (--fungus) option to force BUSCO to work with the eukaryotic (fungal) database. . possible values: --conserved-genes-finding
-  type: boolean
-  default: false
-- id: quast_use_all_alignments
-  doc: |-
-    Use all alignments as in QUAST v.1.*. to compute genome fraction, # genomic features, # operons metrics?. By default, QUAST v.2.0 and higher filters out ambiguous and redundant alignments, keeping only one alignment per contig (or one set of non-overlapping or slightly overlapping alignments). possible values: --use-all-alignments
-  type: boolean
-  default: false
-- id: quast_upper_bound_assembly
-  doc: |-
-    Simulate upper bound assembly based on the reference genome and a given set reads?. Mate-pairs or long reads, such as Pacbio SMRT/Oxford Nanopore, are REQUIRED. This assembly is added to the comparison and could be useful for estimating the upper bounds of completeness and contiguity that theoretically can be reached by assembly software from this particular set of reads. The concept is based on the fact that the reference genome cannot be completely reconstructed from raw reads due to long genomic repeats and low covered regions. See Mikheenko et al., 2018 for more details. . possible values: --upper-bound-assembly
+    Is genome large (> 100 Mbp)?. Use optimal parameters for evaluation of large genomes. Affects speed and accuracy. In particular, imposes --eukaryote --min-contig 3000 --min-alignment 500 --extensive-mis-size 7000 (can be overridden manually with the corresponding options). In addition, this mode tries to identify misassemblies caused by transposable elements and exclude them from the number of misassemblies.. possible values: --large
   type: boolean
   default: false
 - id: quast_skip_unaligned_mis_contigs
@@ -134,20 +101,45 @@ inputs:
     Distinguish contigs with more than 50% unaligned bases as a separate group of contigs?. By default, QUAST breaks contigs only at extensive misassemblies (not local ones).. possible values: --skip-unaligned-mis-contigs
   type: boolean
   default: true
+- id: quast_upper_bound_assembly
+  doc: |-
+    Simulate upper bound assembly based on the reference genome and a given set reads?. Mate-pairs or long reads, such as Pacbio SMRT/Oxford Nanopore, are REQUIRED. This assembly is added to the comparison and could be useful for estimating the upper bounds of completeness and contiguity that theoretically can be reached by assembly software from this particular set of reads. The concept is based on the fact that the reference genome cannot be completely reconstructed from raw reads due to long genomic repeats and low covered regions. See Mikheenko et al., 2018 for more details. . possible values: --upper-bound-assembly
+  type: boolean
+  default: false
+- id: quast_split_scaffolds
+  doc: |-
+    Are assemblies scaffolds rather than contigs?. QUAST will add split versions of assemblies to the comparison. Assemblies are split by continuous fragments of N's of length >= 10. If broken version is equal to the original assembly (i.e. nothing was split) it is not included in the comparison.. possible values: --split-scaffolds
+  type: boolean
+  default: false
+- id: quast_circos
+  doc: 'Draw Circos plot?. possible values: --circos'
+  type: boolean
+  default: false
+- id: quast_conserved_genes_finding
+  doc: |-
+    Enables search for Universal Single-Copy Orthologs using BUSCO?. By default, we assume that the genome is prokaryotic, and BUSCO uses the bacterial database of orthologs. If the genome is eukaryotic (fungal), use --eukaryote (--fungus) option to force BUSCO to work with the eukaryotic (fungal) database. . possible values: --conserved-genes-finding
+  type: boolean
+  default: false
+- id: quast_strict_na
+  doc: |-
+    Break contigs at every misassembly event (including local ones) to compute NAx and NGAx statistics?. By default, QUAST breaks contigs only at extensive misassemblies (not local ones).. possible values: --strict-NA
+  type: boolean
+  default: false
+- id: quast_rna_finding
+  doc: |-
+    Enables ribosomal RNA gene finding?. By default, we assume that the genome is prokaryotic, and Barrnap uses the bacterial database for rRNA prediction. If the genome is eukaryotic (fungal), use --eukaryote (--fungus) option to force Barrnap to work with the eukaryotic (fungal) database. . possible values: --rna-finding
+  type: boolean
+  default: false
 - id: prokka_proteins
   type: File
-- id: prokka_genus
-  doc: Genus name (--genus). May be used to aid annotation, see --usegenus below
-  type: string
-  default: Escherichia
 - id: prokka_species
   doc: Species name (--species)
   type: string
   default: Coli
-- id: prokka_increment
-  doc: Locus tag counter increment (--increment)
-  type: int
-  default: 10
+- id: prokka_genus
+  doc: Genus name (--genus). May be used to aid annotation, see --usegenus below
+  type: string
+  default: Escherichia
 - id: prokka_strain
   doc: Strain name (--strain)
   type: string
@@ -156,6 +148,10 @@ inputs:
   doc: Locus tag prefix (--locustag)
   type: string
   default: PROKKA
+- id: prokka_increment
+  doc: Locus tag counter increment (--increment)
+  type: int
+  default: 10
 
 outputs:
 - id: fastqc1_out_html_file
@@ -225,8 +221,6 @@ steps:
     source: fastqc1_nogroup
   - id: adapters
     source: fastqc1_adapters
-  - id: outdir
-    source: fastqc1_outdir
   - id: contaminants
     source: fastqc1_contaminants
   - id: limits
@@ -243,8 +237,6 @@ steps:
     source: fastqc2_nogroup
   - id: adapters
     source: fastqc2_adapters
-  - id: outdir
-    source: fastqc2_outdir
   - id: contaminants
     source: fastqc2_contaminants
   - id: limits
@@ -255,34 +247,34 @@ steps:
   - id: out_text_file
 - id: unicycler
   in:
-  - id: no_correct
-    source: unicycler_no_correct
   - id: largest_component
     source: unicycler_largest_component
-  - id: no_rotate
-    source: unicycler_no_rotate
+  - id: no_correct
+    source: unicycler_no_correct
   - id: no_pilon
     source: unicycler_no_pilon
+  - id: no_rotate
+    source: unicycler_no_rotate
+  - id: contamination
+    source: unicycler_contamination
   - id: fastq_input1
     source: in_forward_reads
   - id: fastq_input2
     source: in_reverse_reads
+  - id: input_l_file
+    source: unicycler_input_l_file
   - id: input_s_fastqsanger
     source: in_forward_reads
   - id: long
     source: in_long_reads
-  - id: start_genes
-    source: unicycler_start_genes
-  - id: start_gene_id
-    source: unicycler_start_gene_id
-  - id: start_gene_cov
-    source: unicycler_start_gene_cov
-  - id: contamination
-    source: unicycler_contamination
   - id: pilon_path
     source: unicycler_pilon_path
-  - id: input_l_file
-    source: unicycler_input_l_file
+  - id: start_gene_cov
+    source: unicycler_start_gene_cov
+  - id: start_gene_id
+    source: unicycler_start_gene_id
+  - id: start_genes
+    source: unicycler_start_genes
   run: tools/unicycler_0_4_8_0.cwl
   out:
   - id: out_assembly_graph
@@ -298,30 +290,30 @@ steps:
   - id: out_log
 - id: quast
   in:
-  - id: split_scaffolds
-    source: quast_split_scaffolds
-  - id: large
-    source: quast_large
   - id: circos
     source: quast_circos
-  - id: rna_finding
-    source: quast_rna_finding
   - id: conserved_genes_finding
     source: quast_conserved_genes_finding
-  - id: use_all_alignments
-    source: quast_use_all_alignments
   - id: fragmented
     source: quast_fragmented
-  - id: upper_bound_assembly
-    source: quast_upper_bound_assembly
-  - id: strict_na
-    source: quast_strict_na
+  - id: large
+    source: quast_large
+  - id: rna_finding
+    source: quast_rna_finding
   - id: skip_unaligned_mis_contigs
     source: quast_skip_unaligned_mis_contigs
-  - id: references_list2
-    source: quast_references_list2
+  - id: split_scaffolds
+    source: quast_split_scaffolds
+  - id: strict_na
+    source: quast_strict_na
+  - id: upper_bound_assembly
+    source: quast_upper_bound_assembly
+  - id: use_all_alignments
+    source: quast_use_all_alignments
   - id: labels
     source: quast_labels
+  - id: references_list2
+    source: quast_references_list2
   run: tools/quast_5_0_2.cwl
   out:
   - id: out_quast_tabular
@@ -333,20 +325,20 @@ steps:
   - id: out_kmers
 - id: prokka
   in:
-  - id: locustag
-    source: prokka_locustag
-  - id: increment
-    source: prokka_increment
   - id: genus
     source: prokka_genus
+  - id: increment
+    source: prokka_increment
+  - id: locustag
+    source: prokka_locustag
+  - id: notrna
+    source: unicycler/out_assembly
+  - id: proteins
+    source: prokka_proteins
   - id: species
     source: prokka_species
   - id: strain
     source: prokka_strain
-  - id: proteins
-    source: prokka_proteins
-  - id: notrna
-    source: unicycler/out_assembly
   run: tools/prokka_1_14_5.cwl
   out:
   - id: out_gff

@@ -1,10 +1,12 @@
 
 
-from janis.formatters.JanisToolFormatter import JanisToolFormatter
-from janis.formatters.JanisWorkflowFormatter import JanisWorkflowFormatter
 from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from tool.Tool import Tool
 from workflows.workflow.Workflow import Workflow
+
+from janis.definitions.tool.JanisToolFormatter import JanisToolFormatter
+from janis.definitions.workflow.StepwiseWorkflowDefinitionWriter import StepwiseWorkflowDefinitionWriter
+from janis.definitions.workflow.BulkWorkflowDefinitionWriter import BulkWorkflowDefinitionWriter
 
 
 def write_file(path: str, contents: str) -> None:
@@ -18,22 +20,12 @@ def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
     write_file(tool_path, tool_definition)
 
 def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
+    # tool definitions
     write_workflow_tools(workflow)
-    write_workflow_steps(esettings, workflow)
-    write_workflow_config(esettings, workflow)
-    write_workflow_definition(esettings, workflow)
 
-def write_workflow_steps(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    pass
-
-def write_workflow_config(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    pass
-
-def write_workflow_definition(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    formatter = JanisWorkflowFormatter(workflow)
-    workflow_definition = formatter.to_janis_definition()
-    workflow_path = esettings.get_janis_workflow_path()
-    write_file(workflow_path, workflow_definition)
+    # workflow definition
+    writer = StepwiseWorkflowDefinitionWriter(esettings, workflow)
+    writer.write()
 
 def write_workflow_tools(workflow: Workflow) -> None:
     for step in workflow.list_steps():

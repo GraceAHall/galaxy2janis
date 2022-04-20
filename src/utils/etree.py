@@ -4,7 +4,18 @@
 # libraries
 from xml.etree import ElementTree as et
 
-# local modules
+
+# new
+def get_xml_tool_id(filepath: str) -> str:
+    tree = et.parse(filepath)
+    root = tree.getroot()
+    return str(root.attrib['id']) # type: ignore
+
+
+
+
+
+
 
 
 # TODO add tests for each of these!
@@ -75,8 +86,6 @@ def create_output_param(node: et.Element) -> et.Element:
     }
     node = et.Element('param', attributes)
     return node
-
-
 
 
 

@@ -1,10 +1,9 @@
 
-import os
 from typing import Optional
 from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from startup.ArgsValidator import ToolArgsValidator, WorkflowArgsValidator
 from startup.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSettingsInitialiser
-from startup.downloads import download_repo
+from startup.downloads import handle_downloads
 from startup.FileValidator import ToolFileValidator, WorkflowFileValidator
 from startup.FileInitialiser import ToolFileInitialiser, WorkflowFileInitialiser
 
@@ -17,26 +16,20 @@ and managed. shouldn't be any config issues past this point.
 """
 
 
-def load_tool_settings(args: dict[str, Optional[str]]) -> ToolExeSettings:
+def load_tool_settings(args: dict[str, Optional[str]], intended_tool_id: Optional[str]=None) -> ToolExeSettings:
     ToolArgsValidator().validate(args)
-    settings = ToolSettingsInitialiser().init_settings(args)
-    settings = handle_downloads(settings)
-    ToolFileValidator().validate(settings)
-    ToolFileInitialiser().initialise(settings)
-    return settings
-
-def handle_downloads(esettings: ToolExeSettings) -> ToolExeSettings:
-    if esettings.remote_url:
-        esettings.xmldir = download_repo(esettings.remote_url, esettings.get_download_dir())
-        xmls = [x for x in os.listdir(esettings.xmldir) if x.endswith('.xml') and 'macros' not in x]
-        esettings.xmlfile = xmls[0]
+    esettings = ToolSettingsInitialiser().init_settings(args)
+    if esettings.remote_url and intended_tool_id:
+        esettings = handle_downloads(intended_tool_id, esettings)
+    ToolFileValidator().validate(esettings)
+    ToolFileInitialiser().initialise(esettings)
     return esettings
     
 def load_workflow_settings(args: dict[str, Optional[str]]) -> WorkflowExeSettings:
     WorkflowArgsValidator().validate(args)
-    settings = WorkflowSettingsInitialiser().init_settings(args)
-    WorkflowFileValidator().validate(settings)
-    WorkflowFileInitialiser().initialise(settings)
-    return settings
+    esettings = WorkflowSettingsInitialiser().init_settings(args)
+    WorkflowFileValidator().validate(esettings)
+    WorkflowFileInitialiser().initialise(esettings)
+    return esettings
     
     

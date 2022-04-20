@@ -7,12 +7,13 @@ from typing import Any, Optional
 
 @dataclass
 class StepMetadata:
-    step_id: int
     uuid: str
+    step_id: int
     step_name: str
     tool_id: str
-    workflow_outputs: list[dict[str, Any]]
     is_inbuilt: bool
+    workflow_outputs: list[dict[str, Any]]
+    repo_name: Optional[str] = None
     label: Optional[str] = None
     owner: Optional[str] = None
     changeset_revision: Optional[str] = None
@@ -20,7 +21,7 @@ class StepMetadata:
     tool_definition_path: Optional[str] = None
 
     def get_uri(self) -> str:
-        return f'https://{self.shed}/repos/{self.owner}/{self.tool_id}/archive/{self.changeset_revision}.tar.gz'
+        return f'https://{self.shed}/repos/{self.owner}/{self.repo_name}/archive/{self.changeset_revision}.tar.gz'
 
 
 

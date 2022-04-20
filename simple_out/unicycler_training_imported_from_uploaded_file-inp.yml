@@ -11,9 +11,6 @@ fastqc1_limits:
   class: File
   path: null
 fastqc1_nogroup: false
-fastqc1_outdir:
-  class: File
-  path: null
 fastqc2_adapters:
   class: File
   path: null
@@ -27,9 +24,6 @@ fastqc2_limits:
   class: File
   path: null
 fastqc2_nogroup: false
-fastqc2_outdir:
-  class: File
-  path: null
 in_forward_reads:
   class: File
   path: null

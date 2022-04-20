@@ -82,7 +82,7 @@ class ToolFactory:
         for gxparam in self.xmltool.list_outputs():
             has_output_component = False
             for output in known_outputs:
-                if output.gxparam == gxparam:
+                if output.gxparam.name == gxparam.name:
                     has_output_component = True
                     break
             if not has_output_component:

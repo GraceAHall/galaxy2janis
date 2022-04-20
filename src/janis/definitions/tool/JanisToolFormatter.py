@@ -9,7 +9,7 @@ from tool.Tool import Tool
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
 from janis.imports.ToolImportHandler import ToolImportHandler
-import janis.snippets.tool_snippets as snippets
+import janis.definitions.tool.snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
 
