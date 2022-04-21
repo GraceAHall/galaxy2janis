@@ -1,6 +1,58 @@
 
 
 
+class BaseWorkflowDefinitionWriter(WorkflowDefinitionWriter):
+    def __init__(self, esettings: WorkflowExeSettings, workflow: Workflow):
+        self.esettings = esettings
+        self.workflow = workflow
+        self.ignore_defaults: bool = False 
+        # TODO NOTE ^^^ SHOULD BE CLI RUNTIME SETTING
+
+    def write(self) -> None:
+        self.write_header()
+        self.write_imports()
+        self.write_metadata()
+        self.write_declaration()
+        self.write_inputs()
+        self.write_steps()
+        self.write_outputs()
+
+
+
+
+imports 
+variable 
+    - common imports
+    - either tool imports or step imports
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Things which get uuids:
 - workflow          Workflow
 - workflow step     WorkflowStep

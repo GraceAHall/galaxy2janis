@@ -1,93 +1,108 @@
 
 
+from abc import ABC, abstractmethod
+
 from datatypes.JanisDatatype import JanisDatatype
+from workflows.step.WorkflowStep import WorkflowStep
 from workflows.workflow.Workflow import Workflow
+from .Import import Import
 
 
-default_class_imports = {
-    'janis_core': set([
-        'WorkflowBuilder', 
-        'WorkflowMetadata',
-    ])
-}
-default_datatype_imports = {
-    'janis_core.types.common_data_types': set([
-        'File', 
-    ])
-}
+class SortStrategy(ABC):
+    @abstractmethod
+    def sort(self, imports: list[Import]) -> list[Import]:
+        ...
+
+class AlphabeticalSortStrategy(SortStrategy):
+    def sort(self, imports: list[Import]) -> list[Import]:
+        imports.sort(key=lambda x: f'{x.path}.{x.entity}')
+        return imports
+
+class LengthSortStrategy(SortStrategy):
+    def sort(self, imports: list[Import]) -> list[Import]:
+        imports.sort(key=lambda x: len(f'{x.path}.{x.entity}'), reverse=True)
+        return imports
+
+
+default_class_imports = [
+    Import(path='janis_core', entity='WorkflowBuilder'),
+    Import(path='janis_core', entity='WorkflowMetadata')
+]
+
+default_datatype_imports = [
+    Import(path='janis_core.types.common_data_types', entity='File'),
+]
+
 
 class WorkflowImportCollector:
     def __init__(self):
-        self.class_imports: dict[str, set[str]] = default_class_imports
-        self.tool_imports: dict[str, set[str]] = {}
-        self.datatype_imports: dict[str, set[str]] = default_datatype_imports 
-
-    def collect(self, workflow: Workflow) -> None:
-        raise NotImplementedError()
-
-    def update_imports(self, tag: str, component: Any) -> None:
-        match component:
-            case WorkflowInput():
-                self.update_imports_for_workflow_input(component)
-            case WorkflowStep():
-                self.update_imports_for_tool_step(tag, component)
-            case WorkflowOutput():
-                self.update_imports_for_workflow_output(component)
-            case _:
-                pass
+        self.imports: dict[str, Import] = dict()
     
-    def update_imports_for_workflow_input(self, inp: WorkflowInput) -> None:
-        self.import_handler.update_datatype_imports(inp.janis_datatypes)
+    def update(self, imports: list[Import]) -> None:
+        for imp in imports:
+            key = f'{imp.path}.{imp.entity}'
+            if key not in self.imports:
+                self.imports[key] = imp
     
-    def update_imports_for_tool_step(self, tool_tag: str, step: WorkflowStep) -> None:
-        self.update_imports_for_tool_definition(tool_tag, step)
-        self.update_imports_for_tool_inputs(step)
-        self.update_imports_for_tool_outputs(step)
+    def list_imports(self) -> list[Import]:
+        sort_strategies = [
+            AlphabeticalSortStrategy(),
+            LengthSortStrategy(),
+        ]
+        imports = list(self.imports.values())
+        for strategy in sort_strategies:
+            imports = strategy.sort(imports)
+        return imports
 
-    def update_imports_for_tool_definition(self, tool_tag: str, step: WorkflowStep) -> None:
+    def collect_workflow_imports(self, workflow: Workflow) -> None:
+        workflow_imports: list[Import] = []
+        workflow_imports += default_class_imports
+        workflow_imports += default_datatype_imports
+        workflow_imports += self.get_imports_from_inputs(workflow)
+        workflow_imports += self.get_imports_from_outputs(workflow)
+        self.update(workflow_imports)
+
+    def collect_step_imports(self, step: WorkflowStep, workflow: Workflow) -> None:
+        step_imports: list[Import] = []
+        step_imports.append(self.get_tool_definition_import(step, workflow))
+        step_imports += self.get_runtime_input_imports(step)
+        self.update(step_imports)
+        
+    def get_imports_from_inputs(self, workflow: Workflow) -> list[Import]:
+        imports: list[Import] = []
+        for inp in workflow.inputs:
+            imports += self.get_datatype_imports(inp.janis_datatypes)
+        return imports
+    
+    def get_datatype_imports(self, janis_types: list[JanisDatatype]) -> list[Import]:
+        imports: list[Import] = [] 
+        for jtype in janis_types:
+            imports.append(Import(path=jtype.import_path, entity=jtype.classname))
+        return imports
+    
+    def get_imports_from_outputs(self, workflow: Workflow) -> list[Import]:
+        imports: list[Import] = []
+        for out in workflow.outputs:
+            imports += self.get_datatype_imports(out.janis_datatypes)
+        return imports
+
+    def get_tool_definition_import(self, step: WorkflowStep, workflow: Workflow) -> Import:
         tool_path = step.get_definition_path()
         tool_path = tool_path.rsplit('.py')[0]
         tool_path = tool_path.replace('/', '.')
+        tool_tag = workflow.tag_manager.get(step.tool.get_uuid())
         tool_tag = tool_tag.rstrip('123456789') # same as getting basetag, just dodgy method
-        self.import_handler.update_tool_imports(tool_path, tool_tag)
+        return Import(path=tool_path, entity=tool_tag)
 
-    def update_imports_for_tool_inputs(self, step: WorkflowStep) -> None:
-        pass
-        # # get uuids of tool components with value
-        # for inp in step():
-        # assert(step.tool)
-        # component_uuids = [uuid for uuid, _ in step.list_tool_values()]
-        # # get component for each uuid
-        # components = [c for c in step.tool.inputs if c.get_uuid() in component_uuids]
-        # # get datatypes of that component and update
-        # for component in components:
-        #     self.import_handler.update_datatype_imports(component.janis_datatypes)
-
-    def update_imports_for_tool_outputs(self, step: WorkflowStep) -> None:
-        pass
-        # # step outputs? this is a little weird
-        # for output in step.list_outputs():
-        #     self.import_handler.update_datatype_imports(output.janis_datatypes)
-
-    def update_imports_for_workflow_output(self, output: WorkflowOutput) -> None:
-        self.import_handler.update_datatype_imports(output.janis_datatypes)
-
-
-    def update_class_imports(self, import_path: str, import_name: str) -> None: 
-        if import_path not in self.class_imports:
-            self.class_imports[import_path] = set()
-        self.class_imports[import_path].add(import_name)
+    def get_runtime_input_imports(self, step: WorkflowStep) -> list[Import]:
+        raise NotImplementedError()
     
-    def update_tool_imports(self, import_path: str, import_name: str) -> None: 
-        if import_path not in self.class_imports:
-            self.tool_imports[import_path] = set()
-        self.tool_imports[import_path].add(import_name)
-    
-    def update_datatype_imports(self, janis_types: list[JanisDatatype]) -> None: 
-        for jtype in janis_types:
-            if jtype.import_path not in self.datatype_imports:
-                self.datatype_imports[jtype.import_path] = set()
-            self.datatype_imports[jtype.import_path].add(jtype.classname)
+
+
+
+
+"""
+    # FORMATTING AND STR REPRESENTATION
 
     def imports_to_string(self) -> str:
         out_str: str = ''
@@ -124,3 +139,32 @@ class WorkflowImportCollector:
         imports_list.sort(key=lambda x: len(x))
         return imports_list
 
+
+    # STEP RELATED
+
+
+
+    def update_imports_for_tool_outputs(self, step: WorkflowStep) -> None:
+        pass
+    
+    def update_tool_imports(self, import_path: str, import_name: str) -> None: 
+        if import_path not in self.class_imports:
+            self.tool_imports[import_path] = set()
+        self.tool_imports[import_path].add(import_name)
+
+
+
+
+    def update_imports(self, tag: str, component: Any) -> None:
+        match component:
+            case WorkflowInput():
+                self.update_imports_for_workflow_input(component)
+            case WorkflowStep():
+                self.update_imports_for_tool_step(tag, component)
+            case WorkflowOutput():
+                self.update_imports_for_workflow_output(component)
+            case _:
+                pass
+
+
+"""

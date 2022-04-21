@@ -8,8 +8,6 @@ from typing import Optional
 from xmltool.param.Param import Param
 
 class InputValueType(Enum):
-    #WORKFLOW_INPUT  = auto()
-    #CONNECTION      = auto()
     RUNTIME         = auto()
     ENV_VAR         = auto()
     STRING          = auto()
@@ -35,6 +33,7 @@ class ConnectionInputValue(InputValue):
 @dataclass
 class WorkflowInputInputValue(InputValue):
     input_uuid: str
+    is_runtime: bool = False
 
 @dataclass
 class StaticInputValue(InputValue):
@@ -50,6 +49,6 @@ class DefaultInputValue(InputValue):
 class RuntimeInputValue(InputValue):
     """
     RuntimeInputValues are eventually migrated to WorkflowInputInputValues.
-    This is a temporary class and will never be present in a finalised workflow.
+    This is a temporary class and will never be present in a finalised workflow. ?
     """
     pass

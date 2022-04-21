@@ -38,7 +38,7 @@ def create_runtime(component: CommandComponent) -> InputValue:
     strategy = RuntimeInputValueFactory(component)
     return strategy.create()
 
-def create_workflow_input(component: CommandComponent, workflow_input: WorkflowInput) -> InputValue:
+def create_workflow_input(component: CommandComponent, workflow_input: WorkflowInput) -> WorkflowInputInputValue:
     strategy = WorkflowInputInputValueFactory(component, workflow_input)
     return strategy.create()
 
@@ -51,7 +51,6 @@ def create_unlinked_workflowinput(workflow_input: WorkflowInput) -> InputValue:
     component = Flag(prefix='__UNKNOWN__')
     strategy = WorkflowInputInputValueFactory(component, workflow_input)
     return strategy.create()
-
 
 def cast_connection_to_workflowinput(value: ConnectionInputValue, winp: WorkflowInput) -> WorkflowInputInputValue:
     return WorkflowInputInputValue(

@@ -1,15 +1,22 @@
 
 
-from typing import Optional, Tuple
-from janis_core import WorkflowBuilder
 from datetime import datetime
-
-from workflows.step.values.InputValue import InputValue
-
+from typing import Optional
+from janis.imports.Import import Import
 
 DATE_FORMAT = "%Y-%m-%d"
 
-w = WorkflowBuilder("alignmentWorkflow")
+
+# GENERAL ----------------------------------
+
+def import_snippet(imp: Import) -> str:
+    return f'from {imp.path} import {imp.entity}\n'
+
+def path_append_snippet() -> str:
+    return """
+import sys
+sys.path.append('/home/grace/work/pp/gxtool2janis')
+"""
 
 def gxtool2janis_note_snippet(
     workflow_name: str,
@@ -19,16 +26,11 @@ def gxtool2janis_note_snippet(
 # NOTE
 # This is an automated translation of the '{workflow_name}' version '{workflow_version}' workflow. 
 # Translation was performed by the gxtool2janis program (in-development)
-
 """
 
-def path_append_snippet() -> str:
-    return """import sys
-sys.path.append('/home/grace/work/pp/gxtool2janis')
+# WORKFLOW ---------------------------------
 
-"""
-
-def metadata_snippet(
+def workflow_metadata_snippet(
     tags: list[str],
     annotation: str,
     version: str,
@@ -48,14 +50,8 @@ def metadata_snippet(
     doi={doi},
     citation={citation}
 )
-
 """
 
-
-# WORKFLOWBUILDER
-"""
-w = WorkflowBuilder("alignmentWorkflow")
-"""
 def workflow_builder_snippet(
     tag: str,
     friendly_name: Optional[str]=None,
@@ -71,13 +67,6 @@ def workflow_builder_snippet(
     out_str += '\n)\n'
     return out_str
 
-
-# INPUTS
-"""
-w.input("sample_name", String)
-w.input("read_group", String)
-w.input("fastq", FastqGzPairedEnd)
-"""
 def workflow_input_snippet(
     tag: str,
     datatype: str,
@@ -95,55 +84,6 @@ def workflow_input_snippet(
     #out_str += '\n)\n'
     return out_str
 
-
-# STEPS
-"""
-w.step(
-    "bwamem", 
-    BwaMemLatest( 
-        reads=w.fastq, 
-        readGroupHeaderLine=w.read_group, 
-        reference=w.reference
-    )
-)
-"""
-def workflow_step_snippet(
-    tag: str,
-    tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
-    linked_values: list[Tuple[str, str]],
-    unlinked_values: list[Tuple[str, str]],
-    scatter: Optional[str]=None,
-    doc: Optional[str]=None
-) -> str:
-    out_str: str = ''
-    out_str += 'w.step(\n'
-    out_str += f'\t"{tag}",\n'
-    out_str += f'\tscatter="{scatter}",\n' if scatter else ''
-    out_str += f'\t{tool}(\n'
-    for tag, value in unlinked_values:
-        out_str += f'\t\t{tag}={value},\n'
-    for tag, value in linked_values:
-        out_str += f'\t\t{tag}={value},\n'
-    out_str += '\t)'
-    out_str += f',\n\tdoc="{doc}"' if doc else ''
-    out_str += '\n)\n'
-    return out_str
-
-
-# OUTPUTS
-"""
-w.output("out", source=w.sortsam.out)
-
-identifier: str,
-datatype: Optional[ParseableType] = None,
-source: Union[
-    List[Union[Selector, ConnectionSource]], Union[Selector, ConnectionSource]
-] = None,
-output_folder: Union[str, Selector, List[Union[str, Selector]]] = None,
-output_name: Union[bool, str, Selector, ConnectionSource] = True,
-extension: Optional[str] = None,
-doc: Union[str, OutputDocumentation] = None,
-"""
 def workflow_output_snippet(
     tag: str,
     datatype: str,
@@ -166,32 +106,119 @@ def workflow_output_snippet(
     out_str += '\n)\n'
     return out_str
 
-
-def translate_snippet(toolname: str) -> str:
+def workflow_translate_snippet(toolname: str) -> str:
     return f"""
-
 if __name__ == "__main__":
     w.translate("cwl", **args)
     w.translate("wdl", **args)
+"""
+
+# STEP -------------------------------------
+
+def step_title_snippet(step_count: int, tool_tag: str) -> str: 
+    title_line = f'# STEP{step_count}: {tool_tag.upper()}\n'
+    border = f'# {"=" * (len(title_line) - 2)}\n'
+    return border + title_line + border
+
+def step_foreward_snippet() -> str:
+    return"""
+\"\"\"
+
+FOREWORD ----------
+
+RUNTIME VALUES
+    ...
+
+PRE TASK, TOOL STEP, POST TASK
+    ...
+
+\"\"\"
+    """
+
+def step_runtime_input_snippet(input_tag: str, dtype_string: str) -> str:
+    return f'w.input("{input_tag}", {dtype_string})\n'
+
+def step_unlinked_value_snippet(text_value: str) -> str:
+    return f'#UNKNOWN={text_value}\n'
+
+def step_linked_value_snippet(
+    line_len: int,
+    tag_and_value: str,
+    label: Optional[str],
+    argument: str,
+    datatype: str
+) -> str:
+    left = tag_and_value
+    right = '# '
+    if label:
+        right += f'{label.upper()} '
+    right += f'({argument}) '
+    right += f'[{datatype.upper()}]'
+    return f'{left:<{line_len+2}}{right}'
 
 """
 
+def workflow_step_snippet(
+    tag: str,
+    tool: str, # represents a tool. need to import this and the import has to be a written janis tool definition
+    linked_values: list[Tuple[str, str]],
+    unlinked_values: list[Tuple[str, str]],
+    scatter: Optional[str]=None,
+    doc: Optional[str]=None
+) -> str:
+    out_str: str = ''
+    out_str += 'w.step(\n'
+    out_str += f'\t"{tag}",\n'
+    out_str += f'\tscatter="{scatter}",\n' if scatter else ''
+    out_str += f'\t{tool}(\n'
+    for tag, value in unlinked_values:
+        out_str += f'\t\t{tag}={value},\n'
+    for tag, value in linked_values:
+        out_str += f'\t\t{tag}={value},\n'
+    out_str += '\t)'
+    out_str += f',\n\tdoc="{doc}"' if doc else ''
+    out_str += '\n)\n'
+    return out_str
 
+def format_step_workflow_inputs(workflow: Workflow, step: WorkflowStep) -> str:
+    # for step workflow inputs - get (tag, inp) 
+    step_wflow_inputs = [inp for inp in workflow.inputs if inp.step_id == step.metadata.step_id]
+    step_wflow_inputs = [(workflow.tag_manager.get(inp.get_uuid()), inp) for inp in step_wflow_inputs]
+    step_wflow_inputs.sort(key=lambda x: x[0])
+    out_str: str = ''
+    for tag, inp in step_wflow_inputs:
+        out_str += snippets.workflow_input_snippet(
+            tag=tag,
+            datatype=inp.get_janis_datatype_str(),
+            doc=format_docstring(inp)
+        )
+    return out_str
 
-"""
-SHAME CORNER
+def format_step_body(workflow: Workflow, step: WorkflowStep) -> str:
+    step_tag = workflow.tag_manager.get(step.get_uuid())
+    tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
+    linked_values = step.get_tool_tags_values()
+    linked_values = format_linked_tool_values(linked_values, workflow)
+    unlinked_values = step.get_unlinked_values()
+    unlinked_values = format_unlinked_tool_values(unlinked_values, workflow)
+    return snippets.workflow_step_snippet(
+        tag=step_tag,
+        tool=tool_tag,
+        linked_values=linked_values,
+        unlinked_values=unlinked_values, 
+        doc=format_docstring(step)
+    )
 
+def format_linked_tool_values(tags_inputs: list[Tuple[str, InputValue]], workflow: Workflow, ignore_defaults: bool=True) -> list[Tuple[str, str]]:
+    # provides the final list of tool input tags & values. 
+    # logic for whether to write inputs if they are default, should wrap with quotes etc
+    out: list[Tuple[str, str]] = []
+    for comp_tag, input_value in tags_inputs:
+        if input_value.is_default_value and ignore_defaults:
+            pass
+        else:
+            formatted_value = format_value(input_value, workflow)
+            out.append((comp_tag, formatted_value))
+    return out
 
-    # if 'positional' in tool_input_values:
-    #     out_str += f'\t\t# Positionals\n'
-    #     for name, value in tool_input_values['positional']:
-    #         out_str += f'\t\t{name}={value},\n'
-    # if 'flag' in tool_input_values:
-    #     out_str += f'\t\t# Flags (boolean options)\n'
-    #     for name, value in tool_input_values['flag']:
-    #         out_str += f'\t\t{name}={value},\n'
-    # if 'option' in tool_input_values:
-    #     out_str += f'\t\t# Options\n'
-    #     for name, value in tool_input_values['option']:
-    #         out_str += f'\t\t{name}={value},\n'
 """

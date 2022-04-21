@@ -2,12 +2,9 @@
 
 
 
-
 # ===============
 # STEP2: filtlong
 # ===============
-
-
 
 
 """
@@ -24,7 +21,6 @@ PRE TASK, TOOL STEP, POST TASK
 
 """
 
-
 # RUNTIME VALUES
 w.input("filtlong_assembly", Fasta)
 w.input("filtlong_illumina_1", FastqSanger)   # see lines 67 - 72
@@ -40,7 +36,7 @@ w.input("filtlong_illumina_2", FastqSanger)
 "filtlong",
 	filtlong(
 		input_file=w.in_long_reads,         # INPUT CONNECTION (positional) [FASTQSANGER]
-		assembly=w.filtlong_assembly,       # PRE-TASK (--assembly) [FASTA]
+		assembly=w.filtlong_assembly,       # RUNTIME VALUE (--assembly) [FASTA]
 		illumina_1=w.filtlong_illumina_1,   # RUNTIME VALUE (--illumina_1) [FASTQSANGER]
 		illumina_2=w.filtlong_illumina_2,   # RUNTIME VALUE (--illumina_2) [FASTQSANGER]
 		trim=False,                         # (--trim) [BOOLEAN]
@@ -55,11 +51,20 @@ w.input("filtlong_illumina_2", FastqSanger)
         min_mean_q=None,        # (--min_mean_q) [FLOAT]
 	)
 
-# POST TASK
-"filtlong_post_task",
-    galaxy_post_task(
-        ...
-    )
+
+"""
+POST TASK
+
+## output file
+#if str( $sam_options.sam_options_selector ) == "no" or (str( $sam_options.sam_opt ) == "false" and str($sam_options.reorder) == ''):
+    | samtools sort -@\${GALAXY_SLOTS:-2} -O bam -o '$output'
+#else if $sam_options.reorder:
+    | samtools view -bS - -o '$output'
+#else:
+    > '$output'
+#end if
+"""
+
 
 
 RELEVANT CHEETAH SECTIONS

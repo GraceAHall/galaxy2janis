@@ -174,6 +174,7 @@ class InputValueLinker:
                 workflow_input = self.create_workflow_input(uuid)
                 self.workflow.add_input(workflow_input)
                 input_value = value_utils.create_workflow_input(component, workflow_input)
+                input_value.is_runtime = True
                 self.valregister.update(uuid, input_value)
 
     def should_migrate_runtime_to_workflowinput(self, value: InputValue) -> bool:
