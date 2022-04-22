@@ -5,47 +5,16 @@ from tool.Tool import Tool
 from workflows.workflow.Workflow import Workflow
 
 from janis.definitions.tool.JanisToolFormatter import JanisToolFormatter
-from janis.definitions.workflow.StepwiseWorkflowTextDefinition import StepwiseWorkflowTextDefinition
-from janis.definitions.workflow.BulkWorkflowTextDefinition import BulkWorkflowTextDefinition
+from janis.definitions.workflow.WorkflowTextDefinition import StepwiseWorkflowTextDefinition, WorkflowTextDefinition
+#from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition
 
-
-def write_file(path: str, contents: str) -> None:
-    with open(path, 'w') as fp:
-        fp.write(contents)
 
 def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
     formatter = JanisToolFormatter(tool)
     tool_definition = formatter.to_janis_definition()
     tool_path = esettings.get_janis_definition_path()
-    write_file(tool_path, tool_definition)
-
-def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    # tool definitions
-    write_workflow_tools(workflow)
-
-    # workflow definition
-    writer = BulkWorkflowTextDefinition(esettings, workflow)
-    writer.write()
-    
-def write_to_workflow_page(self, contents: str) -> None:
-    filepath = self.get_workflow_page_path()
-    with open(filepath, 'w') as fp:
-        fp.write(contents)
-
-def get_workflow_page_path(self) -> str:
-    return self.esettings.get_janis_workflow_path()
-
-
-def write_to_step_page(self, step: WorkflowStep, contents: str) -> None:
-    filepath = self.get_step_page_path(step)
-    with open(filepath, 'w') as fp:
-        fp.write(contents)
-
-def get_step_page_path(self, step: WorkflowStep) -> str:
-    steps_dir = self.esettings.get_janis_steps_dir()
-    step_tag = self.workflow.tag_manager.get(step.get_uuid())
-    return os.path.join(steps_dir, step_tag)
-
+    with open(tool_path, 'w') as fp:
+        fp.write(tool_definition)
 
 def write_workflow_tools(workflow: Workflow) -> None:
     for step in workflow.list_steps():
@@ -53,5 +22,32 @@ def write_workflow_tools(workflow: Workflow) -> None:
         formatter = JanisToolFormatter(step.tool)
         tool_definition = formatter.to_janis_definition()
         tool_path = step.get_definition_path()
-        write_file(tool_path, tool_definition)
+        with open(tool_path, 'w') as fp:
+            fp.write(tool_definition)
+
+def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
+    # tool definitions
+    write_workflow_tools(workflow)
+
+    # workflow definitions
+    text_def = StepwiseWorkflowTextDefinition(esettings, workflow)
+    wflow_path = esettings.get_janis_workflow_path()
+    write_main_page(wflow_path, text_def)
+    write_step_pages(text_def)
+    
+def write_main_page(path: str, text_def: WorkflowTextDefinition) -> None:
+    with open(path, 'w') as fp:
+        fp.write(text_def.header)
+        fp.write(text_def.imports)
+        fp.write(text_def.metadata)
+        fp.write(text_def.declaration)
+        fp.write(text_def.inputs)
+        for step in text_def.steps:
+            fp.write(step)
+        fp.write(text_def.outputs)
+        
+def write_step_pages(text_def: StepwiseWorkflowTextDefinition) -> None:
+    for page in text_def.step_pages:
+        with open(page.path, 'w') as fp:
+            fp.write(page.text)
 

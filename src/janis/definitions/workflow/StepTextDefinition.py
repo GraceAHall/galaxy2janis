@@ -27,23 +27,15 @@ class StepTextDefinition(ABC):
     step: WorkflowStep
     workflow: Workflow
     imports: list[Import]
-    pre_task: Optional[str] = None
-    post_task: Optional[str] = None
-    ignore_defaults: bool = False 
     # TODO NOTE ^^^ SHOULD BE CLI RUNTIME SETTING
 
     def get_step_tag(self) -> str:
         return self.workflow.tag_manager.get(self.step.get_uuid())
     
     def get_tool_tag(self) -> str:
-        assert(self.step.tool)
-        return self.workflow.tag_manager.get(self.step.tool.get_uuid())
-
-    def get_unlinked_values(self) -> list[InputValue]:
-        return self.step.get_unlinked_values()
-    
-    def get_linked_values(self) -> list[Tuple[str, InputValue]]:
-        return self.step.list_tool_values()
+        tool = self.step.tool
+        assert(tool)
+        return tool.tag_manager.get(tool.get_uuid())
 
     @property
     def title(self) -> str:
@@ -52,16 +44,20 @@ class StepTextDefinition(ABC):
     @property
     def foreword(self) -> str:
         return snippets.step_foreward_snippet()
+    
+    @property
+    def pre_task(self) -> str:
+        return snippets.pre_task_snippet()
 
     @property
     def runtime_inputs(self) -> str:
         # following few lines could be workflow method? 
-        linked_values = self.get_linked_values()
-        runtime_inputs = [value for _, value in linked_values if isinstance(value, WorkflowInputInputValue)]
-        runtime_inputs = [self.workflow.get_input(input_uuid=value.input_uuid) for value in runtime_inputs]
-        runtime_inputs = [x for x in runtime_inputs if x is not None]
+        runtime_inputs = self.step.list_runtime_values()
+        workflow_inputs = [ self.workflow.get_input(input_uuid=value.input_uuid) 
+                            for value in runtime_inputs]
+        workflow_inputs = [x for x in workflow_inputs if x is not None]
         out_str: str = ''
-        for wflow_inp in runtime_inputs:
+        for wflow_inp in workflow_inputs:
             input_tag = self.workflow.tag_manager.get(wflow_inp.get_uuid())
             dtype_string = wflow_inp.get_janis_datatype_str()
             out_str += snippets.workflow_input_snippet(input_tag, dtype_string)
@@ -83,15 +79,15 @@ class StepTextDefinition(ABC):
 
     def format_unlinked_inputs(self) -> str:
         out: str = ''
-        for input_value in self.get_unlinked_values():
+        for input_value in self.step.list_unlinked_values():
             text_value = self.get_input_text_value(input_value)
-            out += snippets.step_unlinked_value_snippet(text_value)
+            out += snippets.step_unlinked_value_snippet(text_value, input_value)
         return out
 
     def format_linked_nondefault_inputs(self) -> str:
         # linked non-default
-        out: str = '\n\n'
-        linked_values = self.get_linked_values()
+        out: str = ''
+        linked_values = self.step.list_linked_values()
         non_defaults = [(comp_uuid, value) for comp_uuid, value in linked_values 
                         if not isinstance(value, DefaultInputValue)]
         out += self.format_tool_inputs(non_defaults)
@@ -99,20 +95,20 @@ class StepTextDefinition(ABC):
         
     def format_linked_default_inputs(self) -> str:
         # linked default
-        out: str = '\n\n# DEFAULTS\n'
-        linked_values = self.get_linked_values()
+        out: str = '\n\t\t# DEFAULTS\n'
+        linked_values = self.step.list_linked_values()
         defaults = [(comp_uuid, value) for comp_uuid, value in linked_values 
                     if isinstance(value, DefaultInputValue)]
         out += self.format_tool_inputs(defaults)
         return out
 
     def format_tool_inputs(self, inputs: list[Tuple[str, InputValue]]) -> str:
-        out: str = ''
         line_len = self.calculate_line_len(inputs)
+        out: str = ''
         for comp_uuid, value in inputs:
-            tag = self.workflow.tag_manager.get(comp_uuid)
+            tag = self.step.tool.tag_manager.get(comp_uuid) # type: ignore
             text_value = self.get_input_text_value(value)
-            out += snippets.step_linked_value_snippet(
+            out += snippets.step_input_value_snippet(
                 line_len=line_len,
                 tag_and_value=f'{tag}={text_value},',           # trim=False,
                 label=self.get_input_label(value),              # INPUT CONNECTION? RUNTIME VALUE?
@@ -148,7 +144,8 @@ class StepTextDefinition(ABC):
 
     def calculate_line_len(self, inputs: list[Tuple[str, InputValue]]) -> int:
         max_line_len: int = 0
-        for tag, value in inputs:
+        for comp_uuid, value in inputs:
+            tag = self.step.tool.tag_manager.get(comp_uuid) # type: ignore
             line = f'{tag}={self.get_input_text_value(value)},'
             if len(line) > max_line_len:
                 max_line_len = len(line)
@@ -167,7 +164,9 @@ class StepTextDefinition(ABC):
                 text = f'w.{input_tag}'
             case StaticInputValue():
                 text = f'{value.value}'
-            case _: # Default?
+            case DefaultInputValue():
+                text = f'{value.value}'
+            case _: 
                 pass
         wrapped_value = self.wrap(text, value)
         return wrapped_value
@@ -178,11 +177,15 @@ class StepTextDefinition(ABC):
         return text
 
     def should_quote(self, inval: InputValue) -> bool:
-        if isinstance(inval, StaticInputValue):
+        if isinstance(inval, StaticInputValue) or isinstance(inval, DefaultInputValue):
             quoted_types = [InputValueType.STRING, InputValueType.RUNTIME]
             if inval.valtype in quoted_types:
                 return True
         return False
+    
+    @property
+    def post_task(self) -> str:
+        return snippets.post_task_snippet()
     
     
     

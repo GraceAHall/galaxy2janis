@@ -10,7 +10,7 @@ from workflows.step.metadata.StepMetadata import StepMetadata
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
-from workflows.step.values.InputValue import InputValue
+from workflows.step.values.InputValue import InputValue, WorkflowInputInputValue
 from workflows.step.values.InputValueRegister import InputValueRegister
 
 """
@@ -67,20 +67,25 @@ class WorkflowStep:
     def get_tool_name(self) -> str:
         return self.metadata.tool_id
 
-    def list_tool_values(self) -> list[Tuple[str, InputValue]]:
-        return self.values.list_values()
+    def list_linked_values(self) -> list[Tuple[str, InputValue]]:
+        return self.values.list_linked()
+    
+    def list_unlinked_values(self) -> list[InputValue]:
+        return self.values.list_unlinked()
+    
+    def list_runtime_values(self) -> list[WorkflowInputInputValue]:
+        linked_values = self.list_linked_values()
+        runtime_inputs = [value for _, value in linked_values if isinstance(value, WorkflowInputInputValue)]
+        return runtime_inputs
 
     def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
         """translates [uuid, value] into [tag, value] for tool input values"""
         out: list[Tuple[str, InputValue]] = []
-        for uuid, input_value in self.list_tool_values():
+        for uuid, input_value in self.list_linked_values():
             assert(self.tool)
             component_tag = self.tool.tag_manager.get(uuid)
             out.append((component_tag, input_value))
         return out
-    
-    def get_unlinked_values(self, only_connections: bool=False) -> list[InputValue]:
-        return self.values.list_unlinked()
 
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label

@@ -72,13 +72,13 @@ class InputValueRegister:
         if uuid in self.values:
             return self.values[uuid]
 
-    def update(self, uuid: str, value: InputValue) -> None:
+    def update_linked(self, uuid: str, value: InputValue) -> None:
         self.values[uuid] = value
     
     def update_unlinked(self, value: InputValue) -> None:
         self.unlinked.append(value)
     
-    def list_values(self) -> list[Tuple[str, InputValue]]:
+    def list_linked(self) -> list[Tuple[str, InputValue]]:
         values = list(self.values.items())
         for strategy in self.value_ordering_strategies:
             values = strategy.order(values)

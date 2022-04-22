@@ -61,7 +61,7 @@ class InputValueLinker:
                 step_input = self.step.get_input(gxvarname)
                 if step_input:
                     value = value_utils.create(component, step_input, self.workflow) # type: ignore
-                    self.valregister.update(component.get_uuid(), value)
+                    self.valregister.update_linked(component.get_uuid(), value)
                     step_input.linked = True
     
     def is_directly_linkable(self, component: CommandComponent) -> bool:
@@ -82,7 +82,7 @@ class InputValueLinker:
         for component in tool_inputs:
             if not self.valregister.get(component.get_uuid()):
                 value = value_utils.create_default(component)
-                self.valregister.update(component.get_uuid(), value)
+                self.valregister.update_linked(component.get_uuid(), value)
     
     def assign_unlinked(self) -> None:
         # go through step inputs, checking if any have the 'linked' attribute as false
@@ -104,7 +104,7 @@ class InputValueLinker:
         self.update_components_via_presence()
 
     def update_components_via_values(self) -> None:
-        for uuid, value in self.valregister.list_values():
+        for uuid, value in self.valregister.list_linked():
             component = self.tool.get_input(uuid)
             update_component_from_workflow_value(component, value)
     
@@ -126,11 +126,11 @@ class InputValueLinker:
         where the default doens't look right. ie environment variables
         forces the user to supply a value for this input. 
         """
-        for uuid, value in self.valregister.list_values():
+        for uuid, value in self.valregister.list_linked():
             if self.should_migrate_default_to_runtime(value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_runtime(component)
-                self.valregister.update(uuid, input_value)
+                self.valregister.update_linked(uuid, input_value)
     
     def should_migrate_default_to_runtime(self, value: InputValue) -> bool:
         if isinstance(value, DefaultInputValue):
@@ -144,11 +144,11 @@ class InputValueLinker:
         for the tool input. can be due to value being same as tool input default,
         or when the input value is None
         """
-        for uuid, value in self.valregister.list_values():
+        for uuid, value in self.valregister.list_linked():
             if self.should_migrate_static_to_default(uuid, value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_default(component)
-                self.valregister.update(uuid, input_value)
+                self.valregister.update_linked(uuid, input_value)
 
     def should_migrate_static_to_default(self, uuid: str, value: InputValue) -> bool:
         if isinstance(value, StaticInputValue):
@@ -168,14 +168,14 @@ class InputValueLinker:
         A WorkflowInput will be created, and the user will have to supply a value for this 
         input when running the workflow. 
         """
-        for uuid, value in self.valregister.list_values():
+        for uuid, value in self.valregister.list_linked():
             if self.should_migrate_runtime_to_workflowinput(value):
                 component = self.tool.get_input(uuid)
                 workflow_input = self.create_workflow_input(uuid)
                 self.workflow.add_input(workflow_input)
                 input_value = value_utils.create_workflow_input(component, workflow_input)
                 input_value.is_runtime = True
-                self.valregister.update(uuid, input_value)
+                self.valregister.update_linked(uuid, input_value)
 
     def should_migrate_runtime_to_workflowinput(self, value: InputValue) -> bool:
         if isinstance(value, RuntimeInputValue):

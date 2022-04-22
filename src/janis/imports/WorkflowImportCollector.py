@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from datatypes.JanisDatatype import JanisDatatype
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.workflow.Workflow import Workflow
-from .Import import Import
+from .Import import Import, ImportType
 
 
 class SortStrategy(ABC):
@@ -25,12 +25,12 @@ class LengthSortStrategy(SortStrategy):
 
 
 default_class_imports = [
-    Import(path='janis_core', entity='WorkflowBuilder'),
-    Import(path='janis_core', entity='WorkflowMetadata')
+    Import(path='janis_core', entity='WorkflowBuilder', itype=ImportType.JANIS_CLASS),
+    Import(path='janis_core', entity='WorkflowMetadata', itype=ImportType.JANIS_CLASS)
 ]
 
 default_datatype_imports = [
-    Import(path='janis_core.types.common_data_types', entity='File'),
+    Import(path='janis_core.types.common_data_types', entity='File', itype=ImportType.DATATYPE),
 ]
 
 
@@ -55,48 +55,87 @@ class WorkflowImportCollector:
         return imports
 
     def collect_workflow_imports(self, workflow: Workflow) -> None:
+        """
+        workflow inputs include janis classes and datatypes of workflow inputs/outputs
+        tool / step imports are handled in collect_step_imports() method
+        """
         workflow_imports: list[Import] = []
         workflow_imports += default_class_imports
         workflow_imports += default_datatype_imports
-        workflow_imports += self.get_imports_from_inputs(workflow)
-        workflow_imports += self.get_imports_from_outputs(workflow)
+        workflow_imports += self.init_imports_from_inputs(workflow)
+        workflow_imports += self.init_imports_from_outputs(workflow)
         self.update(workflow_imports)
 
     def collect_step_imports(self, step: WorkflowStep, workflow: Workflow) -> None:
+        """
+        step imports include datatypes in step runtime inputs (workflow inputs)
+        and the tool being executed (definition file is external)
+        """
         step_imports: list[Import] = []
-        step_imports.append(self.get_tool_definition_import(step, workflow))
-        step_imports += self.get_runtime_input_imports(step)
+        step_imports.append(self.init_tool_definition_import(step))
+        step_imports += self.init_runtime_input_imports(step, workflow)
         self.update(step_imports)
-        
-    def get_imports_from_inputs(self, workflow: Workflow) -> list[Import]:
+    
+    def collect_page_imports(self, step_paths: list[str]) -> None:
+        """
+        page imports are the individual steps (when defined in external files)
+        """
+        page_imports: list[Import] = []
+        for path in step_paths:
+            page_imports.append(self.init_page_import(path))
+        self.update(page_imports)
+    
+    def init_page_import(self, filepath: str) -> Import:
+        import_path = filepath.rsplit('.py', 1)[0]
+        import_path = import_path.replace('/', '.')
+        return Import(
+            path=import_path, 
+            entity='*', 
+            itype=ImportType.STEP_DEF
+        )
+
+    def init_imports_from_inputs(self, workflow: Workflow) -> list[Import]:
         imports: list[Import] = []
         for inp in workflow.inputs:
-            imports += self.get_datatype_imports(inp.janis_datatypes)
+            imports += self.init_datatype_imports(inp.janis_datatypes)
         return imports
     
-    def get_datatype_imports(self, janis_types: list[JanisDatatype]) -> list[Import]:
+    def init_datatype_imports(self, janis_types: list[JanisDatatype]) -> list[Import]:
         imports: list[Import] = [] 
         for jtype in janis_types:
-            imports.append(Import(path=jtype.import_path, entity=jtype.classname))
+            imports.append(Import(
+                path=jtype.import_path, 
+                entity=jtype.classname,
+                itype=ImportType.DATATYPE
+            ))
         return imports
     
-    def get_imports_from_outputs(self, workflow: Workflow) -> list[Import]:
+    def init_imports_from_outputs(self, workflow: Workflow) -> list[Import]:
         imports: list[Import] = []
         for out in workflow.outputs:
-            imports += self.get_datatype_imports(out.janis_datatypes)
+            imports += self.init_datatype_imports(out.janis_datatypes)
         return imports
 
-    def get_tool_definition_import(self, step: WorkflowStep, workflow: Workflow) -> Import:
+    def init_tool_definition_import(self, step: WorkflowStep) -> Import:
         tool_path = step.get_definition_path()
         tool_path = tool_path.rsplit('.py')[0]
         tool_path = tool_path.replace('/', '.')
-        tool_tag = workflow.tag_manager.get(step.tool.get_uuid())
-        tool_tag = tool_tag.rstrip('123456789') # same as getting basetag, just dodgy method
-        return Import(path=tool_path, entity=tool_tag)
+        tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
+        tool_tag = tool_tag.rstrip('123456789') # TODO same as getting basetag, just dodgy method
+        return Import(
+            path=tool_path, 
+            entity=tool_tag,
+            itype=ImportType.TOOL_DEF
+        )
 
-    def get_runtime_input_imports(self, step: WorkflowStep) -> list[Import]:
-        raise NotImplementedError()
-    
+    def init_runtime_input_imports(self, step: WorkflowStep, workflow: Workflow) -> list[Import]:
+        # pulls any datatypes appearing in step runtime inputs (workflow inputs)
+        imports: list[Import] = []
+        for value in step.list_runtime_values():
+            wflow_input = workflow.get_input(input_uuid=value.input_uuid) 
+            assert(wflow_input)
+            imports += self.init_datatype_imports(wflow_input.janis_datatypes)
+        return imports
 
 
 

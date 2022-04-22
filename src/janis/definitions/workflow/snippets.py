@@ -3,6 +3,7 @@
 from datetime import datetime
 from typing import Optional
 from janis.imports.Import import Import
+from workflows.step.values.InputValue import InputValue
 
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -116,9 +117,14 @@ if __name__ == "__main__":
 # STEP -------------------------------------
 
 def step_title_snippet(step_count: int, tool_tag: str) -> str: 
-    title_line = f'# STEP{step_count}: {tool_tag.upper()}\n'
-    border = f'# {"=" * (len(title_line) - 2)}\n'
-    return border + title_line + border
+    TITLE = f'\n# STEP{step_count}: {tool_tag.upper()}'
+    BORDER = f'# {"=" * (len(TITLE) - 2)}'
+
+    return f"""
+{BORDER}
+{TITLE}
+{BORDER}
+"""
 
 def step_foreward_snippet() -> str:
     return"""
@@ -135,13 +141,19 @@ PRE TASK, TOOL STEP, POST TASK
 \"\"\"
     """
 
+def pre_task_snippet() -> str:
+    return '\n\n# __PRE_TASK__\n\n'
+
+def post_task_snippet() -> str:
+    return '\n\n# __POST_TASK__\n\n'
+
 def step_runtime_input_snippet(input_tag: str, dtype_string: str) -> str:
     return f'w.input("{input_tag}", {dtype_string})\n'
 
-def step_unlinked_value_snippet(text_value: str) -> str:
-    return f'#UNKNOWN={text_value}\n'
+def step_unlinked_value_snippet(text_value: str, input_value: InputValue) -> str:
+    return f'\t\t#UNKNOWN={text_value},  # \n'
 
-def step_linked_value_snippet(
+def step_input_value_snippet(
     line_len: int,
     tag_and_value: str,
     label: Optional[str],
@@ -154,7 +166,8 @@ def step_linked_value_snippet(
         right += f'{label.upper()} '
     right += f'({argument}) '
     right += f'[{datatype.upper()}]'
-    return f'{left:<{line_len+2}}{right}'
+    justified = f'\t\t{left:<{line_len+2}}{right}\n'
+    return justified
 
 """
 
