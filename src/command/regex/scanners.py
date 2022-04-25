@@ -33,6 +33,11 @@ def get_all(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(ALL, the_string)
     return [m for m in matches]
 
+def get_preceeding_dashes(search_term: str, text: str) -> list[str]:
+    PRECEEDING_DASHES = r'(?<![$.{])(-+?)' + fr'({search_term})' + r'(?=[\s=:]|$|[\'"])'
+    matches = re.finditer(PRECEEDING_DASHES, text)
+    return [m.group(1) for m in matches]
+
 def get_backtick_sections(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(BACKTICK_SECTIONS, the_string)
     return [m for m in matches]

@@ -5,6 +5,27 @@
 SOLVED
 
 issue
+    duplicate toolinput [bug]: references_list1 / references_list2 (quast)
+    duplicate toolinput [bug]: max_ref_num1 / max_ref_num2 (quast)
+    duplicate toolinput [bug]: discard_untrimmed1 / discard_untrimmed2 (cutadapt)
+solution
+    created searching feature to look for param arguments in the <command> text, and identify the best number of preceeding dashes
+
+issue 
+    fastqc contaminants1 contaminants2
+    should be just single Option rather than a Positional and an Option
+solution
+    no idea, solved itself during other bug fixes
+
+issue
+    mismatch between janis tool tags and tool import statements
+    picard_markduplicates vs picard_MarkDuplicates
+    rseqc_genebody_coverage vs rseqc_geneBody_coverage
+solution
+    tool tag was being taken from tool.metadata.id not 
+    from tag manager. 
+
+issue
     imperfect UnknownOutput creation 
     - is duplicating other outputs 
     - picard_FilterSamReads InputOutput 'outFile'

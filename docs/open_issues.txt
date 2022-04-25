@@ -3,14 +3,14 @@
 TODO
 
 
-issue
-    mismatch between janis tool tags and tool import statements
-    picard_markduplicates vs picard_MarkDuplicates
-    rseqc_genebody_coverage vs rseqc_geneBody_coverage
+issue 
+    seqtk sample tool input
+    4_0=4.0
 
 issue 
-    fastqc contaminants1 contaminants2
-    should be just single Option rather than a Positional and an Option
+    collapse_dataset2 tool input
+    if_nr==1_{print="{if (NR==1) {print}}"
+    cooked
 
 issue
     blank value for default attribute (bowtie2_wrapper)
@@ -22,9 +22,19 @@ issue
 		default=,
 		doc="None",
 	),
+solution?
+    default can't be blank string?
+    in this case gets assigned None
+
+
+issue   
+    --discard-trimmed not appearing (cutadapt)
+    probably due to recent ArgumentCommandAnnotator changes
 
 issue
-    duplicate toolinput [bug]: references_list1 / references_list2 (quast)
-    duplicate toolinput [bug]: max_ref_num1 / max_ref_num2 (quast)
-    duplicate toolinput [bug]: discard_untrimmed1 / discard_untrimmed2 (cutadapt)
+    picard_MarkDuplicates
+    input_#="#",  
+solution
+    this was actually a broken tool.
+    maybe get the most recent version of the tool when getting a repo path? 
 

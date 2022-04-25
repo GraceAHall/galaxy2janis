@@ -20,6 +20,7 @@ SIMPLE_STRINGS = r'[\w$_-]+'
 WORDS = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
 KEYVAL_PAIRS = r'(?<=\s|^)(\S+?)([=:])(\S+?)(?=\s|$)'
 
+
 VARIABLES_FMT1 = r'\$\w[\w._]+'
 VARIABLES_FMT2 = r'\$\{\w[\w._]+\}'
 FUNCTION_CALL_FMT1 = r'\$\{[^(].+?(\(.*\))[^(]*\}'

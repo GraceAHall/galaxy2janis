@@ -121,7 +121,6 @@ class WorkflowImportCollector:
         tool_path = tool_path.rsplit('.py')[0]
         tool_path = tool_path.replace('/', '.')
         tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
-        tool_tag = tool_tag.rstrip('123456789') # TODO same as getting basetag, just dodgy method
         return Import(
             path=tool_path, 
             entity=tool_tag,

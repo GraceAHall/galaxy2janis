@@ -173,7 +173,7 @@ class JanisToolFormatter:
     def format_commandtool(self) -> str:
         container = self.tool.container
         return snippets.command_tool_builder_snippet(
-            toolname=self.tool.metadata.id,
+            toolname=self.tool.tag_manager.get(self.tool.get_uuid()),
             base_command=self.tool.base_command,
             container=container.url if container else MISSING_CONTAINER_STRING,
             version=self.tool.metadata.version, # should this be based on get_main_requirement()?

@@ -9,6 +9,34 @@ from command.components.inputs.Option import Option
 from xmltool.param.InputParam import BoolParam, SelectParam
 from command.components.inputs import spawn_component 
 import xmltool.param.utils as param_utils
+import command.regex.scanners as scanners
+
+def argument_exists(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
+    if hasattr(gxparam, 'argument') and gxparam.argument is not None:  #type: ignore
+        return True
+    return False
+
+def argument_format(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
+    banned_argument_chars = [' ', '/', '\\']
+    if any([char in gxparam.argument for char in banned_argument_chars]):  #type: ignore
+        return False
+    return True
+
+def argument_component_not_exists(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
+    # check whether the argument is already known as a prefix 
+    prefix_components: list[Flag | Option] = []
+    prefix_components += command.get_flags()
+    prefix_components += command.get_options()
+    for component in prefix_components:
+        if gxparam.argument == component.prefix: # type: ignore
+            return False
+    return True
+
+def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
+    argument: str = gxparam.argument # type: ignore
+    if argument is not None and argument in xmltool.command:
+        return True
+    return False
 
 
 class ArgumentCommandAnnotator:
@@ -20,24 +48,32 @@ class ArgumentCommandAnnotator:
         # add any gxparams which hint they are components (or update the component)
         for gxparam in self.xmltool.list_inputs():
             if self.should_update_command_components(gxparam):
+                gxparam = self.refine_argument(gxparam)
                 self.update_command_components(gxparam)
     
     def should_update_command_components(self, gxparam: Param) -> bool:
-        # check the gxparam has an argument, and the argument isn't weirdly written
-        banned_argument_chars = [' ', '/', '\\']
-        if gxparam.argument: # type: ignore
-            if any([char in gxparam.argument for char in banned_argument_chars]):
+        checks = [
+            argument_exists,
+            argument_format,
+            argument_component_not_exists,
+            argument_has_command_presence
+        ]
+        for check in checks:
+            if not check(gxparam, self.xmltool, self.command):
                 return False
-                # check whether the argument is already known as a prefix 
-                prefix_components: list[Flag | Option] = []
-                prefix_components += self.command.get_flags()
-                prefix_components += self.command.get_options()
-                for component in prefix_components:
-                    if gxparam.argument == component.prefix: # type: ignore
-                        return False
-            else:
-                return True
-        return False
+        return True
+
+    def refine_argument(self, gxparam: Param) -> Param:
+        old_argument: str = gxparam.argument # type: ignore
+        #if not old_argument.startswith('-'): 
+        matches = scanners.get_preceeding_dashes(
+            search_term=old_argument,
+            text=self.xmltool.command
+        )
+        if matches:
+            num_dashes = max(len(dashes) for dashes in matches)
+            gxparam.argument = '-' * num_dashes + old_argument
+        return gxparam
 
     def update_command_components(self, gxparam: Param) -> None:
         """

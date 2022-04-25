@@ -28,6 +28,14 @@ class GenericFormattingStrategy(FormattingStrategy):
         tag = formatters.encode(tag)
         return tag
 
+class ToolNameStrategy(FormattingStrategy):
+    def format(self, starting_text: str, entity: Any) -> str:
+        tag = formatters.handle_short_tag(starting_text, entity)
+        tag = formatters.replace_non_alphanumeric(tag, entity)
+        tag = formatters.handle_prohibited_key(tag, entity)
+        tag = formatters.encode(tag)
+        return tag
+        
 class ToolInputStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
         tag = formatters.handle_short_tag(starting_text, entity)
@@ -35,13 +43,14 @@ class ToolInputStrategy(FormattingStrategy):
         tag = formatters.encode(tag)
         return tag
 
+
 def get_strategy(entity_type: str) -> FormattingStrategy:
     strategy_map = {
         'workflow': GenericFormattingStrategy(),
         'workflow_input': GenericFormattingStrategy(),
         'workflow_step': GenericFormattingStrategy(),
         'workflow_output': GenericFormattingStrategy(),
-        'tool': GenericFormattingStrategy(),
+        'tool': ToolNameStrategy(),
         'tool_input': ToolInputStrategy(),
         'tool_output': GenericFormattingStrategy(),
     }
