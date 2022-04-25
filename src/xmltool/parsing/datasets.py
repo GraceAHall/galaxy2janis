@@ -25,18 +25,18 @@ class FormatSourceFetchStrategy(FetchStrategy):
         param = inputs.get(gxout.format_source, strategy='lca')
         if param:
             return param.datatypes
-        return ['data']
+        return []
 
 class CollectorFetchStrategy(FetchStrategy):
     def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
         coll = gxout.dataset_collector_descriptions[0]
         if coll.default_ext:
             return str(coll.default_ext).split(',')
-        return ['data']
+        return []
 
 class FallbackFetchStrategy(FetchStrategy):
     def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
-        return ['file']
+        return []
 
 
 def fetch_datatype(gxout: GxOutput, inputs: InputParamRegister) -> list[str]:

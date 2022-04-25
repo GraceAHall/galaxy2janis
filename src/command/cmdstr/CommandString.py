@@ -64,14 +64,6 @@ class CommandString:
                 out += f'{line}\n'
         return out
 
-    def get_positional(self) -> str:
-        raise NotImplementedError()
-    
-    def get_flag(self) -> str:
-        raise NotImplementedError()
-    
-    def get_option(self) -> str:
-        raise NotImplementedError()
 
 
 

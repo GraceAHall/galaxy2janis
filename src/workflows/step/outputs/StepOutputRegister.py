@@ -15,7 +15,7 @@ class StepOutputRegister:
                 return output
         raise RuntimeError(f'could not find output {gxvarname}')
 
-    def list_outputs(self) -> list[StepOutput]:
+    def list(self) -> list[StepOutput]:
         return self.register
 
 

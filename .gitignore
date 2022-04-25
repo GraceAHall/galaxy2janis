@@ -20,10 +20,11 @@ requirements.txt
 edge_cases.txt
 
 super_simple_workflow/
+super_simple_out/
 simple_workflow/
+simple_out/
 medium_workflow/
+medium_out/
 hard_workflow/
+hard_out/
 characterisation_workflow/
-
-
-

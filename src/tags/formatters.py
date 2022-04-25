@@ -51,8 +51,8 @@ def handle_short_tag(tag: str, entity: Any) -> str:
             tag = f'{tag}_flag'
         else:
             tag = f"input_{tag}"
-            if hasattr(entity, 'janis_datatypes'):
-                tag = append_datatype(tag, entity)
+            # if hasattr(entity, 'janis_datatypes'):
+            #     tag = append_datatype(tag, entity)
     return tag
 
 def append_datatype(tag: str, entity: Any) -> str:

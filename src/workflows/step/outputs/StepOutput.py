@@ -20,7 +20,7 @@ def init_input_step_output(step: dict[str, Any]) -> StepOutput:
     is_wflow_out, wflow_out_label = get_wflow_out_details(step, 'output')
     return StepOutput(
         gxvarname='output',
-        gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else ['file'],
+        gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else [],
         is_wflow_out=is_wflow_out,
         wflow_out_label=wflow_out_label
     )

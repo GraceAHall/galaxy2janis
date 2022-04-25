@@ -9,7 +9,7 @@ from workflows.workflow.Workflow import Workflow
 
 def set_outputs(workflow: Workflow) -> None:
     for step in workflow.list_steps():
-        for stepout in step.list_outputs():
+        for stepout in step.outputs.list():
             if stepout.is_wflow_out:
                 toolout = stepout.tool_output
                 assert(step.tool)

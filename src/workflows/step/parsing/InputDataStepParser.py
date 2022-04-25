@@ -12,7 +12,7 @@ class InputDataStepParser:
             name=step['inputs'][0]['name'],
             step_id=step['id'],
             step_tag=None,
-            gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else ['file'],
+            gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else [],
             is_galaxy_input_step=True
         )
 

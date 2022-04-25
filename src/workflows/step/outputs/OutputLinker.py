@@ -25,10 +25,10 @@ class StepToolOutputLinker:
         self.workflow = workflow
 
     def link(self) -> None:
-        for output in self.step.list_outputs():
-            output.tool_output = self.get_associated_tool_output(output)
+        for output in self.step.outputs.list():
+            output.tool_output = self._get_associated_tool_output(output)
 
-    def get_associated_tool_output(self, stepout: StepOutput) -> Optional[CommandComponent]:
+    def _get_associated_tool_output(self, stepout: StepOutput) -> Optional[CommandComponent]:
         # each tool output should have a linked gxparam
         for toolout in self.tool.list_outputs():
             assert(toolout.gxparam)

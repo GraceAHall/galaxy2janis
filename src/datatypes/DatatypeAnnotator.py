@@ -10,13 +10,7 @@ from workflows.io.WorkflowInput import WorkflowInput
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.io.WorkflowOutput import WorkflowOutput
 
-FALLBACK = JanisDatatype(
-    format='file',
-    source='janis',
-    classname='File',
-    extensions=None,
-    import_path='janis_core.types.common_data_types'
-)
+from datatypes.default import DEFAULT_DATATYPE
 
 def positional_strategy(positional: Positional, register: DatatypeRegister) -> None:
     gxtypes: list[str] = []
@@ -26,12 +20,11 @@ def positional_strategy(positional: Positional, register: DatatypeRegister) -> N
         gxtypes = ['integer']
     elif positional.value_record.values_are_floats():
         gxtypes = ['float']
-    else:
-        gxtypes = ['file']
-    positional.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
+    positional.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def flag_strategy(flag: Flag, register: DatatypeRegister) -> None:
-    flag.janis_datatypes = [cast_gx_to_janis('boolean', register)]
+    gxtypes = ['boolean']
+    flag.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def option_strategy(option: Option, register: DatatypeRegister) -> None:
     gxtypes: list[str] = []
@@ -41,50 +34,45 @@ def option_strategy(option: Option, register: DatatypeRegister) -> None:
         gxtypes = ['integer']
     elif option.value_record.values_are_floats():
         gxtypes = ['float']
-    else:
-        gxtypes = ['file']
-    option.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
+    option.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def redirect_output_strategy(redirect_output: RedirectOutput, register: DatatypeRegister) -> None:
     gxtypes: list[str] = []
     if redirect_output.gxparam:
         gxtypes = redirect_output.gxparam.datatypes
-    else:
-        gxtypes = ['file']
-    redirect_output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
+    redirect_output.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def input_output_strategy(input_output: InputOutput, register: DatatypeRegister) -> None:
     gxtypes: list[str] = []
     if input_output.gxparam:
         gxtypes = input_output.gxparam.datatypes
-    else:
-        gxtypes = ['file']
-    input_output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
+    input_output.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def wildcard_output_strategy(wildcard_output: WildcardOutput, register: DatatypeRegister) -> None:
     gxtypes: list[str] = []
     if wildcard_output.gxparam:
         gxtypes = wildcard_output.gxparam.datatypes
-    else:
-        gxtypes = ['file']
-    wildcard_output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in gxtypes]
+    wildcard_output.janis_datatypes = cast_gx_to_janis(gxtypes, register)
 
 def workflow_input_strategy(inp: WorkflowInput, register: DatatypeRegister) -> None:
-    inp.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in inp.gx_datatypes]
+    inp.janis_datatypes = cast_gx_to_janis(inp.gx_datatypes, register)
 
 def tool_step_strategy(tool_step: WorkflowStep, register: DatatypeRegister) -> None:
-    for output in tool_step.output_register.list_outputs():
-        output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in output.gx_datatypes]
+    for output in tool_step.outputs.list():
+        output.janis_datatypes = cast_gx_to_janis(output.gx_datatypes, register)
 
 def workflow_output_strategy(output: WorkflowOutput, register: DatatypeRegister) -> None:
-    output.janis_datatypes = [cast_gx_to_janis(gx, register) for gx in output.gx_datatypes]
+    output.janis_datatypes = cast_gx_to_janis(output.gx_datatypes, register)
 
-def cast_gx_to_janis(gxtype: str, register: DatatypeRegister) -> JanisDatatype:
-    jtype = register.get(gxtype)
-    if jtype is None:
-        jtype = FALLBACK 
-    return jtype
-
+def cast_gx_to_janis(gxtypes: list[str], register: DatatypeRegister) -> list[JanisDatatype]:
+    out: list[JanisDatatype] = []
+    for gxtype in gxtypes:
+        jtype = register.get(gxtype)
+        if jtype is not None:
+            out.append(jtype)
+    if len(out) == 0:
+        out.append(DEFAULT_DATATYPE)
+    return out
 
 strategy_map = {
     Positional: positional_strategy,

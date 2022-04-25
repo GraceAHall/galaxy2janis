@@ -36,25 +36,13 @@ w.step(
 class WorkflowStep:
     """represents a galaxy tool step"""
     metadata: StepMetadata
-    input_register: StepInputRegister
-    output_register: StepOutputRegister
+    inputs: StepInputRegister
+    outputs: StepOutputRegister
     tool: Optional[Tool] = None
     values: InputValueRegister = InputValueRegister()
 
     def get_uuid(self) -> str:
         return self.metadata.uuid
-
-    def get_input(self, query_name: str) -> Optional[StepInput]:
-        return self.input_register.get(query_name)
-    
-    def list_inputs(self) -> list[StepInput]:
-        return self.input_register.list_inputs()
-    
-    def get_output(self, query_name: str) -> StepOutput:
-        return self.output_register.get(query_name)
-    
-    def list_outputs(self) -> list[StepOutput]:
-        return self.output_register.list_outputs()
 
     def set_definition_path(self, path: str) -> None:
         self.metadata.tool_definition_path = path
@@ -67,21 +55,10 @@ class WorkflowStep:
     def get_tool_name(self) -> str:
         return self.metadata.tool_id
 
-    def list_linked_values(self) -> list[Tuple[str, InputValue]]:
-        return self.values.list_linked()
-    
-    def list_unlinked_values(self) -> list[InputValue]:
-        return self.values.list_unlinked()
-    
-    def list_runtime_values(self) -> list[WorkflowInputInputValue]:
-        linked_values = self.list_linked_values()
-        runtime_inputs = [value for _, value in linked_values if isinstance(value, WorkflowInputInputValue)]
-        return runtime_inputs
-
     def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
         """translates [uuid, value] into [tag, value] for tool input values"""
         out: list[Tuple[str, InputValue]] = []
-        for uuid, input_value in self.list_linked_values():
+        for uuid, input_value in self.values.linked:
             assert(self.tool)
             component_tag = self.tool.tag_manager.get(uuid)
             out.append((component_tag, input_value))

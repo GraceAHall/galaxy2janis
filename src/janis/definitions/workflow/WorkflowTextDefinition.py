@@ -3,46 +3,35 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 import os
 
 from janis.definitions.workflow.StepTextDefinition import StepTextDefinition
 from startup.ExeSettings import WorkflowExeSettings
-from workflows.io.WorkflowInput import WorkflowInput
-from workflows.io.WorkflowOutput import WorkflowOutput
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.workflow.Workflow import Workflow
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector
 import janis.definitions.workflow.snippets as snippets
-#import janis.definitions.workflow.formatting as formatting
-from janis.imports.Import import Import, ImportType
+import janis.definitions.workflow.formatting as formatting
+from janis.imports.Import import Import
+
 
 class WorkflowTextDefinition(ABC):
     def __init__(self, esettings: WorkflowExeSettings, workflow: Workflow):
         self.esettings = esettings
         self.workflow = workflow
         self.step_text_definitions: list[StepTextDefinition] = self.init_step_text_definitions()
-    
-    def init_step_text_definitions(self) -> list[StepTextDefinition]:
-        step_defs: list[StepTextDefinition] = []
-        step_count = 0
-        for step in list(self.workflow.steps.values()):
-            step_count += 1
-            step_def = self.init_step_definition(step_count, step)
-            step_defs.append(step_def)
-        step_defs.sort(key=lambda x: x.step_count)
-        return step_defs
-    
-    def init_step_definition(self, step_count: int, step: WorkflowStep) -> StepTextDefinition:
-        import_collector = WorkflowImportCollector()
-        import_collector.collect_step_imports(step, self.workflow)
-        step_definition = StepTextDefinition(
-            step_count=step_count,
-            step=step,
-            workflow=self.workflow,
-            imports=import_collector.list_imports()
-        )
-        return step_definition
+
+    def format(self) -> str:
+        out: str = '\n'
+        out += self.header
+        out += self.imports + '\n'
+        out += self.metadata + '\n'
+        out += self.declaration + '\n'
+        out += self.inputs + '\n'
+        for step in self.steps:
+            out += step + '\n'
+        out += self.outputs + '\n'
+        return out
     
     @property
     def header(self) -> str:
@@ -51,12 +40,12 @@ class WorkflowTextDefinition(ABC):
             workflow_version=self.workflow.metadata.version
         )
         path_appends = snippets.path_append_snippet()
-        return f'\n{top_note}\n\n{path_appends}\n'
+        return f'{top_note}\n{path_appends}\n'
 
     @property
     def imports(self) -> str:
         imports = self.collect_workflow_imports()
-        return self.format_imports(imports)
+        return formatting.format_imports(imports)
     
     @abstractmethod
     def collect_workflow_imports(self) -> list[Import]:
@@ -70,18 +59,6 @@ class WorkflowTextDefinition(ABC):
             - Step imports (tool imports are in step pages)
         """
         ...
-
-    def format_imports(self, imports: list[Import]) -> str:
-        dtype_imports = [x for x in imports if x.itype == ImportType.DATATYPE]
-        class_imports = [x for x in imports if x.itype == ImportType.JANIS_CLASS]
-        tool_imports = [x for x in imports if x.itype == ImportType.TOOL_DEF]
-        out: str = ''
-        for category in [dtype_imports, class_imports, tool_imports]:
-            out += '\n'
-            for imp in category:
-                out += snippets.import_snippet(imp)
-        out += '\n'
-        return out
     
     @property
     def metadata(self) -> str:
@@ -94,13 +71,13 @@ class WorkflowTextDefinition(ABC):
     
     @property
     def declaration(self) -> str:
-        comment = '# WORKFLOW DECLARATION'
-        section = snippets.workflow_builder_snippet(
+        out_str = '# WORKFLOW DECLARATION\n'
+        out_str += snippets.workflow_builder_snippet(
             tag=self.workflow.tag_manager.get(self.workflow.get_uuid()),
             version=str(self.workflow.metadata.version),
             doc=self.workflow.metadata.annotation
         )
-        return f'\n{comment}\n\n{section}\n'
+        return out_str
     
     @property
     def inputs(self) -> str:
@@ -108,31 +85,12 @@ class WorkflowTextDefinition(ABC):
         for inp in self.workflow.inputs:
             tag = self.workflow.tag_manager.get(inp.get_uuid())
             if inp.is_galaxy_input_step:
-                out_str += snippets.workflow_input_snippet(
-                    tag=tag,
-                    datatype=inp.get_janis_datatype_str(),
-                    doc=self.format_docstring(inp)
-                )
-        out_str += '\n'
+                out_str += formatting.format_workflow_input(tag, inp)
         return out_str
-    
-    def format_docstring(self, entity: WorkflowStep | WorkflowInput | WorkflowOutput) -> Optional[str]:
-        raw_doc = entity.get_docstring()
-        if raw_doc:
-            return raw_doc.replace('"', "'")
-        return None
 
     @property
     @abstractmethod
     def steps(self) -> list[str]:
-        ...
-
-    @abstractmethod
-    def format_step(self, textdef: StepTextDefinition) -> str:
-        """
-        formats a StepTextDefinition into a writable string.
-        method differs between BulkWorkflowTextDefinition and StepwiseWorkflowTextDefinition
-        """
         ...
     
     @property
@@ -141,48 +99,47 @@ class WorkflowTextDefinition(ABC):
         for out in self.workflow.outputs:
             uuid = out.get_uuid()
             tag = self.workflow.tag_manager.get(uuid)
-            out_str += self.format_output(tag, out)
-        out_str += '\n'
+            out_str += formatting.format_workflow_output(tag, out)
         return out_str
-
-    def format_output(self, tag: str, output: WorkflowOutput) -> str:
-        return snippets.workflow_output_snippet(
-            tag=tag,
-            datatype=output.get_janis_datatype_str(),
-            step_tag=output.step_tag,
-            toolout_tag=output.toolout_tag
+        
+    def init_step_text_definitions(self) -> list[StepTextDefinition]:
+        step_defs: list[StepTextDefinition] = []
+        step_count = 0
+        for step in list(self.workflow.steps.values()):
+            step_count += 1
+            step_def = self.init_step_definition(step_count, step)
+            step_defs.append(step_def)
+        step_defs.sort(key=lambda x: x.step_count)
+        return step_defs
+    
+    def init_step_definition(self, step_count: int, step: WorkflowStep) -> StepTextDefinition:
+        step_definition = StepTextDefinition(
+            step_count=step_count,
+            step=step,
+            workflow=self.workflow
         )
+        return step_definition
     
 
     
 class BulkWorkflowTextDefinition(WorkflowTextDefinition):
-    
+
     def collect_workflow_imports(self) -> list[Import]:
         import_collector = WorkflowImportCollector()
         import_collector.collect_workflow_imports(self.workflow)
-        for step in list(self.workflow.steps.values()):
-            # all workflow imports
-            import_collector.collect_step_imports(step, self.workflow)
+        for step in list(self.step_text_definitions):
+            import_collector.update(step.imports)
         imports = import_collector.list_imports()
         return imports
     
     @property
     def steps(self) -> list[str]:
         """Returns actual step contents"""
-        str_steps: list[str] = []
-        for text_definition in self.step_text_definitions:
-            step_str = self.format_step(text_definition)
-            str_steps.append(step_str)
-        return str_steps
-    
-    def format_step(self, textdef: StepTextDefinition) -> str:
-        # subset of all StepTextDefinition properties
-        out: str = ''
-        out += textdef.runtime_inputs
-        out += textdef.step_call
+        out: list[str] = ['# STEPS']
+        for text_def in self.step_text_definitions:
+            step_str = text_def.format_main()
+            out.append(step_str)
         return out
-
-
 
 
 @dataclass
@@ -206,7 +163,7 @@ class StepwiseWorkflowTextDefinition(WorkflowTextDefinition):
             page = StepPage(
                 tag=step_tag,
                 path=step_path,
-                text=self.format_step(text_def)
+                text=text_def.format_page()
             )
             pages.append(page)
         return pages
@@ -223,20 +180,11 @@ class StepwiseWorkflowTextDefinition(WorkflowTextDefinition):
     @property
     def steps(self) -> list[str]:
         """Returns references to imported steps"""
-        out: list[str] = []
+        out: list[str] = ['# STEPS']
         for page in self.step_pages:
-            out.append(page.tag)
+            out.append(f'# {page.tag}\n')
         return out
    
-    def format_step(self, textdef: StepTextDefinition) -> str:
-        # include all StepTextDefinition properties
-        out: str = ''
-        out += textdef.title
-        out += textdef.foreword
-        out += textdef.pre_task
-        out += textdef.runtime_inputs
-        out += textdef.step_call
-        out += textdef.post_task
-        return out
+
 
     

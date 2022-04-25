@@ -23,6 +23,7 @@ class InputValue(ABC):
 
     def __post_init__(self):
         self.is_default_value: bool = False
+        self.linked: bool = False
 
 
 @dataclass

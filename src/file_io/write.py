@@ -5,8 +5,13 @@ from tool.Tool import Tool
 from workflows.workflow.Workflow import Workflow
 
 from janis.definitions.tool.JanisToolFormatter import JanisToolFormatter
-from janis.definitions.workflow.WorkflowTextDefinition import StepwiseWorkflowTextDefinition, WorkflowTextDefinition
+from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition
 #from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition
+
+
+
+WFLOW_TEXT_DEFINITION_CLS = BulkWorkflowTextDefinition
+#WFLOW_TEXT_DEFINITION_CLS = StepwiseWorkflowTextDefinition
 
 
 def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
@@ -30,21 +35,15 @@ def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
     write_workflow_tools(workflow)
 
     # workflow definitions
-    text_def = StepwiseWorkflowTextDefinition(esettings, workflow)
+    text_def = WFLOW_TEXT_DEFINITION_CLS(esettings, workflow)
     wflow_path = esettings.get_janis_workflow_path()
     write_main_page(wflow_path, text_def)
-    write_step_pages(text_def)
+    if isinstance(text_def, StepwiseWorkflowTextDefinition):
+        write_step_pages(text_def)
     
 def write_main_page(path: str, text_def: WorkflowTextDefinition) -> None:
     with open(path, 'w') as fp:
-        fp.write(text_def.header)
-        fp.write(text_def.imports)
-        fp.write(text_def.metadata)
-        fp.write(text_def.declaration)
-        fp.write(text_def.inputs)
-        for step in text_def.steps:
-            fp.write(step)
-        fp.write(text_def.outputs)
+        fp.write(text_def.format())
         
 def write_step_pages(text_def: StepwiseWorkflowTextDefinition) -> None:
     for page in text_def.step_pages:

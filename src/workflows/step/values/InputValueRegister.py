@@ -2,91 +2,41 @@
 
 
 
-from abc import ABC, abstractmethod
 from typing import Optional, Tuple
-from workflows.step.values.InputValue import ConnectionInputValue, InputValue, RuntimeInputValue, WorkflowInputInputValue
-
-
-
-
-class ValueOrderingStrategy(ABC):
-    @abstractmethod
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        """orders input values and returns ordered list"""
-        ...
-
-class AlphabeticalStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        input_values.sort(key=lambda x: x[0])
-        return input_values
-
-class ComponentTypeStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        priorities = {'positional': 0, 'flag': 1, 'option': 2}
-        input_values.sort(key=lambda x: priorities[x[1].comptype])
-        return input_values
-
-class RuntimeNonRuntimeStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        runtime = [x for x in input_values if isinstance(x[1], RuntimeInputValue)]
-        non_runtime = [x for x in input_values if not isinstance(x[1], RuntimeInputValue)]
-        return runtime + non_runtime
-
-class ConnectionNonConnectionStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        connection = [x for x in input_values if isinstance(x[1], ConnectionInputValue)]
-        non_connection = [x for x in input_values if not isinstance(x[1], ConnectionInputValue)]
-        return connection + non_connection
-
-class WorkflowInputStrategy(ValueOrderingStrategy):
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        connection = [x for x in input_values if isinstance(x[1], WorkflowInputInputValue)]
-        non_connection = [x for x in input_values if not isinstance(x[1], WorkflowInputInputValue)]
-        return connection + non_connection
-
-class InputOrConnectionStrategy(ValueOrderingStrategy):
-    priority_types = [WorkflowInputInputValue, ConnectionInputValue]
-    
-    def order(self, input_values: list[Tuple[str, InputValue]]) -> list[Tuple[str, InputValue]]:
-        connection = [x for x in input_values if type(x[1]) in self.priority_types]
-        non_connection = [x for x in input_values if type(x[1]) not in self.priority_types]
-        return connection + non_connection
-
+from workflows.step.values.InputValue import InputValue, WorkflowInputInputValue
 
 
 class InputValueRegister:
     def __init__(self):
-        self.values: dict[str, InputValue] = {}
-        self.unlinked: list[InputValue] = []
-        # changing the order of the objects below changes the 
-        # ordering priority, as the last ordering method has the highest impact etc
-        self.value_ordering_strategies = [
-            ComponentTypeStrategy(),
-            AlphabeticalStrategy(),
-            InputOrConnectionStrategy(),
-            # WorkflowInputStrategy(),
-            # ConnectionNonConnectionStrategy()
-        ]
+        self.linked_values: dict[str, InputValue] = {}
+        self.unlinked_values: list[InputValue] = []
 
-    def get(self, uuid: str) -> Optional[InputValue]:
-        if uuid in self.values:
-            return self.values[uuid]
+    @property
+    def linked(self) -> list[Tuple[str, InputValue]]:
+        return list(self.linked_values.items())
+    
+    @property
+    def unlinked(self) -> list[InputValue]:
+        return self.unlinked_values
+    
+    @property
+    def runtime(self) -> list[WorkflowInputInputValue]:
+        values = [value for _, value in self.linked if isinstance(value, WorkflowInputInputValue)]
+        values = [value for value in values if value.is_runtime]
+        return values
+
+    def get_linked(self, uuid: str) -> Optional[InputValue]:
+        if uuid in self.linked_values:
+            return self.linked_values[uuid]
 
     def update_linked(self, uuid: str, value: InputValue) -> None:
-        self.values[uuid] = value
+        value.linked = True
+        self.linked_values[uuid] = value
     
     def update_unlinked(self, value: InputValue) -> None:
-        self.unlinked.append(value)
+        value.linked = False
+        self.unlinked_values.append(value)
     
-    def list_linked(self) -> list[Tuple[str, InputValue]]:
-        values = list(self.values.items())
-        for strategy in self.value_ordering_strategies:
-            values = strategy.order(values)
-        return values
-    
-    def list_unlinked(self) -> list[InputValue]:
-        return self.unlinked
-
     def __str__(self) -> str:
         out_str: str = '\nInputValueRegister -----\n'
         out_str += f'{"[uuid]":>20}{"[value]":>20}{"[type]":>40}\n'

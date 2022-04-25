@@ -25,7 +25,7 @@ def link_step_input_values(workflow: Workflow):
     for step in workflow.list_steps():
         assert(step.tool)
         # assign actual Param objects to gxparam field of inputs
-        step.input_register.assign_gxparams(step.tool)  
+        step.inputs.assign_gxparams(step.tool)  
         linker = InputValueLinker(step, workflow)
         linker.link()
 
@@ -58,7 +58,7 @@ class InputValueLinker:
         for component in tool_inputs:
             if self.is_directly_linkable(component):
                 gxvarname = component.gxparam.name  # type: ignore
-                step_input = self.step.get_input(gxvarname)
+                step_input = self.step.inputs.get(gxvarname)
                 if step_input:
                     value = value_utils.create(component, step_input, self.workflow) # type: ignore
                     self.valregister.update_linked(component.get_uuid(), value)
@@ -73,21 +73,21 @@ class InputValueLinker:
         """
         if component.gxparam:
             query = component.gxparam.name 
-            if self.step.get_input(query):
+            if self.step.inputs.get(query):
                 return True
         return False
     
     def assign_default_values(self) -> None:
         tool_inputs = self.tool.list_inputs()
         for component in tool_inputs:
-            if not self.valregister.get(component.get_uuid()):
+            if not self.valregister.get_linked(component.get_uuid()):
                 value = value_utils.create_default(component)
                 self.valregister.update_linked(component.get_uuid(), value)
     
     def assign_unlinked(self) -> None:
         # go through step inputs, checking if any have the 'linked' attribute as false
         permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
-        for step_input in self.step.list_inputs():
+        for step_input in self.step.inputs.list():
             if not step_input.linked and type(step_input) in permitted_inputs:
                 # workflow inputs
                 if isinstance(step_input, WorkflowInputStepInput):
@@ -104,7 +104,7 @@ class InputValueLinker:
         self.update_components_via_presence()
 
     def update_components_via_values(self) -> None:
-        for uuid, value in self.valregister.list_linked():
+        for uuid, value in self.valregister.linked:
             component = self.tool.get_input(uuid)
             update_component_from_workflow_value(component, value)
     
@@ -116,7 +116,7 @@ class InputValueLinker:
         for component in self.tool.list_inputs():
             comp_uuid = component.get_uuid()
             if not component.is_optional():
-                value = self.valregister.get(comp_uuid)
+                value = self.valregister.get_linked(comp_uuid)
                 if isinstance(value, DefaultInputValue) and value.valtype == InputValueType.NONE:
                     component.forced_optionality = True
 
@@ -126,7 +126,7 @@ class InputValueLinker:
         where the default doens't look right. ie environment variables
         forces the user to supply a value for this input. 
         """
-        for uuid, value in self.valregister.list_linked():
+        for uuid, value in self.valregister.linked:
             if self.should_migrate_default_to_runtime(value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_runtime(component)
@@ -144,7 +144,7 @@ class InputValueLinker:
         for the tool input. can be due to value being same as tool input default,
         or when the input value is None
         """
-        for uuid, value in self.valregister.list_linked():
+        for uuid, value in self.valregister.linked:
             if self.should_migrate_static_to_default(uuid, value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_default(component)
@@ -168,7 +168,7 @@ class InputValueLinker:
         A WorkflowInput will be created, and the user will have to supply a value for this 
         input when running the workflow. 
         """
-        for uuid, value in self.valregister.list_linked():
+        for uuid, value in self.valregister.linked:
             if self.should_migrate_runtime_to_workflowinput(value):
                 component = self.tool.get_input(uuid)
                 workflow_input = self.create_workflow_input(uuid)
@@ -199,7 +199,7 @@ class InputValueLinker:
     def assert_all_components_assigned(self) -> None:
         tool_inputs = self.tool.list_inputs()
         for component in tool_inputs:
-            if not self.valregister.get(component.get_uuid()):
+            if not self.valregister.get_linked(component.get_uuid()):
                 raise AssertionError(f'tool input "{component.get_name()}" has no assigned step value')
 
 

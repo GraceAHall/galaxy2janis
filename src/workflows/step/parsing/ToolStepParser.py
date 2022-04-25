@@ -23,8 +23,8 @@ class ToolStepParser:
         self.gxstep = step
         return WorkflowStep(
             metadata=self.get_step_metadata(),
-            input_register=self.get_step_inputs(),
-            output_register=self.get_step_outputs()
+            inputs=self.get_step_inputs(),
+            outputs=self.get_step_outputs()
         )
 
     def get_step_metadata(self) -> StepMetadata:

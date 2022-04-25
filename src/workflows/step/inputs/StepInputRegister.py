@@ -52,6 +52,9 @@ class StepInputRegister:
             if inp.gxvarname == gxvarname:
                 return inp
         return None
+    
+    def list(self) -> list[StepInput]:
+        return self.register
 
     def get_connection(self, gxvarname: str) -> Optional[StepInput]:
         step_input = self.get(gxvarname)
@@ -70,9 +73,6 @@ class StepInputRegister:
         if isinstance(step_input, StaticStepInput):
             return step_input
         return None
-
-    def list_inputs(self) -> list[StepInput]:
-        return self.register
 
     def assign_gxparams(self, tool: Tool) -> None:
         for step_input in self.register:
