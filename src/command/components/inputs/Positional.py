@@ -53,8 +53,9 @@ class Positional(BaseCommandComponent):
         return ''
         #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
-    def update(self, incoming: Positional) -> None:
+    def update(self, incoming: Any) -> None:
         # transfer values
+        assert(isinstance(incoming, Positional))
         self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:

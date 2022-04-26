@@ -1,40 +1,42 @@
 
-
-TODO
-
-
-issue 
-    seqtk sample tool input
-    4_0=4.0
-
-issue 
-    collapse_dataset2 tool input
-    if_nr==1_{print="{if (NR==1) {print}}"
-    cooked
-
-issue
-    blank value for default attribute (bowtie2_wrapper)
-    ToolInput(
-		'rg',
-		Int(optional=True),
-		prefix='--rg',
-		position=1,
-		default=,
-		doc="None",
-	),
-solution?
-    default can't be blank string?
-    in this case gets assigned None
-
-
-issue   
-    --discard-trimmed not appearing (cutadapt)
-    probably due to recent ArgumentCommandAnnotator changes
-
+ONGOING 
 issue
     picard_MarkDuplicates
     input_#="#",  
 solution
     this was actually a broken tool.
     maybe get the most recent version of the tool when getting a repo path? 
+    mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+
+issue 
+    collapse_dataset2 tool input
+    if_nr==1_{print="{if (NR==1) {print}}"
+    cooked
+
+
+TODO
+
+issue
+    hisat2
+    wrong dynamiccommandstring being chosen as main tool statement
+
+
+issue
+    hisat2
+    Long and short form for argument (hisat2)
+    ToolInput('trim51', Int(optional=True), prefix='-5')
+    ToolInput('trim52', Int(optional=True), prefix='--trim5')
+solution?
+    Single galaxy parameter can only be linked to single tool input? no?
+    Prefer ‘--’ longform in these cases
+
+issue
+    cutadapt
+    WildcardSelector outputs which also have direct <command> reference 
+    WildcardSelector for outputs, but XML also references $output in <command> (cutadapt)
+    ToolOutput('out_out11', selector=InputSelector("output_fastqsanger"))
+    ToolOutput('out_out12', selector=WildcardSelector("out1*"))
+solution?
+    When creating Output CommandComponents, check if a referenced gxparam is available, and if it has a collection method (from_work_dir, discover_datatsets etc), don’t add this as an Output. It will be picked up at the end anyway and will be formatted using the collection method into a WildcardOutput
+
 

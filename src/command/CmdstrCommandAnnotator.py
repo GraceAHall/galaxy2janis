@@ -21,8 +21,8 @@ class CmdstrCommandAnnotator:
 
     def annotate(self) -> None:
         self.set_attrs()
-        self.feed_cmdstrs(source='test')
         self.feed_cmdstrs(source='xml')
+        self.feed_cmdstrs(source='test')
         self.feed_cmdstrs(source='workflow')
         self.cleanup()
 
@@ -69,6 +69,6 @@ class CmdstrCommandAnnotator:
         self.update_components_presence_array()
 
     def update_components_presence_array(self) -> None:
-        for component in self.command.list_all_inputs():
+        for component in self.command.list_inputs():
             component.update_presence_array(self.epath_count - 1, fill_false=True)
     

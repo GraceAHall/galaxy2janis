@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 from xmltool.param.InputParam import BoolParam
 
 from command.components.CommandComponent import BaseCommandComponent
@@ -48,7 +48,8 @@ class Flag(BaseCommandComponent):
             return self.gxparam.get_docstring()
         return None
 
-    def update(self, incoming: Flag):
+    def update(self, incoming: Any):
+        assert(isinstance(incoming, Flag))
         # gxparam transfer
         if not self.gxparam and incoming.gxparam:
             self.gxparam = incoming.gxparam

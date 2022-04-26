@@ -35,14 +35,6 @@ class CommandStringFactory:
 
     def create_statements(self, the_string: str) -> list[DynamicCommandStatement]:
         return split_to_statements(the_string)
-
-    # def resolve_statement_aliases(self, statements: list[DynamicCommandStatement]) -> list[DynamicCommandStatement]:
-    #     ar = AliasResolver(self.xmltool)
-    #     for cmd_statement in statements:
-    #         ar.extract(cmd_statement)
-    #     for cmd_statement in statements:
-    #         ar.resolve(cmd_statement)
-    #     return statements
         
     def set_statement_tokens(self, statements: list[DynamicCommandStatement]) -> list[DynamicCommandStatement]:
         for cmd_statement in statements:

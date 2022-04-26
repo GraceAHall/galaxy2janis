@@ -11,7 +11,7 @@ from command.Command import Command
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import spawn_component 
 import command.epath.utils as component_utils
-
+import command.regex.scanners as scanners
 
 """
 iterates through a ExecutionPath, yielding the current tokens being assessed.
@@ -79,6 +79,7 @@ class GreedyEPathAnnotator:
                 self.annot()
             self.pos += 1
     
+    # this is challenging logic and ugly
     def annot(self) -> None:
         """
         annotates the current epath position with a command component
@@ -98,7 +99,10 @@ class GreedyEPathAnnotator:
 
         if component_utils.is_option(ctoken, ntoken):
             ctype= 'option'
-            delim, vtokens = self.format_option()
+            if component_utils.has_compound_structure(ctoken):
+                delim, vtokens = self.format_compound_option()
+            else:
+                delim, vtokens = self.format_option()
         elif component_utils.is_flag(ctoken, ntoken):
             ctype= 'flag'
         else:
@@ -113,6 +117,26 @@ class GreedyEPathAnnotator:
         )
         self.transfer_gxparam_to_component(start, stop, component)
         self.update_epath(start, stop, component)
+
+    def format_compound_option(self) -> Tuple[str, list[Token]]:
+        # ugly. whole module needs refactor.
+        ctoken = self.epath.positions[self.pos].token
+        compound_opts = scanners.get_compound_opt(ctoken.text)
+
+        match = compound_opts[0]
+        prefix = match.group(1)
+        prefix_match = scanners.get_all(prefix)[0]
+        value = match.group(2)
+        value_match = scanners.get_all(value)[0]
+        
+        ctoken.match = prefix_match                         # changes -k19 -> -k
+        ntoken = Token(value_match, TokenType.RAW_NUM)      # generates the ntoken (the opt value)
+        ntoken.gxparam = ctoken.gxparam
+        delim = ''                                          # sets zero space delim
+        return delim, [ntoken]                                           
+        
+
+
 
     def format_option(self) -> Tuple[str, list[Token]]:
         delim = self.get_delim()

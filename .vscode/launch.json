@@ -359,6 +359,19 @@
             ]
         },
         {
+            "name": "collapse_collections",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/collapse_collections", 
+                "--xml", "merge.xml",
+            ]
+        },
+        {
             "name": "nanoplot",
             "type": "python",
             "request": "launch",

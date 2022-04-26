@@ -22,12 +22,17 @@ class Option(BaseCommandComponent):
     def get_default_value(self) -> Optional[Any]:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
+        default = None
         if self.gxparam:
             default = self.gxparam.get_default()
-        elif self.value_record.get_observed_env_var():
-            default = self.value_record.get_observed_env_var()
-        else:
-            default = self.value_record.get_most_common_value()
+        if default is None:
+            default = self.value_record.get_most_common_value(no_env=True)
+        return default
+
+        # if default is None and self.value_record.get_observed_env_var():
+        #     default = self.value_record.get_observed_env_var()
+        # if default is None:
+        #     default = self.value_record.get_most_common_value()
         return default
         #return utils.sanitise_default_value(default)
         
@@ -53,7 +58,8 @@ class Option(BaseCommandComponent):
         return ''
         #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
-    def update(self, incoming: Option):
+    def update(self, incoming: Any):
+        assert(isinstance(incoming, Option))
         # transfer values
         self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference

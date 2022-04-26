@@ -2,13 +2,14 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
-import tags.formatters as formatters
+from command.components.CommandComponent import CommandComponent
+import tags.formatting_rules as rules
 
-basic_formatters = [
-    formatters.format_capitalisation,
-    formatters.replace_non_alphanumeric,
-    formatters.handle_prohibited_key
-]
+# rules = [
+#     formatting_rules.non_alphanumeric,
+#     formatting_rules.prohibited_key
+#     formatting_rules.capitalisation,
+# ]
 
 class FormattingStrategy(ABC):
 
@@ -16,95 +17,80 @@ class FormattingStrategy(ABC):
     def format(self, starting_text: str, entity: Any) -> str:
         ...
 
-    def format_basic(self, tag: str, entity: Any) -> str:
-        for formatter in basic_formatters:
-            tag = formatter(tag, entity)
-        return tag
-
-
+# default
 class GenericFormattingStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text, entity)
-        tag = formatters.encode(tag)
+        tag = starting_text
+        tag = rules.numeric(tag, entity)
+        tag = rules.numeric_start(tag, entity)
+        tag = rules.non_alphanumeric(tag, entity)
+        tag = rules.short_tag(tag, entity)
+        tag = rules.capitalisation(tag, entity)
+        tag = rules.prohibited_key(tag, entity)
+        tag = rules.encode(tag)
         return tag
 
+# capitalisation is allowed
 class ToolNameStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
-        tag = formatters.handle_short_tag(starting_text, entity)
-        tag = formatters.replace_non_alphanumeric(tag, entity)
-        tag = formatters.handle_prohibited_key(tag, entity)
-        tag = formatters.encode(tag)
+        tag = starting_text
+        tag = rules.non_alphanumeric(tag, entity)
+        tag = rules.numeric(tag, entity)
+        tag = rules.numeric_start(tag, entity)
+        tag = rules.short_tag(tag, entity)
+        #tag = rules.capitalisation(tag, entity)
+        tag = rules.prohibited_key(tag, entity)
+        tag = rules.encode(tag)
         return tag
         
-class ToolInputStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = formatters.handle_short_tag(starting_text, entity)
-        tag = self.format_basic(tag, entity)
-        tag = formatters.encode(tag)
-        return tag
+
+def get_starting_text(entity_type: str, entity: Any) -> str:
+    match entity_type:
+        case 'workflow':
+            return entity.metadata.name # type: ignore
+        case 'workflow_input':
+            if entity.is_galaxy_input_step: # type: ignore
+                return f'in_{entity.name}' # type: ignore
+            else:
+                return f'{entity.step_tag}_{entity.name}' # type: ignore
+        case 'workflow_step':
+            return entity.metadata.tool_id # type: ignore
+        case 'workflow_output':
+            return f'{entity.step_tag}_{entity.toolout_tag}' # type: ignore
+        case 'tool':
+            return entity.metadata.id # type: ignore
+        case 'tool_input':
+            return get_tool_input_name(entity)
+        case 'tool_output':
+            basetag = entity.get_name()
+            if basetag.startswith('out'):
+                return basetag
+            else:
+                return f'out_{basetag}'
+        case _:
+            raise RuntimeError()
+
+def get_tool_input_name(component: CommandComponent) -> str:
+    default_name = component.get_name()
+    if default_name.isnumeric() and component.gxparam:
+        return component.gxparam.name.rsplit('.', 1)[-1]  # adv.reference -> reference (gxvarnames)
+    return default_name
 
 
-def get_strategy(entity_type: str) -> FormattingStrategy:
-    strategy_map = {
-        'workflow': GenericFormattingStrategy(),
-        'workflow_input': GenericFormattingStrategy(),
-        'workflow_step': GenericFormattingStrategy(),
-        'workflow_output': GenericFormattingStrategy(),
-        'tool': ToolNameStrategy(),
-        'tool_input': ToolInputStrategy(),
-        'tool_output': GenericFormattingStrategy(),
-    }
-    return strategy_map[entity_type]
+STRATEGIES = {
+    'workflow': GenericFormattingStrategy(),
+    'workflow_input': GenericFormattingStrategy(),
+    'workflow_step': GenericFormattingStrategy(),
+    'workflow_output': GenericFormattingStrategy(),
+    'tool': ToolNameStrategy(),
+    'tool_input': GenericFormattingStrategy(),
+    'tool_output': GenericFormattingStrategy(),
+}
 
-def format_tag(starting_text: str, entity_type: str, entity: Any) -> str:
-    strategy = get_strategy(entity_type)
+def format_tag(entity_type: str, entity: Any) -> str:
+    starting_text = get_starting_text(entity_type, entity)
+    strategy = STRATEGIES[entity_type]
     return strategy.format(starting_text, entity)
 
 
 
-
-"""
-class WorkflowNameStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-class WorkflowInputStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-class WorkflowStepStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-class WorkflowOutputStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-class ToolNameStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-class ToolInputStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = formatters.handle_short_tag(starting_text, entity)
-        tag = self.format_basic(tag)
-        tag = formatters.encode(tag)
-        return tag
-
-class ToolOutputStrategy(FormattingStrategy):
-    def format(self, starting_text: str, entity: Any) -> str:
-        tag = self.format_basic(starting_text)
-        tag = formatters.encode(tag)
-        return tag
-
-"""

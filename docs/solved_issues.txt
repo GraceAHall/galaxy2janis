@@ -5,6 +5,49 @@
 SOLVED
 
 issue
+    minimap2 
+    -k19 etc. no seperation between prefix and value.
+    rules:
+        - single preceeding dash
+        - number is above 3
+        - ntoken is not a Positional
+solution    
+    added logic to parse 'compound options' (eg -k19)
+    uses the rules above to identify. tries to be as conservative as possible. 
+
+issue
+    seqtk sample
+    'single_pass_mode' Boolean appears in options section not flags
+solution
+    this is actually kind of intended behaviour. 
+    Boolean comes from the gxparam, but it could be [BOOLEAN] [VALUE]
+    and the boolean could be actually a tool option.
+    enhanced flag detection to handle this scenario - two adjacent tokens have different
+    gxparams, and the first is a BoolParam
+
+issue 
+    seqtk sample tool input
+    4_0=4.0
+solution 
+    improved TagManager formatting 
+
+issue
+    blank value for default attribute (bowtie2_wrapper)
+    ToolInput(
+		'rg',
+		Int(optional=True),
+		prefix='--rg',
+		position=1,
+		default=,
+		doc="None",
+	),
+solution
+    error with component.value_record.get_counts()
+    was returning '' as a key with a certain count because the value_register
+    can have blank values 
+
+
+issue
     duplicate toolinput [bug]: references_list1 / references_list2 (quast)
     duplicate toolinput [bug]: max_ref_num1 / max_ref_num2 (quast)
     duplicate toolinput [bug]: discard_untrimmed1 / discard_untrimmed2 (cutadapt)

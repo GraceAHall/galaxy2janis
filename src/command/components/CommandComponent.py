@@ -13,9 +13,9 @@ from uuid import uuid4
 class CommandComponent(Protocol):
     uuid: str
     gxparam: Optional[Param]
+    cmd_pos: int
     presence_array: list[bool]
     janis_datatypes: list[JanisDatatype]
-    cmd_pos: int
     forced_optionality: Optional[bool]
 
     def get_name(self) -> str:
@@ -69,6 +69,9 @@ class BaseCommandComponent(ABC):
         """
         ...
 
+    def get_uuid(self) -> str:
+        return self.uuid
+
     @abstractmethod
     def get_default_value(self) -> Any:
         """
@@ -77,9 +80,6 @@ class BaseCommandComponent(ABC):
         galaxy param information if available.
         """
         ...
-
-    def get_uuid(self) -> str:
-        return self.uuid
 
     def set_janis_datatypes(self, datatypes: list[JanisDatatype]) -> None:
         self.janis_datatypes = datatypes

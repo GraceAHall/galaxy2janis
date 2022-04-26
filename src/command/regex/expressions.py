@@ -19,7 +19,7 @@ SIMPLE_STRINGS = r'[\w$_-]+'
 
 WORDS = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
 KEYVAL_PAIRS = r'(?<=\s|^)(\S+?)([=:])(\S+?)(?=\s|$)'
-
+COMPOUND_OPT = r'^(-\w)(\d+?)$'
 
 VARIABLES_FMT1 = r'\$\w[\w._]+'
 VARIABLES_FMT2 = r'\$\{\w[\w._]+\}'

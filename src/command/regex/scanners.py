@@ -25,12 +25,17 @@ from command.regex.expressions import (
     SH_STREAM_MERGE, 
     SH_STATEMENT_DELIMS,
     VERSIONS,
+    COMPOUND_OPT,
     ALL
 )
 
 
 def get_all(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(ALL, the_string)
+    return [m for m in matches]
+
+def get_compound_opt(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(COMPOUND_OPT, the_string)
     return [m for m in matches]
 
 def get_preceeding_dashes(search_term: str, text: str) -> list[str]:

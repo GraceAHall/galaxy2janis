@@ -43,11 +43,17 @@ class ValueRecord(ABC):
                 return str(obsval)
         return None
 
-    def get_most_common_value(self) -> str:
+    def get_most_common_value(self, no_env: bool=False) -> Optional[Any]:
         counts_dict = self.get_counts()
         counts_list = list(counts_dict.items())
         counts_list.sort(key=lambda x: x[1], reverse=True)
-        return counts_list[0][0]
+        if no_env:
+            counts_list = [(val, count) for val, count in counts_list if not val.startswith('$')]
+
+        if len(counts_list) > 0:
+            return counts_list[0][0]
+        else:
+            return None
 
 
 class PositionalValueRecord(ValueRecord):
@@ -58,7 +64,8 @@ class PositionalValueRecord(ValueRecord):
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            counts[obsval] += 1
+            if obsval != '':
+                counts[obsval] += 1
         return counts
 
     def values_are_ints(self) -> bool:
@@ -88,8 +95,9 @@ class OptionValueRecord(ValueRecord):
     def get_counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
         for obsval in self.record:
-            label = ' '.join(obsval)
-            counts[label] += 1
+            if len(obsval) > 0:
+                label = ' '.join(obsval)
+                counts[label] += 1
         return counts
 
     def values_are_ints(self) -> bool:

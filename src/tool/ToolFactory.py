@@ -36,7 +36,7 @@ class ToolFactory:
 
     def supply_inputs(self, tool: Tool) -> None:
         self.command.set_cmd_positions()
-        inputs = self.command.get_inputs()
+        inputs = self.command.list_inputs(include_base_cmd=False)
         for inp in inputs:
             self.datatype_annotator.annotate(inp)
             tool.add_input(inp)
@@ -53,7 +53,7 @@ class ToolFactory:
 
     def get_redirect_outputs(self) -> list[CommandComponent]:
         # already identified in ExecutionPaths
-        return self.command.get_outputs()
+        return self.command.list_outputs()
     
     def get_input_outputs(self) -> list[CommandComponent]:
         # can be identified by looking at the input components which
@@ -62,7 +62,7 @@ class ToolFactory:
         # the -o option would be picked up as a command component, and the
         # gxparam referred to by $outfile is stored on the command component
         out: list[CommandComponent] = []
-        for component in self.command.get_inputs():
+        for component in self.command.list_inputs(include_base_cmd=False):
             if component.gxparam and isinstance(component.gxparam, OutputParam):
                 out.append(self.output_factory.create_input_output(component))
         return out

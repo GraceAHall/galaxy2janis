@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Callable
+from typing import Any, Optional
 from command.cmdstr.CommandString import CommandString
 
 from command.components.inputs import Positional, Flag, Option
@@ -163,6 +163,66 @@ class Command:
     def set_xml_cmdstr(self, xmlcmdstr: CommandString) -> None:
         self.xmlcmdstr = xmlcmdstr
 
+    def list_inputs(self, include_base_cmd: bool=True) -> list[CommandComponent]:
+        components: list[Positional | Option | Flag] = []
+        if include_base_cmd:
+            components += self.get_positionals()
+        else:
+            components += self.get_non_base_positionals()
+        components += self.get_flags()
+        components += self.get_options()
+        return components
+
+    def list_outputs(self) -> list[CommandComponent]:
+        # just returns redirect component if present.
+        # other outputs are handled by ToolFactory
+        components: list[CommandComponent] = []
+        if self.redirect:
+            components.append(self.redirect)
+        return components
+    
+    def get_positional(self, cmd_pos: int) -> Optional[Positional]:
+        if cmd_pos in self.positionals:
+            return self.positionals[cmd_pos]
+        return None
+
+    def get_flag(self, query_prefix: str) -> Optional[Flag]:
+        if query_prefix in self.flags:
+            return self.flags[query_prefix]
+        return None
+
+    def get_option(self, query_prefix: str) -> Optional[Option]:
+        if query_prefix in self.options:
+            return self.options[query_prefix]
+        return None
+    
+    def get_positionals(self) -> list[Positional]:
+        """returns positionals in sorted order"""
+        positions_components = list(self.positionals.items())
+        positions_components.sort(key=lambda x: x[0])
+        return [p[1] for p in positions_components]
+    
+    def get_flags(self) -> list[Flag]:
+        return list(self.flags.values())
+    
+    def get_options(self) -> list[Option]:
+        return list(self.options.values())
+
+    def get_base_positionals(self) -> list[CommandComponent]:
+        positionals = self.get_positionals()
+        out: list[CommandComponent] = []
+        for p in positionals:
+            if p.before_opts and not p.gxparam and p.has_single_value() and not p.values_are_variables():
+                out.append(p)
+            else:
+                break
+        return out
+
+    def get_non_base_positionals(self) -> list[Positional]:
+        base_positionals = self.get_base_positionals()
+        all_positionals = self.get_positionals()
+        return [p for p in all_positionals if p not in base_positionals]
+
     def update(self, incoming: CommandComponent) -> None:
         component = self.refine_component(incoming)
         updater = self.select_updater(component)
@@ -217,74 +277,6 @@ class Command:
             i += 1
         return i + 1
 
-    def list_all_inputs(self) -> list[CommandComponent]:
-        components: list[CommandComponent] = []
-        components += self.get_positionals()
-        components += self.get_flags()
-        components += self.get_options()
-        return components
-
-    def get_inputs(self) -> list[CommandComponent]:
-        components: list[CommandComponent] = []
-        components += self.get_non_base_positionals()
-        components += self.get_flags()
-        components += self.get_options()
-        return components
-
-    def get_outputs(self) -> list[CommandComponent]:
-        # just returns redirect component if present.
-        # other outputs are handled by ToolFactory
-        components: list[CommandComponent] = []
-        if self.redirect:
-            components.append(self.redirect)
-        return components
-
-    def get_base_positionals(self) -> list[Positional]:
-        positionals = self.get_positionals()
-        out: list[Positional] = []
-        for p in positionals:
-            if p.before_opts and not p.gxparam and p.has_single_value() and not p.values_are_variables():
-                out.append(p)
-            else:
-                break
-        # positionals = [p for p in positionals if p.before_opts]
-        # positionals = [p for p in positionals if not p.gxparam]
-        # positionals = [p for p in positionals if p.has_single_value()]
-        # positionals = [p for p in positionals if not p.values_are_variables()]
-        return out
-
-    def get_non_base_positionals(self) -> list[Positional]:
-        base_positionals = self.get_base_positionals()
-        all_positionals = self.get_positionals()
-        return [p for p in all_positionals if p not in base_positionals]
-
-    def get_positionals(self) -> list[Positional]:
-        """returns positionals in sorted order"""
-        positions_components = list(self.positionals.items())
-        positions_components.sort(key=lambda x: x[0])
-        return [p[1] for p in positions_components]
-
-    def get_positional(self, cmd_pos: int) -> Optional[Positional]:
-        if cmd_pos in self.positionals:
-            return self.positionals[cmd_pos]
-        return None
-
-    def get_flags(self) -> list[Flag]:
-        return list(self.flags.values())
-
-    def get_flag(self, query_prefix: str) -> Optional[Flag]:
-        if query_prefix in self.flags:
-            return self.flags[query_prefix]
-        return None
-
-    def get_options(self) -> list[Option]:
-        return list(self.options.values())
-
-    def get_option(self, query_prefix: str) -> Optional[Option]:
-        if query_prefix in self.options:
-            return self.options[query_prefix]
-        return None
-
     # string representations
     def __str__(self) -> str:
         return f""" \
@@ -303,7 +295,7 @@ options: ------------
 {self._get_components_list_as_str('option')}"""
 
     def _get_components_list_as_str(self, ctype: str='positional') -> str:
-        funcmap: dict[str, Callable[[], list[CommandComponent]]]  = {
+        funcmap = {
             'positional': self.get_positionals,
             'flag': self.get_flags,
             'option': self.get_options,

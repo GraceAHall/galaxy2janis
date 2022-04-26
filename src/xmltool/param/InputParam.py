@@ -61,10 +61,10 @@ class IntegerParam(InputParam):
     def get_default(self) -> Any:
         if self.value:
             return self.value
-        elif self.min:
-            return self.min
-        elif self.max:
-            return self.max
+        # elif self.min:
+        #     return self.min
+        # elif self.max:
+        #     return self.max
         return None
 
 
