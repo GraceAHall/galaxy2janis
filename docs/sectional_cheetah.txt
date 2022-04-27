@@ -1,0 +1,215 @@
+
+
+SECTIONAL CHEETAH PARSING NOTES
+
+IMPORTANT
+    - moving towards simplification of <command> using workflow step inputs and sectional cheetah
+    - simplification already occurs, and less text the better 
+    - allows a better translation of the tool for the given workflow step
+    - will additionally help simplify pre/post task (relates to outputs)
+
+
+
+Rules:
+- if a gxparam is directly linkable (see below), don't simplify
+    <command> --kmers $kmers <\command>
+    "tool_state": 'kmers': '7'
+    <param argument="--kmers" type="integer" value="7" min="2" max="10"
+    in this case, if we simplified $kmers to 7, we would lose gxparam reference. 
+- PROTECTED sections? 
+    #if $filter.maxlength
+        --maxlength $filter.maxlength
+    #end if
+
+
+Components
+- simplifying lines/sections
+- assigning python to env_vars
+
+min_length=108, -> min_length=None
+
+- evaluate <command> section using the workflow step inputs as param dict
+- produces simplified <command> specific to this workflow translation where we can more accurately pull values
+- for tool inputs which no longer appear in the <command> section after templating, 
+  assume their value is None / False depending on whether its a Flag or Option/Positional
+
+- for any identified __FUNCTION_CALL__, replace with #env_var and create #set env_var = __FUNCTION_CALL__
+    --$mode.reads.type ${' '.join($reads_temp)}
+    --fastq ${' '.join($reads_temp)} [after cheetah simplification - step input mode.reads.type]
+
+    [PRETASK]
+    #set mode_reads_type = ${' '.join($reads_temp)}
+    [MAIN]
+    --$mode.reads.type $mode_reads_type
+    --fastq input1.fq input2.fq 
+
+    w.input(
+        'nanoplot',
+        NanoPlot(
+            mode_reads_type=nanoplot_pretask_mode_reads_type,   # 
+        )
+    
+
+
+
+
+TODO 
+- bring back alias tracing (tool parsing)
+- add sectional cheetah parsing
+
+improvements to FASTQC
+(alias, not cheetah)
+ln -s '${input_file}' '${input_file_sl}' &&
+    - ${input_file} -> ${input_file_sl}
+    - (gxparam) is aliased to (env var)
+
+improvements to UNICYCLER
+    w.in_forward_reads goes where?
+    fastq_input1=w.in_forward_reads,          # -1 [FastqSanger]
+    option_s=w.in_forward_reads,              # -s [FastqSanger]
+
+relevant cheetah:
+    #if str( $paired_unpaired.fastq_input_selector ) == "paired"
+        -1 '$fq1'
+    #elif str( $paired_unpaired.fastq_input_selector ) == "paired_collection"
+        -1 '$fq1'
+    #elif str( $paired_unpaired.fastq_input_selector ) == "single"
+        -s '$fq'
+
+relevant step inputs: 
+    $paired_unpaired.fastq_input_selector = 'paired'
+
+would resolve the above. <command> would be templated to:
+    -1 '$fq1'
+therefore we have 
+    fastq_input1=w.in_forward_reads,    # -1 [FastqSanger]
+    option_s=None,                      # -s [FastqSanger] [IMPROVEMENT]
+
+some other inputs may be wrong values? and these could also be template to correct value. especially for cases where we are checking condition
+
+improvements to MULTIQC
+
+
+   
+fastp templating
+
+```
+fastp
+
+--thread \${GALAXY_SLOTS:-1}
+--report_title 'fastp report for $in1_name' [NOT TEMPLATABLE till runtime]
+
+#if $in1.is_of_type('fastqillumina', 'fastqsolexa', 'fastqillumina.gz', 'fastqsolexa.gz'): [NOT TEMPLATABLE till runtime]
+    --phred64
+#end if
+
+-i '$in1_name' [NOT TEMPLATABLE till runtime]
+-o first${ext} [DEFAULT TEMPLATABLE]
+
+#if str($single_paired.single_paired_selector).startswith('paired'): [DEFAULT TEMPLATABLE]
+    -I '$in2_name'  [NOT TEMPLATABLE till runtime]
+    -O second${ext} [DEFAULT TEMPLATABLE]
+#end if
+```
+
+
+
+
+
+
+    - xml <command> will always be parsed to identify tool inputs
+        - tests provide evaulated command strings, while xml does not
+    - tool inputs are enclosed within cheetah control logic 
+    - tool inputs may have an env var for its value 
+    - <command> section may include arbitrary python code which needs to be evaluated to get a final value
+
+
+Motivation: Control logic
+    - conditional / loops
+    - don't know whether they should appear in the command (conditional block), or their value (loops)
+    
+    #if 'json_stats' in $output_selector:
+        --json stats.json
+    #end if
+
+
+Motivation: Env var for tool input value
+    - set using cheetah / python code
+    - can't get the underlying value until cheetah evaulation
+
+    #if $filter.readtype
+        --readtype $filter.readtype  (gxparam)
+    #end if
+    
+    #set out1 = $output_paired_coll.forward (env var from gxparam value)
+
+    -x '$index_path'  (env var)
+
+
+Motivation: Arbitrary python
+    - python can appear anywhere and is executed as part of cheetah evaluation
+    - this is commonly text manipulation, and can occur inline, or when setting env vars
+
+    #set $in1_name = re.sub('[^\w\-\s]', '_', str($single_paired.paired_input.name)) + $ext
+    solution: 
+        - gather all enclosing lines referencing $in1_name
+        - evaluate all
+        - replace lines with evaluated lines
+
+    ```
+    #if $single_paired.single_paired_selector == 'paired_collection':
+        #set $in1_name = re.sub('[^\w\-\s]', '_', str($single_paired.paired_input.name)) + $ext
+        ln -s '$in1' '$in1_name' &&
+    #else
+        #set $in1_name = re.sub('[^\w\-\s]', '_', str($in1.element_identifier)) + $ext
+        ln -s '$in1' '$in1_name' &&
+    #end if
+    --report_title 'fastp report for $in1_name'
+    -i '$in1_name'
+    ```
+
+    ```
+    #if $one_header:
+      #if $filename.add_name:
+        awk '{if (NR==1) {print "Sample\t"$0}}' "$input_list[0]";
+      #else:
+        awk '{if (NR==1) {print}}' "$input_list[0]";
+      #end if
+    #end if
+    ```
+
+    --$mode.reads.type ${' '.join($reads_temp)}
+    solution: evaluate line to create simplified version
+
+
+Requirements
+- 
+
+
+Structure of workflow steps
+- pre-task
+- main
+- post-task
+
+
+
+
+
+Outcomes of cheetah section evaulation:
+- valid evaluation: tool input / value are present (linkable: value is value)
+- valid evaluation: tool input / value are not present (linkable: value is None)
+- invalid evaluation: execution fails (not linkable)
+
+
+naive is to just grab enclosing cheetah around each reference to the input argument:
+
+#if 'json_stats' in $output_selector:
+    --json stats.json
+#end if
+
+doesn't work in this situation, as other env vars are definied in the header 
+
+
+
+
+

@@ -128,12 +128,8 @@ def step_title_snippet(step_count: int, tool_tag: str) -> str:
 def step_foreward_snippet() -> str:
     return"""\"\"\"
 FOREWORD ----------
-
-RUNTIME VALUES
-    ...
-
-PRE TASK, TOOL STEP, POST TASK
-    ...
+Please see [WEBLINK] for information on RUNTIME VALUES
+Please see [WEBLINK] for information on the PRE TASK, TOOL STEP, POST TASK structure
 \"\"\"
 """
 
