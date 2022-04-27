@@ -40,7 +40,7 @@ class WildcardOutput(BaseCommandComponent):
             return self.gxparam.get_docstring()
         return 'output created during runtime. file is collected from working directory'
 
-    def update(self, incoming: WildcardOutput):
+    def update(self, incoming: Any):
         pass
 
 

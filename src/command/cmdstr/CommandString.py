@@ -23,7 +23,7 @@ class CommandString:
         self.preprocessing = []
         self.postprocessing = []
         
-        inferrer = MainStatementInferrer(statements, metadata)
+        inferrer = MainStatementInferrer(self.source, statements, metadata)
         main_index = inferrer.infer()
         for i, statement in enumerate(statements):
             if i < main_index:

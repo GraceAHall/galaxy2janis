@@ -8,7 +8,8 @@ from command.cmdstr.CommandString import CommandString
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput
 from command.components.CommandComponent import CommandComponent
-from command.components.inputs import spawn_component 
+from command.components.inputs import spawn_component
+from xmltool.param.Param import Param 
 
 
 class Updater(ABC):
@@ -159,6 +160,14 @@ class Command:
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
         self.redirect: Optional[RedirectOutput] = None
+
+    def gxparam_is_attached(self, gxparam: Param) -> bool:
+        components = self.list_inputs()
+        components += self.list_outputs()
+        for component in components:
+            if component.gxparam and component.gxparam.name == gxparam.name:
+                return True
+        return False
 
     def set_xml_cmdstr(self, xmlcmdstr: CommandString) -> None:
         self.xmlcmdstr = xmlcmdstr

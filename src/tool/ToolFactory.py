@@ -73,8 +73,10 @@ class ToolFactory:
         # like from_work_dir or a <discover_datatsets> tag as a child
         out: list[CommandComponent] = []
         for gxparam in self.xmltool.list_outputs():
-            if gxparam.wildcard_pattern:
-                out.append(self.output_factory.create_wildcard_output(gxparam))
+            if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern:
+                if not self.command.gxparam_is_attached(gxparam):
+                    new_output = self.output_factory.create_wildcard_output(gxparam)
+                    out.append(new_output)
         return out
     
     def get_unknown_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:
