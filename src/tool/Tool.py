@@ -23,7 +23,7 @@ class Tool:
     """
     uuid: str = field(init=False)
     metadata: ToolXMLMetadata
-    xmlcmdstr: CommandString
+    raw_command: str
     gxparam_register: InputParamRegister
     container: Optional[Container]
     base_command: list[str]

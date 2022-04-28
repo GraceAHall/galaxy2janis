@@ -4,10 +4,11 @@
 import re
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
+import command.manipulation.utils as utils
 
 
 def replace_function_calls(cmdstr: str) -> str:
-    cmdlines = split_lines(cmdstr)
+    cmdlines = utils.split_lines(cmdstr)
     out: list[str] = []
     for line in cmdlines:
         matches = scanners.get_function_calls(line)
@@ -16,7 +17,7 @@ def replace_function_calls(cmdstr: str) -> str:
             new_section = '__FUNCTION_CALL__'
             line = line.replace(old_section, new_section)
         out.append(line)
-    return join_lines(out)
+    return utils.join_lines(out)
 
 def replace_backticks(cmdstr: str) -> str:
     matches = scanners.get_backtick_sections(cmdstr)
@@ -44,18 +45,9 @@ def translate_variable_markers(cmdstr: str) -> str:
 
 def standardise_variable_format(cmdstr: str) -> str:
     """standardises different forms of a galaxy variable ${var}, $var etc"""
-    cmdlines: list[str] = split_lines(cmdstr)
+    cmdlines: list[str] = utils.split_lines(cmdstr)
     outlines: list[str] = [remove_var_braces(line) for line in cmdlines]
-    return join_lines(outlines)
-
-def split_lines(cmdstr: str) -> list[str]:
-    lines = cmdstr.split('\n')
-    lines = [ln.strip() for ln in lines]
-    lines = [ln for ln in lines if ln != '']
-    return lines 
-
-def join_lines(cmdlines: list[str]) -> str:
-    return '\n'.join(cmdlines)
+    return utils.join_lines(outlines)
 
 def remove_var_braces(text: str) -> str:
     """
@@ -114,7 +106,7 @@ def remove_cheetah_comments(cmdstr: str) -> str:
     removes cheetah comments from command lines
     comments can be whole line, or part way through
     """
-    cmdlines: list[str] = split_lines(cmdstr)
+    cmdlines: list[str] = utils.split_lines(cmdstr)
     outlines: list[str] = []
 
     for line in cmdlines:
@@ -125,6 +117,6 @@ def remove_cheetah_comments(cmdstr: str) -> str:
         # make sure we didnt trim a full line comment and now its an empty string
         if line != '':
             outlines.append(line)
-    return join_lines(outlines)
+    return utils.join_lines(outlines)
 
 

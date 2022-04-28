@@ -10,6 +10,7 @@ parsed/*/*.log
 galaxy_types/
 venv/
 test/data/
+!test/data/cheetah_simplification
 test/rubbish/
 tool-data
 *.tmp

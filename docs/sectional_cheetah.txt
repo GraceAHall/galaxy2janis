@@ -2,60 +2,63 @@
 
 SECTIONAL CHEETAH PARSING NOTES
 
-IMPORTANT
-    - moving towards simplification of <command> using workflow step inputs and sectional cheetah
-    - simplification already occurs, and less text the better 
-    - allows a better translation of the tool for the given workflow step
-    - will additionally help simplify pre/post task (relates to outputs)
+
+Aim
+- More accurately assign tool values
+- Provide simplified pre/post tasks 
+- Identify more tool arguments (resolve templated arguments) and update Command (edge case)
+
+Approach
+- Parse tool normally
+- module runs when linking tool inputs to values
+- module simplifies the <command> section using cheetah templating
+- simplified <command> section is then used to identify values associated with arguments
+    - can the argument be found in the simplified command? if so, determine its value
+    - if not, it must be optional and in this case has a value of None
+    - 
+- what about the step inputs json? is this just ignored now? 
 
 
 
-Rules:
-- if a gxparam is directly linkable (see below), don't simplify
-    <command> --kmers $kmers <\command>
-    "tool_state": 'kmers': '7'
-    <param argument="--kmers" type="integer" value="7" min="2" max="10"
-    in this case, if we simplified $kmers to 7, we would lose gxparam reference. 
-- PROTECTED sections? 
-    #if $filter.maxlength
-        --maxlength $filter.maxlength
+
+Templated tool arguments (9+ tools)
+    gatk2_macros.xml
+    #if hasattr( $param.input, 'truevalue' ):
+        ${param}
+    #else:
+        --${name} "${param}"
     #end if
 
-
-Components
-- simplifying lines/sections
-- assigning python to env_vars
-
-min_length=108, -> min_length=None
-
-- evaluate <command> section using the workflow step inputs as param dict
-- produces simplified <command> specific to this workflow translation where we can more accurately pull values
-- for tool inputs which no longer appear in the <command> section after templating, 
-  assume their value is None / False depending on whether its a Flag or Option/Positional
-
-- for any identified __FUNCTION_CALL__, replace with #env_var and create #set env_var = __FUNCTION_CALL__
+    nanoplot.xml
     --$mode.reads.type ${' '.join($reads_temp)}
-    --fastq ${' '.join($reads_temp)} [after cheetah simplification - step input mode.reads.type]
 
-    [PRETASK]
-    #set mode_reads_type = ${' '.join($reads_temp)}
-    [MAIN]
-    --$mode.reads.type $mode_reads_type
-    --fastq input1.fq input2.fq 
+    metaspades.xml
+    --$prefix$num-1 fastq:$file.file_type.fwd_reads
 
-    w.input(
-        'nanoplot',
-        NanoPlot(
-            mode_reads_type=nanoplot_pretask_mode_reads_type,   # 
-        )
+    mitos2.xml
+    --$tpe 0
+
+
+moving main python to pretask 
+    - swap __FUNCTION_CALL__ with $env_var
+    - creat #set env_var = __FUNCTION_CALL__ line at end of pre-task
+        --$mode.reads.type ${' '.join($reads_temp)}
+        --fastq ${' '.join($reads_temp)} [after cheetah simplification - step input mode.reads.type]
+
+        [PRETASK]
+        #set mode_reads_type = ${' '.join($reads_temp)}
+        [MAIN]
+        --$mode.reads.type $mode_reads_type
+        --fastq input1.fq input2.fq 
+
+        w.input(
+            'nanoplot',
+            NanoPlot(
+                mode_reads_type=nanoplot_pretask_mode_reads_type,   # 
+            )
     
 
 
-
-
-TODO 
-- bring back alias tracing (tool parsing)
-- add sectional cheetah parsing
 
 improvements to FASTQC
 (alias, not cheetah)

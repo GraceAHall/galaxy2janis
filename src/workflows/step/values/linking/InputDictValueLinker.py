@@ -20,16 +20,6 @@ from workflows.step.values.InputValue import (
 import workflows.step.values.create_value as value_utils
 
 
-# module entry
-def link_step_input_values(workflow: Workflow):
-    for step in workflow.list_steps():
-        assert(step.tool)
-        # assign actual Param objects to gxparam field of inputs
-        step.inputs.assign_gxparams(step.tool)  
-        linker = InputValueLinker(step, workflow)
-        linker.link()
-
-
 class InputValueLinker:
     def __init__(self, step: WorkflowStep, workflow: Workflow):
         self.step = step
@@ -37,7 +27,7 @@ class InputValueLinker:
         self.workflow = workflow
         self.valregister: InputValueRegister = InputValueRegister()
 
-    def link(self) -> None:
+    def link(self) -> InputValueRegister:
         # setting basic values
         self.assign_supplied_values()
         self.assign_default_values()
@@ -50,7 +40,7 @@ class InputValueLinker:
         self.migrate_static_to_default()
         # cleanup
         self.assert_all_components_assigned()
-        self.step.values = self.valregister
+        return self.valregister
 
     def assign_supplied_values(self) -> None:
         # link tool components to static and connection inputs

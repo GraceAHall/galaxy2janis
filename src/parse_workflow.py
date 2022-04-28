@@ -6,7 +6,7 @@ from workflows.workflow.WorkflowFactory import WorkflowFactory
 from workflows.workflow.Workflow import Workflow
 
 # modules
-from workflows.step.values.InputValueLinker import link_step_input_values
+from workflows.step.values.linking.InputDictValueLinker import link_step_input_values
 from workflows.step.outputs.OutputLinker import link_step_outputs_tool_outputs
 from workflows.step.tools.assign import set_tools
 from workflows.step.tools.assign import set_tool_paths

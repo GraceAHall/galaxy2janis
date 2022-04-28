@@ -9,7 +9,7 @@ class XMLCommandLoader:
         self.tooldef = tooldef
 
     def load(self) -> str:
-        return self.tooldef.command
+        return self.tooldef.raw_command
        
 
 

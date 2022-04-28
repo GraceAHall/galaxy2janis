@@ -24,7 +24,7 @@ class XMLToolDefinition:
     Permits storing and retreiving data about the tool.
     """
     metadata: ToolXMLMetadata
-    command: str
+    raw_command: str
     inputs: InputParamRegister
     outputs: OutputParamRegister
     tests: TestRegister

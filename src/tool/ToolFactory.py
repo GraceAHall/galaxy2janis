@@ -25,7 +25,7 @@ class ToolFactory:
     def create(self) -> Tool:
         tool = Tool(
             metadata=self.xmltool.metadata,
-            xmlcmdstr=self.command.xmlcmdstr,
+            raw_command=self.xmltool.raw_command,
             container=self.container,
             base_command=self.get_base_command(),
             gxparam_register=self.xmltool.inputs

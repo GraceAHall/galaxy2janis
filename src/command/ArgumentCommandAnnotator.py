@@ -34,7 +34,7 @@ def argument_component_not_exists(gxparam: Param, xmltool: XMLToolDefinition, co
 
 def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
     argument: str = gxparam.argument # type: ignore
-    if argument is not None and argument in xmltool.command:
+    if argument is not None and argument in xmltool.raw_command:
         return True
     return False
 
@@ -68,7 +68,7 @@ class ArgumentCommandAnnotator:
         #if not old_argument.startswith('-'): 
         matches = scanners.get_preceeding_dashes(
             search_term=old_argument,
-            text=self.xmltool.command
+            text=self.xmltool.raw_command
         )
         if matches:
             num_dashes = max(len(dashes) for dashes in matches)

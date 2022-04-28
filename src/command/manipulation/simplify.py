@@ -1,8 +1,7 @@
 
 
 from typing import Callable
-
-from command.simplify.filters import (
+from command.manipulation.filters import (
     flatten_multiline_strings,
     translate_variable_markers,
     standardise_variable_format,
@@ -16,6 +15,19 @@ from command.simplify.filters import (
     interpret_raw
 )
 
+# module entry points
+
+def simplify_test(cmdstr: str) -> str:
+    simplifier = TestCommandSimplifier()
+    return simplifier.simplify(cmdstr)
+
+def simplify_xml(cmdstr: str) -> str:
+    simplifier = XMLCommandSimplifier()
+    return simplifier.simplify(cmdstr)
+
+
+
+# classes 
 
 class CommandSimplifier:
     filters: list[Callable[[str], str]] = []

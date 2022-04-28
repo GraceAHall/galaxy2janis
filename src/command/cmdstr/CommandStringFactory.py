@@ -8,10 +8,10 @@ from xmltool.tool_definition import XMLToolDefinition
 
 from command.cmdstr.CommandString import CommandString
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-from command.simplify.simplify import TestCommandSimplifier, XMLCommandSimplifier
-#from command.alias.AliasResolver import AliasResolver
+#from command.manipulation.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
 from command.regex.utils import get_quoted_sections
+from command.manipulation import simplify_test, simplify_xml
 
 
 class CommandStringFactory:
@@ -25,13 +25,14 @@ class CommandStringFactory:
         esource = CommandString(source, statements, self.xmltool.metadata)
         return esource
 
-    def simplify_raw_string(self, source: str, the_string: str) -> str:
-        strategy_map = {
-            'test': TestCommandSimplifier(),
-            'xml': XMLCommandSimplifier(),
-        }
-        strategy = strategy_map[source]
-        return strategy.simplify(the_string)
+    def simplify_raw_string(self, source: str, cmdstr: str) -> str:
+        match source:
+            case 'xml':
+                return simplify_xml(cmdstr)
+            case 'test':
+                return simplify_test(cmdstr)
+            case _:
+                raise NotImplementedError()
 
     def create_statements(self, the_string: str) -> list[DynamicCommandStatement]:
         return split_to_statements(the_string)

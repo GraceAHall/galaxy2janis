@@ -9,7 +9,7 @@ from .mock_metadata import MOCK_METADATA
 
 MOCK_XMLTOOL = XMLToolDefinition(
     metadata=MOCK_METADATA,
-    command='',
+    raw_command='',
     inputs=InputParamRegister([]),
     outputs=OutputParamRegister([]),
     tests=TestRegister([])

@@ -26,12 +26,31 @@ from command.regex.expressions import (
     SH_STATEMENT_DELIMS,
     VERSIONS,
     COMPOUND_OPT,
+    LN,
+    MV,
+    CP,
+    CH_SET,
     ALL
 )
 
-
 def get_all(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(ALL, the_string)
+    return [m for m in matches]
+
+def get_ln(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(LN, the_string)
+    return [m for m in matches]
+
+def get_mv(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(MV, the_string)
+    return [m for m in matches]
+
+def get_cp(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(CP, the_string)
+    return [m for m in matches]
+
+def get_set(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(CH_SET, the_string)
     return [m for m in matches]
 
 def get_compound_opt(the_string: str) -> list[re.Match[str]]:
