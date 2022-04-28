@@ -21,6 +21,137 @@ Approach
 
 
 
+Cheetah templating
+input dict
+    - can't just slot in values 
+        - need to determine the underlying param value  
+        - "nogroup": "false" -> $nogroup is BoolToolParam. when value is false, value becomes ""
+        - need to get the galaxy loaded gxparams, then evaluate the underlying value given the step value
+process
+    - left to right (indentation/cheetah constructs)
+    - then top to bottom
+    - so we don't have errors within construct, replace contents with identifier
+    - after resolving the outer construct, replace the inner with the original text using the identifier
+    - if error in outer construct resolution, keep going. its fine. 
+    
+    OUTER CONSTRUCT 
+
+    #if $long                                       # OK
+        #if $long.is_of_type('fastqsanger')         # FAILS (.is_of_type())
+            #set lr = "lr.fastq"                    # OK
+        #elif $long.is_of_type('fastqsanger.gz')    # FAILS
+            #set lr = "lr.fastq.gz"                 # OK
+        #elif $long.is_of_type('fasta')             # FAILS
+            #set lr = "lr.fasta"                    # OK
+        #end if                                     # OK
+        ln -s '${long}' '$lr' &&                    # FAILS (no $lr)
+    #else
+        another command &&
+    #end if
+
+    BECOMES
+
+    #if $long
+        identifier1
+    #else
+        identifier2
+    #end if
+
+    identifier1 = """
+        #if $long.is_of_type('fastqsanger')
+            #set lr = "lr.fastq"
+        #elif $long.is_of_type('fastqsanger.gz')
+            #set lr = "lr.fastq.gz"
+        #elif $long.is_of_type('fasta')
+            #set lr = "lr.fasta"
+        #end if
+        ln -s '${long}' '$lr' &&
+    """
+
+    identifier2 = """
+        another command &&
+    """
+
+    BECOMES
+
+        identifier1
+
+    BECOMES
+
+        #if $long.is_of_type('fastqsanger')
+            #set lr = "lr.fastq"
+        #elif $long.is_of_type('fastqsanger.gz')
+            #set lr = "lr.fastq.gz"
+        #elif $long.is_of_type('fasta')
+            #set lr = "lr.fasta"
+        #end if
+        ln -s '${long}' '$lr' &&
+
+    INNER CONSTRUCT 1
+
+        #if $long.is_of_type('fastqsanger')
+            identifier1
+        #elif $long.is_of_type('fastqsanger.gz')
+            identifier2
+        #elif $long.is_of_type('fasta')
+            identifier3
+        #end if
+
+    identifier1 = """#set lr = "lr.fastq""""
+    identifier2 = """#set lr = "lr.fastq.gz""""
+    identifier3 = """#set lr = "lr.fasta""""
+
+    BECOMES (due to failure)
+
+        #if $long.is_of_type('fastqsanger')
+            identifier1
+        #elif $long.is_of_type('fastqsanger.gz')
+            identifier2
+        #elif $long.is_of_type('fasta')
+            identifier3
+        #end if
+    
+    BECOMES (back to a few steps ago as nothing to resolve)
+
+        #if $long.is_of_type('fastqsanger')
+            #set lr = "lr.fastq"
+        #elif $long.is_of_type('fastqsanger.gz')
+            #set lr = "lr.fastq.gz"
+        #elif $long.is_of_type('fasta')
+            #set lr = "lr.fasta"
+        #end if
+
+    INNER CONSTRUCT 2
+
+        ln -s '${long}' '$lr' &&
+    
+    BECOMES
+
+        ln -s '${long}' '$lr' && (failure)
+    
+    FINAL 
+
+        #if $long.is_of_type('fastqsanger')
+            #set lr = "lr.fastq"
+        #elif $long.is_of_type('fastqsanger.gz')
+            #set lr = "lr.fastq.gz"
+        #elif $long.is_of_type('fasta')
+            #set lr = "lr.fasta"
+        #end if
+        ln -s '${long}' '$lr' &&
+
+
+
+
+
+
+
+
+
+
+
+
+
 Templated tool arguments (9+ tools)
     gatk2_macros.xml
     #if hasattr( $param.input, 'truevalue' ):

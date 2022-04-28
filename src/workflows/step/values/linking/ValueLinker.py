@@ -1,51 +1,29 @@
 
 
 from abc import ABC, abstractmethod
-from typing import Any
-from command.components.CommandComponent import CommandComponent
-from tool.Tool import Tool
-from workflows.io.WorkflowInput import WorkflowInput
-from workflows.workflow.Workflow import Workflow
-
-from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.inputs.StepInput import ConnectionStepInput, WorkflowInputStepInput
 
 from workflows.step.values.InputValueRegister import InputValueRegister
-from workflows.step.values.component_updates import update_component_from_workflow_value
-from workflows.step.values.InputValue import (
-    DefaultInputValue, 
-    InputValue, 
-    InputValueType, 
-    RuntimeInputValue, 
-    StaticInputValue
-)
-import workflows.step.values.create_value as value_utils
-
 
 
 class ValueLinker(ABC):
     """
     assigns values to each tool argument given some reference information
     
-    CheetahValueLinker templates the <command> with the step input dict,
-    then uses the templated <command> to locate arguments and pull their value
-
     InputDictValueLinker looks up values directly from the step input dict
     when possible (a gxparam is attached to the component)
 
-    when a value cannot be assigned...
+    CheetahValueLinker follows similar logic to InputDictValueLinker, except also 
+    templates the <command> with the step input dict, then uses the templated <command> 
+    to locate arguments and pull their value
 
     """
 
     @abstractmethod
-    def link(self) -> None:
+    def link(self) -> InputValueRegister:
         """links tool arguments to their value for a given workflow step"""
         ...
 
-    @abstractmethod
-    def get_value(self, component: CommandComponent) -> Any:
-        """gets the value for a specific tool argument"""
-        ...
+
     
 
 

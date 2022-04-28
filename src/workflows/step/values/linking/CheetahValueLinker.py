@@ -1,31 +1,23 @@
 
 
-from command.components.CommandComponent import CommandComponent
+from typing import Any
+
 from tool.Tool import Tool
-from workflows.io.WorkflowInput import WorkflowInput
+from command.components.CommandComponent import CommandComponent
 from workflows.workflow.Workflow import Workflow
-
 from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.inputs.StepInput import ConnectionStepInput, WorkflowInputStepInput
-
 from workflows.step.values.InputValueRegister import InputValueRegister
-from workflows.step.values.component_updates import update_component_from_workflow_value
-from workflows.step.values.InputValue import (
-    DefaultInputValue, 
-    InputValue, 
-    InputValueType, 
-    RuntimeInputValue, 
-    StaticInputValue
-)
-import workflows.step.values.create_value as value_utils
-
 
 from command.manipulation import sectional_template
 from command.manipulation import resolve_aliases
+from .ValueLinker import ValueLinker
 
 
 
-class CheetahValueLinker:
+# from galaxy.util.template 
+
+
+class CheetahValueLinker(ValueLinker):
     """
     - create simplified <command>
     - for each tool Flag/Option (component)
@@ -37,7 +29,6 @@ class CheetahValueLinker:
             update component -> Optionality 
 
     """
-
     def __init__(self, step: WorkflowStep, workflow: Workflow):
         assert(step.tool)
         self.step = step
@@ -50,13 +41,26 @@ class CheetahValueLinker:
         assert(self.step.tool)
         cmdstr = sectional_template(
             cmdstr=self.step.tool.raw_command,
-            inputs=self.step.inputs.list()
+            inputs=self.step.metadata.tool_state
         )
-        cmdstr = resolve_aliases(cmdstr)
+        cmdstr = resolve_aliases(cmdstr) # -> dont do this?
         return cmdstr
 
     def link(self) -> InputValueRegister:
         raise NotImplementedError()
+
+    def link_argument(self, component: CommandComponent) -> None:
+        """gets the value for a specific tool argument"""
+        raise NotImplementedError()
+
+    def get_value(self, component: CommandComponent) -> Any:
+        """gets the value for a specific tool argument"""
+        raise NotImplementedError()
+
+        # simplified cheetah
+        # input step
+        # 
+
         
 
 

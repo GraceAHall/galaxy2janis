@@ -11,6 +11,7 @@ class StepMetadata:
     step_id: int
     step_name: str
     tool_id: str
+    tool_state: dict[str, Any]
     is_inbuilt: bool
     workflow_outputs: list[dict[str, Any]]
     repo_name: Optional[str] = None

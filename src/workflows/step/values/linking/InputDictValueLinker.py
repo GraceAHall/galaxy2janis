@@ -18,9 +18,10 @@ from workflows.step.values.InputValue import (
     StaticInputValue
 )
 import workflows.step.values.create_value as value_utils
+from .ValueLinker import ValueLinker
 
 
-class InputValueLinker:
+class InputDictValueLinker(ValueLinker):
     def __init__(self, step: WorkflowStep, workflow: Workflow):
         self.step = step
         self.tool: Tool = step.tool # type: ignore

@@ -1,6 +1,7 @@
 
 
 from typing import Any
+import json
 
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.step.inputs.StepInput import StepInput, init_connection_step_input, init_static_step_input, init_runtime_step_input, init_workflow_input_step_input
@@ -10,7 +11,6 @@ from workflows.step.outputs.StepOutput import init_tool_step_output
 from workflows.step.metadata.StepMetadata import StepMetadata
 from workflows.workflow.Workflow import Workflow
 from .ToolStateFlattener import ToolStateFlattener
-
 
 
 class ToolStepParser:
@@ -39,6 +39,7 @@ class ToolStepParser:
             step_id=self.gxstep['id'],
             step_name=self.gxstep['name'],
             tool_id=self.gxstep['tool_id'],
+            tool_state=self.gxstep['tool_state'], 
             is_inbuilt=True,
             workflow_outputs=self.gxstep['workflow_outputs'],
             label=self.gxstep['label'],
@@ -57,6 +58,7 @@ class ToolStepParser:
             step_name=self.gxstep['name'],
             repo_name=self.gxstep['tool_shed_repository']['name'],
             tool_id=tool_id,
+            tool_state=self.gxstep['tool_state'],
             is_inbuilt=False,
             workflow_outputs=self.gxstep['workflow_outputs'],
             label=self.gxstep['label'],
