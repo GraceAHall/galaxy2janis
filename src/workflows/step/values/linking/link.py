@@ -16,6 +16,6 @@ def link_step_input_values(workflow: Workflow):
         assert(step.tool)
         # assign actual Param objects to gxparam field of inputs
         step.inputs.assign_gxparams(step.tool)  
-        #linker = InputDictValueLinker(step, workflow)
-        linker = CheetahValueLinker(step, workflow)
+        linker = InputDictValueLinker(step, workflow)
+        #linker = CheetahValueLinker(step, workflow)
         step.values = linker.link()

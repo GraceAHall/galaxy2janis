@@ -14,12 +14,6 @@ def get_cmd(path: str) -> str:
 
 
 class TestAliases(unittest.TestCase):
-    def setUp(self) -> None:
-        raw_path = 'test/data/command/manipulation/aliases/fastqc/fastqc_command.xml'
-        ref_path = 'test/data/command/manipulation/aliases/fastqc/fastqc_command_resolved.xml'
-        self.raw_cmd = get_cmd(raw_path)
-        self.ref_cmd = get_cmd(ref_path)
-        self.maxDiff = None
 
     def test_resolve_fastqc(self):
         raw_path = 'test/data/command/manipulation/aliases/fastqc/fastqc_command.xml'

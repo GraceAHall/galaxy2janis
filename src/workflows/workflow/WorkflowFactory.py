@@ -8,7 +8,7 @@ from typing import Any
 
 from workflows.workflow.Workflow import Workflow
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
-from workflows.step.parsing.parse import parse_input_step, parse_tool_step
+from workflows.step.parsing.step import parse_input_step, parse_tool_step
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 
 class WorkflowFactory:

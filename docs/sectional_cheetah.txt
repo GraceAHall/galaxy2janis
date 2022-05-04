@@ -39,22 +39,62 @@ process
     #if $long                                       # OK
         #if $long.is_of_type('fastqsanger')         # FAILS (.is_of_type())
             #set lr = "lr.fastq"                    # OK
-        #elif $long.is_of_type('fastqsanger.gz')    # FAILS
+        #elif $long.is_of_type('fastqsanger.gz')    # FAILS (.is_of_type())
             #set lr = "lr.fastq.gz"                 # OK
-        #elif $long.is_of_type('fasta')             # FAILS
+        #elif $long.is_of_type('fasta')             # FAILS (.is_of_type())
             #set lr = "lr.fasta"                    # OK
         #end if                                     # OK
         ln -s '${long}' '$lr' &&                    # FAILS (no $lr)
     #else
         another command &&
     #end if
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        another command &&
+    
 
     BECOMES
 
     #if $long
         identifier1
+
+
+
+
+
+
+        ln -s '${long}' '$lr' &&
     #else
+        another command &&
+    #end if
+
+    #if $long
+        identifier1
+
+
+
+
+
+
         identifier2
+    #else
+        identifier3
+    #end if
+    
+    #if $long
+        identifier1
+        identifier2
+    #else
+        identifier3
     #end if
 
     identifier1 = """
@@ -65,16 +105,30 @@ process
         #elif $long.is_of_type('fasta')
             #set lr = "lr.fasta"
         #end if
-        ln -s '${long}' '$lr' &&
     """
 
     identifier2 = """
+        ln -s '${long}' '$lr' &&
+    """
+
+    identifier3 = """
         another command &&
     """
 
     BECOMES
 
+    
         identifier1
+
+
+
+
+
+
+        identifier2
+    
+    
+    
 
     BECOMES
 

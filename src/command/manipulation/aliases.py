@@ -1,6 +1,5 @@
 
 
-
 from typing import Optional, Tuple
 import command.manipulation.utils as utils
 import command.regex.scanners as scanners
