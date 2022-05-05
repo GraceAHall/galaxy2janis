@@ -40,7 +40,7 @@ class CheetahValueLinker(ValueLinker):
     def prepare_command(self) -> str:
         assert(self.step.tool)
         cmdstr = sectional_template(
-            cmdstr=self.step.tool.raw_command,
+            text=self.step.tool.raw_command,
             inputs=self.step.metadata.tool_state
         )
         cmdstr = resolve_aliases(cmdstr) # -> dont do this?

@@ -1,7 +1,7 @@
 
 
 
-from command.cmdstr.ConstructTracker import ConstructTracker
+from command.cheetah.ConstructTracker import ConstructTracker
 from command.cmdstr.MainStatementInferrer import MainStatementInferrer
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement

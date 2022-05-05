@@ -8,7 +8,7 @@ from typing import Optional
 from xmltool.tool_definition import XMLToolDefinition
 from xmltool.param.Param import Param
 
-from command.cmdstr.ConstructTracker import ConstructTracker
+from command.cheetah.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
 from command.tokens.Tokens import Token
 from command.tokens.TokenFactory import TokenFactory
@@ -92,7 +92,7 @@ class RealisedTokenValueifier:
             self.tokens += realised_token_values
 
     def should_tokenify_line(self, line: str) -> bool:
-        if self.tracker.is_construct_line(line) or self.tracker.in_banned_segment():
+        if self.tracker.is_construct_line(line) or self.tracker.within_banned_segment():
             return False
         return True
     
