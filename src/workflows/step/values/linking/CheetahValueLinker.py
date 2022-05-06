@@ -43,6 +43,7 @@ class CheetahValueLinker(ValueLinker):
             text=self.step.tool.raw_command,
             inputs=self.step.metadata.tool_state
         )
+        print(cmdstr)
         cmdstr = resolve_aliases(cmdstr) # -> dont do this?
         return cmdstr
 

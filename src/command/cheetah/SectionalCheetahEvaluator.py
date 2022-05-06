@@ -2,133 +2,145 @@
 
 
 from __future__ import annotations
-from typing import Any, Optional
-from Cheetah.Template import Template
+from typing import Any
 
-import command.manipulation.utils as utils
-from command.cheetah.blocks import CheetahBlock, BlockType, get_blocks
-
-from command.cheetah.constructs import (
-    CH_WITHIN_CONDITIONAL,
-    CH_CLOSE_CONDITIONAL,
-    CH_CLOSE_LOOP,
-    CH_CLOSE_FUNC,
-)
-IGNORE_CONSTRUCTS = CH_WITHIN_CONDITIONAL | CH_CLOSE_CONDITIONAL | CH_CLOSE_LOOP | CH_CLOSE_FUNC
-
-
-
-"""
-TODO tomorrow
-this should just update self.lines
-single source of truth that gets updated as we go
-for #else #elif etc within constructs - ignore these 'blocks'.
-
-"""
-
+from command.cheetah.blocks import get_next_block 
+from command.cheetah.blocks import CheetahBlock, BlockType
 
 
 
 class SectionalCheetahEvaluator:
-    """
-    evaluates a cheetah template with a supplied input_dict.
-    returns the output str, or None if fails
-    recursive
-    """
     def __init__(self, lines: list[str], input_dict: dict[str, Any]):
         self.lines = lines
         self.input_dict = input_dict
-        self.identifiers_blocks: dict[str, CheetahBlock] = {}
+        self.ptr: int = 0
 
     def evaluate(self) -> list[str]:
-        for block in get_blocks(offset=0, lines=self.lines, indent_level=0):
-            block = self.evaluate_block(block)
-            self.update_lines(block)
-            for child in block.child_blocks:
-                child = self.evaluate_block(child)
-                self.update_lines(child)
+        while self.ptr < len(self.lines):
+            block = get_next_block(self.ptr, self.lines)
+            if self.should_evaluate(block):
+                block.evaluate(self.input_dict)
+                self.update_lines(block)
+            self.update_ptr(block)
         return self.lines
-
-    def update_lines(self, block: CheetahBlock) -> None:
-        old_lines_top = self.lines[:block.real_start]
-        old_lines_bottom = self.lines[block.real_stop+1:]
-        self.lines = old_lines_top + block.lines + old_lines_bottom
     
-    def evaluate_block(self, block: CheetahBlock) -> CheetahBlock:
-        self.identifiers_blocks: dict[str, CheetahBlock] = {}
-        if self.should_evaluate(block):
-            template = self.prepare_template(block)
-            evaluation = self.evaluate_template(template)
-            if evaluation:
-                self.update_block(block, evaluation)
-        return block
-    
-    def evaluate_template(self, template: str) -> Optional[str]:
-        """cheetah eval happens here"""
-        try:
-            t = Template(template, searchList=[self.input_dict]) # type: ignore
-            print(t)
-            return str(t)
-        except Exception as e:
-            print(e)
-            return None
-
-    def update_block(self, block: CheetahBlock, evaluation: str) -> None:
-        eval_lines = utils.split_lines_blanklines(evaluation)
-        eval_lines = self.expand_identifiers(eval_lines)
-        block.set_lines(eval_lines) # override block contents
-
-    def expand_identifiers(self, lines: list[str]) -> list[str]:
-        out: list[str] = []
-        for i in range(len(lines)):
-            if self.is_uuid(lines[i]):
-                block = self.identifiers_blocks[lines[i]]
-                out += block.lines
-                i += block.height
-            else:
-                i += 1
-        return out
-
-    def is_uuid(self, line: str) -> bool:
-        if ' ' not in line and line in self.identifiers_blocks:
-            return True
-        return False
-
     def should_evaluate(self, block: CheetahBlock) -> bool:
         """dictates whether this block should be evaluated or left as original text"""
-        permitted_blocks = [BlockType.INLINE, BlockType.CONDITIONAL]
-        if block.type in permitted_blocks:
+        if block.lines == ['']:
+            return False
+        if block.type in [BlockType.INLINE, BlockType.CONDITIONAL]:
             return True
         return False
 
-    def prepare_template(self, block: CheetahBlock) -> str:
-        """
-        prepares text ready for evaluation
-        includes swapping child blocks with identifiers if present
-        """
-        template_lines = block.lines
-        template_lines = self.substitute_identifiers(template_lines, block)
-        template = utils.join_lines(template_lines)
-        return template  # ready for evaluation
-        
-    def substitute_identifiers(self, template_lines: list[str], block: CheetahBlock) -> list[str]:
-        for child in block.child_blocks:
-            if not # TODO HERE
-            self.identifiers_blocks[child.uuid] = child  # register identifier/block
-            template_lines = self.substitute_identifier(template_lines, child)
-        return template_lines
+    def update_lines(self, block: CheetahBlock) -> None:
+        old_lines_top = self.lines[:block.start]
+        old_lines_bottom = self.lines[block.stop + 1:]
+        self.lines = old_lines_top + block.lines + old_lines_bottom
+    
+    def update_ptr(self, block: CheetahBlock) -> None:
+        if block.evaluated:
+            self.ptr += 1  # success, go to next line
+        else:
+            self.ptr += block.height # TODO CHECK
 
-    def should_ignore(self, line: str) -> bool:
-        if any ([line.startswith(text) for text in IGNORE_CONSTRUCTS]):
-            return True
-        return False
 
-    def substitute_identifier(self, block_lines: list[str], child: CheetahBlock) -> list[str]:
-        """swaps child block with identifier in template"""
-        old_lines_top = block_lines[:child.relative_start]
-        identifier_lines = [child.uuid] + (child.height - 1) * ['\n']
-        old_lines_bottom = block_lines[child.relative_stop+1:]
-        return old_lines_top + identifier_lines + old_lines_bottom
+
+
+
+
+
+"""
+#if str( $paired_unpaired.fastq_input_selector ) == "paired"
+    #if $paired_unpaired.fastq_input1.is_of_type('fastqsanger')
+        #set fq1 = "fq1.fastq"
+    #elif $paired_unpaired.fastq_input1.is_of_type('fastqsanger.gz')
+        #set fq1 = "fq1.fastq.gz"
+    #end if
+    #if $paired_unpaired.fastq_input2.is_of_type('fastqsanger')
+        #set fq2 = "fq2.fastq"
+    #elif $paired_unpaired.fastq_input2.is_of_type('fastqsanger.gz')
+        #set fq2 = "fq2.fastq.gz"
+    #end if
+    ln -s '${paired_unpaired.fastq_input1}' $fq1 &&
+    ln -s '${paired_unpaired.fastq_input2}' $fq2 &&
+#elif str( $paired_unpaired.fastq_input_selector ) == "paired_collection"
+    #if $paired_unpaired.fastq_input1.forward.is_of_type('fastqsanger')
+        #set fq1 = "fq1.fastq"
+    #elif $paired_unpaired.fastq_input1.forward.is_of_type('fastqsanger.gz')
+        #set fq1 = "fq1.fastq.gz"
+    #end if
+    #if $paired_unpaired.fastq_input1.reverse.is_of_type('fastqsanger')
+        #set fq2 = "fq2.fastq"
+    #elif $paired_unpaired.fastq_input1.reverse.is_of_type('fastqsanger.gz')
+        #set fq2 = "fq2.fastq.gz"
+    #end if
+    ln -s '${paired_unpaired.fastq_input1.forward}' $fq1 &&
+    ln -s '${paired_unpaired.fastq_input1.reverse}' $fq2 &&
+#elif str( $paired_unpaired.fastq_input_selector ) == "single"
+    #if $paired_unpaired.fastq_input1.is_of_type('fastqsanger')
+        #set fq = "fq.fastq"
+    #elif $paired_unpaired.fastq_input1.is_of_type('fastqsanger.gz')
+        #set fq = "fq.fastq.gz"
+    #end if
+    ln -s '${paired_unpaired.fastq_input1}' '$fq' &&
+#end if
+"""
+
+
+
+
+
+
+# class SectionalCheetahEvaluatorOld:
+#     """
+#     evaluates a cheetah template with a supplied input_dict.
+#     returns the output str, or None if fails
+#     recursive
+#     """
+#     def __init__(self, lines: list[str], input_dict: dict[str, Any]):
+#         self.lines = lines   # the <command> section text to alter
+#         self.input_dict = input_dict
+#         self.masked_blocks: dict[str, CheetahBlock] = {}
+
+#     def evaluate(self) -> list[str]:
+#         for block in get_blocks(offset=0, lines=self.lines, indent_level=0):
+#             self.evaluate_block(block)
+#         return self.lines
+
+#     def evaluate_block(self, block: CheetahBlock) -> None:
+#         self.identifiers_blocks: dict[str, CheetahBlock] = {}
+#         if self.should_evaluate(block):
+#             template = self.prepare_template(block)
+#             print('\ntemplate:')
+#             print(template)
+#             evaluation = self.evaluate_template(template)
+#             print('\nevaluation:')
+#             print(evaluation)
+#             if evaluation is not None:
+#                 self.update_block(block, evaluation)
+#                 self.update_lines(block)
+#                 for child in block.child_blocks:
+#                     self.evaluate_block(child)
+
+
+#     def evaluate_template(self, source: str) -> Optional[str]:
+#         """cheetah eval happens here"""
+#         try:
+#             t = Template(source, searchList=[self.input_dict]) 
+#             return unicodify(t)
+#         except Exception as e:
+#             print('\n' + str(e))
+#             return None
+
+#     def update_block(self, block: CheetahBlock, evaluation: str) -> None:
+#         eval_lines = utils.split_lines_blanklines(evaluation)
+#         eval_lines = self.expand_identifiers(eval_lines)
+#         block.lines = eval_lines # override block contents
+
+#     def update_lines(self, block: CheetahBlock) -> None:
+#         old_lines_top = self.lines[:block.real_start]
+#         old_lines_bottom = self.lines[block.real_stop+1:]
+#         self.lines = old_lines_top + block.lines + old_lines_bottom
 
 
 

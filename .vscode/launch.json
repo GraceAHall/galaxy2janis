@@ -6,6 +6,13 @@
     "configurations": [
 
         {
+            "name": "test",
+            "type": "python",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "rip galaxy types",
             "type": "python",
             "request": "launch",
