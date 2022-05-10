@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.param.Param import Param

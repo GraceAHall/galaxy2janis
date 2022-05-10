@@ -62,22 +62,18 @@ class RuntimeInputValueFactory(InputValueFactory):
 
 @dataclass
 class StaticInputValueFactory(InputValueFactory):
-    step_input: StaticStepInput
+    value: Any
     
     def create(self) -> StaticInputValue:
         return StaticInputValue(
-            value=self.get_value(),
+            value=self.value,
             valtype=self.get_valtype(),
             comptype=self.get_comptype(),
-            gxparam=self.step_input.gxparam
+            gxparam=self.component.gxparam
         )
 
-    def get_value(self) -> Any:
-        return self.step_input.value
-
     def get_valtype(self) -> InputValueType:
-        value = self.get_value()
-        return select_input_value_type(self.component, value)
+        return select_input_value_type(self.component, self.value)
 
 
 @dataclass

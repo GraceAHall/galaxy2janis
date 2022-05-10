@@ -85,7 +85,7 @@ class StepTextDefinition:
     @property
     def runtime_inputs(self) -> str:
         # following few lines could be workflow method? 
-        runtime_inputs = self.step.values.runtime
+        runtime_inputs = self.step.tool_values.runtime
         workflow_inputs = [ self.workflow.get_input(input_uuid=value.input_uuid) 
                             for value in runtime_inputs]
         workflow_inputs = [x for x in workflow_inputs if x is not None]
@@ -120,12 +120,11 @@ class StepTextDefinition:
     
     def get_tool_tag(self) -> str:
         tool = self.step.tool
-        assert(tool)
         return tool.tag_manager.get(tool.get_uuid())
 
     def format_unlinked_inputs(self) -> str:
         lines: list[ToolInputLine] = []
-        for inp in self.step.values.unlinked:
+        for inp in self.step.tool_values.unlinked:
             lines.append(UnlinkedInputLine(inp, self.step, self.workflow))
         return self.format_input_section(lines)
 
@@ -142,9 +141,8 @@ class StepTextDefinition:
         return self.format_input_section(lines)
 
     def get_nondefault_input_values(self) -> list[Tuple[CommandComponent, InputValue]]:
-        assert(self.step.tool)
         out: list[Tuple[CommandComponent, InputValue]] = []
-        for comp_uuid, invalue in self.step.values.linked:
+        for comp_uuid, invalue in self.step.tool_values.linked:
             if not isinstance(invalue, DefaultInputValue):
                 component = self.step.tool.get_input(comp_uuid)
                 assert(component)
@@ -152,9 +150,8 @@ class StepTextDefinition:
         return out
     
     def get_default_input_values(self) -> list[Tuple[CommandComponent, InputValue]]:
-        assert(self.step.tool)
         out: list[Tuple[CommandComponent, InputValue]] = []
-        for comp_uuid, invalue in self.step.values.linked:
+        for comp_uuid, invalue in self.step.tool_values.linked:
             if isinstance(invalue, DefaultInputValue):
                 component = self.step.tool.get_input(comp_uuid)
                 assert(component)

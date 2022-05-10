@@ -1,5 +1,7 @@
 
 from typing import Any
+from startup.ExeSettings import ToolExeSettings
+from workflows.io.WorkflowInput import WorkflowInput
 
 from workflows.step.inputs.StepInputRegister import StepInputRegister
 from workflows.workflow.Workflow import Workflow
@@ -10,26 +12,30 @@ from workflows.step.inputs.StepInput import (
     init_runtime_step_input, 
     init_workflow_input_step_input
 )
-from .ToolStateFlattener import ToolStateFlattener
-from .standardisation import standardise_tool_state_value
+from .standardisation import standardise_tool_state
+from .flatten import get_flattened_tool_state
+from .resolve import resolve_values
 
 
-def parse_step_inputs(gxstep: dict[str, Any], workflow: Workflow) -> StepInputRegister:
+def parse_step_inputs(gxstep: dict[str, Any], workflow: Workflow, esettings: ToolExeSettings) -> StepInputRegister:
     gxstep['tool_state'] = get_flattened_tool_state(gxstep)
-    gxstep['tool_state'] = standardise_tool_state(gxstep)
+    #gxstep['tool_state'] = standardise_tool_state(gxstep)
+    gxstep['tool_state'] = resolve_values(esettings, gxstep)
+    #gxstep['tool_state'] = standardise_tool_state(gxstep)
     parser = ToolStepInputParser(gxstep, workflow)
     inputs = parser.parse()
     return StepInputRegister(inputs)
 
-def get_flattened_tool_state(gxstep: dict[str, Any]) -> dict[str, Any]:
-    flattener = ToolStateFlattener()
-    return flattener.flatten(gxstep)
 
-def standardise_tool_state(gxstep: dict[str, Any]) -> dict[str, Any]:
-    out: dict[str, Any] = {}
-    for key, val in gxstep['tool_state'].items():
-        out[key] = standardise_tool_state_value(val)
-    return out
+class InputDataStepParser:
+    def parse(self, step: dict[str, Any])  -> WorkflowInput:
+        return WorkflowInput(
+            name=step['inputs'][0]['name'],
+            step_id=step['id'],
+            step_tag=None,
+            gx_datatypes=step['tool_state']['format'] if 'format' in step['tool_state'] else [],
+            is_galaxy_input_step=True
+        )
 
 
 class ToolStepInputParser:

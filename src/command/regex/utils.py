@@ -11,6 +11,20 @@ from command.regex.expressions import (
     OPERATOR
 )
 
+
+
+def word_exists(word: str, text: str) -> bool:
+    pattern = rf'\s{word}\s'
+    if re.findall(pattern, text):
+        return True
+    return False
+
+def get_next_word(word: str, delim: str, text: str) -> Optional[str]:
+    matches = scanners.get_next_word(word, delim, text)
+    if matches:
+        return matches[0].group(1)
+    return None
+
 def is_variable_substr(match: re.Match[str]) -> bool:
     """check to see if within a variable. ie file_input is within $file_input"""
     var_matches = scanners.get_variables_fmt1(match.string)

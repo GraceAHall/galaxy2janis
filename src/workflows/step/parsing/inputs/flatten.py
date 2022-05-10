@@ -6,6 +6,12 @@ from copy import deepcopy
 from typing import Any
 
 
+
+def get_flattened_tool_state(gxstep: dict[str, Any]) -> dict[str, Any]:
+    flattener = ToolStateFlattener()
+    return flattener.flatten(gxstep)
+
+
 class ToolStateFlattener:
     def __init__(self):
         self.flattened_tool_state: dict[str, Any] = {}

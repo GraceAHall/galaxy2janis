@@ -130,7 +130,7 @@ class WorkflowImportCollector:
     def init_runtime_input_imports(self, step: WorkflowStep, workflow: Workflow) -> list[Import]:
         # pulls any datatypes appearing in step runtime inputs (workflow inputs)
         imports: list[Import] = []
-        for value in step.values.runtime:
+        for value in step.tool_values.runtime:
             wflow_input = workflow.get_input(input_uuid=value.input_uuid) 
             assert(wflow_input)
             imports += self.init_datatype_imports(wflow_input.janis_datatypes)

@@ -3,7 +3,7 @@
 import unittest
 
 from startup.ExeSettings import WorkflowExeSettings
-from workflows.workflow.WorkflowFactory import WorkflowFactory
+from workflows.workflow.WorkflowParser import WorkflowParser
 
 from mock.mock_esettings import MOCK_WORKFLOW_ESETTINGS
 
@@ -12,7 +12,7 @@ class TestWorkflow(unittest.TestCase):
 
     def setUp(self) -> None:
         esettings: WorkflowExeSettings = MOCK_WORKFLOW_ESETTINGS
-        factory: WorkflowFactory = WorkflowFactory()
+        factory: WorkflowParser = WorkflowParser()
         self.workflow = factory.create(
             workflow_path=esettings.get_galaxy_workflow_path()
         )

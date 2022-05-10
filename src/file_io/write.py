@@ -23,7 +23,6 @@ def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
 
 def write_workflow_tools(workflow: Workflow) -> None:
     for step in workflow.list_steps():
-        assert(step.tool)
         formatter = JanisToolFormatter(step.tool)
         tool_definition = formatter.to_janis_definition()
         tool_path = step.get_definition_path()

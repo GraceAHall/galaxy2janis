@@ -25,7 +25,7 @@ class InputValueRegister:
         values = [value for value in values if value.is_runtime]
         return values
 
-    def get_linked(self, uuid: str) -> Optional[InputValue]:
+    def get(self, uuid: str) -> Optional[InputValue]:
         if uuid in self.linked_values:
             return self.linked_values[uuid]
 

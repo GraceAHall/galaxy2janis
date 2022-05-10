@@ -5,12 +5,10 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from tool.Tool import Tool
-from workflows.step.inputs.StepInput import StepInput
 from workflows.step.metadata.StepMetadata import StepMetadata
 from workflows.step.inputs.StepInputRegister import StepInputRegister
-from workflows.step.outputs.StepOutput import StepOutput
 from workflows.step.outputs.StepOutputRegister import StepOutputRegister
-from workflows.step.values.InputValue import InputValue, WorkflowInputInputValue
+from workflows.step.values.InputValue import InputValue
 from workflows.step.values.InputValueRegister import InputValueRegister
 
 """
@@ -38,8 +36,8 @@ class WorkflowStep:
     metadata: StepMetadata
     inputs: StepInputRegister
     outputs: StepOutputRegister
-    tool: Optional[Tool] = None
-    values: InputValueRegister = InputValueRegister()
+    tool: Tool
+    tool_values: InputValueRegister = InputValueRegister()
 
     def get_uuid(self) -> str:
         return self.metadata.uuid
@@ -58,8 +56,7 @@ class WorkflowStep:
     def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
         """translates [uuid, value] into [tag, value] for tool input values"""
         out: list[Tuple[str, InputValue]] = []
-        for uuid, input_value in self.values.linked:
-            assert(self.tool)
+        for uuid, input_value in self.tool_values.linked:
             component_tag = self.tool.tag_manager.get(uuid)
             out.append((component_tag, input_value))
         return out
@@ -67,8 +64,5 @@ class WorkflowStep:
     def get_docstring(self) -> Optional[str]:
         return self.metadata.label
 
-    def get_uri(self) -> str:
-        return self.metadata.get_uri()
-    
     def __repr__(self) -> str:
         return f'(WorkflowStep) step{self.metadata.step_id} - {self.get_tool_name()}'

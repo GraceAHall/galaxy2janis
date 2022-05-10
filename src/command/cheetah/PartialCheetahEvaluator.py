@@ -9,7 +9,7 @@ from command.cheetah.blocks import CheetahBlock, BlockType
 
 
 
-class SectionalCheetahEvaluator:
+class PartialCheetahEvaluator:
     def __init__(self, lines: list[str], input_dict: dict[str, Any]):
         self.lines = lines
         self.input_dict = input_dict

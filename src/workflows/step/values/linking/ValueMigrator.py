@@ -1,115 +1,39 @@
 
 
-from command.components.CommandComponent import CommandComponent
 from tool.Tool import Tool
-from workflows.io.WorkflowInput import WorkflowInput
+
 from workflows.workflow.Workflow import Workflow
-
+from workflows.io.WorkflowInput import WorkflowInput
 from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.inputs.StepInput import ConnectionStepInput, WorkflowInputStepInput
 
-from workflows.step.values.InputValueRegister import InputValueRegister
-from workflows.step.values.component_updates import update_component_from_workflow_value
 from workflows.step.values.InputValue import (
-    DefaultInputValue, 
     InputValue, 
     InputValueType, 
+    DefaultInputValue, 
     RuntimeInputValue, 
     StaticInputValue
 )
 import workflows.step.values.create_value as value_utils
-from .ValueLinker import ValueLinker
 
 
-class InputDictValueLinker(ValueLinker):
+class ValueMigrator:
+    """
+    migrates InputValues to other InputValue types
+    some assigned tool input values need to be migrated to other values.
+    for example: a non-optional File input which was assigned 'None' would need
+    to be migrated to a WorkflowInput (WorkflowInputInputValue) because this
+    is something the user will need to supply at runtime (non-optional File). 
+    """
     def __init__(self, step: WorkflowStep, workflow: Workflow):
         self.step = step
         self.tool: Tool = step.tool # type: ignore
         self.workflow = workflow
-        self.valregister: InputValueRegister = InputValueRegister()
 
-    def link(self) -> InputValueRegister:
-        # setting basic values
-        self.assign_supplied_values()
-        self.assign_default_values()
-        self.assign_unlinked()
-        self.update_component_knowledge()
-        # adjusting values
+    def migrate(self) -> None:
         self.migrate_default_to_runtime()
         #self.migrate_connection_to_workflowinput()
         self.migrate_runtime_to_workflowinput()
         self.migrate_static_to_default()
-        # cleanup
-        self.assert_all_components_assigned()
-        return self.valregister
-
-    def assign_supplied_values(self) -> None:
-        # link tool components to static and connection inputs
-        tool_inputs = self.tool.list_inputs()
-        for component in tool_inputs:
-            if self.is_directly_linkable(component):
-                gxvarname = component.gxparam.name  # type: ignore
-                step_input = self.step.inputs.get(gxvarname)
-                if step_input:
-                    value = value_utils.create(component, step_input, self.workflow) # type: ignore
-                    self.valregister.update_linked(component.get_uuid(), value)
-                    step_input.linked = True
-    
-    def is_directly_linkable(self, component: CommandComponent) -> bool:
-        """
-        checks whether a janis tool input can actually be linked to a value in the 
-        galaxy workflow step.
-        only possible if the component has a gxparam, and that gxparam is referenced as a
-        ConnectionStepInput, RuntimeStepInput or StaticStepInput
-        """
-        if component.gxparam:
-            query = component.gxparam.name 
-            if self.step.inputs.get(query):
-                return True
-        return False
-    
-    def assign_default_values(self) -> None:
-        tool_inputs = self.tool.list_inputs()
-        for component in tool_inputs:
-            if not self.valregister.get_linked(component.get_uuid()):
-                value = value_utils.create_default(component)
-                self.valregister.update_linked(component.get_uuid(), value)
-    
-    def assign_unlinked(self) -> None:
-        # go through step inputs, checking if any have the 'linked' attribute as false
-        permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
-        for step_input in self.step.inputs.list():
-            if not step_input.linked and type(step_input) in permitted_inputs:
-                # workflow inputs
-                if isinstance(step_input, WorkflowInputStepInput):
-                    workflow_input = self.workflow.get_input(step_id=step_input.step_id)
-                    assert(workflow_input)
-                    input_value = value_utils.create_unlinked_workflowinput(workflow_input)
-                # step connections
-                if isinstance(step_input, ConnectionStepInput):
-                    input_value = value_utils.create_unlinked_connection(step_input, self.workflow)
-                self.valregister.update_unlinked(input_value)
-
-    def update_component_knowledge(self) -> None:
-        self.update_components_via_values()
-        self.update_components_via_presence()
-
-    def update_components_via_values(self) -> None:
-        for uuid, value in self.valregister.linked:
-            component = self.tool.get_input(uuid)
-            update_component_from_workflow_value(component, value)
-    
-    def update_components_via_presence(self) -> None:
-        """
-        if component is not optional, but has default=None and no reference in StepInputs,
-        mark this as optional as its not referred to anywhere. must be optional
-        """
-        for component in self.tool.list_inputs():
-            comp_uuid = component.get_uuid()
-            if not component.is_optional():
-                value = self.valregister.get_linked(comp_uuid)
-                if isinstance(value, DefaultInputValue) and value.valtype == InputValueType.NONE:
-                    component.forced_optionality = True
 
     def migrate_default_to_runtime(self) -> None:
         """
@@ -117,11 +41,12 @@ class InputDictValueLinker(ValueLinker):
         where the default doens't look right. ie environment variables
         forces the user to supply a value for this input. 
         """
-        for uuid, value in self.valregister.linked:
+        register = self.step.tool_values
+        for uuid, value in register.linked:
             if self.should_migrate_default_to_runtime(value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_runtime(component)
-                self.valregister.update_linked(uuid, input_value)
+                register.update_linked(uuid, input_value)
     
     def should_migrate_default_to_runtime(self, value: InputValue) -> bool:
         if isinstance(value, DefaultInputValue):
@@ -135,18 +60,17 @@ class InputDictValueLinker(ValueLinker):
         for the tool input. can be due to value being same as tool input default,
         or when the input value is None
         """
-        for uuid, value in self.valregister.linked:
+        register = self.step.tool_values
+        for uuid, value in register.linked:
             if self.should_migrate_static_to_default(uuid, value):
                 component = self.tool.get_input(uuid)
                 input_value = value_utils.create_default(component)
-                self.valregister.update_linked(uuid, input_value)
+                register.update_linked(uuid, input_value)
 
     def should_migrate_static_to_default(self, uuid: str, value: InputValue) -> bool:
         if isinstance(value, StaticInputValue):
             component = self.tool.get_input(uuid)
-            if value.valtype == InputValueType.NONE:
-                return True
-            elif str(component.get_default_value()) == value.value:
+            if str(component.get_default_value()) == value.value:
                 return True
         return False
 
@@ -159,14 +83,15 @@ class InputDictValueLinker(ValueLinker):
         A WorkflowInput will be created, and the user will have to supply a value for this 
         input when running the workflow. 
         """
-        for uuid, value in self.valregister.linked:
+        register = self.step.tool_values
+        for uuid, value in register.linked:
             if self.should_migrate_runtime_to_workflowinput(value):
                 component = self.tool.get_input(uuid)
                 workflow_input = self.create_workflow_input(uuid)
                 self.workflow.add_input(workflow_input)
                 input_value = value_utils.create_workflow_input(component, workflow_input)
                 input_value.is_runtime = True
-                self.valregister.update_linked(uuid, input_value)
+                register.update_linked(uuid, input_value)
 
     def should_migrate_runtime_to_workflowinput(self, value: InputValue) -> bool:
         if isinstance(value, RuntimeInputValue):
@@ -186,13 +111,6 @@ class InputDictValueLinker(ValueLinker):
             janis_datatypes=component.janis_datatypes,
             is_galaxy_input_step=False
         )
-    
-    def assert_all_components_assigned(self) -> None:
-        tool_inputs = self.tool.list_inputs()
-        for component in tool_inputs:
-            if not self.valregister.get_linked(component.get_uuid()):
-                raise AssertionError(f'tool input "{component.get_name()}" has no assigned step value')
-
 
 
 

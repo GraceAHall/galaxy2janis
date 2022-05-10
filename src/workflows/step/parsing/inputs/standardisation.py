@@ -14,6 +14,12 @@ value_translations = {
     }
 
 
+def standardise_tool_state(gxstep: dict[str, Any]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for key, val in gxstep['tool_state'].items():
+        out[key] = standardise_tool_state_value(val)
+    return out
+
 def standardise_tool_state_value(value: Any) -> Any:
     value = handle_array(value)
     value = handle_translations(value)

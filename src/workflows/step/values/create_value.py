@@ -1,6 +1,7 @@
 
 
 
+from typing import Any
 from command.components.inputs.Flag import Flag
 from workflows.io.WorkflowInput import WorkflowInput
 from workflows.workflow.Workflow import Workflow
@@ -29,6 +30,10 @@ def create(component: CommandComponent, step_input: StepInput, workflow: Workflo
     strategy = select_strategy(component, step_input, workflow)
     value = strategy.create()
     return value
+
+def create_static(component: CommandComponent, value: Any) -> InputValue:
+    strategy = StaticInputValueFactory(component, value)
+    return strategy.create()
 
 def create_default(component: CommandComponent) -> InputValue:
     strategy = DefaultInputValueFactory(component)
@@ -70,7 +75,7 @@ def select_strategy(component: CommandComponent, step_input: StepInput, workflow
             case RuntimeStepInput():
                 return RuntimeInputValueFactory(component) 
             case StaticStepInput():
-                return StaticInputValueFactory(component, step_input)
+                return StaticInputValueFactory(component, step_input.value)
             case WorkflowInputStepInput():
                 workflow_input = workflow.get_input(step_id=step_input.step_id)
                 assert(workflow_input)

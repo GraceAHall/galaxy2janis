@@ -5,15 +5,18 @@
 
 import json
 from typing import Any
+from startup.ExeSettings import WorkflowExeSettings
 
 from workflows.workflow.Workflow import Workflow
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata
 from workflows.step.parsing.step import parse_input_step, parse_tool_step
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 
-class WorkflowFactory:
+class WorkflowParser:
     """models a galaxy workflow"""
-    datatype_annotator: DatatypeAnnotator = DatatypeAnnotator()
+    def __init__(self, wsettings: WorkflowExeSettings):
+        self.wsettings = wsettings
+        self.datatype_annotator: DatatypeAnnotator = DatatypeAnnotator()
 
     def create(self, workflow_path: str):
         self.tree = self.load_tree(workflow_path)
@@ -48,7 +51,7 @@ class WorkflowFactory:
     def set_tool_steps(self) -> None:
         for step in self.tree['steps'].values():
             if step['type'] == 'tool':
-                workflow_step = parse_tool_step(step, self.workflow)
+                workflow_step = parse_tool_step(self.wsettings, step, self.workflow)
                 self.datatype_annotator.annotate(workflow_step)
                 self.workflow.add_step(workflow_step)
 

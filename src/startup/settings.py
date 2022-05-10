@@ -6,6 +6,7 @@ from startup.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSetting
 from startup.downloads import handle_downloads
 from startup.FileValidator import ToolFileValidator, WorkflowFileValidator
 from startup.FileInitialiser import ToolFileInitialiser, WorkflowFileInitialiser
+from workflows.step.metadata.StepMetadata import StepMetadata
 
 
 
@@ -16,11 +17,11 @@ and managed. shouldn't be any config issues past this point.
 """
 
 
-def load_tool_settings(args: dict[str, Optional[str]], intended_tool_id: Optional[str]=None) -> ToolExeSettings:
+def load_tool_settings(metadata: StepMetadata, args: dict[str, Optional[str]]) -> ToolExeSettings:
     ToolArgsValidator().validate(args)
     esettings = ToolSettingsInitialiser().init_settings(args)
-    if esettings.remote_url and intended_tool_id:
-        esettings = handle_downloads(intended_tool_id, esettings)
+    if esettings.remote_url and metadata.tool_id:
+        esettings = handle_downloads(metadata.tool_id, esettings)
     ToolFileValidator().validate(esettings)
     ToolFileInitialiser().initialise(esettings)
     return esettings

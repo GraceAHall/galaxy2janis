@@ -1,8 +1,20 @@
 
 
 from abc import ABC, abstractmethod
+from typing import Any, Iterable, Optional
+from command.components.CommandComponent import CommandComponent
+from command.components.inputs.Flag import Flag
+from command.components.inputs.Option import Option
 
-from workflows.step.values.InputValueRegister import InputValueRegister
+from workflows.step.WorkflowStep import WorkflowStep
+from workflows.step.inputs.StepInput import ConnectionStepInput, StepInput, WorkflowInputStepInput
+from workflows.step.values.InputValue import InputValue
+from workflows.workflow.Workflow import Workflow
+import workflows.step.values.create_value as value_utils
+
+from command.manipulation.evaluation import sectional_evaluate
+from command.manipulation.aliases import resolve_aliases
+import command.regex.utils as regex_utils
 
 
 class ValueLinker(ABC):
@@ -15,19 +27,160 @@ class ValueLinker(ABC):
     CheetahValueLinker follows similar logic to InputDictValueLinker, except also 
     templates the <command> with the step input dict, then uses the templated <command> 
     to locate arguments and pull their value
-
     """
+    def __init__(self, step: WorkflowStep, workflow: Workflow):
+        self.step = step
+        self.workflow = workflow
 
     @abstractmethod
-    def link(self) -> InputValueRegister:
+    def link(self) -> None:
         """links tool arguments to their value for a given workflow step"""
         ...
 
+    def get_linkable_components(self) -> list[CommandComponent]:
+        out: list[CommandComponent] = []
+        # check to see if its already linked, if so, ignore, else link
+        for component in self.step.tool.list_inputs():
+            if not self.step.tool_values.get(component.get_uuid()):
+                out.append(component)
+        return out
 
+    def mark_linked(self, incoming: Any) -> None:
+        if hasattr(incoming, 'gxparam') and incoming.gxparam is not None:
+            for step_input in self.step.inputs.list():
+                if step_input.gxparam is not None:
+                    if step_input.gxparam.name == incoming.gxparam.name:
+                        step_input.linked = True
+
+
+class CheetahValueLinker(ValueLinker):
+
+    def __init__(self, step: WorkflowStep, workflow: Workflow):
+        super().__init__(step, workflow)
+        self.cmdstr: str = self.prepare_command()
+
+    def prepare_command(self) -> str:
+        cmdstr = sectional_evaluate(
+            text=self.step.tool.raw_command,  # type: ignore
+            inputs=self.step.inputs.to_dict()
+        )
+        cmdstr = resolve_aliases(cmdstr)
+        print(cmdstr)
+        return cmdstr
+
+    def link(self) -> None:
+        for component in self.get_linkable_components():
+            match component:
+                case Flag():
+                    self.link_flag(component)
+                case Option():
+                    self.link_option(component)
+                case _:
+                    pass
+    
+    def link_flag(self, flag: Flag) -> None:
+        """
+        links a flag component value as None if not in cmdstr
+        should only detect the flag's absense, nothing else
+        """
+        val_register = self.step.tool_values
+        if not regex_utils.word_exists(flag.prefix, self.cmdstr):
+            value = False
+            inputval = value_utils.create_static(flag, value)  # type: ignore
+            val_register.update_linked(flag.get_uuid(), inputval)
+            self.mark_linked(flag)
+
+    def link_option(self, option: Option) -> None:
+        """gets the value for a specific tool argument"""
+        val_register = self.step.tool_values
+        value = regex_utils.get_next_word(option.prefix, option.delim, self.cmdstr)
+        if value is None:
+            inputval = value_utils.create_static(option, value)  # type: ignore
+            val_register.update_linked(option.get_uuid(), inputval)
+            self.mark_linked(option)
+        elif not self.is_param(value):
+            inputval = value_utils.create_static(option, value)  # type: ignore
+            val_register.update_linked(option.get_uuid(), inputval)
+            self.mark_linked(option)
+
+    # TODO upgrade for pre/post task section
+    def is_param(self, text: Optional[str]) -> bool:
+        if text:
+            if text[0] == '$':
+                return True
+            elif len(text) > 1 and text[1] == '$':
+                return True
+        return False
+
+
+class InputDictValueLinker(ValueLinker):
+
+    def link(self) -> None:
+        # link tool components to static and connection inputs
+        inp_register = self.step.inputs
+        val_register = self.step.tool_values
+        
+        for component in self.get_linkable_components():
+            if self.is_directly_linkable(component):
+                gxvarname = component.gxparam.name  # type: ignore
+                step_input = inp_register.get(gxvarname)
+
+                if step_input:
+                    value = value_utils.create(component, step_input, self.workflow)
+                    val_register.update_linked(component.get_uuid(), value)
+                    self.mark_linked(step_input)
+    
+    def is_directly_linkable(self, component: CommandComponent) -> bool:
+        """
+        checks whether a janis tool input can actually be linked to a value in the 
+        galaxy workflow step.
+        only possible if the component has a gxparam, and that gxparam is referenced as a
+        ConnectionStepInput, RuntimeStepInput or StaticStepInput
+        """
+        if component.gxparam:
+            query = component.gxparam.name 
+            if self.step.inputs.get(query):
+                return True
+        return False
     
 
+class DefaultValueLinker(ValueLinker):
+
+    def link(self) -> None:
+        val_register = self.step.tool_values
+        for component in self.get_linkable_components():
+            value = value_utils.create_default(component)
+            val_register.update_linked(component.get_uuid(), value)
 
 
+class UnlinkedValueLinker(ValueLinker):
+
+    def __init__(self, step: WorkflowStep, workflow: Workflow):
+        super().__init__(step, workflow)
+        self.permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
+
+    def link(self) -> None:
+        register = self.step.tool_values
+        for step_input in self.get_unlinked():
+            invalue = self.create_invalue(step_input)
+            register.update_unlinked(invalue)
+
+    def get_unlinked(self) -> Iterable[StepInput]:
+        for step_input in self.step.inputs.list():
+            if not step_input.linked and type(step_input) in self.permitted_inputs:
+                yield step_input
+
+    def create_invalue(self, step_input: StepInput) -> InputValue:
+        # workflow inputs (genuine or runtime)
+        if isinstance(step_input, WorkflowInputStepInput):
+            workflow_input = self.workflow.get_input(step_id=step_input.step_id)
+            assert(workflow_input)
+            return value_utils.create_unlinked_workflowinput(workflow_input)
+        # step connections
+        elif isinstance(step_input, ConnectionStepInput):
+            return value_utils.create_unlinked_connection(step_input, self.workflow)
+        else:
+            raise RuntimeError()
 
 
 

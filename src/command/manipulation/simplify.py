@@ -15,6 +15,8 @@ from command.manipulation.filters import (
     interpret_raw
 )
 
+from command.manipulation.aliases import resolve_aliases
+
 # module entry points
 
 def simplify_test(cmdstr: str) -> str:
@@ -23,7 +25,9 @@ def simplify_test(cmdstr: str) -> str:
 
 def simplify_xml(cmdstr: str) -> str:
     simplifier = XMLCommandSimplifier()
-    return simplifier.simplify(cmdstr)
+    cmdstr = simplifier.simplify(cmdstr)
+    cmdstr = resolve_aliases(cmdstr)
+    return cmdstr
 
 
 

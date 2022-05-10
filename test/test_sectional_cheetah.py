@@ -6,10 +6,9 @@ import json
 import unittest
 import xml.etree.ElementTree as et
 
-from workflows.step.parsing.ToolStateFlattener import ToolStateFlattener
-from workflows.step.parsing.inputs import get_flattened_tool_state
-from workflows.step.parsing.inputs import standardise_tool_state
-from command.manipulation.template.template import sectional_template
+from workflows.step.parsing.inputs.inputs import get_flattened_tool_state
+from workflows.step.parsing.inputs.inputs import standardise_tool_state
+from command.manipulation.evaluation import sectional_evaluate
 
 def read_cmd(path: str) -> str:
     tree = et.parse(path)
@@ -36,7 +35,7 @@ class TestSectionalCheetah(unittest.TestCase):
         vanilla = read_cmd(unicycler_vanilla_path)
         reference = read_cmd(unicycler_templated_path)
         inputs = read_step_inputs(unicycler_inputs_path)
-        templated = sectional_template(vanilla, inputs)
+        templated = sectional_evaluate(vanilla, inputs)
         self.assertEquals(reference, templated)
 
 

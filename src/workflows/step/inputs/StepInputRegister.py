@@ -6,7 +6,7 @@
 
 
 
-from typing import Optional
+from typing import Any, Optional
 from tool.Tool import Tool
 from workflows.step.inputs.StepInput import ConnectionStepInput, RuntimeStepInput, StaticStepInput, StepInput
 
@@ -38,6 +38,8 @@ from workflows.step.inputs.StepInput import ConnectionStepInput, RuntimeStepInpu
 }
 """
 
+
+
 class StepInputRegister:
     """
     holds the data above
@@ -55,6 +57,13 @@ class StepInputRegister:
     
     def list(self) -> list[StepInput]:
         return self.register
+
+    def to_dict(self) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        static_inputs = [inp for inp in self.list() if isinstance(inp, StaticStepInput)]
+        for inp in static_inputs:
+            out[inp.gxvarname] = inp.value
+        return out
 
     def get_connection(self, gxvarname: str) -> Optional[StepInput]:
         step_input = self.get(gxvarname)
