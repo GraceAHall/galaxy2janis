@@ -10,7 +10,7 @@ from command.cmdstr.CommandString import CommandString
 from command.cmdstr.CommandStringFactory import CommandStringFactory
 from command.ArgumentCommandAnnotator import ArgumentCommandAnnotator
 from command.CmdstrCommandAnnotator import CmdstrCommandAnnotator
-
+from command.manipulation import simplify_test, simplify_xml
 
 # names are really misleading here. 
 def infer_command(gxmanager: GalaxyManager, xmltool: XMLToolDefinition) -> Command:
@@ -48,13 +48,15 @@ class CommandInferer:
         annotator.annotate()
         
     def gen_test_cmdstrs(self) -> None:
-        for test_str in self.gxmanager.get_test_cmdstrs(self.xmltool):
-            cmdstr = self.cmdstr_factory.create('test', test_str)
-            self.cmdstrs.append(cmdstr)
+        for teststr in self.gxmanager.get_test_cmdstrs(self.xmltool):
+            teststr = simplify_test(teststr)
+            teststr = self.cmdstr_factory.create('test', teststr)
+            self.cmdstrs.append(teststr)
 
     def gen_xml_cmdstr(self) -> None:
-        xml_str = self.gxmanager.get_xml_cmdstr(self.xmltool)
-        cmdstr = self.cmdstr_factory.create('xml', xml_str)
+        cmdstr = self.gxmanager.get_xml_cmdstr(self.xmltool)
+        cmdstr = simplify_xml(cmdstr)
+        cmdstr = self.cmdstr_factory.create('xml', cmdstr)
         self.cmdstrs.append(cmdstr)
 
     def gen_workflow_cmdstr(self) -> str:

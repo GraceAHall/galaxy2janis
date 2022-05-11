@@ -29,6 +29,7 @@ class TokenType(Enum):
     START_STATEMENT = auto()
     EXCISION        = auto()
     END_STATEMENT    = auto()
+    EMPTY_STRING    = auto()
     UNKNOWN         = auto()
 
 

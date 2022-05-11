@@ -4,13 +4,7 @@ from typing import Any
 
 value_translations = {
         'false': False,
-        'False': False,
         'true': True,
-        'True': True,
-        'null': None,
-        'none': None,
-        'None': None,
-        '': None
     }
 
 

@@ -35,7 +35,7 @@ class InputUpdater:
 
     def update(self) -> None:
         self.update_components_via_value()
-        self.update_components_via_presence()
+        #self.update_components_via_presence()
 
     def update_components_via_value(self) -> None:
         for uuid, value in self.valregister.linked:

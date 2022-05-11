@@ -37,7 +37,9 @@ class WorkflowStep:
     inputs: StepInputRegister
     outputs: StepOutputRegister
     tool: Tool
-    tool_values: InputValueRegister = InputValueRegister()
+
+    def __post_init__(self):
+        self.tool_values: InputValueRegister = InputValueRegister()
 
     def get_uuid(self) -> str:
         return self.metadata.uuid

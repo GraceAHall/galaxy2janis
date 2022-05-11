@@ -38,9 +38,12 @@ class InputValueRegister:
         self.unlinked_values.append(value)
     
     def __str__(self) -> str:
-        out_str: str = '\nInputValueRegister -----\n'
-        out_str += f'{"[uuid]":>20}{"[value]":>20}{"[type]":>40}\n'
-        # for uuid, input_value in self.values.items():
-        #     out_str += f'{uuid:>20}{input_value.value:>20}{input_value.valtype:>40}\n'
-        return out_str
+        out: str = '\nInputValueRegister -----\n'
+        out += f"{'[gxparam]':30}{'[input type]':30}{'[value]':30}\n"
+        for inp in self.linked_values.values():
+            param_name = inp.gxparam.name if inp.gxparam else 'none'
+            out += f'{param_name:30}{str(type(inp).__name__):30}{inp.abstract_value:30}\n'
+        return out
+
+
 

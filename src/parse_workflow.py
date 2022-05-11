@@ -19,7 +19,7 @@ to a janis definition
 
 def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
     workflow = init_workflow(wsettings)
-    link_tool_input_values(workflow)
+    link_tool_input_values(wsettings, workflow)
     link_step_outputs_tool_outputs(workflow)
     set_outputs(workflow)
     set_tool_paths(wsettings, workflow)

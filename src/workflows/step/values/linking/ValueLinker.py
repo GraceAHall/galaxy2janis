@@ -5,6 +5,8 @@ from typing import Any, Iterable, Optional
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
+from galaxy_interaction.GalaxyManager import GalaxyManager
+from startup.ExeSettings import ToolExeSettings
 
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.step.inputs.StepInput import ConnectionStepInput, StepInput, WorkflowInputStepInput
@@ -15,6 +17,8 @@ import workflows.step.values.create_value as value_utils
 from command.manipulation.evaluation import sectional_evaluate
 from command.manipulation.aliases import resolve_aliases
 import command.regex.utils as regex_utils
+from command.cmdstr.CommandStringFactory import CommandStringFactory
+from xmltool.load import load_xmltool
 
 
 class ValueLinker(ABC):
@@ -28,7 +32,8 @@ class ValueLinker(ABC):
     templates the <command> with the step input dict, then uses the templated <command> 
     to locate arguments and pull their value
     """
-    def __init__(self, step: WorkflowStep, workflow: Workflow):
+    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
+        self.esettings = esettings
         self.step = step
         self.workflow = workflow
 
@@ -54,9 +59,14 @@ class ValueLinker(ABC):
 
 
 class CheetahValueLinker(ValueLinker):
+    """
+    links values (and presence of bool tool inputs) using the patially 
+    evaluated cheetah <command> section. 
+    updates knowledge of components (mainly optionality). 
+    """
 
-    def __init__(self, step: WorkflowStep, workflow: Workflow):
-        super().__init__(step, workflow)
+    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
+        super().__init__(esettings, step, workflow)
         self.cmdstr: str = self.prepare_command()
 
     def prepare_command(self) -> str:
@@ -66,7 +76,12 @@ class CheetahValueLinker(ValueLinker):
         )
         cmdstr = resolve_aliases(cmdstr)
         print(cmdstr)
-        return cmdstr
+        manager = GalaxyManager(self.esettings)
+        xmltool = load_xmltool(manager)
+        command_string = CommandStringFactory(xmltool).create(source='xml', cmdstr=cmdstr)
+        main_statement_cmdstr = command_string.main.cmdline
+        print(main_statement_cmdstr)
+        return main_statement_cmdstr
 
     def link(self) -> None:
         for component in self.get_linkable_components():
@@ -83,25 +98,19 @@ class CheetahValueLinker(ValueLinker):
         links a flag component value as None if not in cmdstr
         should only detect the flag's absense, nothing else
         """
-        val_register = self.step.tool_values
         if not regex_utils.word_exists(flag.prefix, self.cmdstr):
-            value = False
-            inputval = value_utils.create_static(flag, value)  # type: ignore
-            val_register.update_linked(flag.get_uuid(), inputval)
-            self.mark_linked(flag)
+            self.handle_not_present_flag(flag)
 
     def link_option(self, option: Option) -> None:
         """gets the value for a specific tool argument"""
-        val_register = self.step.tool_values
         value = regex_utils.get_next_word(option.prefix, option.delim, self.cmdstr)
+        value = None if value == '' else value
         if value is None:
-            inputval = value_utils.create_static(option, value)  # type: ignore
-            val_register.update_linked(option.get_uuid(), inputval)
-            self.mark_linked(option)
-        elif not self.is_param(value):
-            inputval = value_utils.create_static(option, value)  # type: ignore
-            val_register.update_linked(option.get_uuid(), inputval)
-            self.mark_linked(option)
+            self.handle_not_present_opt(option)
+        elif self.is_param(value):
+            self.handle_gxvar_opt(option, value)
+        else:
+            self.handle_value_opt(option, value)
 
     # TODO upgrade for pre/post task section
     def is_param(self, text: Optional[str]) -> bool:
@@ -111,6 +120,28 @@ class CheetahValueLinker(ValueLinker):
             elif len(text) > 1 and text[1] == '$':
                 return True
         return False
+
+    def handle_not_present_flag(self, flag: Flag) -> None:
+        self.update_tool_values_static(component=flag, value=False)
+
+    def handle_not_present_opt(self, option: Option) -> None:
+        self.update_tool_values_static(component=option, value=None)
+    
+    def handle_gxvar_opt(self, option: Option, value: str) -> None:
+        # future: attach the identified param if not attached? 
+        # should always be attached tho? 
+        pass
+    
+    def handle_value_opt(self, option: Option, value: Any) -> None:
+        self.update_tool_values_static(component=option, value=value)
+
+    def update_tool_values_static(self, component: Flag | Option, value: Any) -> None:
+        register = self.step.tool_values
+        inputval = value_utils.create_static(component, value)  # type: ignore
+        register.update_linked(component.get_uuid(), inputval)
+        self.mark_linked(component)
+
+
 
 
 class InputDictValueLinker(ValueLinker):
@@ -155,8 +186,8 @@ class DefaultValueLinker(ValueLinker):
 
 class UnlinkedValueLinker(ValueLinker):
 
-    def __init__(self, step: WorkflowStep, workflow: Workflow):
-        super().__init__(step, workflow)
+    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
+        super().__init__(esettings, step, workflow)
         self.permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
 
     def link(self) -> None:

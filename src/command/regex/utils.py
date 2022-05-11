@@ -22,7 +22,9 @@ def word_exists(word: str, text: str) -> bool:
 def get_next_word(word: str, delim: str, text: str) -> Optional[str]:
     matches = scanners.get_next_word(word, delim, text)
     if matches:
-        return matches[0].group(1)
+        value = matches[0].group(1)
+        value = value.strip('"\'')
+        return value
     return None
 
 def is_variable_substr(match: re.Match[str]) -> bool:

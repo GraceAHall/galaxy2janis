@@ -32,6 +32,7 @@ from command.regex.expressions import (
     CH_SET,
     NEXT_WORD_LEFT,
     NEXT_WORD_RIGHT,
+    EMPTY_STRINGS,
     ALL
 )
 
@@ -39,6 +40,10 @@ from command.regex.expressions import (
 def get_next_word(word: str, delim: str, text: str) -> list[re.Match[str]]:
     pattern = NEXT_WORD_LEFT + f'{word}{delim}' + NEXT_WORD_RIGHT
     matches = re.finditer(pattern, text)
+    return [m for m in matches]
+
+def get_empty_strings(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(EMPTY_STRINGS, the_string)
     return [m for m in matches]
 
 def get_all(the_string: str) -> list[re.Match[str]]:

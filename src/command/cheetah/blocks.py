@@ -207,7 +207,7 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
         """swaps block block with identifier in template"""
         old_lines_top = self.lines[:block.start]
         old_lines_bottom = self.lines[block.stop+1:]
-        self.lines = old_lines_top + [block.uuid] + old_lines_bottom
+        self.lines = old_lines_top + [block.uuid] * block.height + old_lines_bottom
 
     def create_blank_output(self) -> list[str]:
         return [''] * len(self.lines)
@@ -215,8 +215,8 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
     def restore_surviving_children(self, evaluation: list[str], output: list[str]) -> list[str]:
         surviving_children = self.get_surviving_children(evaluation)
         for identifier, block in surviving_children.items():
-            position = self.get_identifier_position(self.lines, identifier)
-            if position:
+            line_num = self.get_identifier_line_num(self.lines, identifier)
+            if line_num:
                 block = self.masked_blocks[identifier]
                 output = self.substitute_block(output, block)
         return output
@@ -224,12 +224,12 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
     def get_surviving_children(self, evaluation: list[str]) -> dict[str, Any]:
         out: dict[str, Any] = {}
         for identifier, block in self.masked_blocks.items():
-            position = self.get_identifier_position(evaluation, identifier)
+            position = self.get_identifier_line_num(evaluation, identifier)
             if position is not None:
                 out[identifier] = block
         return out
 
-    def get_identifier_position(self, lines: list[str], identifier: str) -> Optional[int]:
+    def get_identifier_line_num(self, lines: list[str], identifier: str) -> Optional[int]:
         for i, line in enumerate(lines):
             if line == identifier:
                 return i

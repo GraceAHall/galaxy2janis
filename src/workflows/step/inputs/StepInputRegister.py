@@ -2,10 +2,6 @@
 
 
 
-
-
-
-
 from typing import Any, Optional
 from tool.Tool import Tool
 from workflows.step.inputs.StepInput import ConnectionStepInput, RuntimeStepInput, StaticStepInput, StepInput
@@ -57,13 +53,24 @@ class StepInputRegister:
     
     def list(self) -> list[StepInput]:
         return self.register
-
+    
     def to_dict(self) -> dict[str, Any]:
-        out: dict[str, Any] = {}
+        the_dict: dict[str, Any] = {}
         static_inputs = [inp for inp in self.list() if isinstance(inp, StaticStepInput)]
         for inp in static_inputs:
-            out[inp.gxvarname] = inp.value
-        return out
+            self.update_dict(inp, the_dict)
+        return the_dict
+
+    def update_dict(self, inp: StaticStepInput, the_dict: dict[str, Any]) -> None:
+        name_heirarchy = inp.gxvarname.split('.')
+        node = the_dict
+        for i, elem in enumerate(name_heirarchy):
+            if i < len(name_heirarchy) - 1:
+                if elem not in the_dict:
+                    node[elem] = {}
+                node = node[elem]
+            else:
+                node[elem] = inp.value
 
     def get_connection(self, gxvarname: str) -> Optional[StepInput]:
         step_input = self.get(gxvarname)
@@ -86,4 +93,4 @@ class StepInputRegister:
     def assign_gxparams(self, tool: Tool) -> None:
         for step_input in self.register:
             step_input.gxparam = tool.get_gxparam(step_input.gxvarname)
-
+ 

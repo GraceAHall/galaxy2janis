@@ -19,9 +19,8 @@ from .resolve import resolve_values
 
 def parse_step_inputs(gxstep: dict[str, Any], workflow: Workflow, esettings: ToolExeSettings) -> StepInputRegister:
     gxstep['tool_state'] = get_flattened_tool_state(gxstep)
-    #gxstep['tool_state'] = standardise_tool_state(gxstep)
     gxstep['tool_state'] = resolve_values(esettings, gxstep)
-    #gxstep['tool_state'] = standardise_tool_state(gxstep)
+    gxstep['tool_state'] = standardise_tool_state(gxstep)
     parser = ToolStepInputParser(gxstep, workflow)
     inputs = parser.parse()
     return StepInputRegister(inputs)

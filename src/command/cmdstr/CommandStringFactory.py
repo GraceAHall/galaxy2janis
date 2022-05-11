@@ -8,31 +8,20 @@ from xmltool.tool_definition import XMLToolDefinition
 
 from command.cmdstr.CommandString import CommandString
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-#from command.manipulation.AliasResolver import AliasResolver
 from command.regex.scanners import get_statement_delims
 from command.regex.utils import get_quoted_sections
-from command.manipulation import simplify_test, simplify_xml
+
 
 
 class CommandStringFactory:
     def __init__(self, xmltool: XMLToolDefinition):
         self.xmltool = xmltool
 
-    def create(self, source: str, raw_string: str) -> CommandString:
-        simple_str = self.simplify_raw_string(source, raw_string)
-        statements = self.create_statements(simple_str)
+    def create(self, source: str, cmdstr: str) -> CommandString:
+        statements = self.create_statements(cmdstr)
         statements = self.set_statement_tokens(statements)
         esource = CommandString(source, statements, self.xmltool.metadata)
         return esource
-
-    def simplify_raw_string(self, source: str, cmdstr: str) -> str:
-        match source:
-            case 'xml':
-                return simplify_xml(cmdstr)
-            case 'test':
-                return simplify_test(cmdstr)
-            case _:
-                raise NotImplementedError()
 
     def create_statements(self, the_string: str) -> list[DynamicCommandStatement]:
         return split_to_statements(the_string)

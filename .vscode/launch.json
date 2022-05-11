@@ -342,6 +342,18 @@
             ]
         },
         {
+            "name": "super simple unicycler",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/super_simple_unicycler.ga"
+            ]
+        },
+        {
             "name": "simple workflow builtin tool",
             "type": "python",
             "request": "launch",

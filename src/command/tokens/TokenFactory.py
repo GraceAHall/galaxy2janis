@@ -48,6 +48,7 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
             TokenType.LINUX_TEE: 6,
             TokenType.LINUX_REDIRECT: 6,
             TokenType.LINUX_STREAM_MERGE: 6,
+            TokenType.EMPTY_STRING: 7,
             TokenType.UNKNOWN: 999,
         }
         token_list.sort(key=lambda x: priorities[x.type])
@@ -68,6 +69,7 @@ class TokenFactory:
             (scanners.get_stream_merges, TokenType.LINUX_STREAM_MERGE),
             (scanners.get_dynamic_keywords, TokenType.GX_KW_DYNAMIC),
             (scanners.get_static_keywords, TokenType.GX_KW_STATIC),
+            (scanners.get_empty_strings, TokenType.EMPTY_STRING),
             (scanners.get_all, TokenType.UNKNOWN)
         ]
         self.ordering_strategies: dict[str, TokenOrderingStrategy] = {

@@ -25,6 +25,15 @@ class InputValue(ABC):
         self.is_default_value: bool = False
         self.linked: bool = False
 
+    @property
+    def abstract_value(self) -> str:
+        if isinstance(self, StaticInputValue) or isinstance(self, DefaultInputValue):
+            return str(self.value)
+        elif isinstance(self, ConnectionInputValue):
+            return f'step {self.step_id} {self.step_output}'
+        else:
+            return 'uuid'
+
 
 @dataclass
 class ConnectionInputValue(InputValue):

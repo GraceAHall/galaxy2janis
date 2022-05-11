@@ -1,12 +1,10 @@
 
 
 
-from command.cheetah.ConstructTracker import ConstructTracker
 from command.cmdstr.MainStatementInferrer import MainStatementInferrer
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
-from command.cmdstr.utils import split_lines
 from command.tokens.Tokens import Token
 
 class CommandString:
@@ -43,31 +41,25 @@ class CommandString:
             out += statement.get_tokens()
         return out
 
-    def get_text(self) -> str:
-        """pieces back together the overall cmdline string from statements and delims"""
-        out: str = ''
-        for segment in [self.preprocessing, [self.main], self.postprocessing]:
-            for statement in segment:
-                if statement.end_delim:
-                    out += f'{statement.cmdline} {statement.end_delim}\n'
-                else:
-                    out += statement.cmdline
-        return out
+    # def get_text(self) -> str:
+    #     """pieces back together the overall cmdline string from statements and delims"""
+    #     out: str = ''
+    #     for segment in [self.preprocessing, [self.main], self.postprocessing]:
+    #         for statement in segment:
+    #             if statement.end_delim:
+    #                 out += f'{statement.cmdline} {statement.end_delim}\n'
+    #             else:
+    #                 out += statement.cmdline
+    #     return out
 
-    def get_constant_text(self) -> str:
-        out: str = ''
-        tracker = ConstructTracker()
-        text = self.get_text()
-        for line in split_lines(text):
-            tracker.update(line)
-            if not tracker.is_within_construct():
-                out += f'{line}\n'
-        return out
-
-
-
-
-
-
+    # def get_constant_text(self) -> str:
+    #     out: str = ''
+    #     tracker = ConstructTracker()
+    #     text = self.get_text()
+    #     for line in split_lines(text):
+    #         tracker.update(line)
+    #         if not tracker.is_within_construct():
+    #             out += f'{line}\n'
+    #     return out
 
 

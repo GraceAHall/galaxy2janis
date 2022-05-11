@@ -2,10 +2,11 @@
 
 # module entry
 from typing import Type
+from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from workflows.step.values.linking.ValueMigrator import ValueMigrator
 from workflows.workflow.Workflow import Workflow
 from workflows.step.WorkflowStep import WorkflowStep
-
+from workflows.step.parsing.settings import get_tool_settings
 from workflows.step.values.linking.ValueLinker import (
     ValueLinker,
     CheetahValueLinker, 
@@ -13,8 +14,6 @@ from workflows.step.values.linking.ValueLinker import (
     UnlinkedValueLinker, 
     DefaultValueLinker
 )
-
-from workflows.step.values.component_updates import update_component_knowledge
 
 """
 assigns values for each tool input 
@@ -34,17 +33,18 @@ linkers: list[Type[ValueLinker]] = [
 ]
 
 
-def link_tool_input_values(workflow: Workflow) -> None:
+def link_tool_input_values(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
     for step in workflow.list_steps():
+        tsettings = get_tool_settings(wsettings, step.metadata)
         step.inputs.assign_gxparams(step.tool)  
-        link_step_values(step, workflow)
-        update_component_knowledge(step)
+        link_step_values(tsettings, step, workflow)
         assert_all_components_assigned(step)
 
-def link_step_values(step: WorkflowStep, workflow: Workflow) -> None:
+def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow) -> None:
     for linker in linkers:
-        l = linker(step, workflow)
+        l = linker(esettings, step, workflow)
         l.link()
+        print(step.tool_values)
     perform_migrations(step, workflow)
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):

@@ -21,6 +21,7 @@ requirements.txt
 edge_cases.txt
 
 super_simple_workflow/
+super_simple_unicycler/
 super_simple_out/
 simple_workflow/
 simple_out/
