@@ -8,7 +8,7 @@ from typing import Optional
 from command.components.outputs.OutputComponentFactory import OutputComponentFactory
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
-from command.infer import Command
+from command.command import Command
 from command.components.CommandComponent import CommandComponent
 from containers.fetch import Container
 from xmltool.param.OutputParam import OutputParam

@@ -8,6 +8,8 @@ from typing import Any, Optional
 from uuid import uuid4
 from enum import Enum, auto
 from Cheetah.Template import Template
+import multiprocessing
+import time
 
 import command.manipulation.utils as utils
 from galaxy.util import unicodify
@@ -153,17 +155,35 @@ class EvaluationStrategy(ABC):
     @abstractmethod
     def eval(self) -> Optional[list[str]]:
         ...
+
+    def do_evaluation(self, source_lines: list[str], return_dict: dict[Any, Any]) -> None:
+        source = utils.join_lines(source_lines)
+        t = Template(source, searchList=[self.input_dict]) # type: ignore
+        evaluation = str(unicodify(t))
+        return_dict['outcome'] = utils.split_lines_blanklines(evaluation)
     
     def evaluate_template(self, source_lines: list[str]) -> Optional[list[str]]:
-        """cheetah eval happens here"""
+        """
+        cheetah eval happens here
+        jank format (multiprocessing with timeout) in case cheetah can't template for some reason
+        """
         try:
-            source = utils.join_lines(source_lines)
-            t = Template(source, searchList=[self.input_dict]) # type: ignore
-            evaluation = str(unicodify(t))
-            return utils.split_lines_blanklines(evaluation) 
+            manager = multiprocessing.Manager()
+            return_dict = manager.dict()
+            p = multiprocessing.Process(target=self.do_evaluation, args=(source_lines, return_dict))
+            p.start()
+            p.join(1)
+            if p.is_alive():
+                print('killed process!')
+                outcome = None
+                p.terminate()
+                p.join()
+            else:
+                outcome = return_dict['outcome']  # type: ignore
         except Exception as e:
+            outcome = None
             print('\n' + str(e))
-            return None
+        return outcome  # type: ignore
 
 
 class InlineEvaluationStrategy(EvaluationStrategy):
@@ -216,7 +236,7 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
         surviving_children = self.get_surviving_children(evaluation)
         for identifier, block in surviving_children.items():
             line_num = self.get_identifier_line_num(self.lines, identifier)
-            if line_num:
+            if line_num is not None:
                 block = self.masked_blocks[identifier]
                 output = self.substitute_block(output, block)
         return output

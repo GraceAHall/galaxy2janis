@@ -5,7 +5,6 @@
 
 from typing import Optional
 
-from xmltool.tool_definition import XMLToolDefinition
 from xmltool.param.Param import Param
 
 from command.cheetah.ConstructTracker import ConstructTracker
@@ -67,9 +66,9 @@ class RealisedTokenValues:
 
 
 class RealisedTokenValueifier:
-    def __init__(self, xmltool: XMLToolDefinition):
+    def __init__(self, token_factory: TokenFactory):
+        self.factory = token_factory
         self.tracker = ConstructTracker()
-        self.factory = TokenFactory(xmltool)
         self.tokens: list[RealisedTokenValues] = []
 
     def tokenify(self, the_string: str) -> list[RealisedTokenValues]:

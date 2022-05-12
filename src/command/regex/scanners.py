@@ -97,7 +97,9 @@ def get_versions(the_string: str) -> list[re.Match[str]]:
 
 def get_statement_delims(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(SH_STATEMENT_DELIMS, the_string)
-    return [m for m in matches]
+    matches = [m for m in matches]
+    matches.sort(key=lambda x: x.start())
+    return matches
 
 def get_keyval_pairs(the_string: str) -> list[re.Match[str]]:
     # TODO IMPROVE

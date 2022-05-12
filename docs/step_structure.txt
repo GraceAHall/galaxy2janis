@@ -28,14 +28,15 @@ w.input("filtlong_illumina_2", FastqSanger)
 
 # PRE TASK
 "filtlong_pre_task",
-    galaxy_pre_task(
+    filtlong_pre_task(
         ...
+        VARNAME
     )
 
 # TOOL STEP
 "filtlong",
 	filtlong(
-		input_file=w.in_long_reads,         # INPUT CONNECTION (positional) [FASTQSANGER]
+		input_file=w.filtlong_pre_task.[VARNAME],         # INPUT CONNECTION (positional) [FASTQSANGER]
 		assembly=w.filtlong_assembly,       # RUNTIME VALUE (--assembly) [FASTA]
 		illumina_1=w.filtlong_illumina_1,   # RUNTIME VALUE (--illumina_1) [FASTQSANGER]
 		illumina_2=w.filtlong_illumina_2,   # RUNTIME VALUE (--illumina_2) [FASTQSANGER]

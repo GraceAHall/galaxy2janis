@@ -1,6 +1,184 @@
 
 
 
+
+
+-----------------------------------------------
+
+#import re
+#import os
+
+
+
+
+
+#set $labels = []
+#for $x in $in.inputs
+#if str($x.labels) != ''
+#silent $labels.append(re.sub('[^\w\-_]', '_', str($x.labels)))
+#else
+#silent $labels.append(re.sub('[^\w\-_]', '_', str($x.input.element_identifier)))
+#end if
+#end for
+#set $labels = ','.join($labels)
+
+
+
+
+
+
+
+
+
+
+quast
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--labels '$labels'
+-o 'outputdir'
+
+
+#if $assembly.ref.use_ref == 'true'
+-r '$assembly.ref.r'
+#if $assembly.ref.features
+--features '$assembly.ref.features'
+#end if
+#if $assembly.ref.operons
+--operons '$assembly.ref.operons'
+#end if
+$assembly.ref.circos
+$assembly.ref.k_mer.k_mer_stats
+#if str($assembly.ref.k_mer.k_mer_stats) != ''
+--k-mer-size $assembly.ref.k_mer.k_mer_size
+#end if
+#else if $assembly.ref.est_ref_size
+--est-ref-size $assembly.ref.est_ref_size
+#end if
+
+
+
+
+
+
+
+
+
+
+
+
+--min-contig 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--min-alignment 65
+--min-identity 95.0
+--ambiguity-usage 'one'
+--ambiguity-score 0.99
+
+
+
+
+
+
+
+
+
+
+
+
+#set $contig_thresholds = ','.join([x.strip() for x in str($advanced.contig_thresholds).split(',')])
+--contig-thresholds '$contig_thresholds'
+
+--extensive-mis-size 1000
+--scaffold-gap-max-size 1000
+--unaligned-part-size 500
+
+
+
+
+
+
+
+#for $k in $in.inputs
+'$k.input'
+#end for
+
+
+--threads ${GALAXY_SLOTS:-1}
+
+&& mkdir -p '$report_html.files_path'
+&& cp outputdir/*.html '$report_html.files_path'
+
+#if ($assembly.type == 'genome' and $assembly.ref.use_ref) or ($assembly.type == 'metagenome' and $assembly.ref.origin != 'none')
+&& cp -R outputdir/icarus_viewers '$report_html.files_path'
+#end if
+
+
+
+
+
+
+
+
+
+
+
+repeat encountered
+ cp -R outputdir/icarus_viewers '$report_html.files_path'
+#end if
+
+
+
+
+
+-----------------------------------------------
+
+
 class BaseWorkflowDefinitionWriter(WorkflowDefinitionWriter):
     def __init__(self, esettings: WorkflowExeSettings, workflow: Workflow):
         self.esettings = esettings

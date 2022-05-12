@@ -9,10 +9,9 @@ import unittest
 from data.tool_args import passing_tools
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
-from galaxy_interaction import load_manager, GalaxyManager
 from xmltool.load import load_xmltool, XMLToolDefinition
 
-from command.infer import infer_command
+from command.command import gen_command
 
 
 class TestCommandInference(unittest.TestCase):
@@ -21,9 +20,8 @@ class TestCommandInference(unittest.TestCase):
     def setUp(self) -> None:
         args = passing_tools['abricate']
         esettings: ToolExeSettings = load_tool_settings(args) 
-        gxmanager: GalaxyManager = load_manager(esettings)
-        self.xmltool: XMLToolDefinition = load_xmltool(gxmanager)
-        self.command = infer_command(gxmanager, self.xmltool)
+        self.xmltool: XMLToolDefinition = load_xmltool(esettings)
+        self.command = gen_command(esettings, self.xmltool)
         print()
 
     def test_command_positionals(self) -> None:
@@ -118,7 +116,7 @@ class TestCommandInference(unittest.TestCase):
 #     def setUp(self) -> None:
 #         args = passing_tools['abricate']
 #         esettings: ToolExeSettings = load_tool_settings(args) 
-#         gxmanager: GalaxyManager = load_manager(esettings)
+#         gxmanager: GalaxyManager = GalaxyManager(esettings)
 #         xmltool: XMLToolDefinition = load_xmltool(gxmanager)
 #         self.factory = CommandStringFactory(xmltool)
 

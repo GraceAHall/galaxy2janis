@@ -22,6 +22,8 @@ edge_cases.txt
 
 super_simple_workflow/
 super_simple_unicycler/
+super_simple_quast/
+super_simple_prokka/
 super_simple_out/
 simple_workflow/
 simple_out/

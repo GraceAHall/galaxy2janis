@@ -21,7 +21,7 @@ def sanitise_default_value(query_default: Any) -> Any:
     """
     currently disallows $env_vars to be defaults.
     """
-    if query_default:
+    if query_default is not None:
         if query_default.startswith('$'):
             return None
     return query_default

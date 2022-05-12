@@ -2,29 +2,19 @@
 
 
 from Cheetah.Template import Template
-from galaxy.util import unicodify
 
-template_text = """
-#if $min_length:
-    hello
-#end if
-#if $not_min_length:
-    there
-#end if
-"""
+template_text = """hell this is an 
+$input"""
 
 context = {
-    'min_length': True,
-    'not_min_length': True,
+    'input': 
 }
 
-print(template_text)
 
 # klass = Template.compile(source=template_text)
 # t = klass(searchList=[context])
 
-
-print(myvar)
+t = Template(template_text, searchList=[context])
 myvar = str(t)
 print(myvar)
 print()

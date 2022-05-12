@@ -1,20 +1,13 @@
 
 
-
-
-from runtime.Logger import Logger
-
-from typing import Optional
-
-
-from galaxy_interaction import load_manager, GalaxyManager
 from startup.ExeSettings import ToolExeSettings
-from xmltool.load import load_xmltool, XMLToolDefinition
+from xmltool.load import load_xmltool
+from command.command import gen_command
+from containers.fetch import fetch_container
+from tool.generate import gen_tool
+
+# TODO future 
 #from xmltool.tests import write_tests
-from command.infer import infer_command, Command
-from containers.fetch import fetch_container, Container
-from tool.Tool import Tool
-from tool.generate import generate_tool
 
 
 """
@@ -25,19 +18,8 @@ only the tool module is called twice (load_tool, and write_tests)
 """
 
 def parse_tool(esettings: ToolExeSettings):
-    logger = Logger(esettings.get_logfile_path())
-    # try:
-    gxmanager: GalaxyManager = load_manager(esettings)
-    xmltool: XMLToolDefinition = load_xmltool(gxmanager)
-    command: Command = infer_command(gxmanager, xmltool)
-    container: Optional[Container] = fetch_container(esettings, logger, xmltool)
-    tool: Tool = generate_tool(xmltool, command, container)
+    xmltool = load_xmltool(esettings)
+    command = gen_command(esettings, xmltool)
+    container = fetch_container(esettings, xmltool)
+    tool = gen_tool(xmltool, command, container)
     return tool
-    # except Exception as e:
-    #     print(e)
-    #     logger.log(2, 'parse_tool failed')
-        
-
-
-    
-

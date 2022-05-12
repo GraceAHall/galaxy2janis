@@ -1,13 +1,13 @@
 
 
 from copy import deepcopy
-from typing import Iterable, Optional
+from typing import Iterable
 
-from xmltool.tool_definition import XMLToolDefinition
-from command.tokens.Tokens import Token, TokenType
-from command.tokens.RealisedTokenValues import RealisedTokenValueifier, RealisedTokenValues
+from command.tokens.Tokens import Token
+from command.tokens.RealisedTokenValues import RealisedTokenValues
 from command.epath.ExecutionPath import ExecutionPath
-from command.regex.scanners import get_all
+
+
 
 class DynamicCommandStatement:
     """
@@ -28,21 +28,12 @@ class DynamicCommandStatement:
     params being present in that statement statement.
     """
 
-    def __init__(self, cmdline: str, end_delim: Optional[str]=None):
+    def __init__(self, cmdline: str, realised_tokens: list[RealisedTokenValues]):
         self.cmdline = cmdline
-        self.end_delim = end_delim
-        self.realised_tokens: list[RealisedTokenValues] = []
-
-    def set_realised_tokens(self, xmltool: XMLToolDefinition) -> None:
-        self.realised_tokens = RealisedTokenValueifier(xmltool).tokenify(self.cmdline)
+        self.realised_tokens = realised_tokens
 
     def get_tokens(self) -> list[Token]:
-        tokens: list[Token] = []
-        tokens += [rt.get_original_token() for rt in self.realised_tokens]
-        if self.end_delim:
-            match = get_all(self.end_delim)[0]
-            tokens.append(Token(match, TokenType.END_STATEMENT))
-        return tokens
+        return [rt.get_original_token() for rt in self.realised_tokens]
 
     def get_execution_paths(self) -> Iterable[ExecutionPath]:
         """

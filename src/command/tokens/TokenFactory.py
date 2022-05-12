@@ -1,6 +1,7 @@
 
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from command.tokens.Tokens import Token, TokenType
 from command.regex import scanners as scanners
@@ -56,8 +57,8 @@ class PriorityTokenOrderingStrategy(TokenOrderingStrategy):
 
 
 class TokenFactory:
-    def __init__(self, xmltool: XMLToolDefinition):
-        self.xmltool = xmltool    
+    def __init__(self, xmltool: Optional[XMLToolDefinition]=None):
+        self.xmltool = xmltool
         self.generic_scanners = [
             #(scanners.get_keyval_pairs, TokenType.KV_PAIR),
             (scanners.get_quoted_numbers, TokenType.QUOTED_NUM),
@@ -178,7 +179,7 @@ class TokenFactory:
         for m, varname in zip(matches, base_vars):
             if varname == '$metrics_file':
                 print()
-            if varname:
+            if varname and self.xmltool:
                 if self.xmltool.get_input(varname):
                     tokens.append(Token(m, TokenType.GX_INPUT, gxparam=self.xmltool.get_input(varname)))
                 elif self.xmltool.get_output(varname):

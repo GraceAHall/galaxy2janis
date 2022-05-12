@@ -6,8 +6,9 @@ WITHIN_BRACKETS = r''
 # within brackets = quoted sections, 
 
 EMPTY_STRINGS = r'\'\'|""'
-NEXT_WORD_LEFT = r'(?<=(?:\s|^)'
-NEXT_WORD_RIGHT = r')([\w\d\'"${}\\_.\-\:]+)(?=\s)'
+NEXT_WORD_LEFT = r'(?<=(?:\s|^))'
+NEXT_WORD_RIGHT = r'+?([\w\d\'"${}\\_.\-\:]+)(?=\s)'
+#NEXT_WORD_RIGHT = r'([\w\d\'"${}\\_.\-\:]+)(?=\s)'
 
 QUOTES = r'[\'"]'
 QUOTED_SECTIONS = r'"([^\"]*?)"|\'([^\']*?)\''

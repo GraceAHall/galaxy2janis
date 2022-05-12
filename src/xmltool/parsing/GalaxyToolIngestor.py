@@ -23,9 +23,8 @@ Requirement = ContainerRequirement | CondaRequirement
 
 
 class GalaxyToolIngestor:
-    def __init__(self, gxtool: GxTool, esettings: ToolExeSettings):
+    def __init__(self, gxtool: GxTool):
         self.gxtool = gxtool
-        self.esettings = esettings
         self.inputs = InputParamRegister([])
 
     def get_metadata(self, ) -> ToolXMLMetadata:

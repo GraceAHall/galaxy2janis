@@ -21,9 +21,3 @@ def spawn_backtick_section() -> Token:
     matches = scanners.get_all('__BACKTICK_SHELL_STATEMENT__')
     return Token(matches[0], TokenType.BACKTICK_SHELL_STATEMENT)
 
-
-def is_full_length_match(token: Token) -> bool:
-    raise NotImplementedError()
-
-def is_semi_full_length_match(token: Token) -> bool:
-    raise NotImplementedError()

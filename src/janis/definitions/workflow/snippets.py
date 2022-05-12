@@ -157,6 +157,6 @@ def step_input_value_snippet(
         right += f' {line.argument}'
     right += f' [{line.datatype}]'
     if line.default:
-        right += f' [DEFAULT]'
+        right += f' [GALAXY DEFAULT]'
     justified = f'\t\t{left:<{line_len+2}}{right}\n'
     return justified

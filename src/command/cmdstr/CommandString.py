@@ -1,35 +1,17 @@
 
 
 
-from command.cmdstr.MainStatementInferrer import MainStatementInferrer
-from xmltool.ToolXMLMetadata import ToolXMLMetadata
+from dataclasses import dataclass
+
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.tokens.Tokens import Token
 
+
+@dataclass
 class CommandString:
-    source: str
     main: DynamicCommandStatement
     preprocessing: list[DynamicCommandStatement]
     postprocessing: list[DynamicCommandStatement]
-
-    def __init__(self, source: str, statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata):
-        self.source = source
-        self.set_statements(statements, metadata)
-
-    def set_statements(self, statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata):
-        self.preprocessing = []
-        self.postprocessing = []
-        
-        inferrer = MainStatementInferrer(self.source, statements, metadata)
-        main_index = inferrer.infer()
-        for i, statement in enumerate(statements):
-            if i < main_index:
-                self.preprocessing.append(statement)
-            elif i == main_index:
-                self.main = statement
-            else:
-                self.postprocessing.append(statement)
 
     def get_original_tokens(self) -> list[Token]:
         """gets the original tokenized form of the command string"""
@@ -40,6 +22,8 @@ class CommandString:
         for statement in self.postprocessing:
             out += statement.get_tokens()
         return out
+
+
 
     # def get_text(self) -> str:
     #     """pieces back together the overall cmdline string from statements and delims"""

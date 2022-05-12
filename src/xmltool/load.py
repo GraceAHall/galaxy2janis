@@ -1,6 +1,6 @@
 
 
-
+from startup.ExeSettings import ToolExeSettings
 from galaxy_interaction import GalaxyManager
 from xmltool.tool_definition import XMLToolDefinition
 
@@ -43,9 +43,10 @@ class Ingestor(Protocol):
         ...
 
 
-def load_xmltool(gxmanager: GalaxyManager) -> XMLToolDefinition:
+def load_xmltool(esettings: ToolExeSettings) -> XMLToolDefinition:
+    gxmanager = GalaxyManager(esettings)
     galaxytool = gxmanager.get_tool()
-    ingestor = GalaxyToolIngestor(galaxytool, gxmanager.esettings)
+    ingestor = GalaxyToolIngestor(galaxytool)
     return XMLToolDefinition(
         ingestor.get_metadata(),
         ingestor.get_command(),

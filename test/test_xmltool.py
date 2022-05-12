@@ -6,7 +6,7 @@ from data.tool_args import passing_tools
 
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
-from galaxy_interaction import load_manager, GalaxyManager
+from galaxy_interaction import GalaxyManager
 from xmltool.load import load_xmltool, XMLToolDefinition
 
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
@@ -45,8 +45,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     def setUp(self) -> None:
         args: dict[str, Optional[str]] = passing_tools['abricate']
         esettings: ToolExeSettings = load_tool_settings(args)
-        self.gxmanager: GalaxyManager = load_manager(esettings)
-        self.xmltool: XMLToolDefinition = load_xmltool(self.gxmanager)
+        self.xmltool: XMLToolDefinition = load_xmltool(esettings)
 
     def test_tool(self) -> None:
         self.assertIsNotNone(self.xmltool)
@@ -55,8 +54,7 @@ class TestGalaxyIngestion(unittest.TestCase):
     def test_all_tools(self) -> None:
         for tool_args in passing_tools.values():
             esettings: ToolExeSettings = load_tool_settings(tool_args)
-            gxmanager = load_manager(esettings)
-            xmltool = load_xmltool(gxmanager)
+            xmltool = load_xmltool(esettings)
             self.assertIsNotNone(xmltool)
 
     def test_metadata(self) -> None:

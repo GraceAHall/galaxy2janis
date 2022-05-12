@@ -6,7 +6,7 @@ import unittest
 from data.tool_args import passing_tools
 from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
-from galaxy_interaction import load_manager, GalaxyManager
+from galaxy_interaction import GalaxyManager
 from xmltool.load import load_xmltool, XMLToolDefinition
 
 
@@ -37,8 +37,8 @@ class TestToolEvaluation(unittest.TestCase):
     def test_evaluation(self):
         args = passing_tools['abricate']
         esettings: ToolExeSettings = load_tool_settings(args) 
-        gxmanager: GalaxyManager = load_manager(esettings)
-        xmltool: XMLToolDefinition = load_xmltool(gxmanager)
+        xmltool: XMLToolDefinition = load_xmltool(esettings)
+        gxmanager: GalaxyManager = GalaxyManager(esettings)
         cmdlines = gxmanager.get_test_cmdstrs(xmltool)
         for cmdline in cmdlines:
             self.assertTrue(cmdline in abricate_test_cmdlines)

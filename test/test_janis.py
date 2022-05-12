@@ -10,7 +10,7 @@ from mock.mock_command import MOCK_COMMAND
 from mock.mock_container import MOCK_CONTAINER
 
 from file_io.write import write_tool
-from tool.generate import generate_tool
+from tool.generate import gen_tool
 
 
 # NOTE THIS IS LAZY
@@ -22,7 +22,7 @@ class TestJanisFormatting(unittest.TestCase):
     def setUp(self) -> None:
         if not os.path.exists(MOCK_TOOL_ESETTINGS.get_outdir()):
             os.mkdir(MOCK_TOOL_ESETTINGS.get_outdir())
-        self.tool = generate_tool(
+        self.tool = gen_tool(
             xmltool=MOCK_XMLTOOL,
             command=MOCK_COMMAND,
             container=MOCK_CONTAINER,

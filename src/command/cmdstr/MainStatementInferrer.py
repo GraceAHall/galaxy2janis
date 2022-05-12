@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Optional
 
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from command.cmdstr.utils import global_align
 
 
@@ -54,10 +53,10 @@ class StatementMetricRecord:
     reqsim: float = 0 # the similarity between the main tool requirement, and the first word of the statement
 
 class MainStatementInferrer:
-    def __init__(self, source: str, statements: list[DynamicCommandStatement], metadata: ToolXMLMetadata):
-        self.source = source
+    def __init__(self, statements: list[DynamicCommandStatement], source: str, requirement: str):
         self.statements = statements
-        self.main_requirement: str = metadata.get_main_requirement().get_text()
+        self.source = source
+        self.requirement = requirement
         self.metric_records: list[StatementMetricRecord] = []
 
     def infer(self) -> int:
@@ -84,14 +83,14 @@ class MainStatementInferrer:
         
     def set_mainreq_similarities(self) -> None:
         banned_command_starters = ['cp', 'ln', 'mv']
-        max_possible_score = global_align(self.main_requirement, self.main_requirement)
+        max_possible_score = global_align(self.requirement, self.requirement)
         for record in self.metric_records:
             if len(record.statement.realised_tokens) == 0:
                 record.reqsim = 0
             elif record.statement.get_first_word() in banned_command_starters:
                 record.reqsim = -99999.9 # HACK
             else:
-                raw_similarity = global_align(record.statement.get_first_word(), self.main_requirement)
+                raw_similarity = global_align(record.statement.get_first_word(), self.requirement)
                 record.reqsim = raw_similarity / max_possible_score
     
     def choose_best_statement_xml(self) -> int:
@@ -103,7 +102,7 @@ class MainStatementInferrer:
         ]
         for identifier_func in identifiers:
             selection = identifier_func(self.metric_records)
-            if selection: 
+            if selection is not None: 
                 return selection
         return len(self.statements) - 1 # fallback: the last statement
 
@@ -116,7 +115,7 @@ class MainStatementInferrer:
         ]
         for identifier_func in identifiers:
             selection = identifier_func(self.metric_records)
-            if selection: 
+            if selection is not None: 
                 return selection
         return len(self.statements) - 1 # fallback: the last statement
 
