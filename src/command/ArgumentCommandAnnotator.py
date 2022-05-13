@@ -11,6 +11,9 @@ from command.components.inputs import spawn_component
 import xmltool.param.utils as param_utils
 import command.regex.scanners as scanners
 
+
+# Utility functions to check aspects of a gxparam argument attribute
+
 def argument_exists(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
     if hasattr(gxparam, 'argument') and gxparam.argument is not None:  #type: ignore
         return True
@@ -39,6 +42,8 @@ def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, co
     return False
 
 
+# main class
+
 class ArgumentCommandAnnotator:
     def __init__(self, command: Command, xmltool: XMLToolDefinition):
         self.command = command
@@ -64,15 +69,20 @@ class ArgumentCommandAnnotator:
         return True
 
     def refine_argument(self, gxparam: Param) -> Param:
+        """
+        'argument' attribute of gxparam not always written with 
+        correct number of preceeding dashes. this aims to discover
+        the correct amount by looking in the <command> section for the
+        argument
+        """
         old_argument: str = gxparam.argument # type: ignore
-        #if not old_argument.startswith('-'): 
         matches = scanners.get_preceeding_dashes(
             search_term=old_argument,
             text=self.xmltool.raw_command
         )
         if matches:
-            num_dashes = max(len(dashes) for dashes in matches)
-            gxparam.argument = '-' * num_dashes + old_argument
+            num_dashes = max(len(dashes) for dashes in matches) 
+            gxparam.argument = '-' * num_dashes + old_argument # type: ignore
         return gxparam
 
     def update_command_components(self, gxparam: Param) -> None:

@@ -5,7 +5,7 @@ from typing import Any, Iterable, Optional
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
-from galaxy_interaction.GalaxyManager import GalaxyManager
+from galaxy_interaction import GalaxyManager
 from startup.ExeSettings import ToolExeSettings
 
 from workflows.step.WorkflowStep import WorkflowStep

@@ -16,29 +16,21 @@ class CmdstrCommandAnnotator:
         self.xmltool = xmltool
         self.cmdstrs = cmdstrs
 
-        self.has_non_xml_sources = False
         self.epath_count: int = 0
 
     def annotate(self) -> None:
-        self.set_attrs()
-        self.feed_cmdstrs(source='xml')
-        self.feed_cmdstrs(source='test')
-        self.feed_cmdstrs(source='workflow')
+        self.analyse_cmdstrs(source='xml')
+        self.analyse_cmdstrs(source='test')
         self.cleanup()
 
-    def set_attrs(self) -> None:
-        self.has_non_xml_sources = True if any([cmd.source != 'xml' for cmd in self.cmdstrs]) else False
-        xmlcmdstr = [cmd for cmd in self.cmdstrs if cmd.source == 'xml'][0]
-        self.command.set_xml_cmdstr(xmlcmdstr)
-
-    def feed_cmdstrs(self, source: str) -> None:
+    def analyse_cmdstrs(self, source: str) -> None:
         active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
         for cmdstr in active_cmdstrs:
             for epath in cmdstr.main.get_execution_paths():
                 print(epath)
-                self.feed(epath)
+                self.extract_components(epath)
 
-    def feed(self, epath: ExecutionPath) -> None:
+    def extract_components(self, epath: ExecutionPath) -> None:
         epath.id = self.epath_count
         epath = self.assign_epath_components(epath)
         self.update_command(epath)

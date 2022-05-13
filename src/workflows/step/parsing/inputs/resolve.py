@@ -3,7 +3,7 @@
 
 
 from typing import Any
-from galaxy_interaction.GalaxyManager import GalaxyManager
+from galaxy_interaction import GalaxyManager
 from startup.ExeSettings import ToolExeSettings
 
 from xmltool.param.InputParam import BoolParam

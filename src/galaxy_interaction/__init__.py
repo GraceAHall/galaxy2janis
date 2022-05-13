@@ -1,4 +1,4 @@
 
 
 
-from galaxy_interaction.GalaxyManager import GalaxyManager
+from .GalaxyManager import GalaxyManager

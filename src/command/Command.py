@@ -3,11 +3,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional
-from command.cmdstr.CommandString import CommandString
 
+from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput
-from command.components.CommandComponent import CommandComponent
 from command.components.inputs import spawn_component
 from xmltool.param.Param import Param 
 
@@ -153,8 +152,6 @@ class RedirectOutputUpdater(Updater):
 
 
 class Command:
-    xmlcmdstr: CommandString # TODO is this problematic? just type declaration right? 
-
     def __init__(self):
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
@@ -168,9 +165,6 @@ class Command:
             if component.gxparam and component.gxparam.name == gxparam.name:
                 return True
         return False
-
-    def set_xml_cmdstr(self, xmlcmdstr: CommandString) -> None:
-        self.xmlcmdstr = xmlcmdstr
 
     def list_inputs(self, include_base_cmd: bool=True) -> list[CommandComponent]:
         components: list[Positional | Option | Flag] = []

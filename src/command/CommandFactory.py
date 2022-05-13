@@ -3,7 +3,7 @@
 
 from startup.ExeSettings import ToolExeSettings
 from xmltool.tool_definition import XMLToolDefinition
-from galaxy_interaction.GalaxyManager import GalaxyManager
+from galaxy_interaction import GalaxyManager
 
 from command.manipulation import simplify_test, simplify_xml
 from command.cmdstr.CommandString import CommandString

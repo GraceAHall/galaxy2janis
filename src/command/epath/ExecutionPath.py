@@ -1,6 +1,7 @@
 
 
 #from __future__ import annotations
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 from command.components.outputs.OutputComponentFactory import OutputComponentFactory
@@ -12,6 +13,7 @@ from command.components.CommandComponent import CommandComponent
 from command.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
 import command.tokens.utils as utils
 
+
 @dataclass
 class EPathPosition:
     ptr: int
@@ -20,14 +22,98 @@ class EPathPosition:
     component: Optional[CommandComponent] = None
 
 
+# SAME AS class Annotator(ABC) in GreedyEPathAnnotator
+class Extractor(ABC):
+
+    def __init__(self, positions: list[EPathPosition]):
+        self.positions = positions
+
+    def extract(self) -> Any:
+        ptr = self.identify()
+        if ptr:
+            return self.handle(ptr)
+
+    @abstractmethod
+    def identify(self) -> Optional[int]:
+        ...
+    
+    @abstractmethod
+    def handle(self, ptr: int) -> Any:
+        ...
+    
+    def annotate_position_with_component(self, ptr: int, comp: Any) -> None:
+        self.positions[ptr].ignore = True
+        self.positions[ptr].component = comp
+
+
+class StreamMergeExtractor(Extractor):
+
+    def identify(self) -> Optional[int]:
+        for position in self.positions:
+            if position.token.type == TokenType.LINUX_STREAM_MERGE:
+                return position.ptr
+    
+    def handle(self, ptr: int) -> Any:
+        sm = StreamMerge(self.positions[ptr].token)
+        self.annotate_position_with_component(ptr, sm)
+        self.stream_merges.append(sm)
+
+
+class RedirectExtractor(Extractor):
+
+    def identify(self) -> Optional[int]:
+        for position in self.positions:
+            if position.token.type == TokenType.LINUX_REDIRECT:
+                return position.ptr
+    
+    def handle(self, ptr: int) -> Any:
+        redirect_token = self.positions[ptr].token
+        outfile_token = self.positions[ptr + 1].token
+        factory = OutputComponentFactory()
+
+        if redirect_token and outfile_token:
+            redirect = factory.create_redirect_output((redirect_token, outfile_token))
+            self.annotate_position_with_component(ptr, redirect)
+            self.annotate_position_with_component(ptr + 1, redirect)
+            self.redirect = redirect
+
+
+class TeeExtractor(Extractor):
+
+    def identify(self) -> Optional[int]:
+        for position in self.positions:
+            if position.token.type == TokenType.LINUX_TEE:
+                return position.ptr
+    
+    def handle(self, ptr: int) -> Any:
+        tee = Tee()
+        next_text = self.positions[ptr + 1].token.text
+        # tee opts
+        while next_text.startswith('-'):
+            ptr += 1
+            token = self.positions[ptr].token
+            tee.options.append(token)
+            self.annotate_position_with_component(ptr, tee)
+            next_text = self.positions[ptr + 1].token.text
+        # tee files
+        while ptr < len(self.positions):
+            ptr += 1
+            token = self.positions[ptr].token
+            tee.files.append(token)
+            self.annotate_position_with_component(ptr, tee)
+        self.tee = tee
+
+
+
+
 class ExecutionPath:
     id: int
 
     def __init__(self, tokens: list[Token]):
         self.positions: list[EPathPosition] = self.init_positions(tokens)
-        self.stream_merges: list[StreamMerge] = []
-        self.redirect: Optional[RedirectOutput] = None
-        self.tees: Optional[Tee] = None
+        self.stream_merges: Optional[StreamMerge] = None # TODO move to get_stream_merge()
+        self.redirect: Optional[RedirectOutput] = None  # TODO move to get_redirect()
+        self.tee: Optional[Tee] = None  # TODO move to get_tee()
         self.tokens_to_excise: list[int] = []
         self.set_attrs()
 
@@ -37,12 +123,12 @@ class ExecutionPath:
         positions.append(EPathPosition(len(positions), end_sentinel))
         return positions
 
-    def get_end_token_position(self) -> int:
-        end_tokens = [TokenType.END_STATEMENT, TokenType.LINUX_TEE, TokenType.LINUX_REDIRECT]
-        for position in self.positions:
-            if position.token.type in end_tokens:
-                return position.ptr - 1
-        return len(self.positions) - 2  # this will never happen
+    # def get_end_token_position(self) -> int:
+    #     end_tokens = [TokenType.END_STATEMENT, TokenType.LINUX_TEE, TokenType.LINUX_REDIRECT]
+    #     for position in self.positions:
+    #         if position.token.type in end_tokens:
+    #             return position.ptr - 1
+    #     return len(self.positions) - 2  # this will never happen
 
     def get_components(self) -> list[CommandComponent]:
         components = self.get_component_list()
@@ -68,19 +154,9 @@ class ExecutionPath:
         self.set_redirect()
         self.set_tee()
     
-    def set_stream_merges(self) -> None:
-        for position in self.positions:
-            if position.token.type == TokenType.LINUX_STREAM_MERGE:
-                self.handle_stream_merge(position)
 
-    def handle_stream_merge(self, position: EPathPosition) -> None:
-        sm = StreamMerge(position.token)
-        self.stream_merges.append(sm)
-        self.annotate_position_with_component(position.ptr, sm)
 
-    def annotate_position_with_component(self, ptr: int, comp: Any) -> None:
-        self.positions[ptr].ignore = True
-        self.positions[ptr].component = comp
+
     
     def set_redirect(self) -> None:
         for position in self.positions:
