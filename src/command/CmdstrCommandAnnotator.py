@@ -1,12 +1,12 @@
 
-
+import logging
 from command.Command import Command 
 
 from xmltool.tool_definition import XMLToolDefinition
 from command.cmdstr.CommandString import CommandString
 
 from command.epath.ExecutionPath import ExecutionPath
-from command.epath.GreedyEPathAnnotator import GreedyEPathAnnotator
+from command.epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
 
 
 class CmdstrCommandAnnotator:
@@ -15,19 +15,17 @@ class CmdstrCommandAnnotator:
         self.command = command
         self.xmltool = xmltool
         self.cmdstrs = cmdstrs
-
         self.epath_count: int = 0
 
     def annotate(self) -> None:
-        self.analyse_cmdstrs(source='xml')
-        self.analyse_cmdstrs(source='test')
+        self.analyse_cmdstrs()
         self.cleanup()
 
-    def analyse_cmdstrs(self, source: str) -> None:
-        active_cmdstrs = [c for c in self.cmdstrs if c.source == source]
-        for cmdstr in active_cmdstrs:
+    def analyse_cmdstrs(self) -> None:
+        for cmdstr in self.cmdstrs:
             for epath in cmdstr.main.get_execution_paths():
-                print(epath)
+                logger = logging.getLogger('gxtool2janis')
+                logger.debug(epath)
                 self.extract_components(epath)
 
     def extract_components(self, epath: ExecutionPath) -> None:
@@ -37,25 +35,14 @@ class CmdstrCommandAnnotator:
         self.epath_count += 1
     
     def assign_epath_components(self, epath: ExecutionPath) -> ExecutionPath:
-        annotator = GreedyEPathAnnotator(epath, self.xmltool, self.command)
-        return annotator.annotate_epath()
+        annotator = GreedyExecutionPathAnnotator(epath, self.xmltool, self.command)
+        return annotator.annotate()
 
     def update_command(self, epath: ExecutionPath) -> None:
-        """
-        updates command components using an annotated epath
-        """
-        self.update_command_components(epath)
-        self.update_redirects(epath)
-
-    def update_command_components(self, epath: ExecutionPath) -> None:
         for component in epath.get_components():
             component.update_presence_array(self.epath_count)
             self.command.update(component)
 
-    def update_redirects(self, epath: ExecutionPath) -> None:
-        if epath.redirect and epath.redirect.file_token.gxparam:
-            self.command.update(epath.redirect)
-   
     def cleanup(self) -> None:
         # just one thing to do
         self.update_components_presence_array()

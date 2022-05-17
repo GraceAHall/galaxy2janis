@@ -14,7 +14,7 @@ import utils.etree as etree_utils
 def get_tool_settings(wsettings: WorkflowExeSettings, metadata: StepMetadata) -> ToolExeSettings:
     """generates ToolExeSettings for each tool to be parsed"""
     args = make_parse_tool_args(metadata, wsettings)
-    return load_tool_settings(metadata, args)
+    return load_tool_settings(args, metadata.tool_id)
         
 def make_parse_tool_args(metadata: StepMetadata, esettings: WorkflowExeSettings) -> dict[str, Optional[str]]:
     if metadata.is_inbuilt:

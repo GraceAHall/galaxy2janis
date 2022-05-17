@@ -110,8 +110,6 @@ class AliasResolver:
                 dest = self.register.get(source)
                 if dest:
                     # ensure ends/starts with whitespace or quotes or forwardslash or is curly brackets
-                    if source in line:
-                        print()
                     matches = self.get_line_matches(source, line)
                     for match in matches:
                         line = self.perform_replacement(match, dest, line)

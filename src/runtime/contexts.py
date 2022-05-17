@@ -1,4 +1,9 @@
 
+
+# from stackoverflow: Alex Martelli
+# https://stackoverflow.com/questions/2828953/silence-the-stdout-of-a-function-in-python-without-trashing-sys-stdout-and-resto
+
+
 import sys
 from typing import Any
 
@@ -14,9 +19,13 @@ def nostdout(func):  # type: ignore
         return res
     return wrapper
 
-@nostdout
-def main():
-    print('hello')
+    
 
-if __name__ == '__main__':
-    main()
+#import contextlib
+# @contextlib.contextmanager
+# def nostdout():
+#     save_stdout = sys.stdout
+#     sys.stdout = DummyFile()
+#     yield
+#     sys.stdout = save_stdout
+

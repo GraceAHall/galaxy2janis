@@ -4,6 +4,7 @@ import os
 import json
 from typing import Any, Optional
 
+from runtime.contexts import nostdout
 from startup.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 import galaxy_interaction.cmdstrings.dataset_utils as dataset_utils

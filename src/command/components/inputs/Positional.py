@@ -7,6 +7,7 @@ from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 #import command.components.inputs.utils as utils
 import command.regex.scanners as scanners
+from xmltool.param.Param import Param
 
 class Positional(BaseCommandComponent):
     def __init__(self, value: str) -> None:
@@ -21,6 +22,8 @@ class Positional(BaseCommandComponent):
             return self.gxparam.name
         # otherwise, most commonly witnessed option value as name
         pseudo_name = self.value_record.get_most_common_value()
+        if not pseudo_name:
+            pseudo_name = 'positional'
         return pseudo_name.strip('$')
     
     def get_default_value(self) -> Any:
@@ -59,7 +62,7 @@ class Positional(BaseCommandComponent):
         self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
-            self.gxparam = incoming.gxparam
+            self.gxparam: Optional[Param] = incoming.gxparam
         # update presence
         cmdstr_index = len(incoming.presence_array) - 1
         self.update_presence_array(cmdstr_index)

@@ -1,5 +1,7 @@
 
 
+import logging
+
 # classes
 from startup.ExeSettings import WorkflowExeSettings
 from workflows.workflow.WorkflowParser import WorkflowParser
@@ -18,6 +20,8 @@ to a janis definition
 """
 
 def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
+    logger = logging.getLogger('gxtool2janis')
+    logger.info(f'parsing workflow from {wsettings.workflow}')
     workflow = init_workflow(wsettings)
     link_tool_input_values(wsettings, workflow)
     link_step_outputs_tool_outputs(workflow)

@@ -1,24 +1,26 @@
 
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Optional
+
+from startup.ExeSettings import ToolExeSettings
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
-from galaxy_interaction import GalaxyManager
-from startup.ExeSettings import ToolExeSettings
 
+from workflows.workflow.Workflow import Workflow
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.step.inputs.StepInput import ConnectionStepInput, StepInput, WorkflowInputStepInput
 from workflows.step.values.InputValue import InputValue
-from workflows.workflow.Workflow import Workflow
-import workflows.step.values.create_value as value_utils
 
 from command.manipulation.evaluation import sectional_evaluate
 from command.manipulation.aliases import resolve_aliases
-import command.regex.utils as regex_utils
-from command.cmdstr.CommandStringFactory import CommandStringFactory
 from xmltool.load import load_xmltool
+from command.cmdstr.cmdstr import gen_command_string
+
+import workflows.step.values.create_value as value_utils
+import command.regex.utils as regex_utils
 
 
 class ValueLinker(ABC):
@@ -70,18 +72,18 @@ class CheetahValueLinker(ValueLinker):
         self.cmdstr: str = self.prepare_command()
 
     def prepare_command(self) -> str:
-        cmdstr = sectional_evaluate(
+        rawstr = sectional_evaluate(
             text=self.step.tool.raw_command,  # type: ignore
             inputs=self.step.inputs.to_dict()
         )
-        cmdstr = resolve_aliases(cmdstr)
-        print(cmdstr)
-        manager = GalaxyManager(self.esettings)
-        xmltool = load_xmltool(manager)
-        command_string = CommandStringFactory(xmltool).create(source='xml', cmdstr=cmdstr)
-        main_statement_cmdstr = command_string.main.cmdline
-        print(main_statement_cmdstr)
-        return main_statement_cmdstr
+        rawstr = resolve_aliases(rawstr)
+        xmltool = load_xmltool(self.esettings)
+        cmdstr = gen_command_string(source='xml', the_string=rawstr, xmltool=xmltool)
+        stmtstr = cmdstr.main.cmdline
+        logger = logging.getLogger('gxtool2janis')
+        logger.debug(rawstr)
+        logger.debug(stmtstr)
+        return stmtstr
 
     def link(self) -> None:
         for component in self.get_linkable_components():

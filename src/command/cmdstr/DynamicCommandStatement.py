@@ -74,10 +74,3 @@ class DynamicCommandStatement:
     def get_first_word(self) -> str:
         return self.realised_tokens[0].tlists[0][0].text # pure cancer but 
 
-    def print_execution_paths(self) -> None:
-        for epath in self.get_execution_paths():
-            for position in epath.positions:
-                print(position.token.text, end=' ')
-            print('\n')
-
-

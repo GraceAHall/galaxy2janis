@@ -1,6 +1,7 @@
 
 
 from abc import ABC, abstractmethod
+from typing import Optional
 from command.components.CommandComponent import CommandComponent
 
 from command.components.inputs import Positional, Flag, Option
@@ -12,16 +13,15 @@ from command.components.inputs import Positional, Flag, Option
 #     return [p for p in positionals if not p.gxparam and p.has_single_value()]
 
 
-
 class ComponentOrderingStrategy(ABC):
     @abstractmethod
-    def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
+    def order(self, components: list[CommandComponent], disallow: Optional[list[str]]=None) -> list[CommandComponent]:
         """annotates components with command line positions"""
         ...
 
 # TODO WTF epath cmd_pos orderings for components vs Command() orderings for components
 class SimplifiedComponentOrderingStrategy(ComponentOrderingStrategy):
-    def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
+    def order(self, components: list[CommandComponent], disallow: Optional[list[str]]=None) -> list[CommandComponent]:
         start_pos_count = self.count_starting_positionals(components)
         self.assign_positional_positions(components, start_pos_count)
         self.assign_flag_option_positions(components, start_pos_count)
@@ -49,7 +49,7 @@ class SimplifiedComponentOrderingStrategy(ComponentOrderingStrategy):
 
 
 class RealisticComponentOrderingStrategy(ComponentOrderingStrategy):
-    def annotate(self, components: list[CommandComponent]) -> list[CommandComponent]:
+    def order(self, components: list[CommandComponent], disallow: Optional[list[str]]=None) -> list[CommandComponent]:
         # wayyy more complicated
         # 
         pos: int = 0

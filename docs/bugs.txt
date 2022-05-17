@@ -2,6 +2,167 @@
 
 TOOL PARSING
 
+
+
+BUGS 
+
+
+cutadapt input_1, input_2
+
+
+prokka has no input assembly
+
+get most recent build for wrapper version when doing parse_tool() - picard_markDuplicates.xml has error in the wrapper download
+
+optional outputs
+hisat2.xml
+    ToolOutput(
+		'output_unaligned_reads_l1',
+		FastqSanger,
+		selector=InputSelector("un_gz"),
+		doc="unaligned reads (L)",
+	),
+
+unknown output (should i just ignore? yes)
+see featureCounts.xml and others
+    ToolOutput(
+		'out_pairs',
+		Array(FastqGz),
+		selector=WildcardSelector("__UNKNOWN_OUTPUT__"),
+		doc="Reads",
+	),
+
+2 records of same unknown output
+hisat2.xml
+    ToolOutput(
+		'output_unaligned_reads_r',
+		FastqSanger,
+		selector=WildcardSelector("__UNKNOWN_OUTPUT__"),
+		doc="unaligned reads (R)",
+	),
+	ToolOutput(
+		'output_aligned_reads_r',
+		FastqSanger,
+		selector=WildcardSelector("__UNKNOWN_OUTPUT__"),
+		doc="aligned reads (R)",
+	),
+
+duplicate prefix! cutadapt.xml
+    ToolInput(
+		'action',
+		String,
+		prefix='--action--action',
+		separate_value_from_prefix=False,
+		position=1,
+		default="trim",
+		doc="What to do if a match is found. possible values: lowercase, mask, none, retain, trim",
+	),
+    ToolInput(
+		'info_file',
+		TextFile,
+		prefix='--info-file--info-file',
+		separate_value_from_prefix=False,
+		position=1,
+		default=None,
+		doc="Info File",
+	),
+
+duplicate outputs 
+filtlong.xml
+outputs = [
+	ToolOutput(
+		'output_string',
+		Stdout(String),
+	),
+	ToolOutput(
+		'outfile',
+		FastqSanger,
+		selector=WildcardSelector("output.fastq"),
+		doc="Filtered FASTQ",
+	),
+kraken2.xml
+    ToolOutput(
+		'out1',
+		Array(Fasta),
+		selector=WildcardSelector("un_out_1.*"),
+		doc="Unclassified forward",
+	),
+	ToolOutput(
+		'out2',
+		Array(Fasta),
+		selector=WildcardSelector("un_out_2.*"),
+		doc="Unclassified reverse",
+	),
+	ToolOutput(
+		'out3',
+		Array(Fasta),
+		selector=WildcardSelector("cl_out_1.*"),
+		doc="Classified forward",
+	),
+	ToolOutput(
+		'out4',
+		Array(Fasta),
+		selector=WildcardSelector("cl_out_2.*"),
+		doc="Classified reverse",
+	),
+	ToolOutput(
+		'out1_1',
+		Array(String),
+		selector=WildcardSelector("un_out_1.*"),
+		doc="Unclassified forward",
+	),
+	ToolOutput(
+		'out2_1',
+		Array(String),
+		selector=WildcardSelector("un_out_2.*"),
+		doc="Unclassified reverse",
+	),
+	ToolOutput(
+		'out3_1',
+		Array(String),
+		selector=WildcardSelector("cl_out_1.*"),
+		doc="Classified forward",
+	),
+	ToolOutput(
+		'out4_1',
+		Array(String),
+		selector=WildcardSelector("cl_out_2.*"),
+		doc="Classified reverse",
+	),
+
+
+conditionals! quast.xml
+inputs = [
+	# Positionals
+	ToolInput(
+		'quast',
+		String,
+		position=1,
+		default=None,
+		doc="None",
+	),
+	ToolInput(
+		'metaquast',
+		String(optional=True),
+		position=2,
+		default=None,
+		doc="None",
+	),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Minor (mostly formatting and cleanliness)
 input_t_int -> t_int? cleaner?
 in general, I think janis should allow single letter tags, even single digit. 

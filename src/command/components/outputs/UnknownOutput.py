@@ -4,16 +4,11 @@
 
 from __future__ import annotations
 from command.components.CommandComponent import BaseCommandComponent
-from typing import Any, Optional
+from typing import Optional
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
-from xmltool.param.Param import Param
 
 
 class UnknownOutput(BaseCommandComponent):
-    def __init__(self, gxparam: Param):
-        super().__init__()
-        self.gxparam = gxparam
-        assert(self.gxparam)
 
     def get_name(self) -> str:
         if self.gxparam:

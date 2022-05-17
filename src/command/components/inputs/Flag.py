@@ -4,6 +4,7 @@ from typing import Any, Optional
 from xmltool.param.InputParam import BoolParam
 
 from command.components.CommandComponent import BaseCommandComponent
+from xmltool.param.Param import Param
 
 
 class Flag(BaseCommandComponent):
@@ -52,7 +53,7 @@ class Flag(BaseCommandComponent):
         assert(isinstance(incoming, Flag))
         # gxparam transfer
         if not self.gxparam and incoming.gxparam:
-            self.gxparam = incoming.gxparam
+            self.gxparam: Optional[Param] = incoming.gxparam
         # presence
         cmdstr_index = len(incoming.presence_array) - 1
         self.update_presence_array(cmdstr_index)

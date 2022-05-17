@@ -1,6 +1,11 @@
 
 #sys.path.append('./galaxy/lib')
 
+#import logging
+from logging import config
+import logging
+import warnings
+import yaml
 import sys
 from typing import Optional
 from startup.CLIparser import CLIparser
@@ -18,9 +23,27 @@ gxtool2janis program entry point
 parses cli settings then hands execution to other files based on command
 """
 
-
 def main():
+    configure_logging()
+    configure_warnings()
     args = load_args()
+    run_sub_program(args)
+
+def configure_logging() -> None:
+    with open("src/config/logging_config.yaml", "r") as fp:
+        the_dict = yaml.safe_load(fp)
+    config.dictConfig(the_dict)
+    logger = logging.getLogger('gxtool2janis')
+    logger.debug('hello')
+
+def configure_warnings() -> None:
+    warnings.filterwarnings("ignore")
+
+def load_args() -> dict[str, Optional[str]]:
+    parser = CLIparser(sys.argv)
+    return parser.args
+
+def run_sub_program(args: dict[str, Optional[str]]) -> None:
     match args['command']:
         case 'tool':
             run_tool_mode(args)
@@ -28,10 +51,6 @@ def main():
             run_workflow_mode(args)
         case _:
             pass
-
-def load_args() -> dict[str, Optional[str]]:
-    parser = CLIparser(sys.argv)
-    return parser.args
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     esettings: ToolExeSettings = load_tool_settings(args) 

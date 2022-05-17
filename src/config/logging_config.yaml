@@ -1,0 +1,36 @@
+
+formatters:
+  default:
+    format: '[%(levelname)s] [%(name)s] %(message)s'
+  time:
+    format: '[%(asctime)s] [%(levelname)-8s] [%(name)s] %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+handlers:
+  # gxtool2janis
+  gxtool2janis_console:
+    class: logging.StreamHandler
+    level: INFO
+    stream: ext://sys.stdout
+    formatter: default
+  gxtool2janis_file:
+    level: DEBUG
+    class: logging.FileHandler
+    filename: gxtool2janis.log
+    formatter: default
+  # galaxy
+  galaxy_console:
+    class: logging.StreamHandler
+    level: ERROR
+    stream: ext://sys.stdout
+    formatter: default
+  galaxy_file:
+    level: ERROR
+    class: logging.FileHandler
+    filename: galaxy.log
+    formatter: default
+loggers:
+  gxtool2janis:
+    handlers: [gxtool2janis_console, gxtool2janis_file]
+  root:
+    handlers: [galaxy_console, galaxy_file]
+version: 1

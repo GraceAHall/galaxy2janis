@@ -1,11 +1,11 @@
 
 
 
+import logging
 import re
 from command.regex.utils import find_unquoted
 import command.regex.scanners as scanners
 import command.manipulation.utils as utils
-
 
 def replace_function_calls(cmdstr: str) -> str:
     cmdlines = utils.split_lines(cmdstr)
@@ -37,7 +37,8 @@ def flatten_multiline_strings(cmdstr: str) -> str:
             old_section = match[0]
             new_section = match[0].replace('\n', ' ')
             cmdstr = cmdstr.replace(old_section, new_section)
-            print(f'removing a multiline string: \n{old_section}')
+            logger = logging.getLogger('gxtool2janis')
+            logger.debug(f'removed multiline string')
     return cmdstr
 
 def translate_variable_markers(cmdstr: str) -> str:

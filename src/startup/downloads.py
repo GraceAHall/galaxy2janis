@@ -1,29 +1,31 @@
 
 
-
+import logging
 import os
 import tarfile
-import wget
+import requests
 
 from startup.ExeSettings import ToolExeSettings
 import utils.etree as etree_utils 
 
 
 def handle_downloads(intended_tool_id: str, esettings: ToolExeSettings) -> ToolExeSettings:
+    logger = logging.getLogger('gxtool2janis')
+    logger.info(f'downloading tool repo from {esettings.remote_url}')
     esettings.xmldir = download_repo(esettings)
     esettings.xmlfile = select_xml_source(intended_tool_id, esettings)
     return esettings
 
-def download_repo(esettings: ToolExeSettings) -> str: 
-    uri = esettings.remote_url
+def download_repo(esettings: ToolExeSettings) -> str:
+    assert(esettings.remote_url)  
+    url = esettings.remote_url
     download_folder = esettings.get_download_dir()
-    tarball_filename: str = wget.download(uri, out=download_folder)
-    tar = tarfile.open(tarball_filename, "r:gz")
+    response = requests.get(url, stream=True)
+    tar = tarfile.open(fileobj=response.raw, mode='r:gz')
     tar.extractall(path=download_folder)
-    tar.close()
-    os.remove(tarball_filename)
-    local_folder_name = tarball_filename.rsplit('.tar', 1)[0]
-    return local_folder_name
+    folder_name = os.path.commonprefix(tar.getnames())
+    folder_path = f"{download_folder}/{folder_name.rstrip('/')}"
+    return folder_path
 
 def select_xml_source(intended_tool_id: str, esettings: ToolExeSettings) -> str:
     assert(esettings.xmldir)

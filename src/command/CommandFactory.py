@@ -7,7 +7,7 @@ from galaxy_interaction import GalaxyManager
 
 from command.manipulation import simplify_test, simplify_xml
 from command.cmdstr.CommandString import CommandString
-from command.cmdstr import gen_command_string
+from command.cmdstr.cmdstr import gen_command_string
 
 from command.ArgumentCommandAnnotator import ArgumentCommandAnnotator
 from command.CmdstrCommandAnnotator import CmdstrCommandAnnotator
@@ -42,9 +42,11 @@ class CommandFactory:
         annotator.annotate()
 
     def gen_cmdstrs(self) -> list[CommandString]:
+        # note ordering: xml then test
         xml_cmdstr = self.gen_cmdstr_from_xml()
         test_cmdstrs = self.gen_cmdstrs_from_tests()
-        return [xml_cmdstr] + test_cmdstrs
+        cmdstrs = [xml_cmdstr] + test_cmdstrs
+        return cmdstrs
 
     def gen_cmdstr_from_xml(self) -> CommandString:
         gxmanager = GalaxyManager(self.esettings)

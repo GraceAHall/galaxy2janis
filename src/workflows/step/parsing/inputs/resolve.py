@@ -3,7 +3,6 @@
 
 
 from typing import Any
-from galaxy_interaction import GalaxyManager
 from startup.ExeSettings import ToolExeSettings
 
 from xmltool.param.InputParam import BoolParam
@@ -13,8 +12,7 @@ from xmltool.tool_definition import XMLToolDefinition
 
 
 def resolve_values(esettings: ToolExeSettings, gxstep: dict[str, Any]) -> dict[str, Any]:
-    manager = GalaxyManager(esettings)
-    xmltool = load_xmltool(manager)
+    xmltool = load_xmltool(esettings)
     resolver = StepValueResolver(gxstep, xmltool)
     return resolver.resolve()
 

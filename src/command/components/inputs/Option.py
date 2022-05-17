@@ -5,6 +5,7 @@ from xmltool.param.InputParam import SelectParam
 
 from command.components.ValueRecord import OptionValueRecord
 from command.components.CommandComponent import BaseCommandComponent
+from xmltool.param.Param import Param
 
 
 class Option(BaseCommandComponent):
@@ -64,7 +65,7 @@ class Option(BaseCommandComponent):
         self.value_record.record += incoming.value_record.record
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
-            self.gxparam = incoming.gxparam
+            self.gxparam: Optional[Param] = incoming.gxparam
         # presence
         cmdstr_index = len(incoming.presence_array) - 1
         self.update_presence_array(cmdstr_index)

@@ -2,6 +2,7 @@
 
 
 from __future__ import annotations
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
@@ -9,7 +10,6 @@ from uuid import uuid4
 from enum import Enum, auto
 from Cheetah.Template import Template
 import multiprocessing
-import time
 
 import command.manipulation.utils as utils
 from galaxy.util import unicodify
@@ -172,9 +172,10 @@ class EvaluationStrategy(ABC):
             return_dict = manager.dict()
             p = multiprocessing.Process(target=self.do_evaluation, args=(source_lines, return_dict))
             p.start()
-            p.join(1)
+            p.join(5)
             if p.is_alive():
-                print('killed process!')
+                logger = logging.getLogger('gxtool2janis')
+                logger.debug('killed sectional evaluation process!')
                 outcome = None
                 p.terminate()
                 p.join()
@@ -182,7 +183,6 @@ class EvaluationStrategy(ABC):
                 outcome = return_dict['outcome']  # type: ignore
         except Exception as e:
             outcome = None
-            print('\n' + str(e))
         return outcome  # type: ignore
 
 
@@ -213,7 +213,6 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
         for child in self.get_child_blocks():
             self.masked_blocks[child.uuid] = child  # register identifier/block
             self.substitute_identifier(child)
-            print()
 
     def get_child_blocks(self) -> list[CheetahBlock]:
         """returns next level of cheetah blocks within this block"""

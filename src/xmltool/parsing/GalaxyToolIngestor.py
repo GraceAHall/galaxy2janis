@@ -3,10 +3,8 @@
 from galaxy.tools import Tool as GxTool
 from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
-from startup.ExeSettings import ToolExeSettings
 
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
-from xmltool.requirements import CondaRequirement, ContainerRequirement
 from xmltool.citations import Citation
 
 from xmltool.parsing.ParamFlattener import ParamFlattener
@@ -19,6 +17,7 @@ from xmltool.param.OutputParamRegister import OutputParamRegister
 from xmltool.TestRegister import TestRegister
 from biblib.biblib import bib
 
+from xmltool.requirements import CondaRequirement, ContainerRequirement
 Requirement = ContainerRequirement | CondaRequirement
 
 

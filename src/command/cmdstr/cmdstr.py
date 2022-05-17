@@ -32,7 +32,6 @@ def gen_command_string(
     statement_dict = _split_pre_main_post_statements(statements, source, requirement)
     return _init_command_string(statement_dict)
 
-
 def _gen_command_statements(the_string: str, xmltool: Optional[XMLToolDefinition]=None) -> list[DynamicCommandStatement]:
     statements: list[DynamicCommandStatement] = []
     for cmdstmt in _split_text_statements(the_string):
@@ -44,14 +43,15 @@ def _split_text_statements(the_string: str) -> list[str]:
     quoted_sections = get_quoted_sections(the_string)
     delim_matches = get_statement_delims(the_string)
 
-    for m in delim_matches:
+    # has to be reverse order otherwise m.start() and m.end() are out of place
+    for m in sorted(delim_matches, key=lambda x: x.start(), reverse=True): 
         if quoted_sections[m.start()] == False and quoted_sections[m.end()] == False:
             left_split = the_string[:m.start()]
             right_split = the_string[m.end():]
-            statements.append(left_split)
-            the_string = right_split
+            statements = [right_split] + statements # prepend
+            the_string = left_split
 
-    statements.append(the_string)
+    statements = [the_string] + statements # prepend the final split (left this time)
     return statements
 
 def _split_pre_main_post_statements(

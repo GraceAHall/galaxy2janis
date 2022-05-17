@@ -5,7 +5,7 @@
 
 
 from typing import Optional
-from command.components.outputs.OutputComponentFactory import OutputComponentFactory
+from command.components.outputs.create import create_output
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
 from command.command import Command
@@ -14,12 +14,13 @@ from containers.fetch import Container
 from xmltool.param.OutputParam import OutputParam
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 
+
+
 class ToolFactory:
     def __init__(self, xmltool: XMLToolDefinition, command: Command, container: Optional[Container]) -> None:
         self.xmltool = xmltool
         self.command = command
         self.container = container
-        self.output_factory = OutputComponentFactory()
         self.datatype_annotator = DatatypeAnnotator() 
 
     def create(self) -> Tool:
@@ -64,7 +65,7 @@ class ToolFactory:
         out: list[CommandComponent] = []
         for component in self.command.list_inputs(include_base_cmd=False):
             if component.gxparam and isinstance(component.gxparam, OutputParam):
-                out.append(self.output_factory.create_input_output(component))
+                out.append(create_output('input', component))
         return out
     
     def get_wildcard_outputs(self) -> list[CommandComponent]:
@@ -73,10 +74,9 @@ class ToolFactory:
         # like from_work_dir or a <discover_datatsets> tag as a child
         out: list[CommandComponent] = []
         for gxparam in self.xmltool.list_outputs():
-            if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern:
+            if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern is not None:
                 if not self.command.gxparam_is_attached(gxparam):
-                    new_output = self.output_factory.create_wildcard_output(gxparam)
-                    out.append(new_output)
+                    out.append(create_output('wildcard', gxparam))
         return out
     
     def get_unknown_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:
@@ -84,11 +84,11 @@ class ToolFactory:
         for gxparam in self.xmltool.list_outputs():
             has_output_component = False
             for output in known_outputs:
-                if output.gxparam.name == gxparam.name:
+                if output.gxparam and output.gxparam.name == gxparam.name:
                     has_output_component = True
                     break
             if not has_output_component:
-                out.append(self.output_factory.create_unknown_output(gxparam))
+                out.append(create_output('unknown', gxparam))
         return out
 
     def verify_outputs(self, outputs: list[CommandComponent]) -> None:

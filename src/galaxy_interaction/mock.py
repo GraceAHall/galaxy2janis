@@ -2,6 +2,7 @@
 import os
 import shutil
 import tempfile
+from typing import Any
 
 from sqlalchemy.orm.scoping import scoped_session
 
@@ -39,6 +40,8 @@ from galaxy.tools.data import ToolDataTableManager
 # terrible stuff from galaxy. not planning on a refactor.
 
 from startup.settings import ToolExeSettings
+import yaml
+
 
 
 
@@ -121,6 +124,11 @@ class MockApp(di.Container):
 
 
 
+
+def grace_get_config() -> dict[str, Any]:
+    with open("src/galaxy_interaction/config.yaml", "r") as fp:
+        return yaml.safe_load(fp)
+
 class MockAppConfig(Bunch):
 
     class MockSchema(Bunch):
@@ -132,7 +140,7 @@ class MockAppConfig(Bunch):
             root = tempfile.mkdtemp()
             self._remove_root = True
         else:
-            self._remove_root = False
+            self._remove_root = False   
         self.schema = self.MockSchema()
         self.security = idencoding.IdEncodingHelper(id_secret='6e46ed6483a833c100e68cc3f1d0dd76')
         self.database_connection = kwargs.get('database_connection', "sqlite:///:memory:")
@@ -143,11 +151,14 @@ class MockAppConfig(Bunch):
         self.jobs_directory = os.path.join(self.data_dir, 'jobs_directory')
         self.new_file_path = os.path.join(self.data_dir, 'tmp')
 
-        # grace altered
+        # GRACE TOOL DATA
         self.tool_data_path = None
         self.tool_data_table_config_path = None
         self.tool_dependency_dir = None
         self.set_tool_data_attrs(esettings)
+
+        # GRACE LOGGING
+        self.logging = grace_get_config()
 
         self.metadata_strategy = 'legacy'
 

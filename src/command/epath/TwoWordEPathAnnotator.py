@@ -4,7 +4,10 @@ from typing import Iterable, Tuple
 from command.cmdstr.CommandString import CommandString
 from command.tokens.Tokens import Token
 
-class TwoWordEPathAnnotator:
+
+# DEPRECATED
+
+class TwoWordExecutionPathAnnotator:
     """
     iterates through a CommandString, yielding the current tokens being assessed.
     keeps track of the location we are in the CommandString

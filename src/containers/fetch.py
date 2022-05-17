@@ -1,6 +1,6 @@
 
 
-
+import logging
 from typing import Optional
 from containers.ContainerCache import ContainerCache
 from startup.ExeSettings import ToolExeSettings
@@ -17,8 +17,9 @@ def fetch_container(esettings: ToolExeSettings, xmltool: XMLToolDefinition) -> O
         container = fetch_online(xmltool)
         if container:
             cache.add(container)
-        else:            
-            print('[WARN] no suitable container found')
+        else:      
+            logger = logging.getLogger('gxtool2janis')
+            logger.debug('no container found')     
     return container
 
 def fetch_from_cache(cache: ContainerCache, xmltool: XMLToolDefinition) -> Optional[Container]:

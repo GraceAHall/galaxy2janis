@@ -1,6 +1,7 @@
 
 
 # module entry
+import logging
 from typing import Type
 from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from workflows.step.values.linking.ValueMigrator import ValueMigrator
@@ -44,7 +45,8 @@ def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: W
     for linker in linkers:
         l = linker(esettings, step, workflow)
         l.link()
-        print(step.tool_values)
+        logger = logging.getLogger('gxtool2janis')
+        logger.debug(step.tool_values)
     perform_migrations(step, workflow)
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):

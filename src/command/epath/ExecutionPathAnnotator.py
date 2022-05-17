@@ -1,19 +1,22 @@
 
 
-from abc import ABC, abstractmethod
-from typing import Any
-
-from command.components.inputs.Flag import Flag
-from command.components.inputs.Option import Option
-from command.components.inputs.Positional import Positional
-
-from command.epath.ExecutionPath import EPathPosition, ExecutionPath
+from typing import Type
 from xmltool.tool_definition import XMLToolDefinition
+from command.Command import Command
+from command.epath.ExecutionPath import ExecutionPath
 from command.tokens.Tokens import TokenType
 
-from command.Command import Command
-import command.epath.utils as component_utils
-import command.regex.scanners as scanners
+from command.epath.annotation.Annotator import (
+    Annotator, 
+    CompoundOptionAnnotator, 
+    FlagAnnotator, 
+    OptionAnnotator, 
+    PositionalAnnotator, 
+    RedirectAnnotator, 
+    StreamMergeAnnotator, 
+    TeeAnnotator
+)
+
 
 """
 iterates through a ExecutionPath, yielding the current tokens being assessed.
@@ -38,185 +41,14 @@ at token 3, we would return {
 
 """
 
-
-class Annotator(ABC):
-    """extracts a command component at the current position in an epath"""
-
-    def __init__(self, ptr: int, positions: list[EPathPosition]):
-        self.ptr = ptr
-        self.positions = positions
-
-        self.ctoken = self.positions[self.ptr].token
-        self.ntoken = self.positions[self.ptr + 1].token
-        self.success: bool = False
-
-    def annotate(self) -> None:
-        if self.passes_check():
-            self.handle()
-            self.success = True
-
-    def update_epath_components(self, ptr: int, component: Any) -> None:
-        self.positions[ptr].ignore = True
-        self.positions[ptr].component = component
-
-    @abstractmethod
-    def passes_check(self) -> bool:
-        """confirm whether this type of component should be extracted at the current position"""
-        ...
-    
-    @abstractmethod
-    def handle(self) -> None:
-        """perform the necessary operations now that the component is valid"""
-        ...
-   
-    @abstractmethod
-    def calculate_next_ptr_pos(self) -> int:
-        """update the ptr pos to continue iteration. based on component span"""
-        ...
-    
-
-class OptionAnnotator(Annotator):
-    """this one is complex, others are straightforward"""
-    def __init__(self, ptr: int, positions: list[EPathPosition]):
-        super().__init__(ptr, positions)
-        self.stop_ptr: int = 0
-
-    def passes_check(self) -> bool:
-        if component_utils.is_option(self.ctoken, self.ntoken):
-            if not component_utils.has_compound_structure(self.ctoken):
-                return True
-        return False
-    
-    def handle(self) -> None:
-        component = Option(
-            prefix=self.ctoken.text,
-            delim=self.get_delim(),
-            values=self.get_option_values()
-        )
-        for pos in range(self.ptr, self.stop_ptr + 1):
-            self.update_epath_components(pos, component)
-
-    def get_delim(self) -> str:
-        if self.positions[self.ptr + 1].token.type == TokenType.KV_LINKER:
-            return self.positions[self.ptr].token.text
-        return ' ' # fallback default
-
-    def get_option_values(self) -> list[str]:
-        if self.is_kv_pair():
-            return self.get_single_value()
-        else:
-            return self.get_multiple_values()
-
-    def is_kv_pair(self) -> bool:
-        if self.positions[self.ptr + 1].token.type == TokenType.KV_LINKER:
-            return True
-        return False
-     
-    def get_single_value(self) -> list[str]:
-        self.stop_ptr = self.ptr + 1
-        value = self.positions[self.ptr + 2]
-        return [value.token.text]
-
-    def get_multiple_values(self) -> list[str]:
-        out: list[str] = []
-
-        # define a max possible end point to consume upto (handles edge cases)
-        final_pos = self.get_greedy_consumption_end()  
-        values_type = self.positions[self.ptr + 1].token.type
-
-        # look at next ntoken to see its probably a value for the option
-        curr_pos = self.ptr + 1
-        while curr_pos < final_pos:
-            if self.should_eat_value(curr_pos, values_type):
-                out.append(self.positions[curr_pos].token.text)
-                curr_pos += 1 
-            else:
-                self.stop_ptr = curr_pos
-                break
-        return out
-
-    def should_eat_value(self, curr_pos: int, values_type: TokenType) -> bool:
-        ctoken = self.positions[curr_pos].token
-        ntoken = self.positions[curr_pos + 1].token
-        if component_utils.is_positional(ctoken) and ctoken.type == values_type and ntoken.type != TokenType.KV_LINKER:
-            return True
-        return False
-
-    def get_greedy_consumption_end(self) -> int:
-        """
-        define an end point -> tee or redirect or end of positions
-        most cases: end point = len(positions) to the end, first tee, first redirect etc - 2
-        special case: 2nd last position. --files $input1 set end point = the above - 1
-        """
-        final_pos = self.get_end_token_position()
-        if self.ptr < final_pos - 1:
-            final_pos -= 1
-        return final_pos
-
-    def get_end_token_position(self) -> int:
-        end_tokens = [TokenType.END_STATEMENT, TokenType.LINUX_TEE, TokenType.LINUX_REDIRECT]
-        for position in self.positions:
-            if position.token.type in end_tokens:
-                return position.ptr - 1
-        return len(self.positions) - 2  # this will never happen
-    
-    def calculate_next_ptr_pos(self) -> int:
-        return self.stop_ptr + 1
-
-
-class CompoundOptionAnnotator(Annotator):
-
-    def passes_check(self) -> bool:
-        if component_utils.is_option(self.ctoken, self.ntoken):
-            if component_utils.has_compound_structure(self.ctoken):
-                return True
-        return False
-    
-    def handle(self) -> None:
-        match = scanners.get_compound_opt(self.ctoken.text)[0]
-        component = Option(
-            prefix=match.group(1),
-            delim='',
-            values=[match.group(2)]
-        )
-        self.update_epath_components(self.ptr, component)
-    
-    def calculate_next_ptr_pos(self) -> int:
-        return self.ptr + 1
-
-
-class FlagAnnotator(Annotator):
-
-    def passes_check(self) -> bool:
-        if component_utils.is_flag(self.ctoken, self.ntoken):
-            return True
-        return True
-    
-    def handle(self) -> None:
-        component = Flag(prefix=self.ctoken.text)
-        self.update_epath_components(self.ptr, component)
-
-    def calculate_next_ptr_pos(self) -> int:
-        return self.ptr + 1
-
-
-class PositionalAnnotator(Annotator):
-
-    def passes_check(self) -> bool:
-        if component_utils.is_positional(self.ctoken):
-            return True
-        return False
-    
-    def handle(self) -> None:
-        component = Positional(value=self.ctoken.text)
-        self.update_epath_components(self.ptr, component)
-    
-    def calculate_next_ptr_pos(self) -> int:
-        return self.ptr + 1
-
+linux_constructs: list[Type[Annotator]] = [
+    StreamMergeAnnotator,  
+    RedirectAnnotator,  
+    TeeAnnotator,  
+]
 
 # annotation order matters ?
-annotators = [
+tool_arguments: list[Type[Annotator]] = [
     OptionAnnotator,   # priority 1?
     CompoundOptionAnnotator,
     FlagAnnotator,
@@ -224,17 +56,17 @@ annotators = [
 ]
 
 
-class GreedyEPathAnnotator:
+class GreedyExecutionPathAnnotator:
     def __init__(self, epath: ExecutionPath, xmltool: XMLToolDefinition, command: Command):
         self.epath = epath 
         self.xmltool = xmltool
         self.command = command
-        self.ptr = 0
 
-    def annotate_epath(self) -> ExecutionPath:
+    def annotate(self) -> ExecutionPath:
         self.mark_ignore_tokens()
         self.annotate_via_param_args()
-        self.annotate_via_iteration()
+        self.annotate_linux_constructs()
+        self.annotate_tool_arguments()
         self.transfer_gxparams()
         return self.epath
 
@@ -248,31 +80,38 @@ class GreedyEPathAnnotator:
                 position.ignore = True
         
     def annotate_via_param_args(self) -> None:
-        arguments: list[str] = [param.argument for param in self.xmltool.list_inputs() if param.argument]
-        for arg in arguments:
-            self.ptr = 0 # reset
-            while self.ptr < len(self.epath.positions) - 1:
-                token = self.epath.positions[self.ptr].token
-                if token.text == arg:
-                    token.type = TokenType.FORCED_PREFIX
-                    self.annot()
-                self.ptr += 1
+        arguments: set[str] = set([param.argument for param in self.xmltool.list_inputs() if param.argument]) # type: ignore
+        ptr = 0
+        while ptr < len(self.epath.positions) - 1:
+            token = self.epath.positions[ptr].token
+            if token.text in arguments:
+                token.type = TokenType.FORCED_PREFIX
+                ptr = self.annotate_position(ptr, annotators=tool_arguments)
+            else:
+                ptr += 1
     
-    def annotate_via_iteration(self) -> None:
-        self.ptr = 0 # reset
-        while self.ptr < len(self.epath.positions) - 1:
-            position = self.epath.positions[self.ptr]
-            if not position.ignore:
-                self.annot()
-            self.ptr += 1  # ????
+    def annotate_linux_constructs(self) -> None:
+        self.iter_annotate(annotators=linux_constructs)
+    
+    def annotate_tool_arguments(self) -> None:
+        self.iter_annotate(annotators=tool_arguments)
 
-    def annot(self) -> None:
+    def iter_annotate(self, annotators: list[Type[Annotator]]) -> None:
+        ptr = 0 # reset
+        while ptr < len(self.epath.positions) - 1:
+            position = self.epath.positions[ptr]
+            if not position.ignore:
+                ptr = self.annotate_position(ptr, annotators=annotators)
+            else:
+                ptr += 1
+
+    def annotate_position(self, ptr: int, annotators: list[Type[Annotator]]) -> int:
         for annotator in annotators:
-            a = annotator(self.ptr, self.epath.positions)
+            a = annotator(ptr, self.epath.positions)
             a.annotate()
             if a.success:
-                self.ptr = a.calculate_next_ptr_pos()
-                break
+                return a.calculate_next_ptr_pos()
+        return ptr + 1
 
     def transfer_gxparams(self) -> None:
         for position in self.epath.positions:
@@ -280,6 +119,9 @@ class GreedyEPathAnnotator:
                 position.component.gxparam = position.token.gxparam
 
     
+
+
+
     # # this is challenging logic and ugly
     # def annot_old(self) -> None:
     #     """
