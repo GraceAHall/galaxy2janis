@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
+from xmltool.param.OutputParam import OutputParam
 from xmltool.param.Param import Param
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.OutputParamRegister import OutputParamRegister
@@ -38,7 +39,7 @@ class XMLToolDefinition:
     def get_output(self, query: str, strategy: str='default') -> Optional[Param]:
         return self.outputs.get(query.lstrip('$'), strategy=strategy)
     
-    def list_outputs(self) -> list[Param]:
+    def list_outputs(self) -> list[OutputParam]:
         return self.outputs.list()
 
     def list_tests(self) -> list[TTestCase]:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from command.components.CommandComponent import BaseCommandComponent
-from command.tokens.Tokens import Token
+from command.text.tokens.Tokens import Token
 from typing import Any, Optional, Tuple
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from command.components.ValueRecord import PositionalValueRecord

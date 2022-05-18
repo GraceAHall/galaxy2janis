@@ -1,8 +1,8 @@
 
 
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 from galaxy_interaction import GalaxyManager
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from xmltool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
 
 

@@ -9,6 +9,9 @@ from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 
 class WildcardOutput(BaseCommandComponent):
+    def __init__(self):
+        super().__init__()
+        self.verified: bool = False
 
     def get_name(self) -> str:
         if self.gxparam:

@@ -3,7 +3,7 @@
 
 import regex as re
 
-from command.regex.expressions import (
+from command.text.regex.expressions import (
     VARIABLES_FMT1,
     VARIABLES_FMT2,
     FUNCTION_CALL_FMT1,
@@ -33,9 +33,14 @@ from command.regex.expressions import (
     NEXT_WORD_LEFT,
     NEXT_WORD_RIGHT,
     EMPTY_STRINGS,
+    EDGE_CASE_CH_INPUT,
     ALL
 )
 
+
+def get_edge_case_ch_input(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(EDGE_CASE_CH_INPUT, the_string)
+    return [m for m in matches]
 
 def get_next_word(word: str, delim: str, text: str) -> list[re.Match[str]]:
     pattern = NEXT_WORD_LEFT + f'{word}{delim}' + NEXT_WORD_RIGHT

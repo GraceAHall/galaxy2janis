@@ -44,13 +44,19 @@ class WorkflowStep:
     def get_uuid(self) -> str:
         return self.metadata.uuid
 
-    def set_definition_path(self, path: str) -> None:
+    def set_tool_definition_path(self, path: str) -> None:
         self.metadata.tool_definition_path = path
     
-    def get_definition_path(self) -> str:
+    def get_tool_definition_path(self) -> str:
         if self.metadata.tool_definition_path:
             return self.metadata.tool_definition_path
-        raise RuntimeError('tool_definition_path not set for tool step')
+        raise RuntimeError()
+
+    def set_step_definition_path(self, folder: str) -> None:
+        raise NotImplementedError()
+    
+    def get_step_definition_path(self) -> str:
+        raise NotImplementedError()
 
     def get_tool_name(self) -> str:
         return self.metadata.tool_id

@@ -1,8 +1,8 @@
 
 
 
-from command.tokens.Tokens import Token, TokenType
-from command.regex import scanners as scanners
+from command.text.tokens.Tokens import Token, TokenType
+from command.text.regex import scanners as scanners
 
 
 def spawn_end_sentinel() -> Token:

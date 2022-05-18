@@ -2,7 +2,7 @@
 
 from typing import Any
 import json
-from startup.ExeSettings import WorkflowExeSettings
+from runtime.ExeSettings import WorkflowExeSettings
 
 from workflows.io.WorkflowInput import WorkflowInput
 from workflows.step.WorkflowStep import WorkflowStep
@@ -15,7 +15,7 @@ from .inputs import parse_step_inputs
 from .outputs import parse_step_outputs
 
 from parse_tool import parse_tool
-from .settings import get_tool_settings
+from runtime.settings import create_tool_settings_for_step
 
 
 ### parsing galaxy to steps -----------
@@ -26,7 +26,7 @@ def parse_input_step(step: dict[str, Any]) -> WorkflowInput:
 def parse_tool_step(wsettings: WorkflowExeSettings, step: dict[str, Any], workflow: Workflow) -> WorkflowStep:
     step['tool_state'] = json.loads(step['tool_state'])
     metadata = parse_step_metadata(step)
-    tsettings = get_tool_settings(wsettings, metadata)
+    tsettings = create_tool_settings_for_step(wsettings, metadata)
     tool = parse_tool(tsettings)
 
     wstep = WorkflowStep(

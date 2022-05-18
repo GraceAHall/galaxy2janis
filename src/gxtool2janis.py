@@ -12,10 +12,10 @@ from startup.CLIparser import CLIparser
 
 from parse_tool import parse_tool
 from parse_workflow import parse_workflow
-from startup.settings import load_tool_settings
-from startup.ExeSettings import ToolExeSettings
-from startup.settings import load_workflow_settings
-from startup.ExeSettings import WorkflowExeSettings
+from runtime.settings import load_tool_settings
+from runtime.ExeSettings import ToolExeSettings
+from runtime.settings import load_workflow_settings
+from runtime.ExeSettings import WorkflowExeSettings
 from file_io.write import write_tool, write_workflow
 
 """
@@ -33,8 +33,6 @@ def configure_logging() -> None:
     with open("src/config/logging_config.yaml", "r") as fp:
         the_dict = yaml.safe_load(fp)
     config.dictConfig(the_dict)
-    logger = logging.getLogger('gxtool2janis')
-    logger.debug('hello')
 
 def configure_warnings() -> None:
     warnings.filterwarnings("ignore")

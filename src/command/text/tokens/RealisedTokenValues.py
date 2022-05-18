@@ -9,8 +9,8 @@ from xmltool.param.Param import Param
 
 from command.cheetah.ConstructTracker import ConstructTracker
 from command.cmdstr.utils import split_lines, split_to_words
-from command.tokens.Tokens import Token
-from command.tokens.TokenFactory import TokenFactory
+from command.text.tokens.Tokens import Token
+from command.text.tokens.TokenFactory import TokenFactory
 from command.epath.utils import is_bool_select
 
 class RealisedTokenValues:

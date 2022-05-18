@@ -10,13 +10,13 @@ from command.components.inputs.Option import Option
 from command.components.inputs.Positional import Positional
 
 from command.epath.ExecutionPath import EPathPosition
-from command.tokens.Tokens import Token, TokenType
+from command.text.tokens.Tokens import Token, TokenType
 
 from command.components.outputs.create import create_output
 from command.components.linux import Tee, StreamMerge
 
 import command.epath.utils as component_utils
-import command.regex.scanners as scanners
+import command.text.regex.scanners as scanners
 
 
 class Annotator(ABC):

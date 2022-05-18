@@ -3,9 +3,9 @@
 import logging 
 import tempfile
 from typing import Optional
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.verify.interactor import ToolTestDescription
 

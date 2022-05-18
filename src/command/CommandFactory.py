@@ -1,11 +1,10 @@
 
 
 
-from startup.ExeSettings import ToolExeSettings
-from xmltool.tool_definition import XMLToolDefinition
-from galaxy_interaction import GalaxyManager
+from runtime.ExeSettings import ToolExeSettings
+from xmltool.XMLToolDefinition import XMLToolDefinition
 
-from command.manipulation import simplify_test, simplify_xml
+from command.text.load import load_xml_command, load_test_commands
 from command.cmdstr.CommandString import CommandString
 from command.cmdstr.cmdstr import gen_command_string
 
@@ -19,7 +18,10 @@ class CommandFactory:
     def __init__(self, esettings: ToolExeSettings, xmltool: XMLToolDefinition):
         self.esettings = esettings
         self.xmltool = xmltool
-        self.command = Command()
+        
+        self.xmlcmdstr = self.gen_cmdstr_from_xml()
+        self.testcmdstrs = self.gen_cmdstrs_from_tests()
+        self.command = Command(self.xmlcmdstr)
 
     def create(self) -> Command:
         self.update_command_via_arguments()
@@ -49,17 +51,13 @@ class CommandFactory:
         return cmdstrs
 
     def gen_cmdstr_from_xml(self) -> CommandString:
-        gxmanager = GalaxyManager(self.esettings)
-        cmdstr = gxmanager.get_xml_cmdstr(self.xmltool)
-        cmdstr = simplify_xml(cmdstr)
-        return gen_command_string(source='xml', the_string=cmdstr, xmltool=self.xmltool)
+        text = load_xml_command(self.esettings)
+        return gen_command_string(source='xml', the_string=text, xmltool=self.xmltool)
 
     def gen_cmdstrs_from_tests(self) -> list[CommandString]:
         cmdstrs: list[CommandString] = []
-        gxmanager = GalaxyManager(self.esettings)
-        for teststr in gxmanager.get_test_cmdstrs(self.xmltool):
-            teststr = simplify_test(teststr)
-            cmdstr = gen_command_string(source='test', the_string=teststr, xmltool=self.xmltool)
+        for text in load_test_commands(self.esettings):
+            cmdstr = gen_command_string(source='test', the_string=text, xmltool=self.xmltool)
             cmdstrs.append(cmdstr)
         return cmdstrs
 

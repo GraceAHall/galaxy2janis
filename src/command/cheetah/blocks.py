@@ -1,17 +1,15 @@
 
 
-
 from __future__ import annotations
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 from uuid import uuid4
 from enum import Enum, auto
 from Cheetah.Template import Template
-import multiprocessing
+import command.text.regex.scanners as scanners
 
-import command.manipulation.utils as utils
+import command.text.simplification.utils as utils
 from galaxy.util import unicodify
 from command.cheetah.ConstructTracker import ConstructTracker
 from command.cheetah.constructs import (
@@ -152,64 +150,59 @@ class EvaluationStrategy(ABC):
         self.lines = lines
         self.input_dict = input_dict
     
-    @abstractmethod
     def eval(self) -> Optional[list[str]]:
-        ...
+        template = self.prepare_template()
+        outcome = self.evaluate_template(template)
+        if outcome is not None: 
+            return self.handle_outcome(outcome)
+        return None
 
-    def do_evaluation(self, source_lines: list[str], return_dict: dict[Any, Any]) -> None:
-        source = utils.join_lines(source_lines)
-        t = Template(source, searchList=[self.input_dict]) # type: ignore
-        evaluation = str(unicodify(t))
-        return_dict['outcome'] = utils.split_lines_blanklines(evaluation)
+    @abstractmethod
+    def prepare_template(self) -> list[str]:
+        """prepares the template text for evaluation"""
+        ...
     
     def evaluate_template(self, source_lines: list[str]) -> Optional[list[str]]:
-        """
-        cheetah eval happens here
-        jank format (multiprocessing with timeout) in case cheetah can't template for some reason
-        """
+        """performs cheetah evaluation of template"""
         try:
-            manager = multiprocessing.Manager()
-            return_dict = manager.dict()
-            p = multiprocessing.Process(target=self.do_evaluation, args=(source_lines, return_dict))
-            p.start()
-            p.join(5)
-            if p.is_alive():
-                logger = logging.getLogger('gxtool2janis')
-                logger.debug('killed sectional evaluation process!')
-                outcome = None
-                p.terminate()
-                p.join()
-            else:
-                outcome = return_dict['outcome']  # type: ignore
-        except Exception as e:
-            outcome = None
-        return outcome  # type: ignore
+            source = utils.join_lines(source_lines)
+            t = Template(source, searchList=[self.input_dict]) # type: ignore
+            evaluation = str(unicodify(t))
+            return utils.split_lines_blanklines(evaluation)
+        except:
+            return None
+
+    @abstractmethod
+    def handle_outcome(self, outcome: list[str]) -> list[str]:
+        """handles the evaluated text (if successful) and applies any transformations needed"""
+        ...
+
 
 
 class InlineEvaluationStrategy(EvaluationStrategy):
 
-    def eval(self) -> Optional[list[str]]:
+    def prepare_template(self) -> list[str]:
         assert(len(self.lines) == 1)
-        return self.evaluate_template(self.lines)
+        return self.lines
+
+    def handle_outcome(self, outcome: list[str]) -> list[str]:
+        return outcome
 
 
 class ConditionalEvaluationStrategy(EvaluationStrategy):
 
-    def eval(self) -> Optional[list[str]]:
-        self.masked_blocks: dict[str, CheetahBlock] = {}
+    def prepare_template(self) -> list[str]:
         self.mask_children()
-        evaluation = self.evaluate_template(self.lines)
-        if evaluation is not None:
-            output = self.create_blank_output()
-            output = self.restore_surviving_children(evaluation, output)
-            return output
-        return None
+        return self.lines
+
+    def handle_outcome(self, outcome: list[str]) -> list[str]:
+        output = self.create_blank_output()
+        output = self.restore_surviving_children(outcome, output)
+        return output
 
     def mask_children(self) -> None:
-        """
-        prepares text ready for evaluation
-        swaps child blocks with identifiers
-        """
+        """prepares text ready for evaluation. swaps child blocks with identifiers"""
+        self.masked_blocks: dict[str, CheetahBlock] = {}
         for child in self.get_child_blocks():
             self.masked_blocks[child.uuid] = child  # register identifier/block
             self.substitute_identifier(child)
@@ -262,7 +255,6 @@ class ConditionalEvaluationStrategy(EvaluationStrategy):
 
 
 
-
 class BlockType(Enum):
     MAIN            = auto()
     INLINE          = auto()
@@ -271,6 +263,7 @@ class BlockType(Enum):
     CONDITIONAL     = auto()
     FUNCTION        = auto()
     LOOP            = auto()
+
 
 class CheetahBlock:
     """
@@ -290,14 +283,34 @@ class CheetahBlock:
         return self.stop - self.start + 1
     
     def evaluate(self, input_dict: dict[str, Any]) -> None:
-        strategy = self.init_eval_strategy(input_dict)
-        evaluation = strategy.eval()
-        if evaluation is not None:
-            self.evaluated = True
-            assert(len(self.lines) == len(evaluation))
-            self.lines = evaluation
+        if self.should_evaluate(input_dict):
+            strategy = self.get_eval_strategy(input_dict)
+            evaluation = strategy.eval()
+            if evaluation is not None:
+                assert(len(self.lines) == len(evaluation))
+                self.evaluated = True
+                self.lines = evaluation
+        
+    def should_evaluate(self, input_dict: dict[str, Any]) -> bool:
+        """dictates whether this block should be evaluated or left as original text"""
+        permitted_blocks = [BlockType.INLINE, BlockType.INLINE_ALIAS, BlockType.INLINE_CH, BlockType.CONDITIONAL]
+        if self.lines == ['']:
+            return False
+        elif self.type not in permitted_blocks:
+            return False
+        elif self.edge_case_input(input_dict):
+            return False
+        return True
 
-    def init_eval_strategy(self, input_dict: dict[str, Any]) -> EvaluationStrategy:
+    def edge_case_input(self, input_dict: dict[str, Any]) -> bool:
+        for line in self.lines:
+            matches = scanners.get_edge_case_ch_input(line)
+            if matches:
+                if 'input' not in input_dict:
+                    return True
+        return False
+
+    def get_eval_strategy(self, input_dict: dict[str, Any]) -> EvaluationStrategy:
         if self.type in [BlockType.INLINE, BlockType.INLINE_ALIAS, BlockType.INLINE_CH]:
             return InlineEvaluationStrategy(self.lines, input_dict)
         elif self.type == BlockType.CONDITIONAL:

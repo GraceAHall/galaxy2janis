@@ -1,8 +1,6 @@
 
 
 
-
-
 CH_OPEN_CONDITIONAL = set(['#if ', '#unless '])
 CH_WITHIN_CONDITIONAL = set(['#else if ', '#elif ', '#else'])
 CH_CLOSE_CONDITIONAL = set(['#end if', '#end unless'])

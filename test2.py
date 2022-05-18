@@ -4,7 +4,7 @@ from Cheetah.Template import Template
 
 templateDef = """
 <HTML>
-<HEAD><TITLE>$input</TITLE></HEAD>
+<HEAD><TITLE>$input.reference</TITLE></HEAD>
 <BODY>
 $contents
 ## this is a single-line Cheetah comment and won't appear in the output
@@ -14,7 +14,10 @@ $contents
 </BODY>
 </HTML>"""
 
-nameSpace = {'input': None, 'contents': 'Hello World!'}
+nameSpace = {
+    
+    'contents': 'Hello World!'
+}
 
 t = Template(templateDef, searchList=[nameSpace])
 print(t)

@@ -3,13 +3,13 @@
 
 from command.Command import Command
 from xmltool.param.Param import Param
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
 from xmltool.param.InputParam import BoolParam, SelectParam
 from command.components.inputs import spawn_component 
 import xmltool.param.utils as param_utils
-import command.regex.scanners as scanners
+import command.text.regex.scanners as scanners
 
 
 # Utility functions to check aspects of a gxparam argument attribute

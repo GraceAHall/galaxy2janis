@@ -3,9 +3,9 @@
 import logging
 from typing import Optional
 from containers.ContainerCache import ContainerCache
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 from xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from containers.Container import Container
 from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+from command.cmdstr.CommandString import CommandString
 
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
@@ -152,7 +153,8 @@ class RedirectOutputUpdater(Updater):
 
 
 class Command:
-    def __init__(self):
+    def __init__(self, xmlcmdstr: CommandString):
+        self.xmlcmdstr = xmlcmdstr
         self.positionals: dict[int, Positional] = {}
         self.flags: dict[str, Flag] = {}
         self.options: dict[str, Option] = {}
@@ -176,10 +178,10 @@ class Command:
         components += self.get_options()
         return components
 
-    def list_outputs(self) -> list[CommandComponent]:
+    def list_outputs(self) -> list[RedirectOutput]:
         # just returns redirect component if present.
         # other outputs are handled by ToolFactory
-        components: list[CommandComponent] = []
+        components: list[RedirectOutput] = []
         if self.redirect:
             components.append(self.redirect)
         return components

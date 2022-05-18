@@ -2,25 +2,19 @@
 #pyright: strict
 
 # libraries
+from typing import Optional
 from xml.etree import ElementTree as et
 
 
 # new
-def get_xml_tool_id(filepath: str) -> str:
+def get_xml_tool_id(filepath: str) -> Optional[str]:
     tree = et.parse(filepath)
     root = tree.getroot()
     return str(root.attrib['id']) # type: ignore
 
 
 
-
-
-
-
-
-# TODO add tests for each of these!
-
-
+# BELOW ARE DEPRECATED
 # ---- converting between elem types ---- #
 
 def convert_bool_to_select_elem(node: et.Element) -> et.Element:

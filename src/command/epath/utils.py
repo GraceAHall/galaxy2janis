@@ -2,9 +2,9 @@
 
 
 from command.components.inputs import Flag, Option
-from command.tokens.Tokens import Token, TokenType
+from command.text.tokens.Tokens import Token, TokenType
 from xmltool.param.InputParam import BoolParam, SelectParam
-import command.regex.scanners as scanners
+import command.text.regex.scanners as scanners
 
 NON_VALUE_TOKENTYPES = set([
     TokenType.FUNCTION_CALL, 

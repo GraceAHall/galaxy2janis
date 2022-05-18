@@ -1,7 +1,7 @@
 
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, Optional
 from dataclasses import dataclass
 
 from xmltool.param.Param import Param 
@@ -9,15 +9,15 @@ from xmltool.param.Param import Param
 
 class ParamRegister(ABC):
     @abstractmethod
-    def list(self) -> list[Param]:
+    def list(self) -> list[Any]:
         ...
     
     @abstractmethod
-    def add(self, param: Param) -> None:
+    def add(self, param: Any) -> None:
         ...
     
     @abstractmethod
-    def get(self, query: str, strategy: str='default') -> Optional[Param]:
+    def get(self, query: str, strategy: str='default') -> Optional[Any]:
         ...
 
 

@@ -8,8 +8,8 @@ formatters:
 handlers:
   # gxtool2janis
   gxtool2janis_console:
+    level: DEBUG
     class: logging.StreamHandler
-    level: INFO
     stream: ext://sys.stdout
     formatter: default
   gxtool2janis_file:
@@ -19,8 +19,8 @@ handlers:
     formatter: default
   # galaxy
   galaxy_console:
-    class: logging.StreamHandler
     level: ERROR
+    class: logging.StreamHandler
     stream: ext://sys.stdout
     formatter: default
   galaxy_file:
@@ -30,6 +30,7 @@ handlers:
     formatter: default
 loggers:
   gxtool2janis:
+    level: DEBUG
     handlers: [gxtool2janis_console, gxtool2janis_file]
   root:
     handlers: [galaxy_console, galaxy_file]

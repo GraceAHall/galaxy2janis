@@ -39,7 +39,7 @@ from galaxy.tools.data import ToolDataTableManager
 #from galaxy.datatypes.registry import example_datatype_registry_for_sample
 # terrible stuff from galaxy. not planning on a refactor.
 
-from startup.settings import ToolExeSettings
+from runtime.settings import ToolExeSettings
 import yaml
 
 

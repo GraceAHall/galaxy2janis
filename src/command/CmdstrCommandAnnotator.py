@@ -2,7 +2,7 @@
 import logging
 from command.Command import Command 
 
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from command.cmdstr.CommandString import CommandString
 
 from command.epath.ExecutionPath import ExecutionPath

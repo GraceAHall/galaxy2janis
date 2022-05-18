@@ -1,8 +1,8 @@
 
 
 from typing import Optional, Tuple
-import command.manipulation.utils as utils
-import command.regex.scanners as scanners
+import command.text.simplification.utils as utils
+import command.text.regex.scanners as scanners
 import re
 
 def resolve_aliases(cmdstr: str) -> str:

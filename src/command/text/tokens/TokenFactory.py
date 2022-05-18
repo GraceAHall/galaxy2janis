@@ -3,11 +3,11 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from command.tokens.Tokens import Token, TokenType
-from command.regex import scanners as scanners
-from command.regex.utils import get_base_variable
-from xmltool.tool_definition import XMLToolDefinition
-import command.tokens.utils as token_utils
+from command.text.tokens.Tokens import Token, TokenType
+from command.text.regex import scanners as scanners
+from command.text.regex.utils import get_base_variable
+from xmltool.XMLToolDefinition import XMLToolDefinition
+import command.text.tokens.utils as token_utils
 
 class TokenOrderingStrategy(ABC):
     @abstractmethod
@@ -177,8 +177,6 @@ class TokenFactory:
         base_vars = [get_base_variable(m) for m in matches]
         
         for m, varname in zip(matches, base_vars):
-            if varname == '$metrics_file':
-                print()
             if varname and self.xmltool:
                 if self.xmltool.get_input(varname):
                     tokens.append(Token(m, TokenType.GX_INPUT, gxparam=self.xmltool.get_input(varname)))

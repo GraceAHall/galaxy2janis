@@ -1,6 +1,7 @@
 
 ALL = r'.*'
 
+EDGE_CASE_CH_INPUT = r'\${?input([ =.}\'")]|$)'
 
 WITHIN_BRACKETS = r''
 # within brackets = quoted sections, 

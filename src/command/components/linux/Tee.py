@@ -1,6 +1,6 @@
 
 
-from command.tokens.Tokens import Token
+from command.text.tokens.Tokens import Token
 
 
 class Tee:

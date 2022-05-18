@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import os
 
 from janis.definitions.workflow.StepTextDefinition import StepTextDefinition
-from startup.ExeSettings import WorkflowExeSettings
+from runtime.ExeSettings import WorkflowExeSettings
 from workflows.step.WorkflowStep import WorkflowStep
 from workflows.workflow.Workflow import Workflow
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector

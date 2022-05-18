@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from xmltool.tool_definition import XMLToolDefinition
+    from xmltool.XMLToolDefinition import XMLToolDefinition
 
 import os
 import tempfile
@@ -17,7 +17,7 @@ from galaxy.tools import create_tool_from_source
 from galaxy.model import History
 
 from galaxy_interaction.mock import MockApp, MockObjectStore
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 
 from galaxy_interaction.cmdstrings.loaders.TestCommandLoader import TestCommandLoader
 from galaxy_interaction.cmdstrings.loaders.XMLCommandLoader import XMLCommandLoader

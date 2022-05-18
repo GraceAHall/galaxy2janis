@@ -3,11 +3,11 @@
 # module entry
 import logging
 from typing import Type
-from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from workflows.step.values.linking.ValueMigrator import ValueMigrator
 from workflows.workflow.Workflow import Workflow
 from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.parsing.settings import get_tool_settings
+from runtime.settings import create_tool_settings_for_step
 from workflows.step.values.linking.ValueLinker import (
     ValueLinker,
     CheetahValueLinker, 
@@ -36,7 +36,7 @@ linkers: list[Type[ValueLinker]] = [
 
 def link_tool_input_values(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
     for step in workflow.list_steps():
-        tsettings = get_tool_settings(wsettings, step.metadata)
+        tsettings = create_tool_settings_for_step(wsettings, step.metadata)
         step.inputs.assign_gxparams(step.tool)  
         link_step_values(tsettings, step, workflow)
         assert_all_components_assigned(step)

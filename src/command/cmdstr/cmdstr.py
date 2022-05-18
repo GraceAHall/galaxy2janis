@@ -6,11 +6,11 @@ from typing import Optional
 from command.cmdstr.CommandString import CommandString
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.cmdstr.MainStatementInferrer import MainStatementInferrer
-from command.regex.scanners import get_statement_delims
-from command.regex.utils import get_quoted_sections
-from command.tokens.RealisedTokenValues import RealisedTokenValueifier
-from command.tokens.TokenFactory import TokenFactory
-from xmltool.tool_definition import XMLToolDefinition
+from command.text.regex.scanners import get_statement_delims
+from command.text.regex.utils import get_quoted_sections
+from command.text.tokens.RealisedTokenValues import RealisedTokenValueifier
+from command.text.tokens.TokenFactory import TokenFactory
+from xmltool.XMLToolDefinition import XMLToolDefinition
 
 
 def gen_command_statement(statement: str, xmltool: Optional[XMLToolDefinition]=None) -> DynamicCommandStatement:

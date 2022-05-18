@@ -2,7 +2,7 @@
 
 
 import os
-from startup.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
 default_folders = []
 #     'runtimefiles'

@@ -6,7 +6,7 @@ from typing import Any, Optional
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.CommandComponent import BaseCommandComponent
 #import command.components.inputs.utils as utils
-import command.regex.scanners as scanners
+import command.text.regex.scanners as scanners
 from xmltool.param.Param import Param
 
 class Positional(BaseCommandComponent):

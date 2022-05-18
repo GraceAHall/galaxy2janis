@@ -1,7 +1,7 @@
 
 from typing import Any
 from command.cheetah.PartialCheetahEvaluator import PartialCheetahEvaluator
-import command.manipulation.utils as utils
+import command.text.simplification.utils as utils
 
 
 def sectional_evaluate(text: str, inputs: dict[str, Any]) -> str:

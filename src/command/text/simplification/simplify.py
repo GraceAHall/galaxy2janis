@@ -1,7 +1,7 @@
 
 
 from typing import Callable
-from command.manipulation.filters import (
+from command.text.simplification.filters import (
     flatten_multiline_strings,
     translate_variable_markers,
     standardise_variable_format,
@@ -15,18 +15,23 @@ from command.manipulation.filters import (
     interpret_raw
 )
 
-from command.manipulation.aliases import resolve_aliases
+from command.text.simplification.aliases import resolve_aliases
 
 # module entry points
 
 def simplify_test(cmdstr: str) -> str:
-    simplifier = TestCommandSimplifier()
+    simplifier = TestSimplifier()
     return simplifier.simplify(cmdstr)
 
 def simplify_xml(cmdstr: str) -> str:
-    simplifier = XMLCommandSimplifier()
+    simplifier = XMLSimplifier()
     cmdstr = simplifier.simplify(cmdstr)
     cmdstr = resolve_aliases(cmdstr)
+    return cmdstr
+
+def simplify_xml_cheetah_eval(cmdstr: str) -> str:
+    simplifier = PartialCheetahEvalSimplifier()
+    cmdstr = simplifier.simplify(cmdstr)
     return cmdstr
 
 
@@ -45,7 +50,16 @@ class CommandSimplifier:
         return cmdstr
 
 
-class TestCommandSimplifier(CommandSimplifier):
+class PartialCheetahEvalSimplifier(CommandSimplifier):
+    filters: list[Callable[[str], str]] = [
+        remove_cheetah_comments,
+        simplify_galaxy_static_vars,
+        simplify_galaxy_dynamic_vars,
+        interpret_raw
+    ]
+
+
+class TestSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         translate_variable_markers,
         standardise_variable_format,
@@ -57,7 +71,7 @@ class TestCommandSimplifier(CommandSimplifier):
     ]
 
 
-class XMLCommandSimplifier(CommandSimplifier):
+class XMLSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         flatten_multiline_strings,
         remove_cheetah_comments,

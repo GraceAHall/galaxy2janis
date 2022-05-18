@@ -4,8 +4,8 @@ import regex as re
 import numpy as np
 from typing import Optional, Tuple
 
-from command.regex import scanners as scanners
-from command.regex.expressions import (
+from command.text.regex import scanners as scanners
+from command.text.regex.expressions import (
     QUOTES, 
     QUOTED_SECTIONS, 
     OPERATOR

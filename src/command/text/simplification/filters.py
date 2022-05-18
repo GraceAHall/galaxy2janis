@@ -3,9 +3,9 @@
 
 import logging
 import re
-from command.regex.utils import find_unquoted
-import command.regex.scanners as scanners
-import command.manipulation.utils as utils
+from command.text.regex.utils import find_unquoted
+import command.text.regex.scanners as scanners
+import command.text.simplification.utils as utils
 
 def replace_function_calls(cmdstr: str) -> str:
     cmdlines = utils.split_lines(cmdstr)

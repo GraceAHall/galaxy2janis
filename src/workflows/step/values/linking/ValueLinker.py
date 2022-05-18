@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Optional
 
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
@@ -14,13 +14,14 @@ from workflows.step.WorkflowStep import WorkflowStep
 from workflows.step.inputs.StepInput import ConnectionStepInput, StepInput, WorkflowInputStepInput
 from workflows.step.values.InputValue import InputValue
 
-from command.manipulation.evaluation import sectional_evaluate
-from command.manipulation.aliases import resolve_aliases
+from command.cheetah.evaluation import sectional_evaluate
+from command.text.simplification.aliases import resolve_aliases
 from xmltool.load import load_xmltool
 from command.cmdstr.cmdstr import gen_command_string
 
 import workflows.step.values.create_value as value_utils
-import command.regex.utils as regex_utils
+import command.text.regex.utils as regex_utils
+from command.text.load import load_xml_command_cheetah_eval
 
 
 class ValueLinker(ABC):
@@ -72,17 +73,18 @@ class CheetahValueLinker(ValueLinker):
         self.cmdstr: str = self.prepare_command()
 
     def prepare_command(self) -> str:
-        rawstr = sectional_evaluate(
-            text=self.step.tool.raw_command,  # type: ignore
-            inputs=self.step.inputs.to_dict()
-        )
-        rawstr = resolve_aliases(rawstr)
+        text = load_xml_command_cheetah_eval(self.esettings)
+        text = sectional_evaluate(text, inputs=self.step.inputs.to_dict())
+        text = resolve_aliases(text)
+
         xmltool = load_xmltool(self.esettings)
-        cmdstr = gen_command_string(source='xml', the_string=rawstr, xmltool=xmltool)
+        cmdstr = gen_command_string(source='xml', the_string=text, xmltool=xmltool)
         stmtstr = cmdstr.main.cmdline
+        
         logger = logging.getLogger('gxtool2janis')
-        logger.debug(rawstr)
+        logger.debug(text)
         logger.debug(stmtstr)
+        
         return stmtstr
 
     def link(self) -> None:

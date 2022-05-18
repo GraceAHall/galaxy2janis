@@ -8,14 +8,14 @@ import json
 from typing import Any, Optional, Tuple
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 import galaxy_interaction.cmdstrings.test_commands.datasets as datasets
 from galaxy_interaction.mock import MockApp
 from xmltool.param.Param import Param
 from xmltool.param.InputParam import DataParam, DataCollectionParam
 
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 
 from galaxy.model import (
     History,

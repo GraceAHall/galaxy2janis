@@ -1,6 +1,6 @@
 
 
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.OutputParamRegister import OutputParamRegister
 from xmltool.TestRegister import TestRegister

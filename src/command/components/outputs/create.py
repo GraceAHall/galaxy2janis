@@ -6,7 +6,7 @@ from .InputOutput import InputOutput
 from .WildcardOutput import WildcardOutput
 from .UnknownOutput import UnknownOutput
 
-from command.tokens.Tokens import Token
+from command.text.tokens.Tokens import Token
 from command.components.CommandComponent import CommandComponent
 from xmltool.param.Param import Param
 

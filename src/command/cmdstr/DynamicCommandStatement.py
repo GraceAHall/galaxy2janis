@@ -3,8 +3,8 @@
 from copy import deepcopy
 from typing import Iterable
 
-from command.tokens.Tokens import Token
-from command.tokens.RealisedTokenValues import RealisedTokenValues
+from command.text.tokens.Tokens import Token
+from command.text.tokens.RealisedTokenValues import RealisedTokenValues
 from command.epath.ExecutionPath import ExecutionPath
 
 

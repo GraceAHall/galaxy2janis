@@ -1,8 +1,8 @@
 
 
 from typing import Optional
+from xmltool.param.OutputParam import OutputParam
 
-from xmltool.param.Param import Param 
 from xmltool.param.ParamRegister import (
     ParamRegister,
     DefaultSearchStrategy,
@@ -12,19 +12,19 @@ from xmltool.param.ParamRegister import (
 
 
 class OutputParamRegister(ParamRegister):
-    def __init__(self, params: list[Param]):
-        self.outputs: list[Param] = []
+    def __init__(self, params: list[OutputParam]):
+        self.outputs: list[OutputParam] = []
         for param in params:
             self.add(param)
 
-    def list(self) -> list[Param]:
+    def list(self) -> list[OutputParam]:
         return self.outputs
     
-    def add(self, param: Param) -> None:
+    def add(self, param: OutputParam) -> None:
         """adds a param to register. enforces unique param var names"""
         self.outputs.append(param)
 
-    def get(self, query: str, strategy: str='default') -> Optional[Param]:
+    def get(self, query: str, strategy: str='default') -> Optional[OutputParam]:
         """performs search using the specified search strategy"""
         strategy_map = {
             'default': DefaultSearchStrategy(),

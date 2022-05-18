@@ -3,12 +3,12 @@
 
 
 from typing import Any
-from startup.ExeSettings import ToolExeSettings
+from runtime.ExeSettings import ToolExeSettings
 
 from xmltool.param.InputParam import BoolParam
 
 from xmltool.load import load_xmltool
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 
 
 def resolve_values(esettings: ToolExeSettings, gxstep: dict[str, Any]) -> dict[str, Any]:

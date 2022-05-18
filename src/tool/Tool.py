@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass, field
 from typing import Optional
-from command.cmdstr.CommandString import CommandString
 from command.components.CommandComponent import CommandComponent
 from containers.Container import Container
 from tags.TagManager import ToolTagManager
@@ -23,7 +22,6 @@ class Tool:
     """
     uuid: str = field(init=False)
     metadata: ToolXMLMetadata
-    raw_command: str
     gxparam_register: InputParamRegister
     container: Optional[Container]
     base_command: list[str]

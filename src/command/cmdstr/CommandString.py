@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-from command.tokens.Tokens import Token
+from command.text.tokens.Tokens import Token
 
 
 @dataclass

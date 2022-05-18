@@ -2,8 +2,8 @@
 
 
 from command.CommandFactory import CommandFactory
-from startup.ExeSettings import ToolExeSettings
-from xmltool.tool_definition import XMLToolDefinition
+from runtime.ExeSettings import ToolExeSettings
+from xmltool.XMLToolDefinition import XMLToolDefinition
 from command.Command import Command
 
 

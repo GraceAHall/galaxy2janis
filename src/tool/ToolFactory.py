@@ -5,6 +5,7 @@
 
 
 from typing import Optional
+from command.components.outputs.RedirectOutput import RedirectOutput
 from command.components.outputs.create import create_output
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
@@ -21,12 +22,11 @@ class ToolFactory:
         self.xmltool = xmltool
         self.command = command
         self.container = container
-        self.datatype_annotator = DatatypeAnnotator() 
+        self.datatype_annotator = DatatypeAnnotator() # really? here??
 
     def create(self) -> Tool:
         tool = Tool(
             metadata=self.xmltool.metadata,
-            raw_command=self.xmltool.raw_command,
             container=self.container,
             base_command=self.get_base_command(),
             gxparam_register=self.xmltool.inputs
@@ -53,9 +53,25 @@ class ToolFactory:
             tool.add_output(out)
 
     def get_redirect_outputs(self) -> list[CommandComponent]:
-        # already identified in ExecutionPaths
-        return self.command.list_outputs()
-    
+        # redirect outputs (stdout) already identified when creating Command()
+        # need to ensure they're linked to a gxparam
+        # if not, try to link to dataset collector, else just ignore as the 
+        # redirect seems to be dropped.
+        out: list[CommandComponent] = []
+        redirects: list[RedirectOutput] = self.command.list_outputs()
+        for r in redirects:
+            self.attempt_redirect_gxparam_link(r)
+            if r.gxparam is not None:
+                out.append(r)
+        return out
+
+    def attempt_redirect_gxparam_link(self, r: RedirectOutput) -> None:
+        if not r.gxparam:
+            for query_param in self.xmltool.list_outputs():
+                if query_param.wildcard_pattern is not None:
+                    if query_param.wildcard_pattern == r.file_token.text:
+                        r.gxparam = query_param
+
     def get_input_outputs(self) -> list[CommandComponent]:
         # can be identified by looking at the input components which
         # have attached gxparams which are outputs. 
@@ -69,14 +85,19 @@ class ToolFactory:
         return out
     
     def get_wildcard_outputs(self) -> list[CommandComponent]:
+        # verified vs unverified:
+        # only if no post-processing! otherwise, wildcard outputs may 
+        # have come from post-processing.
+        
         # outputs which were not identified in the command
         # usually just because they have a file collection strategy
         # like from_work_dir or a <discover_datatsets> tag as a child
         out: list[CommandComponent] = []
-        for gxparam in self.xmltool.list_outputs():
-            if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern is not None:
-                if not self.command.gxparam_is_attached(gxparam):
-                    out.append(create_output('wildcard', gxparam))
+        if len(self.command.xmlcmdstr.postprocessing) == 0:
+            for gxparam in self.xmltool.list_outputs():
+                if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern is not None:
+                    if not self.command.gxparam_is_attached(gxparam):
+                        out.append(create_output('wildcard', gxparam))
         return out
     
     def get_unknown_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:

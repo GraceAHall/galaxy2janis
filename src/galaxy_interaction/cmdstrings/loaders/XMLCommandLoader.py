@@ -1,6 +1,6 @@
 
 
-from xmltool.tool_definition import XMLToolDefinition
+from xmltool.XMLToolDefinition import XMLToolDefinition
 
 class XMLCommandLoader:
     """loads <command> section from xml file"""

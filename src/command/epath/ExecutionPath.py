@@ -7,8 +7,8 @@ from command.components.CommandComponent import CommandComponent
 from command.components.linux.StreamMerge import StreamMerge
 from command.components.linux.Tee import Tee
 from command.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
-from command.tokens.Tokens import Token
-import command.tokens.utils as utils
+from command.text.tokens.Tokens import Token
+import command.text.tokens.utils as utils
 
 
 
