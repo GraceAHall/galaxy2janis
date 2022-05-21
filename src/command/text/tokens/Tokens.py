@@ -5,6 +5,7 @@
 from enum import Enum, auto
 from typing import Optional
 import regex as re
+from command.cheetah.ConstructTracker import Construct
 
 from xmltool.param.Param import Param
 
@@ -42,6 +43,7 @@ class Token:
         self.position: Optional[int] = None
         self.in_conditional: bool = False
         self.in_loop: bool = False
+        self.construct: Optional[Construct] = None
 
     @property
     def text(self) -> str:

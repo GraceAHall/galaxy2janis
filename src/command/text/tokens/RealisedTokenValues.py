@@ -13,7 +13,7 @@ from command.text.tokens.Tokens import Token
 from command.text.tokens.TokenFactory import TokenFactory
 from command.epath.utils import is_bool_select
 
-class RealisedTokenValues:
+class RealisedTokens:
     """
     class exists to expose hidden values within galaxy params
     each galaxy select param can hold any number of text values,
@@ -22,25 +22,7 @@ class RealisedTokenValues:
     def __init__(self, values: list[list[Token]], original: Token):
         self.tlists = values
         self.original = original
-        if original:
-            self.set_context_from_original_token(original)
         
-    def set_context_from_original_token(self, source: Token) -> None:
-        for tlist in self.tlists:
-            for token in tlist:
-                token.gxparam = source.gxparam
-                token.in_conditional = source.in_conditional
-                token.in_loop = source.in_loop
-
-    def set_levels(self, levels: dict[str, int]) -> None:
-        for tlist in self.tlists:
-            for token in tlist:
-                if levels:
-                    if levels['conditional'] > 0:
-                        token.in_conditional = True
-                    if levels['loop'] > 0:
-                        token.in_loop = True
-
     def get_original_token(self) -> Token:
         return self.original
     
@@ -65,45 +47,57 @@ class RealisedTokenValues:
 
 
 
-class RealisedTokenValueifier:
+class RealisedTokenFactory:
     def __init__(self, token_factory: TokenFactory):
         self.factory = token_factory
-        self.tracker = ConstructTracker()
-        self.tokens: list[RealisedTokenValues] = []
+        self.tracker = ConstructTracker()  # this is all a bit ugly
 
-    def tokenify(self, the_string: str) -> list[RealisedTokenValues]:
-        self.refresh_attrs()
+    def tokenify(self, the_string: str) -> list[RealisedTokens]:
+        rtvs: list[RealisedTokens] = []
         for line in split_lines(the_string):
-            self.handle_line(line)
-        return self.tokens
-
-    def refresh_attrs(self) -> None:
-        self.tracker = ConstructTracker()
-        self.tokens = []
-
-    def handle_line(self, line: str) -> None:
-        self.tracker.update(line)
-        if self.should_tokenify_line(line):
-            token_lists = self.tokenify_line(line)
-            realised_token_values = self.get_realised_values(token_lists)
-            for rtvs in realised_token_values:
-                rtvs.set_levels(self.tracker.get_levels())
-            self.tokens += realised_token_values
+            self.tracker.update(line)
+            if self.should_tokenify_line(line):
+                rtvs += self.tokenify_line(line)
+        return rtvs
 
     def should_tokenify_line(self, line: str) -> bool:
-        if self.tracker.is_construct_line(line) or self.tracker.within_banned_segment():
+        if self.tracker.active_is_boundary(line) or self.tracker.within_banned_segment:
             return False
         return True
     
-    def tokenify_line(self, line: str) -> list[Token]:
-        words = split_to_words(line)
-        tokens: list[Token] = []
-        for word in words:
-            tokens += self.tokenify_word(word)
-        return tokens
+    def tokenify_line(self, line: str) -> list[RealisedTokens]:
+        line_tokens = self.create_line_tokens(line)
+        line_tokens = self.set_token_context(line_tokens)
+        return self.create_realised_values(line_tokens)
 
-    def tokenify_word(self, text: str) -> list[Token]:
-        return self.factory.create(text)
+    def create_line_tokens(self, line: str) -> list[Token]:
+        line_tokens: list[Token] = []
+        for word in split_to_words(line):
+            line_tokens += self.factory.create(word)
+        return line_tokens
+
+    def set_token_context(self, line_tokens: list[Token]) -> list[Token]:
+        for token in line_tokens:
+            token.construct = self.tracker.stack.current_construct
+            token.in_conditional = self.tracker.within_conditional
+            token.in_loop = self.tracker.within_loop
+        return line_tokens
+
+    def create_realised_values(self, line_tokens: list[Token]) -> list[RealisedTokens]:
+        out: list[RealisedTokens] = []
+        for token in line_tokens:
+            if is_bool_select(token):
+                vals_as_text: list[str] = token.gxparam.get_all_values(nonempty=True) #type: ignore
+                vals_as_tlists = [self.create_line_tokens(text) for text in vals_as_text]
+                out.append(RealisedTokens(values=vals_as_tlists, original=token))
+            else:
+                out.append(RealisedTokens(values=[[token]], original=token))
+        return out
+
+
+
+
+
 
         # def expand_kvpairs(self, tokens: list[Token]) -> list[Token]:
     #     out: list[Token] = []
@@ -123,17 +117,6 @@ class RealisedTokenValueifier:
     #         utils.spawn_kv_linker(delim),
     #         self.factory.create(right_text)
     #     ]
-
-    def get_realised_values(self, tokens: list[Token]) -> list[RealisedTokenValues]:
-        out: list[RealisedTokenValues] = []
-        for token in tokens:
-            if is_bool_select(token):
-                vals_as_text: list[str] = token.gxparam.get_all_values(nonempty=True) #type: ignore
-                vals_as_tlists = [self.tokenify_line(text) for text in vals_as_text]
-                out.append(RealisedTokenValues(values=vals_as_tlists, original=token))
-            else:
-                out.append(RealisedTokenValues(values=[[token]], original=token))
-        return out
 
         
 

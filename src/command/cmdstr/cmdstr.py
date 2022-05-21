@@ -8,14 +8,14 @@ from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from command.cmdstr.MainStatementInferrer import MainStatementInferrer
 from command.text.regex.scanners import get_statement_delims
 from command.text.regex.utils import get_quoted_sections
-from command.text.tokens.RealisedTokenValues import RealisedTokenValueifier
+from command.text.tokens.RealisedTokenValues import RealisedTokenFactory
 from command.text.tokens.TokenFactory import TokenFactory
 from xmltool.XMLToolDefinition import XMLToolDefinition
 
 
 def gen_command_statement(statement: str, xmltool: Optional[XMLToolDefinition]=None) -> DynamicCommandStatement:
     token_factory = TokenFactory(xmltool)
-    realised_tokens = RealisedTokenValueifier(token_factory).tokenify(statement)
+    realised_tokens = RealisedTokenFactory(token_factory).tokenify(statement)
     return DynamicCommandStatement(statement, realised_tokens)
 
 def gen_command_string(

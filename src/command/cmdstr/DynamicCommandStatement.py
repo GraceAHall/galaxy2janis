@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Iterable
 
 from command.text.tokens.Tokens import Token
-from command.text.tokens.RealisedTokenValues import RealisedTokenValues
+from command.text.tokens.RealisedTokenValues import RealisedTokens
 from command.epath.ExecutionPath import ExecutionPath
 
 
@@ -28,7 +28,7 @@ class DynamicCommandStatement:
     params being present in that statement statement.
     """
 
-    def __init__(self, cmdline: str, realised_tokens: list[RealisedTokenValues]):
+    def __init__(self, cmdline: str, realised_tokens: list[RealisedTokens]):
         self.cmdline = cmdline
         self.realised_tokens = realised_tokens
 

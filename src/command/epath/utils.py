@@ -112,8 +112,21 @@ def is_option(ctoken: Token, ntoken: Token) -> bool:
     already know that its not a flag, so if the current token
     looks like a flag/option, it has to be an option. 
     """
-    for condition in option_conditions:
-        if condition(ctoken, ntoken):
+    if not within_different_constructs(ctoken, ntoken):
+        for condition in option_conditions:
+            if condition(ctoken, ntoken):
+                return True
+    return False
+
+def within_different_constructs(ctoken: Token, ntoken: Token) -> bool:
+    # one token is in a construct, other is not
+    if ctoken.construct and not ntoken.construct:
+        return True
+    elif not ctoken.construct and ntoken.construct:
+        return True
+    # both tokens are in constructs, but the construct is not the same
+    elif ctoken.construct and ntoken.construct:
+        if ctoken.construct.uuid != ntoken.construct.uuid:
             return True
     return False
 
