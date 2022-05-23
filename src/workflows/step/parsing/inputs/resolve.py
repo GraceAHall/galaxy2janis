@@ -3,7 +3,7 @@
 
 
 from typing import Any
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 
 from xmltool.param.InputParam import BoolParam
 

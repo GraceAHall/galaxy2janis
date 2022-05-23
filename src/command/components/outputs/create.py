@@ -4,7 +4,7 @@ from typing import Any, Tuple
 from .RedirectOutput import RedirectOutput
 from .InputOutput import InputOutput
 from .WildcardOutput import WildcardOutput
-from .UnknownOutput import UnknownOutput
+from .UncertainOutput import UncertainOutput
 
 from command.text.tokens.Tokens import Token
 from command.components.CommandComponent import CommandComponent
@@ -24,8 +24,8 @@ def create_wildcard_output(gxparam: Param) -> WildcardOutput:
     output.gxparam = gxparam
     return output
 
-def create_unknown_output(gxparam: Param) -> UnknownOutput:
-    output = UnknownOutput()
+def create_uncertain_output(gxparam: Param) -> UncertainOutput:
+    output = UncertainOutput()
     output.gxparam = gxparam
     return output
 
@@ -33,7 +33,7 @@ output_map = {
     'redirect': create_redirect_output,
     'input': create_input_output,
     'wildcard': create_wildcard_output,
-    'unknown': create_unknown_output
+    'uncertain': create_uncertain_output
 }
 
 def create_output(ctype: str, incoming: Any) -> CommandComponent:

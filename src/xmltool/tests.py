@@ -1,6 +1,6 @@
 
 
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.XMLToolDefinition import XMLToolDefinition
 
 

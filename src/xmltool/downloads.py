@@ -1,13 +1,13 @@
 
 
-import logging
+import runtime.logging.logging as logging
 import os
 import tarfile
 from typing import Optional
 import requests
 import json
 
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 import utils.general_utils as general_utils
 
 
@@ -36,28 +36,27 @@ class DownloadHandler:
 
     def get(self) -> None:
         xmldir = self.cache.get(self.url)  # returns the file xmldir (the xml)
+        # cached
         if xmldir is not None:
             self.xmldir = xmldir
             self.xmlfile = general_utils.select_xmlfile(xmldir, self.intended_tool_id)
+        # not cached
         else:
             self.log_message()
-            self.perform_download()
+            tar = self.perform_download()
+            self.xmldir = self.get_xmldir(tar)
+            self.xmlfile = general_utils.select_xmlfile(self.xmldir, self.intended_tool_id)
             self.update_cache()
-            xmldir = self.cache.get(self.url)
-            assert(xmldir)
-            self.xmldir = xmldir
-            self.xmlfile = general_utils.select_xmlfile(xmldir, self.intended_tool_id)
 
     def log_message(self) -> None:
-        logger = logging.getLogger('gxtool2janis')
-        logger.info(f'downloading tool repo from {self.url}')
+        logging.msg_downloading_tool(self.url)
 
-    def perform_download(self) -> None:
+    def perform_download(self) -> tarfile.TarFile:
         response = requests.get(self.url, stream=True)
         tar = tarfile.open(fileobj=response.raw, mode='r:gz')
         tar.extractall(path=self.wrappers_dir)
-        self.xmldir = self.get_xmldir(tar)
-
+        return tar
+        
     def get_xmldir(self, tar: tarfile.TarFile) -> str:
         folder_name = os.path.commonprefix(tar.getnames())
         return f"{self.wrappers_dir}/{folder_name.rstrip('/')}"

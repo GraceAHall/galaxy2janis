@@ -1,7 +1,7 @@
 
 
-
 from __future__ import annotations
+import runtime.logging.logging as logging
 from typing import Any
 
 from command.cheetah.blocks import get_next_block 
@@ -22,8 +22,7 @@ class PartialCheetahEvaluator:
     #         p.start()
     #         p.join(10)
     #         if p.is_alive():
-    #             logger = logging.getLogger('gxtool2janis')
-    #             logger.debug('killed sectional evaluation')
+    #             logging.evaluation_failed()
     #             p.terminate()
     #             p.join()
     #         else:
@@ -34,7 +33,7 @@ class PartialCheetahEvaluator:
     def evaluate(self) -> list[str]:
         try:
             return self.evaluation_worker()
-        except Exception:
+        except Exception as e:
             return self.lines
 
     def evaluation_worker(self) -> list[str]:

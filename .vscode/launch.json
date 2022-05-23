@@ -6,6 +6,26 @@
     "configurations": [
 
         {
+            "name": "bulk_parsing",
+            "type": "python",
+            "request": "launch",
+            "program": "src/bulk_parsing.py",
+            "console": "integratedTerminal",
+            "args": [
+                "test/data/tools", "parsed"
+            ]
+        },
+        {
+            "name": "reporting",
+            "type": "python",
+            "request": "launch",
+            "program": "src/reporting.py",
+            "console": "integratedTerminal",
+            "args": [
+                "parsed"
+            ]
+        },
+        {
             "name": "test",
             "type": "python",
             "request": "launch",
@@ -20,16 +40,6 @@
             "console": "integratedTerminal",
             "args": [
                 "galaxy_types", "datatypes_conf.xml.sample"
-            ]
-        },
-        {
-            "name": "report tool parsing errors",
-            "type": "python",
-            "request": "launch",
-            "program": "src/parsing_manager.py",
-            "console": "integratedTerminal",
-            "args": [
-                "tools/", "parsed_tools/"
             ]
         },
         {

@@ -8,7 +8,7 @@ import json
 from typing import Any, Optional, Tuple
 
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 import galaxy_interaction.cmdstrings.test_commands.datasets as datasets
 from galaxy_interaction.mock import MockApp

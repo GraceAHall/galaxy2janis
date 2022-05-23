@@ -1,6 +1,6 @@
 
 from typing import Any
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from workflows.io.WorkflowInput import WorkflowInput
 
 from workflows.step.inputs.StepInputRegister import StepInputRegister

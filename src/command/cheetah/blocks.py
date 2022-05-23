@@ -58,8 +58,7 @@ class LineFactory:
             return self.block_lines
 
     def add_block_line(self, i: int, line: str) -> None:
-        levels = self.construct_tracker.get_levels()
-        indent = self.calculate_indent(levels)
+        indent = self.construct_tracker.stack.depth
         self.construct_tracker.update(line) # LEAVE THIS HERE
         block_line = BlockLine(
             line_num=i,
@@ -68,8 +67,6 @@ class LineFactory:
         )
         self.block_lines.append(block_line)
     
-    def calculate_indent(self, construct_levels: dict[str, int]) -> int:
-        return sum(construct_levels.values())
     
 
 

@@ -3,6 +3,7 @@
 
 """small module which holds <command> section constructs of importance"""
 
+import runtime.logging.logging as logging
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Tuple
@@ -46,6 +47,10 @@ class ConstructStack:
     
     def add(self, construct: Construct) -> None:
         self.stack.append(construct)
+        if construct.subtype == ConstructType.LOOP:
+            logging.has_cheetah_loop()
+        elif construct.subtype == ConstructType.FUNCTION:
+            logging.has_cheetah_function()
     
     def pop(self, subtype: ConstructType) -> None:
         if self.depth > 0:
@@ -63,7 +68,7 @@ class ConstructStack:
             return self.stack[-1]
         return None
 
-    def within_construct(self, ctype: ConstructType) -> bool:
+    def within(self, ctype: ConstructType) -> bool:
         for construct in self.stack:
             if construct.subtype == ctype:
                 return True
@@ -98,13 +103,13 @@ class ConstructTracker:
 
     @property
     def within_conditional(self) -> bool:
-        if self.stack.within_construct(ConstructType.CONDITIONAL):
+        if self.stack.within(ConstructType.CONDITIONAL):
             return True
         return False
     
     @property
     def within_loop(self) -> bool:
-        if self.stack.within_construct(ConstructType.LOOP):
+        if self.stack.within(ConstructType.LOOP):
             return True
         return False
     
@@ -112,7 +117,7 @@ class ConstructTracker:
     def within_banned_segment(self) -> bool:
         banned_constructs = [ConstructType.LOOP, ConstructType.FUNCTION]
         for construct in banned_constructs: 
-            if self.stack.within_construct(construct):
+            if self.stack.within(construct):
                 return True
         return False
 

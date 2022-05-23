@@ -1,10 +1,9 @@
 
 
-
-
-
 import json
+import filelock
 from typing import Any
+
 from containers.Container import Container
 
 
@@ -27,7 +26,11 @@ class ContainerCache:
         )
 
     def exists(self, tool: str, version: str) -> bool:
-        cache = self._load_cache()
+        try:
+            cache = self._load_cache()
+        except Exception as e:
+            print(e)
+            cache = {}
         if tool in cache:
             if version in cache[tool]:
                 return True
@@ -46,10 +49,18 @@ class ContainerCache:
         self._write_cache(cache)
 
     def _load_cache(self) -> dict[str, Any]:
-        with open(self.cache_path, 'r') as fp:
-            return json.load(fp)
+        filepath = self.cache_path
+        lockpath = f"{filepath.rsplit('.', 1)[0]}.lock"
+        lock = filelock.FileLock(lockpath)
+        with lock.acquire(timeout=10):
+            with open(self.cache_path, 'r') as fp:
+                return json.load(fp)
 
     def _write_cache(self, cache: dict[str, Any]) -> None:
-        with open(self.cache_path, 'w') as fp:
-            json.dump(cache, fp)
+        filepath = self.cache_path
+        lockpath = f"{filepath.rsplit('.', 1)[0]}.lock"
+        lock = filelock.FileLock(lockpath)
+        with lock.acquire(timeout=10):
+            with open(self.cache_path, 'w') as fp:
+                json.dump(cache, fp)
 

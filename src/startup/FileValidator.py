@@ -2,7 +2,7 @@
 
 import os
 import xml.etree.ElementTree as et
-from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from runtime.exceptions import InputError
 
 

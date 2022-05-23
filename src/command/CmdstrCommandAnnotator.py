@@ -1,10 +1,9 @@
 
-import logging
-from command.Command import Command 
+import runtime.logging.logging as logging
 
 from xmltool.XMLToolDefinition import XMLToolDefinition
+from command.Command import Command 
 from command.cmdstr.CommandString import CommandString
-
 from command.epath.ExecutionPath import ExecutionPath
 from command.epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
 
@@ -24,8 +23,7 @@ class CmdstrCommandAnnotator:
     def analyse_cmdstrs(self) -> None:
         for cmdstr in self.cmdstrs:
             for epath in cmdstr.main.get_execution_paths():
-                logger = logging.getLogger('gxtool2janis')
-                logger.debug(epath)
+                logging.runtime_data(str(epath))
                 self.extract_components(epath)
 
     def extract_components(self, epath: ExecutionPath) -> None:

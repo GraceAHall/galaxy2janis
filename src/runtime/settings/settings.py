@@ -3,8 +3,8 @@ from typing import Optional, Tuple
 
 from xmltool.downloads import handle_downloads
 
-from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
-from runtime.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSettingsInitialiser
+from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.settings.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSettingsInitialiser
 
 from startup.ArgsValidator import ToolArgsValidator, WorkflowArgsValidator
 from startup.FileValidator import ToolFileValidator, WorkflowFileValidator

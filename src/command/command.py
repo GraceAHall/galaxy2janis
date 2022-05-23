@@ -2,7 +2,7 @@
 
 
 from command.CommandFactory import CommandFactory
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.XMLToolDefinition import XMLToolDefinition
 from command.Command import Command
 

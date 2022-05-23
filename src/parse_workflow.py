@@ -1,9 +1,9 @@
 
 
-import logging
+import runtime.logging.logging as logging
 
 # classes
-from runtime.ExeSettings import WorkflowExeSettings
+from runtime.settings.ExeSettings import WorkflowExeSettings
 from workflows.workflow.WorkflowParser import WorkflowParser
 from workflows.workflow.Workflow import Workflow
 
@@ -13,14 +13,16 @@ from workflows.step.outputs.OutputLinker import link_step_outputs_tool_outputs
 from workflows.io.io import set_outputs
 
 
+
+
 """
 file ingests a galaxy workflow, then downloads and translates each tool
 to a janis definition
 """
 
 def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
-    logger = logging.getLogger('gxtool2janis')
-    logger.info(f'parsing workflow from {wsettings.workflow}')
+    logging.configure_workflow_logging(wsettings)
+    logging.msg_parsing_workflow(wsettings.workflow)
     workflow = init_workflow(wsettings)
     link_tool_input_values(wsettings, workflow)
     link_step_outputs_tool_outputs(workflow)

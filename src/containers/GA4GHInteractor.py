@@ -1,7 +1,7 @@
 
 
 
-import logging
+import runtime.logging.logging as logging
 from typing import Any, Optional
 import requests
 from requests import Response
@@ -45,8 +45,7 @@ class GA4GHInteractor:
 
     def handle_response(self, response: Optional[Response]) -> Optional[list[dict[str, Any]]]:
         if response and response.status_code != 200:
-            logger = logging.getLogger('gxtool2janis')
-            logger.debug(f'no GA4GH response')
+            logging.no_ga4gh_data()
         else:
             return json.loads(response.text)
 

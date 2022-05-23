@@ -1,7 +1,7 @@
 
 
 
-import logging
+import runtime.logging.logging as logging
 from copy import deepcopy
 from typing import Any
 
@@ -46,8 +46,7 @@ class ParamFlattener:
                     self.explore_node(child, heirarchy)
 
             case Repeat():
-                logger = logging.getLogger('gxtool2janis')
-                logger.debug('repeat encountered')
+                logging.has_repeat()
 
             case _:
                 raise NotImplementedError()

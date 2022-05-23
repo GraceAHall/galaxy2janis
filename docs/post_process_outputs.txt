@@ -1,0 +1,19 @@
+
+
+notes:
+- often ensuring files have correct name and location for dataset collectors ('from_work_dir' attribute etc)
+
+requirements
+- current folder structure must be maintained when passing to post-processing step
+- current environment must be passed to post-processing step
+    - folder structure & files
+    - environment variables
+    - requirements must be loaded? ie samtools view after samtools sort?
+
+
+
+
+from rgFastQC.xml
+
+&& cp '${html_file.files_path}'/*/fastqc_data.txt output.txt
+&& cp '${html_file.files_path}'/*\.html output.html

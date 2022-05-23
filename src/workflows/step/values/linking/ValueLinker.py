@@ -1,10 +1,10 @@
 
 
-import logging
+import runtime.logging.logging as logging
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Optional
 
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
@@ -81,9 +81,8 @@ class CheetahValueLinker(ValueLinker):
         cmdstr = gen_command_string(source='xml', the_string=text, xmltool=xmltool)
         stmtstr = cmdstr.main.cmdline
         
-        logger = logging.getLogger('gxtool2janis')
-        logger.debug(text)
-        logger.debug(stmtstr)
+        logging.runtime_data(text)
+        logging.runtime_data(stmtstr)
         
         return stmtstr
 
@@ -199,6 +198,7 @@ class UnlinkedValueLinker(ValueLinker):
         for step_input in self.get_unlinked():
             invalue = self.create_invalue(step_input)
             register.update_unlinked(invalue)
+            logging.unlinked_input_connection()
 
     def get_unlinked(self) -> Iterable[StepInput]:
         for step_input in self.step.inputs.list():

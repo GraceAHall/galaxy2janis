@@ -1,6 +1,6 @@
 
 
-from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from tool.Tool import Tool
 from workflows.workflow.Workflow import Workflow
 

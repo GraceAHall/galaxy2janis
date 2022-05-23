@@ -10,6 +10,7 @@ galaxy-web-framework@git+https://github.com/galaxyproject/galaxy.git@release_21.
 galaxy-web-stack@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_stack
 galaxy-app@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/app
 
-# add
+# TODO add
 # wget
 # tarfile
+# filelock

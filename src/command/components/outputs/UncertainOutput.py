@@ -8,7 +8,7 @@ from typing import Optional
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 
-class UnknownOutput(BaseCommandComponent):
+class UncertainOutput(BaseCommandComponent):
 
     def get_name(self) -> str:
         if self.gxparam:
@@ -35,7 +35,7 @@ class UnknownOutput(BaseCommandComponent):
             return self.gxparam.get_docstring()
         return 'output created during runtime. file is collected from working directory'
 
-    def update(self, incoming: UnknownOutput) -> None:
+    def update(self, incoming: UncertainOutput) -> None:
         raise NotImplementedError()
 
 

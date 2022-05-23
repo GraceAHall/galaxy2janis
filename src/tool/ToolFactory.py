@@ -3,7 +3,7 @@
 
 
 
-
+import runtime.logging.logging as logging
 from typing import Optional
 from command.components.outputs.RedirectOutput import RedirectOutput
 from command.components.outputs.create import create_output
@@ -38,6 +38,8 @@ class ToolFactory:
     def supply_inputs(self, tool: Tool) -> None:
         self.command.set_cmd_positions()
         inputs = self.command.list_inputs(include_base_cmd=False)
+        if not inputs:
+            logging.no_inputs()
         for inp in inputs:
             self.datatype_annotator.annotate(inp)
             tool.add_input(inp)
@@ -47,7 +49,9 @@ class ToolFactory:
         outputs += self.get_redirect_outputs()
         outputs += self.get_input_outputs()
         outputs += self.get_wildcard_outputs()
-        outputs += self.get_unknown_outputs(outputs)
+        outputs += self.get_uncertain_outputs(outputs)
+        if not outputs:
+            logging.no_outputs()
         for out in outputs:
             self.datatype_annotator.annotate(out)
             tool.add_output(out)
@@ -100,7 +104,7 @@ class ToolFactory:
                         out.append(create_output('wildcard', gxparam))
         return out
     
-    def get_unknown_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:
+    def get_uncertain_outputs(self, known_outputs: list[CommandComponent]) -> list[CommandComponent]:
         out: list[CommandComponent] = []
         for gxparam in self.xmltool.list_outputs():
             has_output_component = False
@@ -109,7 +113,8 @@ class ToolFactory:
                     has_output_component = True
                     break
             if not has_output_component:
-                out.append(create_output('unknown', gxparam))
+                logging.uncertain_output()
+                out.append(create_output('uncertain', gxparam))
         return out
 
     def verify_outputs(self, outputs: list[CommandComponent]) -> None:
@@ -119,5 +124,7 @@ class ToolFactory:
 
     def get_base_command(self) -> list[str]:
         positionals = self.command.get_base_positionals()
+        if not positionals:
+            logging.no_base_cmd()
         return [p.get_default_value() for p in positionals]
     

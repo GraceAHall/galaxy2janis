@@ -5,7 +5,7 @@
 
 import json
 from typing import Any
-from runtime.ExeSettings import WorkflowExeSettings
+from runtime.settings.ExeSettings import WorkflowExeSettings
 
 from workflows.workflow.Workflow import Workflow
 from workflows.workflow.WorkflowMetadata import WorkflowMetadata

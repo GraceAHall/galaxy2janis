@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import runtime.logging.logging as logging
 from command.components.inputs.Positional import Positional
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
@@ -28,12 +29,13 @@ def numeric(tag: str, entity: Any) -> str:
     return tag
 
 def numeric_start(tag: str, entity: Any) -> str:
-    if tag[0].isnumeric():
+    if len(tag) > 0 and tag[0].isnumeric():
         tag = _prepend_component_type(tag, entity)
     return tag
 
 def short_tag(tag: str, entity: Any) -> str:
     if len(tag) == 0:
+        logging.zero_length_tag()
         tag = _prepend_component_type(tag, entity)
         tag = f'{tag}ERROR'
     elif len(tag) == 1:

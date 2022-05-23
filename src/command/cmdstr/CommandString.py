@@ -25,6 +25,15 @@ class CommandString:
 
 
 
+
+
+
+
+
+
+
+
+
     # def get_text(self) -> str:
     #     """pieces back together the overall cmdline string from statements and delims"""
     #     out: str = ''

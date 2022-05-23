@@ -1,9 +1,9 @@
 
 
-import logging
+import runtime.logging.logging as logging
 from typing import Optional
 from containers.ContainerCache import ContainerCache
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
 from xmltool.XMLToolDefinition import XMLToolDefinition
 from containers.Container import Container
@@ -18,8 +18,7 @@ def fetch_container(esettings: ToolExeSettings, xmltool: XMLToolDefinition) -> O
         if container:
             cache.add(container)
         else:      
-            logger = logging.getLogger('gxtool2janis')
-            logger.debug('no container found')     
+            logging.no_container()
     return container
 
 def fetch_from_cache(cache: ContainerCache, xmltool: XMLToolDefinition) -> Optional[Container]:

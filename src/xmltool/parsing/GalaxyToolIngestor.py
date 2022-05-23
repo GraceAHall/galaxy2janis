@@ -1,5 +1,5 @@
 
-
+import runtime.logging.logging as logging
 from galaxy.tools import Tool as GxTool
 from galaxy.tools.parameters.basic import ToolParameter as GxInput
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
@@ -112,6 +112,13 @@ class GalaxyToolIngestor:
     def get_command(self) -> str:
         """returns the tool xml command"""
         return str(self.gxtool.command) # type: ignore
+    
+    def get_configfiles(self) -> dict[str, str]:
+        """returns the tool configfiles"""
+        configfiles = {name: contents for name, _, contents in self.gxtool.config_files} # type: ignore
+        if configfiles:
+            logging.has_configfile()
+        return configfiles
     
     def get_inputs(self) -> InputParamRegister:
         """returns a an InputRegister by reformatting the galaxy tool representation's params."""

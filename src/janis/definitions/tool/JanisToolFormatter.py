@@ -3,7 +3,7 @@
 from typing import Optional
 from command.components.outputs.InputOutput import InputOutput
 from command.components.outputs.RedirectOutput import RedirectOutput
-from command.components.outputs.UnknownOutput import UnknownOutput
+from command.components.outputs.UncertainOutput import UncertainOutput
 from command.components.outputs.WildcardOutput import WildcardOutput
 from tool.Tool import Tool
 from command.components.CommandComponent import CommandComponent
@@ -165,7 +165,7 @@ class JanisToolFormatter:
                 return f'InputSelector("{input_comp_tag}")'
             case WildcardOutput():
                 return f'WildcardSelector("{output.gxparam.wildcard_pattern}")'
-            case UnknownOutput():
+            case UncertainOutput():
                 return f'WildcardSelector("{output.get_default_value()}")'
             case _:
                 pass

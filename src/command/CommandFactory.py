@@ -1,7 +1,7 @@
 
 
 
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.XMLToolDefinition import XMLToolDefinition
 
 from command.text.load import load_xml_command, load_test_commands

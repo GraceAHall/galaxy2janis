@@ -1,13 +1,13 @@
 
 
 # module entry
-import logging
+import runtime.logging.logging as logging
 from typing import Type
-from runtime.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from workflows.step.values.linking.ValueMigrator import ValueMigrator
 from workflows.workflow.Workflow import Workflow
 from workflows.step.WorkflowStep import WorkflowStep
-from runtime.settings import create_tool_settings_for_step
+from runtime.settings.settings import create_tool_settings_for_step
 from workflows.step.values.linking.ValueLinker import (
     ValueLinker,
     CheetahValueLinker, 
@@ -45,8 +45,7 @@ def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: W
     for linker in linkers:
         l = linker(esettings, step, workflow)
         l.link()
-        logger = logging.getLogger('gxtool2janis')
-        logger.debug(step.tool_values)
+        logging.runtime_data(str(step.tool_values))
     perform_migrations(step, workflow)
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):

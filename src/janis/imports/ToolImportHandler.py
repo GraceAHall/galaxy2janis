@@ -3,13 +3,13 @@
 from typing import Any
 from command.components.CommandComponent import CommandComponent
 from command.components.outputs import InputOutput, WildcardOutput
-from command.components.outputs.UnknownOutput import UnknownOutput
+from command.components.outputs.UncertainOutput import UncertainOutput
 from datatypes.JanisDatatype import JanisDatatype
 
 selector_map: dict[Any, str] = {
     InputOutput: 'from janis_core import InputSelector',
     WildcardOutput: 'from janis_core import WildcardSelector',
-    UnknownOutput: 'from janis_core import WildcardSelector',
+    UncertainOutput: 'from janis_core import WildcardSelector',
 }
 
 default_import_str = """
@@ -26,7 +26,7 @@ from janis_core import (
 """
 
 
-SelectorOutputs = InputOutput | WildcardOutput | UnknownOutput
+SelectorOutputs = InputOutput | WildcardOutput | UncertainOutput
 
 
 class ToolImportHandler:

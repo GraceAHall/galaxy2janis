@@ -2,7 +2,7 @@
 
 from typing import Any
 import json
-from runtime.ExeSettings import WorkflowExeSettings
+from runtime.settings.ExeSettings import WorkflowExeSettings
 
 from workflows.io.WorkflowInput import WorkflowInput
 from workflows.step.WorkflowStep import WorkflowStep
@@ -15,7 +15,7 @@ from .inputs import parse_step_inputs
 from .outputs import parse_step_outputs
 
 from parse_tool import parse_tool
-from runtime.settings import create_tool_settings_for_step
+from runtime.settings.settings import create_tool_settings_for_step
 
 
 ### parsing galaxy to steps -----------

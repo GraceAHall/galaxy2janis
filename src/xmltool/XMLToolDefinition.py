@@ -26,6 +26,7 @@ class XMLToolDefinition:
     """
     metadata: ToolXMLMetadata
     raw_command: str
+    configfiles: dict[str, str]
     inputs: InputParamRegister
     outputs: OutputParamRegister
     tests: TestRegister

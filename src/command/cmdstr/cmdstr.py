@@ -1,7 +1,7 @@
 
 
 
-
+import runtime.logging.logging as logging
 from typing import Optional
 from command.cmdstr.CommandString import CommandString
 from command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
@@ -74,6 +74,10 @@ def _split_pre_main_post_statements(
     return out
 
 def _init_command_string(statement_dict: dict[str, list[DynamicCommandStatement]]) -> CommandString:
+    if statement_dict['pre']:
+        logging.has_preprocessing()
+    if statement_dict['post']:
+        logging.has_postprocessing()
     return CommandString(
         main=statement_dict['main'][0], 
         preprocessing=statement_dict['pre'], 

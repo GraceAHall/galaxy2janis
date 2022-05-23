@@ -1,7 +1,7 @@
 
 
 
-import logging
+import runtime.logging.logging as logging
 import re
 from command.text.regex.utils import find_unquoted
 import command.text.regex.scanners as scanners
@@ -13,6 +13,7 @@ def replace_function_calls(cmdstr: str) -> str:
     for line in cmdlines:
         matches = scanners.get_function_calls(line)
         for match in matches:
+            logging.has_cheetah_function()
             old_section = match[0]
             new_section = '__FUNCTION_CALL__'
             line = line.replace(old_section, new_section)
@@ -22,6 +23,7 @@ def replace_function_calls(cmdstr: str) -> str:
 def replace_backticks(cmdstr: str) -> str:
     matches = scanners.get_backtick_sections(cmdstr)
     for match in matches:
+        logging.has_backtick_statement()
         old_section = match[0]
         new_section = '__BACKTICK_SHELL_STATEMENT__'
         cmdstr = cmdstr.replace(old_section, new_section)
@@ -34,11 +36,10 @@ def flatten_multiline_strings(cmdstr: str) -> str:
     matches = scanners.get_quoted_sections(cmdstr)
     for match in matches:
         if '\n' in match[0]:
+            logging.has_multiline_str()
             old_section = match[0]
             new_section = match[0].replace('\n', ' ')
             cmdstr = cmdstr.replace(old_section, new_section)
-            logger = logging.getLogger('gxtool2janis')
-            logger.debug(f'removed multiline string')
     return cmdstr
 
 def translate_variable_markers(cmdstr: str) -> str:

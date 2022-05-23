@@ -1,6 +1,6 @@
 
 
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from galaxy_interaction import GalaxyManager
 from xmltool.load import load_xmltool
 from command.text.simplification import simplify_xml, simplify_xml_cheetah_eval, simplify_test 

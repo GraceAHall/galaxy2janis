@@ -5,12 +5,12 @@ import json
 from typing import Any, Optional
 
 from runtime.contexts import nostdout
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 from galaxy.model import Job, JobParameter
 import galaxy_interaction.cmdstrings.dataset_utils as dataset_utils
 from galaxy_interaction.mock import MockApp
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-from runtime.ExeSettings import ToolExeSettings
+from runtime.settings.ExeSettings import ToolExeSettings
 
 from galaxy.model import (
     History,
