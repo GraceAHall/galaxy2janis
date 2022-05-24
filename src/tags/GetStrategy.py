@@ -10,10 +10,10 @@
 # from command.components.inputs.Positional import Positional
 # from tags.TagManager import TagManager
 # from tool.Tool import Tool
-# from workflows.io.WorkflowInput import WorkflowInput
-# from workflows.io.WorkflowOutput import WorkflowOutput
+# from workflows.entities.workflow.input import WorkflowInput
+# from workflows.entities.workflow.output import WorkflowOutput
 # from workflows.step.Step import GalaxyWorkflowStep
-# from workflows.workflow.Workflow import Workflow
+# from workflows.entities.workflow.workflow import Workflow
 
 
 # class GetStrategy(ABC):

@@ -6,26 +6,6 @@
     "configurations": [
 
         {
-            "name": "bulk_parsing",
-            "type": "python",
-            "request": "launch",
-            "program": "src/bulk_parsing.py",
-            "console": "integratedTerminal",
-            "args": [
-                "test/data/tools", "parsed"
-            ]
-        },
-        {
-            "name": "reporting",
-            "type": "python",
-            "request": "launch",
-            "program": "src/reporting.py",
-            "console": "integratedTerminal",
-            "args": [
-                "parsed"
-            ]
-        },
-        {
             "name": "test",
             "type": "python",
             "request": "launch",
@@ -43,6 +23,47 @@
             ]
         },
         {
+            "name": "bulk_tool_parsing",
+            "type": "python",
+            "request": "launch",
+            "program": "src/bulk_tool_parsing.py",
+            "console": "integratedTerminal",
+            "args": [
+                "test/data/tools", "parsed/tools"
+            ]
+        },
+        {
+            "name": "bulk_workflow_parsing",
+            "type": "python",
+            "request": "launch",
+            "program": "src/bulk_workflow_parsing.py",
+            "console": "integratedTerminal",
+            "args": [
+                "test/data/workflows", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "tool_reporting",
+            "type": "python",
+            "request": "launch",
+            "program": "src/tool_reporting.py",
+            "console": "integratedTerminal",
+            "args": [
+                "parsed/tools"
+            ]
+        },
+        {
+            "name": "workflow_reporting",
+            "type": "python",
+            "request": "launch",
+            "program": "src/workflow_reporting.py",
+            "console": "integratedTerminal",
+            "args": [
+                "parsed/workflows"
+            ]
+        },
+        // TOOLS
+        {
             "name": "abricate",
             "type": "python",
             "request": "launch",
@@ -55,7 +76,6 @@
                 "--xml", "abricate.xml",
             ]
         },
-        
         {
             "name": "unicycler",
             "type": "python",
@@ -95,226 +115,7 @@
                 "--xml", "quast.xml",
             ]
         },
-        {
-            "name": "prokka",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/prokka", 
-                "--xml", "prokka.xml",
-            ]
-        },
-        {
-            "name": "filtlong",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/filtlong", 
-                "--xml", "filtlong.xml",
-            ]
-        },
-        {
-            "name": "kraken2",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/kraken2", 
-                "--xml", "kraken2.xml",
-            ]
-        },
-        // MEDIUM WORKFLOW TOOLS
-        {
-            "name": "medium_workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/medium_workflow.ga"
-            ]
-        },
-        {
-            "name": "long_read_characterisation_minimap2",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/long_read_characterisation_minimap2.ga"
-            ]
-        },
-        {
-            "name": "fastqc",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/fastqc", 
-                "--xml", "rgFastQC.xml",
-            ]
-        },
-        {
-            "name": "awk",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/text_processing", 
-                "--xml", "awk.xml",
-            ]
-        },
-        {
-            "name": "cutadapt",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/cutadapt", 
-                "--xml", "cutadapt.xml",
-            ]
-        },
-        {
-            "name": "hisat2",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/hisat2", 
-                "--xml", "hisat2.xml",
-            ]
-        },
-        {
-            "name": "featurecounts",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/featurecounts", 
-                "--xml", "featurecounts.xml",
-            ]
-        },
-        {
-            "name": "picard_MarkDuplicates",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/picard", 
-                "--xml", "picard_MarkDuplicates.xml",
-            ]
-        },
-        {
-            "name": "samtools_idxstats",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/samtools_idxstats", 
-                "--xml", "samtools_idxstats.xml",
-            ]
-        },
-        {
-            "name": "geneBody_coverage",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/rseqc", 
-                "--xml", "geneBody_coverage.xml",
-            ]
-        },
-        {
-            "name": "infer_experiment",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/rseqc", 
-                "--xml", "infer_experiment.xml",
-            ]
-        },
-        {
-            "name": "read_distribution",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/rseqc", 
-                "--xml", "read_distribution.xml",
-            ]
-        },
-        {
-            "name": "collection_column_join",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/collection_column_join", 
-                "--xml", "collection_column_join.xml",
-            ]
-        },
-        {
-            "name": "multiqc",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/multiqc", 
-                "--xml", "multiqc.xml",
-            ]
-        },
+        // WORKFLOWS
         {
             "name": "super simple workflow",
             "type": "python",
@@ -324,31 +125,8 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/super_simple_workflow.ga"
-            ]
-        },
-        {
-            "name": "super simple workflow builtin tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/super_simple_workflow_builtin_tool.ga"
-            ]
-        },
-        {
-            "name": "simple workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/simple_workflow.ga"
+                "test/data/workflows/mine/super_simple_workflow.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
         {
@@ -360,11 +138,12 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/super_simple_unicycler.ga"
+                "test/data/workflows/mine/super_simple_unicycler.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
         {
-            "name": "super simple quast",
+            "name": "simple workflow",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -372,11 +151,12 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/super_simple_quast.ga"
+                "test/data/workflows/mine/simple_workflow.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
         {
-            "name": "super simple prokka",
+            "name": "medium_workflow",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -384,11 +164,12 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/super_simple_prokka.ga"
+                "test/data/workflows/mine/medium_workflow.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
         {
-            "name": "simple workflow builtin tool",
+            "name": "rna_seq_reads_to_counts",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -396,7 +177,73 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/simple_workflow_builtin_tool.ga"
+                "test/data/workflows/transcriptomics/rna-seq-reads-to-counts.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "debruijn_graph",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/assembly/debruijn-graph.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "mrsa-illumina",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/assembly/mrsa-illumina.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "mrsa-nanopore",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/assembly/mrsa-nanopore.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "apollo",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/genome_annotation/apollo.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
+            "name": "sars-cov-2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/variants/sars-cov-2.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
         {
@@ -408,178 +255,9 @@
             "justMyCode": false,
             "args": [
                 "workflow",
-                "test/data/workflows/hard_workflow.ga"
+                "test/data/workflows/mine/hard_workflow.ga",
+                "--outdir", "parsed/workflows"
             ]
         },
-        {
-            "name": "collapse_collections",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/collapse_collections", 
-                "--xml", "merge.xml",
-            ]
-        },
-        {
-            "name": "nanoplot",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/nanoplot", 
-                "--xml", "nanoplot.xml",
-            ]
-        },
-        {
-            "name": "fastp",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/fastp", 
-                "--xml", "fastp.xml",
-            ]
-        },
-        {
-            "name": "minimap2",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/minimap2", 
-                "--xml", "minimap2.xml",
-            ]
-        },
-        {
-            "name": "samtools_view",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/samtools_view", 
-                "--xml", "samtools_view.xml",
-            ]
-        },
-        {
-            "name": "bowtie2",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/bowtie2", 
-                "--xml", "bowtie2_wrapper.xml",
-            ]
-        },
-        {
-            "name": "seqtk_sample",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/seqtk", 
-                "--xml", "seqtk_sample.xml",
-            ]
-        },
-        {
-            "name": "zip_collection",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "/home/grace/work/pp/gxtool2janis/venv/lib/python3.10/site-packages/galaxy/tools", 
-                "--xml", "zip_collection.xml",
-            ]
-        },
-        {
-            "name": "bandage image",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/bandage", 
-                "--xml", "bandage_image.xml",
-            ]
-        },
-        {
-            "name": "bandage info",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/bandage", 
-                "--xml", "bandage_info.xml",
-            ]
-        },
-        {
-            "name": "fasta_filter_by_length",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/fasta_filter_by_length", 
-                "--xml", "fasta_filter_by_length.xml",
-            ]
-        },
-        {
-            "name": "characterisation workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/characterisation_workflow.ga"
-            ]
-        },
-        {
-            "name": "kraken2tax",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--dir", "test/data/tools/kraken2tax", 
-                "--xml", "kraken2tax.xml",
-            ]
-        },
-        
-        
     ]
 }

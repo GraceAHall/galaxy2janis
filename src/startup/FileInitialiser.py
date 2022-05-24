@@ -61,7 +61,7 @@ class WorkflowFileInitialiser:
     def get_folders_to_init(self) -> list[str]:
         folders: list[str] = default_folders
         es = self.esettings
-        folders.append(es.get_outdir())
+        folders.append(es.outdir)
         folders.append(es.get_xml_wrappers_dir())
         folders.append(es.get_janis_tools_dir())
         folders.append(es.get_janis_steps_dir())
@@ -85,7 +85,7 @@ class ToolFileInitialiser:
         files = self.get_files_to_init()
         safe_init_folders(folders)
         init_files(files)
-        init_cache_dir(self.esettings.get_container_cache_path())
+        init_cache_dir(self.esettings.container_cachedir)
 
     def get_folders_to_init(self) -> list[str]:
         es = self.esettings

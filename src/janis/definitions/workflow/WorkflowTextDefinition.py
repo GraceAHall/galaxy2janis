@@ -7,8 +7,8 @@ import os
 
 from janis.definitions.workflow.StepTextDefinition import StepTextDefinition
 from runtime.settings.ExeSettings import WorkflowExeSettings
-from workflows.step.WorkflowStep import WorkflowStep
-from workflows.workflow.Workflow import Workflow
+from workflows.entities.workflow.workflow import WorkflowStep
+from workflows.entities.workflow.workflow import Workflow
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector
 import janis.definitions.workflow.snippets as snippets
 import janis.definitions.workflow.formatting as formatting
@@ -105,7 +105,7 @@ class WorkflowTextDefinition(ABC):
     def init_step_text_definitions(self) -> list[StepTextDefinition]:
         step_defs: list[StepTextDefinition] = []
         step_count = 0
-        for step in list(self.workflow.steps.values()):
+        for step in list(self.workflow.list_steps()):
             step_count += 1
             step_def = self.init_step_definition(step_count, step)
             step_defs.append(step_def)

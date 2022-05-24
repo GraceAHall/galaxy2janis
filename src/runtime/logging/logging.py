@@ -19,6 +19,7 @@ def configure_tool_logging(esettings: ToolExeSettings) -> None:
 def configure_workflow_logging(esettings: WorkflowExeSettings) -> None:
     with open("src/runtime/logging/logging_config.yaml", "r") as fp:
         the_dict = yaml.safe_load(fp)
+        the_dict['handlers']['workflow_file']['filename'] = esettings.get_logfile_path()
     config.dictConfig(the_dict)
 
 

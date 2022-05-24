@@ -6,9 +6,11 @@ from datatypes.DatatypeRegister import DatatypeRegister
 from datatypes.JanisDatatype import JanisDatatype
 from command.components.inputs import Positional, Flag, Option
 from command.components.outputs import RedirectOutput, InputOutput, WildcardOutput
-from workflows.io.WorkflowInput import WorkflowInput
-from workflows.step.WorkflowStep import WorkflowStep
-from workflows.io.WorkflowOutput import WorkflowOutput
+from workflows.entities.workflow.input import WorkflowInput
+from workflows.entities.workflow.workflow import WorkflowStep
+from workflows.entities.workflow.output import WorkflowOutput
+
+
 
 from datatypes.default import DEFAULT_DATATYPE
 

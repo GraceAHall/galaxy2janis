@@ -11,7 +11,7 @@ from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFe
 
 
 def fetch_container(esettings: ToolExeSettings, xmltool: XMLToolDefinition) -> Optional[Container]:
-    cache: ContainerCache = load_cache(esettings.get_container_cache_path())
+    cache: ContainerCache = load_cache(esettings.container_cachedir)
     container = fetch_from_cache(cache, xmltool)
     if not container:
         container = fetch_online(xmltool)

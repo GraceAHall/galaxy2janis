@@ -15,7 +15,7 @@ def handle_downloads(intended_tool_id: str, esettings: ToolExeSettings) -> ToolE
     assert(esettings.remote_url)
     handler = DownloadHandler(
         intended_tool_id=intended_tool_id, 
-        wrappers_dir=esettings.get_download_dir(),
+        wrappers_dir=esettings.download_dir,
         url=esettings.remote_url
     )
     handler.get()

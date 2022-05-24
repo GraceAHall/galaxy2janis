@@ -6,10 +6,10 @@ from command.components.CommandComponent import CommandComponent
 from command.components.inputs.Flag import Flag
 from command.components.inputs.Option import Option
 from command.components.inputs.Positional import Positional
-from workflows.step.WorkflowStep import WorkflowStep
+from workflows.entities.workflow.workflow import WorkflowStep
 
-from workflows.step.values.InputValue import ConnectionInputValue, DefaultInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
-from workflows.workflow.Workflow import Workflow
+from workflows.entities.step.tool_values import ConnectionInputValue, DefaultInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
+from workflows.entities.workflow.workflow import Workflow
 from datatypes.default import DEFAULT_DATATYPE
 
 

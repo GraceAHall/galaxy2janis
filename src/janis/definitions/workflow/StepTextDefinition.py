@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from typing import Tuple
 from command.components.CommandComponent import CommandComponent
 
-from workflows.step.WorkflowStep import WorkflowStep
-from workflows.step.values.InputValue import DefaultInputValue, InputValue
-from workflows.workflow.Workflow import Workflow
+from workflows.entities.workflow.workflow import WorkflowStep
+from workflows.entities.step.tool_values import DefaultInputValue, InputValue
+from workflows.entities.workflow.workflow import Workflow
 
 from janis.imports.Import import Import
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector

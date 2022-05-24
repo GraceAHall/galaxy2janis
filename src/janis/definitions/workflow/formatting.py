@@ -6,9 +6,9 @@
 from typing import Optional
 from janis.imports.Import import Import, ImportType
 import janis.definitions.workflow.snippets as snippets
-from workflows.io.WorkflowInput import WorkflowInput
-from workflows.io.WorkflowOutput import WorkflowOutput
-from workflows.step.WorkflowStep import WorkflowStep
+from workflows.entities.workflow.input import WorkflowInput
+from workflows.entities.workflow.output import WorkflowOutput
+from workflows.entities.workflow.workflow import WorkflowStep
 
 
 

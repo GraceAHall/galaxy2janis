@@ -147,8 +147,7 @@ def get_words(the_string: str) -> list[re.Match[str]]:
 
 def get_quoted_numbers(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(QUOTED_NUMBERS, the_string)
-    matches = [m for m in matches]
-    return [m.strip('"\'') for m in matches]
+    return [m for m in matches]
 
 def get_raw_numbers(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(RAW_NUMBERS, the_string)

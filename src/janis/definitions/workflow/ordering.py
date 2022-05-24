@@ -4,7 +4,7 @@
 
 
 from abc import ABC, abstractmethod
-from workflows.step.values.InputValue import ConnectionInputValue, WorkflowInputInputValue
+from workflows.entities.step.tool_values import ConnectionInputValue, WorkflowInputInputValue
 
 from janis.definitions.workflow.ToolInputLine import ToolInputLine
 

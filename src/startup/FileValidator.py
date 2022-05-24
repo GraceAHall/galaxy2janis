@@ -20,7 +20,7 @@ class WorkflowFileValidator:
 
     def get_validation_files(self) -> list[str]:
         validation_files = [
-            self.esettings.get_galaxy_workflow_path(),
+            self.esettings.workflow,
         ]
         return [f for f in validation_files if type(f) is str]
 

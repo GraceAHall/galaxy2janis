@@ -2,7 +2,7 @@
 
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from tool.Tool import Tool
-from workflows.workflow.Workflow import Workflow
+from workflows.entities.workflow.workflow import Workflow
 
 from janis.definitions.tool.JanisToolFormatter import JanisToolFormatter
 from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition

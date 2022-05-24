@@ -10,7 +10,7 @@ from startup.ArgsValidator import ToolArgsValidator, WorkflowArgsValidator
 from startup.FileValidator import ToolFileValidator, WorkflowFileValidator
 from startup.FileInitialiser import ToolFileInitialiser, WorkflowFileInitialiser
 
-from workflows.step.metadata.StepMetadata import StepMetadata
+from workflows.entities.step.metadata import StepMetadata
 import utils.general_utils as utils
 
 
@@ -50,16 +50,16 @@ def _make_parse_tool_args(metadata: StepMetadata, esettings: WorkflowExeSettings
             'remote_url': None,
             'download_dir': None,
             'outdir': f'{esettings.get_janis_tools_dir()}/{metadata.tool_id}',
-            'cachedir': esettings.user_container_cachedir
+            'cachedir': esettings.container_cachedir
         }
     else:
         return {
             'dir': None,
             'xml': None,
-            'remote_url': metadata.get_uri(),
+            'remote_url': metadata.get_build_url(),
             'download_dir': esettings.get_xml_wrappers_dir(),
             'outdir': f'{esettings.get_janis_tools_dir()}/{metadata.tool_id}',
-            'cachedir': esettings.user_container_cachedir
+            'cachedir': esettings.container_cachedir
         }
 
 def _get_builtin_tool_path(metadata: StepMetadata) -> Tuple[str, str]:
