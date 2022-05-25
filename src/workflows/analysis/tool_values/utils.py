@@ -21,7 +21,7 @@ def select_input_value_type(component: CommandComponent, value: Any) -> InputVal
         return InputValueType.NUMERIC
     elif is_none(component, value):
         return InputValueType.NONE
-    elif is_env_var(component, value):
+    elif is_env_var(value) or has_env_var(value):
         return InputValueType.ENV_VAR
     else:
         return InputValueType.STRING
@@ -42,8 +42,13 @@ def is_numeric(component: CommandComponent, value: Any) -> bool:
             return True
     return False
 
-def is_env_var(component: CommandComponent, value: Any) -> bool:
+def is_env_var(value: Any) -> bool:
     if str(value).startswith('$'):
+        return True
+    return False
+
+def has_env_var(value: Any) -> bool:
+    if '$' in str(value):
         return True
     return False
 

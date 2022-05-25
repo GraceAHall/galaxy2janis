@@ -15,7 +15,7 @@ from xmltool.XMLToolDefinition import XMLToolDefinition
 
 def gen_command_statement(statement: str, xmltool: Optional[XMLToolDefinition]=None) -> DynamicCommandStatement:
     token_factory = TokenFactory(xmltool)
-    realised_tokens = RealisedTokenFactory(token_factory).tokenify(statement)
+    realised_tokens = RealisedTokenFactory(token_factory).try_tokenify(statement)
     return DynamicCommandStatement(statement, realised_tokens)
 
 def gen_command_string(

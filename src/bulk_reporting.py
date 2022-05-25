@@ -4,17 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 import os
 import sys
-
-
-"""
-metrics:
-- was a workflow produced? - file presence
-- are there UNKNOWN inputs? - log
-- does it translate to cwl? - translate using janis
-
-think that the wrapper build issue may cause a lot of failed workflow parsing runs
-"""
-
+from typing import Optional
 
 
 
@@ -28,6 +18,7 @@ class LogLine:
 
 @dataclass
 class LogFile:
+    type: str  # either 'tool' or 'workflow'
     path: str
     lines: list[LogLine]
 
@@ -55,7 +46,7 @@ class LogFile:
 
 
 @dataclass
-class Report:
+class ToolParsingReport:
     logfiles: list[LogFile]
 
     @property
@@ -100,80 +91,160 @@ class Report:
 
 
 
-class Reporter:
-    def __init__(self, directory: str):
-        self.directory = directory
+@dataclass
+class WorkflowReport:
+    name: str
+    tools_report: ToolParsingReport
+    logfile: LogFile
+    workflow_path: Optional[str]
 
-    def report(self) -> None:
-        report = self.load_report()
-        self.print_report(report)
+    # TODO make actual messages go to logfile. 
+    # TODO read info from the logfile. 
 
-    def load_report(self) -> Report:
-        log_paths = self.get_logfile_paths()
-        log_files = [self.load_log(path) for path in log_paths]
-        return Report(log_files)
-
-    def get_logfile_paths(self) -> list[str]:
-        out: list[str] = []
-        for log_dir in self.get_logfile_directories():
-            files = os.listdir(log_dir)
-            log_files = [f for f in files if f.endswith('.log')]
-            out += [f'{log_dir}/{f}' for f in log_files]
-        return out
-
-    def get_logfile_directories(self) -> list[str]:
-        return [self.directory]
-
-    def load_log(self, path: str) -> LogFile:
-        log_lines: list[LogLine] = []
-        with open(path, 'r') as fp:
-            line = fp.readline().strip('\n').split(' ', 2) # how to delim each LogLine
-            while line[0] != '':
-                level = line[0].strip('][')
-                logger = line[1].strip('][')
-                message = line[2]
-                log_lines.append(LogLine(level, logger, message))
-                line = fp.readline().strip('\n').split(' ', 2)
-        return LogFile(path, log_lines)
+    @property
+    def tool_failure(self) -> bool:
+        # did one of the tool translations fail?
+        raise NotImplementedError()
     
-    def print_report(self, report: Report) -> None:
-        print(f'\nTOOLS PARSED: {report.tool_count}')
-        
-        print('\nSTATUSES:')
-        statuses = list(report.statuses.items())
-        statuses.sort(key=lambda x: x[1], reverse=True)
-        print(f"{'status':<10}{'tool count':>13}{'percent':>10}")
-        for status, count in statuses:
-            percent = count / report.tool_count * 100
-            print(f'{status:<10}{count:>13}{percent:>10.1f}')
+    @property
+    def workflow_failure(self) -> bool:
+        # did something else about the workflow translation cause failure?
+        raise NotImplementedError()
+    
+    @property
+    def translatable(self) -> bool:
+        # does janis translate cwl work?
+        raise NotImplementedError()
 
-        print('\nMESSAGES:')
-        messages = list(report.messages.items())
-        messages.sort(key=lambda x: x[1], reverse=True)
-        print(f"{'message':<30}{'tool count':>13}{'percent':>10}")
-        for message, count in messages:
-            percent = count / report.tool_count * 100
-            print(f'{message:<30}{count:>13}{percent:>10.1f}')
 
-        print('\nERROR TOOLS:')
-        for tool in report.get_tools_with_level('ERROR'):
-            print(tool)
-        
-        print('\nCRITICAL TOOLS:')
-        for tool in report.get_tools_with_msg('exception'):
-            print(tool)
 
+@dataclass
+class WorkflowParsingReport:
+    reports: list[WorkflowReport]
+
+    def hello(self) -> None:
+        print()
+    
 
 def main(argv: list[str]):
-    parsed_folder = argv[0]
-    reporter = Reporter(parsed_folder)
-    reporter.report()
+    mode = argv[0]
+    parsed_folder = argv[1]
+    if mode == 'tool':
+        tool_mode(parsed_folder)
+    elif mode == 'workflow':
+        workflow_mode(parsed_folder)
+    else:
+        raise RuntimeError()
+
+
+def tool_mode(parsed_folder: str) -> None:
+    report = create_tool_parsing_report(parsed_folder)
+    print_tool_parsing_report(report)
+
+def workflow_mode(parsed_folder: str) -> None:
+    report = create_workflow_parsing_report(parsed_folder)
+    print_workflow_parsing_report(report)
+
+def create_tool_parsing_report(parsed_tools_folder: str) -> ToolParsingReport:
+    log_paths = get_tool_logfile_paths(parsed_tools_folder)
+    log_files = [load_log(path, logtype='tool') for path in log_paths]
+    return ToolParsingReport(log_files)
+
+def create_workflow_parsing_report(parsed_workflows_folder: str) -> WorkflowParsingReport:
+    reports: list[WorkflowReport] = []
+    workflow_dirs = get_workflow_directories(parsed_workflows_folder)
+    for directory in workflow_dirs:
+        folder = f'{parsed_workflows_folder}/{directory}'
+        reports.append(WorkflowReport(
+            name=directory, 
+            tools_report=load_workflow_tools_report(folder), 
+            logfile=load_workflow_logfile(folder), 
+            workflow_path=load_workflow_path(folder))
+        )
+    return WorkflowParsingReport(reports)
+
+def get_workflow_directories(folder: str) -> list[str]:
+    files = os.listdir(folder)
+    return [f for f in files if os.path.isdir(f'{folder}/{f}')]
+
+def load_workflow_tools_report(folder: str) -> ToolParsingReport:
+    tools_dir = f'{folder}/tools'
+    return create_tool_parsing_report(tools_dir)
+
+def load_workflow_logfile(folder: str) -> LogFile:
+    logfile_path = f'{folder}/workflow.log'
+    return load_log(logfile_path)
+
+def load_workflow_path(folder: str) -> Optional[str]:
+    if os.path.exists(f'{folder}/workflow.py'):
+        return f'{folder}/workflow.py'
+    return None
+
+
+# helper methods
+def get_tool_logfile_paths(folder: str) -> list[str]:
+    out: list[str] = []
+    for root, dirs, files in os.walk(folder):
+        out += [f'{root}/{f}' for f in files if f != 'workflow.log' and f.endswith('.log')]
+    return out
+
+def load_log(path: str, logtype: str='tool') -> LogFile:
+    log_lines: list[LogLine] = []
+    with open(path, 'r') as fp:
+        line = fp.readline().strip('\n').split(' ', 2) # how to delim each LogLine
+        while line[0] != '':
+            level = line[0].strip('][')
+            logger = line[1].strip('][')
+            message = line[2]
+            log_lines.append(LogLine(level, logger, message))
+            line = fp.readline().strip('\n').split(' ', 2)
+    return LogFile(logtype, path, log_lines)
+    
+def print_tool_parsing_report(report: ToolParsingReport) -> None:
+    print(f'\nTOOLS PARSED: {report.tool_count}')
+    
+    print('\nSTATUSES:')
+    statuses = list(report.statuses.items())
+    statuses.sort(key=lambda x: x[1], reverse=True)
+    print(f"{'status':<10}{'tool count':>13}{'percent':>10}")
+    for status, count in statuses:
+        percent = count / report.tool_count * 100
+        print(f'{status:<10}{count:>13}{percent:>10.1f}')
+
+    print('\nMESSAGES:')
+    messages = list(report.messages.items())
+    messages.sort(key=lambda x: x[1], reverse=True)
+    print(f"{'message':<30}{'tool count':>13}{'percent':>10}")
+    for message, count in messages:
+        percent = count / report.tool_count * 100
+        print(f'{message:<30}{count:>13}{percent:>10.1f}')
+
+    print('\nERROR TOOLS:')
+    for tool in report.get_tools_with_level('ERROR'):
+        print(tool)
+    
+    print('\nCRITICAL TOOLS:')
+    for tool in report.get_tools_with_msg('exception'):
+        print(tool)
+
+def print_workflow_parsing_report(report: WorkflowParsingReport) -> None:
+    report.hello()
+    print()
+
 
 
 if __name__ == '__main__':
     main(sys.argv[1:])
 
 
+# # helper methods
+# def get_logfile_paths(folder: str) -> list[str]:
+#     out: list[str] = []
+#     for log_dir in get_logfile_directories(folder):
+#         files = os.listdir(log_dir)
+#         log_files = [f for f in files if f.endswith('.log')]
+#         out += [f'{log_dir}/{f}' for f in log_files]
+#     return out
 
 
 

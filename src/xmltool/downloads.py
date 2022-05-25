@@ -39,13 +39,15 @@ class DownloadHandler:
         # cached
         if xmldir is not None:
             self.xmldir = xmldir
-            self.xmlfile = general_utils.select_xmlfile(xmldir, self.intended_tool_id)
+            self.xmlfile = general_utils.get_xmlfile_by_tool_id(xmldir, self.intended_tool_id)
+            assert(self.xmlfile)
         # not cached
         else:
             self.log_message()
             tar = self.perform_download()
             self.xmldir = self.get_xmldir(tar)
-            self.xmlfile = general_utils.select_xmlfile(self.xmldir, self.intended_tool_id)
+            self.xmlfile = general_utils.get_xmlfile_by_tool_id(self.xmldir, self.intended_tool_id)
+            assert(self.xmlfile)
             self.update_cache()
 
     def log_message(self) -> None:

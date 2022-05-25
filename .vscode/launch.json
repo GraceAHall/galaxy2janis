@@ -46,20 +46,20 @@
             "name": "tool_reporting",
             "type": "python",
             "request": "launch",
-            "program": "src/tool_reporting.py",
+            "program": "src/bulk_reporting.py",
             "console": "integratedTerminal",
             "args": [
-                "parsed/tools"
+                "tool", "parsed/tools"
             ]
         },
         {
             "name": "workflow_reporting",
             "type": "python",
             "request": "launch",
-            "program": "src/workflow_reporting.py",
+            "program": "src/bulk_reporting.py",
             "console": "integratedTerminal",
             "args": [
-                "parsed/workflows"
+                "workflow", "parsed/workflows"
             ]
         },
         // TOOLS
@@ -130,6 +130,19 @@
             ]
         },
         {
+            "name": "shovill test",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/shovill_test.ga",
+                "--outdir", "parsed/workflows"
+            ]
+        },
+        {
             "name": "super simple unicycler",
             "type": "python",
             "request": "launch",
@@ -152,7 +165,7 @@
             "args": [
                 "workflow",
                 "test/data/workflows/mine/simple_workflow.ga",
-                "--outdir", "parsed/workflows"
+                "--outdir", "parsed/workflows",
             ]
         },
         {

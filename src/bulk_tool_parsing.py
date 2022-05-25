@@ -40,7 +40,7 @@ class ToolModeRunner:
     def run(self) -> None:
         xmldirs = self.get_xml_directories()
         details = self.get_job_details(xmldirs)
-        self.run_jobs(details=details, threads=10)
+        self.run_jobs(details=details, threads=18)
     
     def get_xml_directories(self):
         files = os.listdir(self.tooldir)

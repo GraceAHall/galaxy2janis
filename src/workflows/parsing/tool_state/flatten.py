@@ -25,6 +25,8 @@ class ToolStateFlattener:
             pass
         elif value == {"__class__": "RuntimeValue"}:
             self.add_to_flattened_tool_state(name, 'RuntimeValue', path_copy)
+        elif value == {"__class__": "ConnectedValue"}:
+            pass
         elif isinstance(value, dict):
             path_copy.append(name)
             for key, val in value.items():

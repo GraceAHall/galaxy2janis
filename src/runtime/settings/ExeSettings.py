@@ -9,13 +9,14 @@ class WorkflowExeSettings:
     workflow: str
     outdir: str
     container_cachedir: str
+    dev_no_test_cmdstrs: bool
+    dev_no_partial_eval: bool
 
     def get_container_cache_path(self) -> str:
         return self.container_cachedir
         
     def get_logfile_path(self) -> str:
         return f'{self.outdir}/workflow.log'
-
 
     def get_janis_workflow_path(self) -> str:
         return f'{self.outdir}/workflow.py'
@@ -38,6 +39,7 @@ class WorkflowExeSettings:
 class ToolExeSettings:
     download_dir: str
     container_cachedir: str
+    dev_no_test_cmdstrs: bool
     xmlfile: Optional[str] = None
     xmldir: Optional[str] = None
     remote_url: Optional[str] = None

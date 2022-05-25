@@ -19,9 +19,10 @@ from command.text.simplification.aliases import resolve_aliases
 from xmltool.load import load_xmltool
 from command.cmdstr.cmdstr import gen_command_string
 
-import workflows.analysis.tool_values.create_value as value_utils
-import command.text.regex.utils as regex_utils
 from command.text.load import load_xml_command_cheetah_eval
+import workflows.analysis.tool_values.create_value as value_factory
+import workflows.analysis.tool_values.utils as value_utils
+import command.text.regex.utils as regex_utils
 
 
 class ValueLinker(ABC):
@@ -112,6 +113,8 @@ class CheetahValueLinker(ValueLinker):
             self.handle_not_present_opt(option)
         elif self.is_param(value):
             self.handle_gxvar_opt(option, value)
+        elif value_utils.is_env_var(value) or value_utils.has_env_var(value):
+            self.handle_envvar_opt(option, value)
         else:
             self.handle_value_opt(option, value)
 
@@ -135,12 +138,21 @@ class CheetahValueLinker(ValueLinker):
         # should always be attached tho? 
         pass
     
+    def handle_envvar_opt(self, option: Option, value: Any) -> None:
+        self.update_tool_values_runtime(component=option, value=value)
+    
     def handle_value_opt(self, option: Option, value: Any) -> None:
         self.update_tool_values_static(component=option, value=value)
 
     def update_tool_values_static(self, component: Flag | Option, value: Any) -> None:
         register = self.step.tool_values
-        inputval = value_utils.create_static(component, value)  # type: ignore
+        inputval = value_factory.create_static(component, value)  # type: ignore
+        register.update_linked(component.get_uuid(), inputval)
+        self.mark_linked(component)
+    
+    def update_tool_values_runtime(self, component: Flag | Option, value: Any) -> None:
+        register = self.step.tool_values
+        inputval = value_factory.create_runtime(component)  # type: ignore
         register.update_linked(component.get_uuid(), inputval)
         self.mark_linked(component)
 
@@ -160,7 +172,7 @@ class InputDictValueLinker(ValueLinker):
                 step_input = inp_register.get(gxvarname)
 
                 if step_input:
-                    value = value_utils.create(component, step_input, self.workflow)
+                    value = value_factory.create(component, step_input, self.workflow)
                     val_register.update_linked(component.get_uuid(), value)
                     self.mark_linked(step_input)
     
@@ -183,7 +195,7 @@ class DefaultValueLinker(ValueLinker):
     def link(self) -> None:
         val_register = self.step.tool_values
         for component in self.get_linkable_components():
-            value = value_utils.create_default(component)
+            value = value_factory.create_default(component)
             val_register.update_linked(component.get_uuid(), value)
 
 
@@ -210,10 +222,10 @@ class UnlinkedValueLinker(ValueLinker):
         if isinstance(step_input, WorkflowInputStepInput):
             workflow_input = self.workflow.get_input(step_id=step_input.step_id)
             assert(workflow_input)
-            return value_utils.create_unlinked_workflowinput(workflow_input)
+            return value_factory.create_unlinked_workflowinput(workflow_input)
         # step connections
         elif isinstance(step_input, ConnectionStepInput):
-            return value_utils.create_unlinked_connection(step_input, self.workflow)
+            return value_factory.create_unlinked_connection(step_input, self.workflow)
         else:
             raise RuntimeError()
 

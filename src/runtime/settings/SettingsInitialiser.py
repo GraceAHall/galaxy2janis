@@ -1,17 +1,19 @@
 
 
-from typing import Optional
+from typing import Any, Optional
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
 
 
 class WorkflowSettingsInitialiser:
 
-    def init_settings(self, args: dict[str, Optional[str]]) -> WorkflowExeSettings:
+    def init_settings(self, args: dict[str, Any]) -> WorkflowExeSettings:
         return WorkflowExeSettings(
             workflow=args['workflow'], # type: ignore
             outdir=self.format_outdir(args),
             container_cachedir=self.format_cachedir(args),
+            dev_no_test_cmdstrs=args['dev_no_test_cmdstrs'],
+            dev_no_partial_eval=args['dev_no_partial_eval']
         )
 
     def format_outdir(self, args: dict[str, Optional[str]]) -> str:
@@ -28,7 +30,7 @@ class WorkflowSettingsInitialiser:
 
 class ToolSettingsInitialiser:
 
-    def init_settings(self, args: dict[str, Optional[str]]) -> ToolExeSettings:
+    def init_settings(self, args: dict[str, Any]) -> ToolExeSettings:
         return ToolExeSettings(
             download_dir=self.format_download_dir(args),
             container_cachedir=self.format_cachedir(args),
@@ -36,6 +38,7 @@ class ToolSettingsInitialiser:
             xmldir=args['dir'],
             remote_url=args['remote_url'],
             user_outdir=self.format_user_outdir(args),
+            dev_no_test_cmdstrs=args['dev_no_test_cmdstrs']
         )
 
     def format_user_outdir(self, args: dict[str, Optional[str]]) -> Optional[str]:

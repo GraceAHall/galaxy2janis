@@ -39,7 +39,7 @@ class WorkflowModeRunner:
     def run(self) -> None:
         wflowdirs = self.get_workflow_directories()
         details = self.get_job_details(wflowdirs)
-        self.run_jobs(details=details, threads=10)
+        self.run_jobs(details=details, threads=16)
     
     def get_workflow_directories(self):
         banned_dirs = set(['mine'])

@@ -20,7 +20,6 @@ class CommandFactory:
         self.xmltool = xmltool
         
         self.xmlcmdstr = self.gen_cmdstr_from_xml()
-        self.testcmdstrs = self.gen_cmdstrs_from_tests()
         self.command = Command(self.xmlcmdstr)
 
     def create(self) -> Command:
@@ -45,9 +44,9 @@ class CommandFactory:
 
     def gen_cmdstrs(self) -> list[CommandString]:
         # note ordering: xml then test
-        xml_cmdstr = self.gen_cmdstr_from_xml()
-        test_cmdstrs = self.gen_cmdstrs_from_tests()
-        cmdstrs = [xml_cmdstr] + test_cmdstrs
+        cmdstrs = [self.xmlcmdstr]
+        if not self.esettings.dev_no_test_cmdstrs:
+            cmdstrs += self.gen_cmdstrs_from_tests()
         return cmdstrs
 
     def gen_cmdstr_from_xml(self) -> CommandString:

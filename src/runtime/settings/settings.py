@@ -1,5 +1,6 @@
 
-from typing import Optional, Tuple 
+from typing import Any, Optional, Tuple 
+import os 
 
 from xmltool.downloads import handle_downloads
 
@@ -41,7 +42,7 @@ def create_tool_settings_for_step(wsettings: WorkflowExeSettings, metadata: Step
     args = _make_parse_tool_args(metadata, wsettings)
     return load_tool_settings(args, metadata.tool_id)
         
-def _make_parse_tool_args(metadata: StepMetadata, esettings: WorkflowExeSettings) -> dict[str, Optional[str]]:
+def _make_parse_tool_args(metadata: StepMetadata, wsettings: WorkflowExeSettings) -> dict[str, Any]:
     if metadata.is_inbuilt:
         tool_dir, xml_filename = _get_builtin_tool_path(metadata)
         return {
@@ -49,22 +50,46 @@ def _make_parse_tool_args(metadata: StepMetadata, esettings: WorkflowExeSettings
             'xml': xml_filename,
             'remote_url': None,
             'download_dir': None,
-            'outdir': f'{esettings.get_janis_tools_dir()}/{metadata.tool_id}',
-            'cachedir': esettings.container_cachedir
+            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.tool_id}',
+            'cachedir': wsettings.container_cachedir,
+            'dev_no_test_cmdstrs': wsettings.dev_no_test_cmdstrs
         }
     else:
         return {
             'dir': None,
             'xml': None,
             'remote_url': metadata.get_build_url(),
-            'download_dir': esettings.get_xml_wrappers_dir(),
-            'outdir': f'{esettings.get_janis_tools_dir()}/{metadata.tool_id}',
-            'cachedir': esettings.container_cachedir
+            'download_dir': wsettings.get_xml_wrappers_dir(),
+            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.tool_id}',
+            'cachedir': wsettings.container_cachedir,
+            'dev_no_test_cmdstrs': wsettings.dev_no_test_cmdstrs
         }
 
 def _get_builtin_tool_path(metadata: StepMetadata) -> Tuple[str, str]:
-    import galaxy.tools
-    tool_folder = str(galaxy.tools.__file__).rsplit('/', 1)[0]
-    xmlfile = utils.select_xmlfile(tool_folder, metadata.tool_id)
-    return tool_folder, xmlfile
+    tool_directories = _get_builtin_tool_directories()
+    for directory in tool_directories:
+        xmlfile = utils.get_xmlfile_by_tool_id(directory, metadata.tool_id)
+        if xmlfile:
+            return directory, xmlfile
+    raise RuntimeError(f'cannot locate builtin tool {metadata.tool_id}') 
 
+def _get_builtin_tool_directories() -> list[str]:
+    out: list[str] = []
+    out += _get_builtin_tools_directories()
+    out += _get_datatype_converter_directories()
+    return out
+
+def _get_builtin_tools_directories() -> list[str]:
+    import galaxy.tools
+    tools_folder = str(galaxy.tools.__file__).rsplit('/', 1)[0]
+    bundled_folders = os.listdir(f'{tools_folder}/bundled')
+    bundled_folders = [f for f in bundled_folders if not f.startswith('__')]
+    bundled_folders = [f'{tools_folder}/bundled/{f}' for f in bundled_folders]
+    bundled_folders = [f for f in bundled_folders if os.path.isdir(f)]
+    return [tools_folder] + bundled_folders
+
+def _get_datatype_converter_directories() -> list[str]:
+    import galaxy.datatypes
+    datatypes_folder = str(galaxy.datatypes.__file__).rsplit('/', 1)[0]
+    converters_folder = f'{datatypes_folder}/converters'
+    return [converters_folder]

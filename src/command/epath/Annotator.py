@@ -258,11 +258,11 @@ class TeeAnnotator(Annotator):
             token = self.positions[ptr].token
 
         # tee files: consumes to end of statement
-        while token and ptr < len(self.positions):
+        while ptr < len(self.positions) - 1:
+            token = self.positions[ptr].token
             tee.files.append(token)
             self.update_epath_components(ptr, tee)
             ptr += 1
-            token = self.positions[ptr].token
 
     def calculate_next_ptr_pos(self) -> int:
         return len(self.positions)

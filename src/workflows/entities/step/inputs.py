@@ -41,9 +41,9 @@ class RuntimeStepInput(StepInput):
 
 class StepInputRegister:
     """
-    holds the data above
-    galaxy varnames are linked to actual Param objects
-    allows getting the value of an input by supplying a galaxy varname
+    holds the data above. 
+    galaxy varnames are linked to actual Param objects.
+    allows getting the value of an input by supplying a galaxy varname.
     """
     def __init__(self, step_inputs: list[StepInput]):
         self.register = step_inputs

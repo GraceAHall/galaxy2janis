@@ -1,7 +1,7 @@
 
 
 
-
+import runtime.logging.logging as logging
 
 from typing import Optional
 
@@ -52,12 +52,15 @@ class RealisedTokenFactory:
         self.factory = token_factory
         self.tracker = ConstructTracker()  # this is all a bit ugly
 
-    def tokenify(self, the_string: str) -> list[RealisedTokens]:
+    def try_tokenify(self, the_string: str) -> list[RealisedTokens]:
         rtvs: list[RealisedTokens] = []
-        for line in split_lines(the_string):
-            self.tracker.update(line)
-            if self.should_tokenify_line(line):
-                rtvs += self.tokenify_line(line)
+        try:
+            for line in split_lines(the_string):
+                self.tracker.update(line)
+                if self.should_tokenify_line(line):
+                    rtvs += self.tokenify_line(line)
+        except ValueError:
+            logging.no_close_quotation()
         return rtvs
 
     def should_tokenify_line(self, line: str) -> bool:

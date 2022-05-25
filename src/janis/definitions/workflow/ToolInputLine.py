@@ -124,7 +124,7 @@ class UnlinkedInputLine(ToolInputLine):
     
     @property
     def special_label(self) -> Optional[str]:
-        return 'UNLINKED INPUT'
+        return f"UNLINKED INPUT ({self.invalue.abstract_value})"
        
     @property
     def argument(self) -> Optional[str]:

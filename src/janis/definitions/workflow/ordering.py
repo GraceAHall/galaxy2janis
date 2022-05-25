@@ -26,36 +26,38 @@ class ComponentTypeStrategy(LineOrderingStrategy):
         lines.sort(key=lambda x: priorities[x.invalue.comptype])
         return lines
 
-class InputOrConnectionStrategy(LineOrderingStrategy):
-    priority_types = [WorkflowInputInputValue, ConnectionInputValue]
+class WorkflowInputPriorityStrategy(LineOrderingStrategy):
     def order(self, lines: list[ToolInputLine]) -> list[ToolInputLine]:
-        top = [x for x in lines if type(x.invalue) in self.priority_types]
-        bottom = [x for x in lines if type(x.invalue) not in self.priority_types]
+        top = [x for x in lines if isinstance(x.invalue, WorkflowInputInputValue)]
+        bottom = [x for x in lines if not isinstance(x.invalue, WorkflowInputInputValue)]
         return top + bottom
 
-class ConnectionNonConnectionStrategy(LineOrderingStrategy):
+class RuntimeInputPriorityStrategy(LineOrderingStrategy):
     def order(self, lines: list[ToolInputLine]) -> list[ToolInputLine]:
-        raise NotImplementedError()
-        # connection = [x for x in input_values if isinstance(x[1], ConnectionInputValue)]
-        # non_connection = [x for x in input_values if not isinstance(x[1], ConnectionInputValue)]
-        # return connection + non_connection
+        top: list[ToolInputLine] = []
+        bottom: list[ToolInputLine] = []
+        for line in lines:
+            if isinstance(line.invalue, WorkflowInputInputValue) and not line.invalue.is_runtime:
+                top.append(line)
+            else:
+                bottom.append(line)
+        return top + bottom
 
-class WorkflowInputStrategy(LineOrderingStrategy):
+class ConnectionPriorityStrategy(LineOrderingStrategy):
     def order(self, lines: list[ToolInputLine]) -> list[ToolInputLine]:
-        raise NotImplementedError()
-        # connection = [x for x in input_values if isinstance(x[1], WorkflowInputInputValue)]
-        # non_connection = [x for x in input_values if not isinstance(x[1], WorkflowInputInputValue)]
-        # return connection + non_connection
+        top = [x for x in lines if isinstance(x.invalue, ConnectionInputValue)]
+        bottom = [x for x in lines if not isinstance(x.invalue, ConnectionInputValue)]
+        return top + bottom
 
 
 # changing the order of the objects below changes the 
 # ordering priority, as the last ordering method has the highest impact etc
 STRATEGIES = [
-    ComponentTypeStrategy(),
     AlphabeticalStrategy(),
-    InputOrConnectionStrategy(),
-    # WorkflowInputStrategy(),
-    # ConnectionNonConnectionStrategy()
+    ComponentTypeStrategy(),
+    RuntimeInputPriorityStrategy(),
+    WorkflowInputPriorityStrategy(),
+    ConnectionPriorityStrategy(),
 ]
 
 def order(lines: list[ToolInputLine]) -> list[ToolInputLine]:

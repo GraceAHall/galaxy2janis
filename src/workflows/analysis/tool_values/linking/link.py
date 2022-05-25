@@ -40,7 +40,7 @@ linkers: list[Type[ValueLinker]] = [
 def link_tool_input_values(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
     for step in workflow.list_steps():
         tsettings = create_tool_settings_for_step(wsettings, step.metadata)
-        step.inputs.assign_gxparams(step.tool)  
+        step.inputs.assign_gxparams(step.tool)  # is this needed?
         link_step_values(tsettings, step, workflow)
         assert_all_components_assigned(step)
 
@@ -50,6 +50,7 @@ def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: W
         l.link()
         logging.runtime_data(str(step.tool_values))
     perform_migrations(step, workflow)
+    print()
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):
     migrator = ValueMigrator(step, workflow)

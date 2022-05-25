@@ -1,7 +1,9 @@
 
 from logging import getLogger, config
+from typing import Optional
 import warnings
 import yaml
+import sys 
 
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
@@ -76,9 +78,9 @@ def has_repeat():
     logger = getLogger('tool')
     logger.warning('repeat param')
 
-def has_cheetah_loop():
+def has_cheetah_loop(text: Optional[str]=None):
     logger = getLogger('tool')
-    logger.warning('cheetah loop')
+    logger.warning(f'cheetah loop:\t{text}')
 
 def has_cheetah_function():
     logger = getLogger('tool')
@@ -100,9 +102,16 @@ def zero_length_tag():
     logger = getLogger('tool')
     logger.warning('zero length tag')
 
+def workflow_step_array_connections():
+    logger = getLogger('workflow')
+    logger.warning('workflow step array connections')
+
 # def has_bash_script():
 #     logger = getLogger('tool')
 #     logger.warning('bash script')
+
+
+
 
 
 # error
@@ -127,11 +136,18 @@ def no_base_cmd():
     logger = getLogger('tool')
     logger.error('no base cmd')
 
-# critical 
+# critical (exceptions)
 def tool_exception():
     logger = getLogger('tool')
     logger.critical('exception')
+    sys.exit(1)
+
+def no_close_quotation():
+    logger = getLogger('tool')
+    logger.critical('no closing quotation')
+    sys.exit(1)
 
 def workflow_exception():
     logger = getLogger('workflow')
     logger.critical('exception')
+    sys.exit(1)
