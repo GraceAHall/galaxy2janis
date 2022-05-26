@@ -1,0 +1,33 @@
+in_raw_genome_sequence: null
+repeatmasker_wrapper_ali: false
+repeatmasker_wrapper_alu: false
+repeatmasker_wrapper_cutoff: null
+repeatmasker_wrapper_dir: null
+repeatmasker_wrapper_div: false
+repeatmasker_wrapper_excln: true
+repeatmasker_wrapper_flag_q: false
+repeatmasker_wrapper_flag_s: false
+repeatmasker_wrapper_flag_x: false
+repeatmasker_wrapper_frag: 40000
+repeatmasker_wrapper_gcccalc: false
+repeatmasker_wrapper_gff: false
+repeatmasker_wrapper_human: human
+repeatmasker_wrapper_inv: false
+repeatmasker_wrapper_is_clip: false
+repeatmasker_wrapper_is_only: false
+repeatmasker_wrapper_lib:
+  class: File
+  path: null
+repeatmasker_wrapper_libdir: null
+repeatmasker_wrapper_no_is: false
+repeatmasker_wrapper_nocut: false
+repeatmasker_wrapper_noint: false
+repeatmasker_wrapper_nolow: false
+repeatmasker_wrapper_norna: false
+repeatmasker_wrapper_parallel: 1
+repeatmasker_wrapper_poly: false
+repeatmasker_wrapper_primspec: false
+repeatmasker_wrapper_qq: false
+repeatmasker_wrapper_rodspec: false
+repeatmasker_wrapper_species: human
+repeatmasker_wrapper_xsmall: true

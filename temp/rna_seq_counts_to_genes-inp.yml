@@ -1,0 +1,41 @@
+annotatemyids_annotatemyids_script: null
+in_sampleinfo: null
+in_seqdata: null
+limma_voom_flag_b: true
+limma_voom_flag_c: true
+limma_voom_flag_f: true
+limma_voom_flag_i: false
+limma_voom_flag_l: true
+limma_voom_flag_r: true
+limma_voom_flag_t: true
+limma_voom_flag_w: true
+limma_voom_flag_x: true
+limma_voom_flag_y: true
+limma_voom_input_d: d
+limma_voom_option_c: 0.5
+limma_voom_option_d: BH
+limma_voom_option_g: 10
+limma_voom_option_j: null
+limma_voom_option_l: 0.58
+limma_voom_option_n: TMM
+limma_voom_option_o: null
+limma_voom_option_p: 0.01
+limma_voom_option_r:
+  class: File
+  path: null
+limma_voom_option_s: 2
+limma_voom_option_t: null
+limma_voom_option_z: 0
+mergecols1_col1: 3
+mergecols1_col2: 4
+mergecols1_out_file11:
+  class: File
+  path: null
+tp_cut_tool1_complement: true
+tp_cut_tool1_flag_error: false
+tp_cut_tool1_input__: .
+tp_cut_tool2_complement: false
+tp_cut_tool2_flag_error: false
+tp_cut_tool2_input__: .
+tp_replace_in_line_flag_r: true
+tp_replace_in_line_sandbox: null

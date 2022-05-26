@@ -1,0 +1,92 @@
+cutadapt_action: null
+cutadapt_discard_trimmed: false
+cutadapt_discard_untrimmed: false
+cutadapt_error_rate: null
+cutadapt_info_file:
+  class: File
+  path: null
+cutadapt_length: null
+cutadapt_match_read_wildcards: false
+cutadapt_nextseq_trim: null
+cutadapt_no_indels: false
+cutadapt_no_match_adapter_wildcards: false
+cutadapt_option_j: null
+cutadapt_output_fastqsanger:
+  class: File
+  path: null
+cutadapt_overlap: null
+cutadapt_paired_output:
+  class: File
+  path: null
+cutadapt_quality_cutoff: null
+cutadapt_read2: null
+cutadapt_rest_file:
+  class: File
+  path: null
+cutadapt_revcomp: false
+cutadapt_times: null
+cutadapt_too_long_output:
+  class: File
+  path: null
+cutadapt_too_long_paired_output:
+  class: File
+  path: null
+cutadapt_too_short_output:
+  class: File
+  path: null
+cutadapt_too_short_paired_output:
+  class: File
+  path: null
+cutadapt_trim_n: false
+cutadapt_untrimmed_output:
+  class: File
+  path: null
+cutadapt_untrimmed_paired_output:
+  class: File
+  path: null
+cutadapt_wildcard_file:
+  class: File
+  path: null
+cutadapt_zero_cap: null
+fastqc_extract: true
+fastqc_kmers: 7
+fastqc_nogroup: false
+fastqc_option_f: fastq
+fastqc_outdir: /tmp/tmpwdjzsd51/working/dataset_3_files
+fastqc_quiet: true
+in_broadgpp_brunello_library_contents_csv: null
+in_calabrese_seta_guides_reference_csv: null
+in_input_dataset_collection: null
+mageck_count_count_n: false
+mageck_count_keep_tmp: true
+mageck_count_norm_method: median
+mageck_count_option_l:
+  class: File
+  path: null
+mageck_count_option_n: output
+mageck_count_pdf_report: true
+mageck_count_reverse_complement: false
+mageck_count_sample_label: ''
+mageck_count_test_run: false
+mageck_count_total: total
+mageck_count_unmapped_to_file: false
+mageck_test_adjust_method: fdr
+mageck_test_control: control
+mageck_test_fdr: fdr
+mageck_test_gene_lfc_method: median
+mageck_test_median1: median
+mageck_test_median2: median
+mageck_test_neg: neg
+mageck_test_norm_method: total
+mageck_test_normcounts_to_file: true
+mageck_test_option_c: '1'
+mageck_test_option_n: output
+mageck_test_option_t: '0'
+mageck_test_pdf_report: true
+mageck_test_remove_zero: both
+mageck_test_sort_criteria: neg
+mageck_test_variance_estimation_samples: false
+multiqc_config: null
+multiqc_export: false
+multiqc_filename: report
+multiqc_flat: false
