@@ -1,0 +1,14 @@
+in_foward_reads: null
+in_reverse_reads: null
+shovill_assembler: spades
+shovill_cpus: 1
+shovill_depth: 100
+shovill_mincov: 2
+shovill_minlen: 0
+shovill_namefmt: null
+shovill_nocorr: true
+shovill_outdir: out
+shovill_r1: null
+shovill_r2: null
+shovill_ram: 4
+shovill_trim: false

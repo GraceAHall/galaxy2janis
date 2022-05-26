@@ -1,0 +1,63 @@
+filtlong_assembly:
+  class: File
+  path: null
+filtlong_illumina_1:
+  class: File
+  path: null
+filtlong_illumina_2:
+  class: File
+  path: null
+filtlong_length_weight: 1.0
+filtlong_mean_q_weight: 1.0
+filtlong_min_length: 500
+filtlong_min_mean_q: 8.0
+filtlong_trim: false
+filtlong_window_q_weight: 1.0
+filtlong_window_size: 250
+in_long_reads:
+  class: File
+  path: null
+kraken2_classified_out:
+  class: File
+  path: null
+kraken2_confidence: 0.0
+kraken2_db: null
+kraken2_minimum_base_quality: 0
+kraken2_minimum_hit_groups: 2
+kraken2_paired:
+  class: File
+  path: null
+kraken2_quick: false
+kraken2_report:
+  class: File
+  path: null
+kraken2_report_minimizer_data: false
+kraken2_report_zero_counts: false
+kraken2_threads: 1
+kraken2_unclassified_out:
+  class: File
+  path: null
+kraken2_use_mpa_style: false
+kraken2_use_names: false
+kraken2tax_ncbi_taxonomy_fields_path1: null
+kraken2tax_ncbi_taxonomy_fields_path2: null
+kraken2tax_positional_3: 1
+nanoplot_alength: false
+nanoplot_aliceblue: aliceblue
+nanoplot_barcoded: false
+nanoplot_drop_outliers: false
+nanoplot_format: png
+nanoplot_input_1d: 1D
+nanoplot_loglength: false
+nanoplot_n50: false
+nanoplot_option_o: .
+nanoplot_percentqual: false
+nanoplot_png: png
+nanoplot_threads: '4'
+taxonomy_krona_chart_flag_c: false
+taxonomy_krona_chart_ktimporttext: ktImportText
+taxonomy_krona_chart_option_n: Root
+taxonomy_krona_chart_option_o:
+  class: File
+  path: null
+taxonomy_krona_chart_positional_1: 0

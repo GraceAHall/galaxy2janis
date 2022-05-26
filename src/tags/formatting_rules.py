@@ -1,6 +1,8 @@
 
 
 from typing import Any
+import keyword
+import builtins
 
 import runtime.logging.logging as logging
 from command.components.inputs.Positional import Positional
@@ -11,7 +13,6 @@ from command.components.inputs.Option import Option
 # from command.components.outputs.RedirectOutput import RedirectOutput
 # from command.components.outputs.WildcardOutput import WildcardOutput
 #OutputComponent = InputOutput | RedirectOutput | WildcardOutput
-
 
 
 def encode(tag: str) -> str:
@@ -58,8 +59,11 @@ def non_alphanumeric(tag: str, entity: Any) -> str:
     """
     tag = tag.strip('\\/-${}')
     tag = tag.replace('-', '_')
+    tag = tag.replace('*', '')
     tag = tag.replace('(', '')
     tag = tag.replace(')', '')
+    tag = tag.replace(']', '')
+    tag = tag.replace('[', '')
     tag = tag.replace('.', '_')
     tag = tag.replace(' ', '_')
     tag = tag.replace('|', '_')
@@ -70,25 +74,27 @@ def non_alphanumeric(tag: str, entity: Any) -> str:
     tag = tag.replace("@", 'at')
     return tag
 
-prohibited_keys = {
+
+python_keys = set(keyword.kwlist)
+builtin_keys = set(dir(builtins))
+janis_keys = set([
     "identifier",
     "tool",
     "scatter",
     "ignore_missing",
     "output",
+    "outputs",
     "input",
     "inputs"
-}
+])
+keywords = python_keys | builtin_keys | janis_keys
 
-def prohibited_key(tag: str, entity: Any) -> str:
-    if tag in prohibited_keys:
+def replace_keywords(tag: str, entity: Any) -> str:
+    if tag in keywords:
         tag = _append_datatype(tag, entity)
     return tag
 
-# def _standardise_numeric(tag: str) -> str:
-#     pass
-
-def _strip_numerals(tag: str) -> str:
+def _strip_numerals(tag: str) -> str:  # ??? y
     return tag.lstrip('0123456789')
 
 def _prepend_component_type(tag: str, entity: Any) -> str:

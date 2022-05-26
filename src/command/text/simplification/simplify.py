@@ -55,7 +55,6 @@ class PartialCheetahEvalSimplifier(CommandSimplifier):
         remove_cheetah_comments,
         simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
-        interpret_raw
     ]
 
 
@@ -67,7 +66,6 @@ class TestSimplifier(CommandSimplifier):
         simplify_sh_constructs,
         replace_backticks,
         remove_empty_quotes,
-        interpret_raw
     ]
 
 

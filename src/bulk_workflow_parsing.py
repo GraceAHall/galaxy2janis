@@ -39,15 +39,17 @@ class WorkflowModeRunner:
     def run(self) -> None:
         wflowdirs = self.get_workflow_directories()
         details = self.get_job_details(wflowdirs)
-        self.run_jobs(details=details, threads=16)
+        self.run_jobs(details=details, threads=10)
     
-    def get_workflow_directories(self):
-        banned_dirs = set(['mine'])
-        files = os.listdir(self.indir)
-        directories = [f for f in files if os.path.isdir(f'{self.indir}/{f}')]
-        directories = [f for f in files if not f in banned_dirs]
-        workflow_dirs = [f'{self.indir}/{workflow_dir}' for workflow_dir in directories]
-        return workflow_dirs
+    def get_workflow_directories(self) -> list[str]:
+        #banned_dirs = set(['mine'])
+        banned_dirs = set([])
+        out: list[str] = []
+        for root, dirs, files in os.walk(self.indir):
+            if any([f.endswith('.ga') for f in files]):
+                if not root in banned_dirs:
+                    out.append(root)
+        return out
 
     def get_job_details(self, workflow_dirs: list[str]) -> list[WorkflowJobDetails]:
         """set up jobs to run"""
@@ -77,9 +79,9 @@ class WorkflowModeRunner:
                 
 
 def main(argv: list[str]):
-    tools_folder = argv[0]
+    workflows_folder = argv[0]
     out_dir = argv[1]
-    runner = WorkflowModeRunner(tools_folder, out_dir)
+    runner = WorkflowModeRunner(workflows_folder, out_dir)
     runner.run()
 
 

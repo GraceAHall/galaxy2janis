@@ -1,0 +1,33 @@
+in_forward_reads: null
+in_long_reads: null
+in_reverse_reads: null
+unicycler_contamination:
+  class: File
+  path: null
+unicycler_depth_filter: 0.25
+unicycler_kmer_count: 10
+unicycler_largest_component: false
+unicycler_linear_seqs: 0
+unicycler_max_kmer_frac: 0.95
+unicycler_min_component_size: 1000
+unicycler_min_dead_end_size: 1000
+unicycler_min_fasta_length: 100
+unicycler_min_kmer_frac: 0.2
+unicycler_min_polish_size: 1000
+unicycler_mode: normal
+unicycler_no_correct: false
+unicycler_no_pilon: false
+unicycler_no_rotate: false
+unicycler_option_o: null
+unicycler_option_s:
+  class: File
+  path: null
+unicycler_option_t: 4
+unicycler_pilon_path: "{'no_pilon':"
+unicycler_scores: null
+unicycler_start_gene_cov: 95.0
+unicycler_start_gene_id: 90.0
+unicycler_start_genes:
+  class: File
+  path: null
+unicycler_verbosity: 3

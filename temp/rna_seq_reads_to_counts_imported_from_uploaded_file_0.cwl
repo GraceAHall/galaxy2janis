@@ -30,7 +30,7 @@ inputs:
 - id: fastqc1_outdir
   doc: None
   type: string
-  default: /tmp/tmppblblcxp/working/dataset_4_files
+  default: /tmp/tmp6nipah3b/working/dataset_4_files
 - id: cutadapt_info_file
   doc: |-
     Info File. Write information about each read and its adapter matches to a file.. possible values: false, true
@@ -103,6 +103,12 @@ inputs:
   type:
   - int
   - 'null'
+- id: cutadapt_option_u1
+  doc: |-
+    Cut bases from reads before adapter trimming. Remove bases from each read (first read only if paired). If positive, remove bases from the beginning. If negative, remove bases from the end. This is applied *before* adapter trimming.
+  type:
+  - int
+  - 'null'
 - id: cutadapt_option_u2
   doc: |-
     Cut bases from the second read in each pair.. Remove bases from the beginning or end of each read before trimming adapters. If positive, the bases are removed from the beginning of each read. If negative, the bases are removed from the end of each read.
@@ -143,11 +149,6 @@ inputs:
   type:
   - int
   - 'null'
-- id: cutadapt_option_u1
-  doc: |-
-    Cut bases from reads before adapter trimming. Remove bases from each read (first read only if paired). If positive, remove bases from the beginning. If negative, remove bases from the end. This is applied *before* adapter trimming.
-  type: int
-  default: 0
 - id: fastqc2_contaminants
   type: File
 - id: fastqc2_limits
@@ -167,7 +168,11 @@ inputs:
 - id: fastqc2_outdir
   doc: None
   type: string
-  default: /tmp/tmp15s15icf/working/dataset_4_files
+  default: /tmp/tmpn4n10f5n/working/dataset_4_files
+- id: hisat2_add_chrname
+  doc: None
+  type: boolean
+  default: false
 - id: hisat2_dta
   doc: None
   type: boolean
@@ -234,6 +239,10 @@ inputs:
   type: boolean
   default: false
 - id: hisat2_phred64
+  doc: None
+  type: boolean
+  default: false
+- id: hisat2_remove_chrname
   doc: None
   type: boolean
   default: false
@@ -311,6 +320,11 @@ inputs:
   type:
   - string
   - 'null'
+- id: hisat2_novel_splicesite_outfile
+  doc: Novel Splice Sites
+  type:
+  - File
+  - 'null'
 - id: hisat2_np
   doc: |-
     Ambiguous read penalty. Sets penalty for positions where the read, reference, or both, contain an ambiguous character such as N
@@ -319,10 +333,14 @@ inputs:
   - 'null'
 - id: hisat2_option_1
   doc: None
-  type: string
+  type:
+  - string
+  - 'null'
 - id: hisat2_option_2
   doc: None
-  type: string
+  type:
+  - string
+  - 'null'
 - id: hisat2_option_i
   doc: |-
     Minimum fragment length for valid paired-end alignments. E.g. if -I 60 is specified and a paired-end alignment consists of two 20-bp alignments in the appropriate orientation with a 20-bp gap between them, that alignment is considered valid (as long as -X is also satisfied). A 19-bp gap would not be valid in that case. If trimming options -3 or -5 are also used, the -I constraint is applied with respect to the untrimmed mates. The larger the difference between -I and -X, the slower HISAT2 will run. This is because larger differences between -I and -X require that HISAT2 scan a larger window to determine if a concordant alignment exists. For typical fragment length ranges (200 to 400 nucleotides), HISAT2 is very efficient
@@ -466,27 +484,37 @@ inputs:
   doc: None
   type: string
   default: F
-- id: hisat2_seq
-  doc: None
-  type: string
-  default: seq
 - id: hisat2_flag_f
   doc: None
   type: boolean
   default: true
+- id: hisat2_no_unal
+  doc: |-
+    Suppress SAM records for reads that failed to align.. Default: false. possible values: false, true
+  type: boolean
+  default: false
+- id: hisat2_omit_sec_seq
+  doc: |-
+    When printing secondary alignments, HISAT2 by default will write out the SEQ and QUAL strings. Specifying this option causes HISAT2 to print an asterisk in those fields instead.. Default: false. possible values: false, true
+  type: boolean
+  default: false
 - id: hisat2_option_p
   doc: None
   type: int
   default: 1
 - id: hisat2_option_u2
   doc: None
-  type:
-  - string
-  - 'null'
+  type: string
+  default: input_f.fastq
 - id: hisat2_option_x2
   doc: None
   type: string
   default: genome
+- id: hisat2_rg_id
+  doc: |-
+    Read Group ID. Set the read group ID to the value set here. This causes the SAM @RG header line to be printed, with this input value as the value associated with the ID: tag. It also causes the RG:Z: extra field to be attached to each SAM output record, with value set to the value set here.
+  type: string
+  default: read_group
 - id: featurecounts_byreadgroup
   doc: None
   type: boolean
@@ -506,6 +534,10 @@ inputs:
   type: boolean
   default: false
 - id: featurecounts_flag_l
+  doc: None
+  type: boolean
+  default: false
+- id: featurecounts_flag_m
   doc: None
   type: boolean
   default: false
@@ -534,11 +566,19 @@ inputs:
   doc: None
   type: boolean
   default: false
+- id: featurecounts_nonsplitonly
+  doc: None
+  type: boolean
+  default: false
 - id: featurecounts_primary
   doc: None
   type: boolean
   default: false
 - id: featurecounts_read2pos
+  doc: None
+  type: boolean
+  default: false
+- id: featurecounts_splitonly
   doc: None
   type: boolean
   default: false
@@ -565,12 +605,6 @@ inputs:
     Reference sequence file. The FASTA-format file that contains the reference sequences used in read mapping can be used to improve read counting for junctions
   type:
   - File
-  - 'null'
-- id: featurecounts_option_m
-  doc: |-
-    Count multi-mapping reads/fragments. If specified, multi-mapping reads/fragments will be counted (ie. a multi-mapping read will be counted up to N times if it has N reported mapping locations). The program uses the `NH' tag to find multi-mapping reads.. possible values: ,  -M
-  type:
-  - string
   - 'null'
 - id: featurecounts_option_p
   doc: |-
@@ -610,9 +644,9 @@ inputs:
   default: output
 - id: featurecounts_option_q
   doc: |-
-    Minimum mapping quality per read. The minimum mapping quality score a read must satisfy in order to be counted. For paired-end reads, at least one end should satisfy this criteria. 12 by default.
+    Minimum mapping quality per read. The minimum mapping quality score a read must satisfy in order to be counted. For paired-end reads, at least one end should satisfy this criteria. 0 by default.
   type: int
-  default: 12
+  default: 0
 - id: featurecounts_option_s
   doc: |-
     Specify strand information. Indicate if the data is stranded and if strand-specific read counting should be performed. Strand setting must be the same as the strand settings used to produce the mapped BAM input(s). possible values: 0, 1, 2
@@ -679,6 +713,9 @@ inputs:
 - id: picard_markduplicates_positional2
   doc: None
   type: string
+- id: samtools_idxstats_at
+  doc: None
+  type: string
 - id: rseqc_genebody_coverage_minimum_length
   doc: |-
     Minimum mRNA length (default: 100). Minimum mRNA length in bp, mRNA that are shorter than this value will be skipped (--minimum_length).
@@ -729,39 +766,9 @@ outputs:
 - id: cutadapt_out1
   type: File
   outputSource: cutadapt/out1
-- id: cutadapt_out2
-  type: File
-  outputSource: cutadapt/out2
 - id: cutadapt_out_report
   type: File
   outputSource: cutadapt/out_report
-- id: cutadapt_out_info_file
-  type: File
-  outputSource: cutadapt/out_info_file
-- id: cutadapt_out_rest_output
-  type: File
-  outputSource: cutadapt/out_rest_output
-- id: cutadapt_out_wild_output
-  type: File
-  outputSource: cutadapt/out_wild_output
-- id: cutadapt_out_untrimmed_output
-  type: File
-  outputSource: cutadapt/out_untrimmed_output
-- id: cutadapt_out_untrimmed_paired_output
-  type: File
-  outputSource: cutadapt/out_untrimmed_paired_output
-- id: cutadapt_out_too_short_output
-  type: File
-  outputSource: cutadapt/out_too_short_output
-- id: cutadapt_out_too_short_paired_output
-  type: File
-  outputSource: cutadapt/out_too_short_paired_output
-- id: cutadapt_out_too_long_output
-  type: File
-  outputSource: cutadapt/out_too_long_output
-- id: cutadapt_out_too_long_paired_output
-  type: File
-  outputSource: cutadapt/out_too_long_paired_output
 - id: fastqc2_out_html_file
   type: File
   outputSource: fastqc2/out_html_file
@@ -771,42 +778,15 @@ outputs:
 - id: hisat2_output_alignments
   type: File
   outputSource: hisat2/output_alignments
-- id: hisat2_output_unaligned_reads_l1
-  type: File
-  outputSource: hisat2/output_unaligned_reads_l1
-- id: hisat2_output_aligned_reads_l1
-  type: File
-  outputSource: hisat2/output_aligned_reads_l1
-- id: hisat2_output_unaligned_reads_r
-  type: File
-  outputSource: hisat2/output_unaligned_reads_r
-- id: hisat2_output_aligned_reads_r
-  type: File
-  outputSource: hisat2/output_aligned_reads_r
 - id: hisat2_out_summary_file
   type: File
   outputSource: hisat2/out_summary_file
-- id: featurecounts_output_medium
-  type: File
-  outputSource: featurecounts/output_medium
-- id: featurecounts_output_bam
-  type: File
-  outputSource: featurecounts/output_bam
 - id: featurecounts_output_short
   type: File
   outputSource: featurecounts/output_short
-- id: featurecounts_output_full
-  type: File
-  outputSource: featurecounts/output_full
 - id: featurecounts_output_summary
   type: File
   outputSource: featurecounts/output_summary
-- id: featurecounts_output_feature_lengths
-  type: File
-  outputSource: featurecounts/output_feature_lengths
-- id: featurecounts_output_jcounts
-  type: File
-  outputSource: featurecounts/output_jcounts
 - id: picard_markduplicates_out_metrics_file
   type: File
   outputSource: picard_markduplicates/out_metrics_file
@@ -819,12 +799,6 @@ outputs:
 - id: rseqc_genebody_coverage_outputcurvespdf
   type: File
   outputSource: rseqc_genebody_coverage/outputcurvespdf
-- id: rseqc_genebody_coverage_outputheatmappdf
-  type: File
-  outputSource: rseqc_genebody_coverage/outputheatmappdf
-- id: rseqc_genebody_coverage_outputr
-  type: File
-  outputSource: rseqc_genebody_coverage/outputr
 - id: rseqc_genebody_coverage_outputtxt
   type: File
   outputSource: rseqc_genebody_coverage/outputtxt
@@ -837,18 +811,12 @@ outputs:
 - id: collection_column_join_out_tabular_output
   type: File
   outputSource: collection_column_join/out_tabular_output
-- id: collection_column_join_out_script_output
-  type: File
-  outputSource: collection_column_join/out_script_output
 - id: multiqc_out_stats
   type: string
   outputSource: multiqc/out_stats
 - id: multiqc_out_html_report
   type: File
   outputSource: multiqc/out_html_report
-- id: multiqc_out_log
-  type: File
-  outputSource: multiqc/out_log
 
 steps:
 - id: fastqc1
@@ -953,8 +921,8 @@ steps:
   in:
   - id: input_f
     source: hisat2_input_f
-  - id: seq
-    source: hisat2_seq
+  - id: add_chrname
+    source: hisat2_add_chrname
   - id: dta
     source: hisat2_dta
   - id: dta_cufflinks
@@ -981,16 +949,22 @@ steps:
     source: hisat2_no_spliced_alignment
   - id: no_templatelen_adjustment
     source: hisat2_no_templatelen_adjustment
+  - id: no_unal
+    source: hisat2_no_unal
   - id: nofw
     source: hisat2_nofw
   - id: non_deterministic
     source: hisat2_non_deterministic
   - id: norc
     source: hisat2_norc
+  - id: omit_sec_seq
+    source: hisat2_omit_sec_seq
   - id: phred33
     source: hisat2_phred33
   - id: phred64
     source: hisat2_phred64
+  - id: remove_chrname
+    source: hisat2_remove_chrname
   - id: rf
     source: hisat2_rf
   - id: solexa_quals
@@ -1021,6 +995,8 @@ steps:
     source: hisat2_mp
   - id: n_ceil
     source: hisat2_n_ceil
+  - id: novel_splicesite_outfile
+    source: hisat2_novel_splicesite_outfile
   - id: np
     source: hisat2_np
   - id: option_1
@@ -1057,6 +1033,8 @@ steps:
     source: hisat2_rdg
   - id: rfg
     source: hisat2_rfg
+  - id: rg_id
+    source: hisat2_rg_id
   - id: rna_strandness
     source: hisat2_rna_strandness
   - id: score_min
@@ -1083,7 +1061,7 @@ steps:
     source: hisat2_un_conc_gz
   - id: un_gz
     source: hisat2_un_gz
-  run: tools/hisat2_2_1_0.cwl
+  run: tools/hisat2_2_2_1.cwl
   out:
   - id: output_unaligned_reads_l1
   - id: output_unaligned_reads_l2
@@ -1097,6 +1075,7 @@ steps:
   - id: output_aligned_reads_l4
   - id: output_aligned_reads_l5
   - id: output_aligned_reads_l6
+  - id: out_novel_splicesite_output
   - id: output_alignments
   - id: output_unaligned_reads_r
   - id: output_aligned_reads_r
@@ -1113,6 +1092,8 @@ steps:
     source: featurecounts_flag_j
   - id: flag_l
     source: featurecounts_flag_l
+  - id: flag_m
+    source: featurecounts_flag_m
   - id: flag_o
     source: featurecounts_flag_o
   - id: flag_p
@@ -1125,10 +1106,14 @@ steps:
     source: featurecounts_ignoredup
   - id: largestoverlap
     source: featurecounts_largestoverlap
+  - id: nonsplitonly
+    source: featurecounts_nonsplitonly
   - id: primary
     source: featurecounts_primary
   - id: read2pos
     source: featurecounts_read2pos
+  - id: splitonly
+    source: featurecounts_splitonly
   - id: fracoverlap
     source: featurecounts_fracoverlap
   - id: fracoverlapfeature
@@ -1149,8 +1134,6 @@ steps:
     source: featurecounts_option_g1
   - id: option_g2
     source: featurecounts_option_g2
-  - id: option_m
-    source: featurecounts_option_m
   - id: option_o
     source: featurecounts_option_o
   - id: option_p
@@ -1167,7 +1150,7 @@ steps:
     source: featurecounts_readextension3
   - id: readextension5
     source: featurecounts_readextension5
-  run: tools/featurecounts_1_6_3.cwl
+  run: tools/featurecounts_2_0_1.cwl
   out:
   - id: output_medium
   - id: output_bam
@@ -1216,6 +1199,8 @@ steps:
   in:
   - id: input_bam
     source: hisat2/output_alignments
+  - id: at
+    source: samtools_idxstats_at
   run: tools/samtools_idxstats_2_0_2.cwl
   out:
   - id: output_tabular
@@ -1280,4 +1265,4 @@ steps:
   - id: out_stats
   - id: out_html_report
   - id: out_log
-id: rna_seq_reads_to_counts
+id: rna_seq_reads_to_counts_imported_from_uploaded_file

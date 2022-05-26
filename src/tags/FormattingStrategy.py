@@ -26,7 +26,7 @@ class GenericFormattingStrategy(FormattingStrategy):
         tag = rules.non_alphanumeric(tag, entity)
         tag = rules.short_tag(tag, entity)
         tag = rules.capitalisation(tag, entity)
-        tag = rules.prohibited_key(tag, entity)
+        tag = rules.replace_keywords(tag, entity)
         tag = rules.encode(tag)
         return tag
 
@@ -39,7 +39,7 @@ class ToolNameStrategy(FormattingStrategy):
         tag = rules.numeric_start(tag, entity)
         tag = rules.short_tag(tag, entity)
         #tag = rules.capitalisation(tag, entity)
-        tag = rules.prohibited_key(tag, entity)
+        tag = rules.replace_keywords(tag, entity)
         tag = rules.encode(tag)
         return tag
         

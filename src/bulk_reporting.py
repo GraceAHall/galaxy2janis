@@ -99,7 +99,7 @@ class ToolParsingReport:
         return len(self.reports)
 
     @property
-    def statuses(self) -> dict[str, int]:
+    def log_statuses(self) -> dict[str, int]:
         counts: dict[str, int] = {
             'OK': 0,
             'WARNING': 0,
@@ -110,6 +110,26 @@ class ToolParsingReport:
             counts[report.status] += 1
         return counts
     
+    @property
+    def parsing_statuses(self) -> dict[str, int]:
+        counts: dict[str, int] = {
+            'FAIL': 0,
+            'PARSED': 0,
+            'TRANSLATABLE': 0
+        }
+        for report in self.reports:
+            parsing_status = self.get_parsing_status(report)
+            counts[parsing_status] += 1
+        return counts
+
+    def get_parsing_status(self, report: ToolReport) -> str:
+        if report.status == 'CRITICAL':
+            return 'FAIL'
+        elif report.translatable:
+            return 'TRANSLATABLE'
+        else:
+            return 'PARSED'
+
     @property
     def message_counts(self) -> dict[str, int]:
         counts: dict[str, int] = defaultdict(int)
@@ -151,7 +171,7 @@ class WorkflowReport:
     @property
     def tool_failure(self) -> bool:
         # did one of the tool translations fail?
-        if self.tool_parsing_report.statuses['CRITICAL'] > 0:
+        if self.tool_parsing_report.log_statuses['CRITICAL'] > 0:
             return True
         return False
     
@@ -302,36 +322,56 @@ def load_log(path: str) -> LogFile:
 
 # TOOLS PRINTING
 def print_tool_parsing_report(report: ToolParsingReport) -> None:
-    print_tool_count(report)
-    print_tool_statuses(report)
-    print_tool_messages(report)
-    print_critical_tools(report)
+    out: str = ''
+    out += str_tool_count(report)
+    out += str_tool_log_statuses(report)
+    out += str_tool_parsing_statuses(report)
+    out += str_tool_messages(report)
+    out += str_critical_tools(report)
+    print(out)
 
-def print_tool_count(report: ToolParsingReport) -> None:
-    print(f'\nTOOLS PARSED: {report.tool_count}')
+def str_tool_count(report: ToolParsingReport) -> str:
+    return f'\n\nTOOLS PARSED: {report.tool_count}\n'
     
-def print_tool_statuses(report: ToolParsingReport) -> None:
-    print('\nSTATUSES:')
-    statuses = list(report.statuses.items())
+def str_tool_log_statuses(report: ToolParsingReport) -> str:
+    out: str = ''
+    out += '\n\nLOG STATUSES:\n'
+    statuses = list(report.log_statuses.items())
     statuses.sort(key=lambda x: x[1], reverse=True)
-    print(f"{'status':<10}{'tool count':>13}{'percent':>10}")
+    out += f"{'status':<20}{'tool count':>13}{'percent':>10}\n"
     for status, count in statuses:
         percent = count / report.tool_count * 100
-        print(f'{status:<10}{count:>13}{percent:>10.1f}')
+        out += f'{status:<20}{count:>13}{percent:>10.1f}\n'
+    return out
 
-def print_tool_messages(report: ToolParsingReport) -> None:
-    print('\nMESSAGES:')
+def str_tool_parsing_statuses(report: ToolParsingReport) -> str:
+    out: str = ''
+    out += '\n\nPARSING STATUSES:\n'
+    statuses = list(report.parsing_statuses.items())
+    statuses.sort(key=lambda x: x[1], reverse=True)
+    out += f"{'status':<20}{'tool count':>13}{'percent':>10}\n"
+    for status, count in statuses:
+        percent = count / report.tool_count * 100
+        out += f'{status:<20}{count:>13}{percent:>10.1f}\n'
+    return out
+
+def str_tool_messages(report: ToolParsingReport) -> str:
+    out: str = ''
+    out += '\n\nMESSAGES:\n'
     messages = list(report.message_counts.items())
     messages.sort(key=lambda x: x[1], reverse=True)
-    print(f"{'message':<30}{'tool count':>13}{'percent':>10}")
+    out += f"{'message':<30}{'tool count':>13}{'percent':>10}\n"
     for message, count in messages:
         percent = count / report.tool_count * 100
-        print(f'{message:<30}{count:>13}{percent:>10.1f}')
+        out += f'{message:<30}{count:>13}{percent:>10.1f}\n'
+    return out
 
-def print_critical_tools(report: ToolParsingReport) -> None:
-    print('\nCRITICAL TOOLS:')
+def str_critical_tools(report: ToolParsingReport) -> str:
+    out: str = ''
+    out += '\n\nCRITICAL TOOLS:\n'
     for tool in report.get_tools_with_msg('exception'):
-        print(tool)
+        out += f'{tool}\n'
+    return out
 
 
 # WORKFLOWS PRINTING
@@ -339,6 +379,7 @@ def print_workflow_parsing_report(report: WorkflowParsingReport) -> None:
     out_str: str = ''
     out_str += str_workflow_count(report)
     out_str += str_workflow_statuses(report)
+    out_str += str_translatable_tools(report)
     print(out_str)
 
 def str_workflow_count(report: WorkflowParsingReport) -> str:
@@ -352,6 +393,13 @@ def str_workflow_statuses(report: WorkflowParsingReport) -> str:
     for status, count in statuses:
         percent = count / report.workflow_count * 100
         out += f'{status:<20}{count:>13}{percent:>10.1f}\n'
+    return out
+
+def str_translatable_tools(report: WorkflowParsingReport) -> str:
+    out: str = '\n\nTRANSLATABLE TOOLS:\n'
+    for workflow in report.reports:
+        if workflow.translatable:
+            out += f'{workflow.name}\n'
     return out
 
 if __name__ == '__main__':

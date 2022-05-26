@@ -50,7 +50,6 @@ def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: W
         l.link()
         logging.runtime_data(str(step.tool_values))
     perform_migrations(step, workflow)
-    print()
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):
     migrator = ValueMigrator(step, workflow)

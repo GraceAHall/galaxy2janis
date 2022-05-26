@@ -1,0 +1,30 @@
+in_genome_assembly:
+  class: File
+  path: null
+prokka_addgenes: false
+prokka_centre: null
+prokka_compliant: false
+prokka_cpus: 8
+prokka_evalue: 1e-06
+prokka_fast: false
+prokka_gcode: 11
+prokka_genus: null
+prokka_gffver: '3'
+prokka_increment: 1
+prokka_kingdom: Bacteria
+prokka_locustag: null
+prokka_metagenome: false
+prokka_mincontig: 200
+prokka_norrna: false
+prokka_notrna: false
+prokka_outdir: outdir
+prokka_plasmid: null
+prokka_prefix: prokka
+prokka_proteins:
+  class: File
+  path: null
+prokka_quiet: true
+prokka_rfam: false
+prokka_species: null
+prokka_strain: null
+prokka_usegenus: false

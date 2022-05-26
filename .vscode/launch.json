@@ -43,6 +43,16 @@
             ]
         },
         {
+            "name": "mine_workflow_parsing",
+            "type": "python",
+            "request": "launch",
+            "program": "src/bulk_workflow_parsing.py",
+            "console": "integratedTerminal",
+            "args": [
+                "test/data/workflows/mine", "parsed/workflows"
+            ]
+        },
+        {
             "name": "tool_reporting",
             "type": "python",
             "request": "launch",
@@ -74,6 +84,19 @@
                 "tool",
                 "--dir", "test/data/tools/abricate", 
                 "--xml", "abricate.xml",
+            ]
+        },
+        {
+            "name": "funannotate_busco",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "parsed/workflows/funannotate/wrappers/busco-46ae58b1d792", 
+                "--xml", "busco.xml",
             ]
         },
         {
@@ -117,19 +140,6 @@
         },
         // WORKFLOWS
         {
-            "name": "super simple workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/mine/super_simple_workflow.ga",
-                "--outdir", "parsed/workflows"
-            ]
-        },
-        {
             "name": "shovill test",
             "type": "python",
             "request": "launch",
@@ -143,6 +153,20 @@
             ]
         },
         {
+            "name": "super simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/super_simple_workflow.ga",
+                "--outdir", "parsed/workflows",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
+        {
             "name": "super simple unicycler",
             "type": "python",
             "request": "launch",
@@ -152,7 +176,8 @@
             "args": [
                 "workflow",
                 "test/data/workflows/mine/super_simple_unicycler.ga",
-                "--outdir", "parsed/workflows"
+                "--outdir", "parsed/workflows",
+                "--dev-no-test-cmdstrs"
             ]
         },
         {
@@ -166,6 +191,7 @@
                 "workflow",
                 "test/data/workflows/mine/simple_workflow.ga",
                 "--outdir", "parsed/workflows",
+                "--dev-no-test-cmdstrs"
             ]
         },
         {

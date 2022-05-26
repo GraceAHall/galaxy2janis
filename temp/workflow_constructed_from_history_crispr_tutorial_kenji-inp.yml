@@ -52,7 +52,7 @@ fastqc_extract: true
 fastqc_kmers: 7
 fastqc_nogroup: false
 fastqc_option_f: fastq
-fastqc_outdir: /tmp/tmpwdjzsd51/working/dataset_3_files
+fastqc_outdir: /tmp/tmpj9z4i9vv/working/dataset_3_files
 fastqc_quiet: true
 in_broadgpp_brunello_library_contents_csv: null
 in_calabrese_seta_guides_reference_csv: null

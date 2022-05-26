@@ -20,14 +20,14 @@ class Option(BaseCommandComponent):
     def get_name(self) -> str:
         return self.prefix.strip('--')
 
-    def get_default_value(self) -> Optional[Any]:
+    def get_default_value(self, no_env: bool=False) -> Optional[Any]:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
         default = None
         if self.gxparam:
             default = self.gxparam.get_default()
         if default is None:
-            default = self.value_record.get_most_common_value(no_env=True)
+            default = self.value_record.get_most_common_value(no_env=no_env)
         return default
 
         # if default is None and self.value_record.get_observed_env_var():

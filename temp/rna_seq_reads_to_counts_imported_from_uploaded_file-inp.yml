@@ -1,6 +1,5 @@
 collection_column_join_collection_column_join_script: null
 cutadapt_info_file: false
-cutadapt_option_u1: 0
 cutadapt_rest_file: false
 cutadapt_too_long_output: false
 cutadapt_too_short_output: false
@@ -14,7 +13,7 @@ fastqc1_limits:
   class: File
   path: null
 fastqc1_option_f: fastq
-fastqc1_outdir: /tmp/tmppblblcxp/working/dataset_4_files
+fastqc1_outdir: /tmp/tmp6nipah3b/working/dataset_4_files
 fastqc1_quiet: true
 fastqc2_contaminants:
   class: File
@@ -24,13 +23,14 @@ fastqc2_limits:
   class: File
   path: null
 fastqc2_option_f: fastq
-fastqc2_outdir: /tmp/tmp15s15icf/working/dataset_4_files
+fastqc2_outdir: /tmp/tmpn4n10f5n/working/dataset_4_files
 fastqc2_quiet: true
 featurecounts_byreadgroup: false
 featurecounts_flag_b: false
 featurecounts_flag_f: false
 featurecounts_flag_j: false
 featurecounts_flag_l: false
+featurecounts_flag_m: false
 featurecounts_flag_o: false
 featurecounts_flag_p: false
 featurecounts_flag_r: false
@@ -40,6 +40,7 @@ featurecounts_fraction: false
 featurecounts_ignoredup: false
 featurecounts_largestoverlap: false
 featurecounts_minoverlap: 1
+featurecounts_nonsplitonly: false
 featurecounts_option_a:
   class: File
   path: null
@@ -51,7 +52,7 @@ featurecounts_option_d2: null
 featurecounts_option_f: SAF
 featurecounts_option_g1: gene_id
 featurecounts_option_o: output
-featurecounts_option_q: 12
+featurecounts_option_q: 0
 featurecounts_option_s: '0'
 featurecounts_option_t1: exon
 featurecounts_option_t2: 2
@@ -59,6 +60,8 @@ featurecounts_primary: false
 featurecounts_read2pos: false
 featurecounts_readextension3: null
 featurecounts_readextension5: null
+featurecounts_splitonly: false
+hisat2_add_chrname: false
 hisat2_dta: false
 hisat2_dta_cufflinks: false
 hisat2_ff: false
@@ -73,17 +76,19 @@ hisat2_no_mixed: false
 hisat2_no_softclip: false
 hisat2_no_spliced_alignment: false
 hisat2_no_templatelen_adjustment: false
+hisat2_no_unal: false
 hisat2_nofw: false
 hisat2_non_deterministic: false
 hisat2_norc: false
-hisat2_option_1: null
-hisat2_option_2: null
+hisat2_omit_sec_seq: false
 hisat2_option_p: 1
+hisat2_option_u2: input_f.fastq
 hisat2_option_x2: genome
 hisat2_phred33: false
 hisat2_phred64: false
+hisat2_remove_chrname: false
 hisat2_rf: false
-hisat2_seq: seq
+hisat2_rg_id: read_group
 hisat2_solexa_quals: false
 hisat2_summary_file: false
 hisat2_tmo: false
@@ -117,3 +122,4 @@ rseqc_genebody_coverage_option_i: null
 rseqc_genebody_coverage_option_o: output
 rseqc_infer_experiment_mapq: 30
 rseqc_infer_experiment_sample_size: 200000
+samtools_idxstats_at: null

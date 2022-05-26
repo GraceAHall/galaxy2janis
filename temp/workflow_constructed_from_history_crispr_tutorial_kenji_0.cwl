@@ -61,7 +61,7 @@ inputs:
 - id: fastqc_outdir
   doc: None
   type: string
-  default: /tmp/tmpwdjzsd51/working/dataset_3_files
+  default: /tmp/tmpj9z4i9vv/working/dataset_3_files
 - id: cutadapt_read2
   type: string
 - id: cutadapt_discard_trimmed

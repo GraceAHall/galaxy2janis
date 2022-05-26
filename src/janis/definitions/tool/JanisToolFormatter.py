@@ -1,6 +1,6 @@
 
 
-from typing import Optional
+from typing import Any, Optional
 from command.components.outputs.InputOutput import InputOutput
 from command.components.outputs.RedirectOutput import RedirectOutput
 from command.components.outputs.UncertainOutput import UncertainOutput
@@ -121,16 +121,19 @@ class JanisToolFormatter:
         )
 
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
-        default_value = component.get_default_value()
-        if self.should_quote(component):
-            return f'"{default_value}"'
-        return default_value
+        if isinstance(component, Option):
+            default = component.get_default_value(no_env=True)
+        else:
+            default = component.get_default_value()
+        if self.should_quote(default, component):
+            return f'"{default}"'
+        return default
     
-    def should_quote(self, component: CommandComponent) -> bool:
+    def should_quote(self, default: Any, component: CommandComponent) -> bool:
         dclasses = [x.classname for x in component.janis_datatypes]
         if 'Int' in dclasses or 'Float' in dclasses:
             return False
-        if component.get_default_value() is None:
+        elif default is None:
             return False
         return True
 

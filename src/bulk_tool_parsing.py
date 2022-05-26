@@ -33,14 +33,14 @@ class ToolModeRunner:
         thread worker target function
         """
         print(job.xmlfile)
-        command = f'python src/gxtool2janis.py tool --dir {job.xmldir} --xml {job.xmlfile} --outdir {job.outdir}'
+        command = f'python src/gxtool2janis.py tool --dir {job.xmldir} --xml {job.xmlfile}'
         subprocess.run(command, shell=True)
         #subprocess.run(command, shell=True, check=True)
 
     def run(self) -> None:
         xmldirs = self.get_xml_directories()
         details = self.get_job_details(xmldirs)
-        self.run_jobs(details=details, threads=18)
+        self.run_jobs(details=details, threads=10)
     
     def get_xml_directories(self):
         files = os.listdir(self.tooldir)
