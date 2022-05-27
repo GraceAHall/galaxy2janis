@@ -22,25 +22,33 @@ class WorkflowStep:
     def __post_init__(self):
         self.tool_values: InputValueRegister = InputValueRegister()
 
-    def get_uuid(self) -> str:
-        return self.metadata.uuid
-
-    def set_tool_definition_path(self, path: str) -> None:
-        self.metadata.tool_definition_path = path
+    @property
+    def uuid(self) -> str:
+        return self.metadata.uuid  # why?
     
-    def get_tool_definition_path(self) -> str:
+    @property
+    def docstring(self) -> Optional[str]:
+        return self.metadata.label
+
+    @property
+    def tool_name(self) -> str:
+        return self.metadata.tool_id
+
+    @property
+    def tool_definition_path(self) -> str:
         if self.metadata.tool_definition_path:
             return self.metadata.tool_definition_path
         raise RuntimeError()
+    
+    def set_tool_definition_path(self, path: str) -> None:
+        self.metadata.tool_definition_path = path
+
+    @property
+    def step_definition_path(self) -> str:
+        raise NotImplementedError()
 
     def set_step_definition_path(self, folder: str) -> None:
         raise NotImplementedError()
-    
-    def get_step_definition_path(self) -> str:
-        raise NotImplementedError()
-
-    def get_tool_name(self) -> str:
-        return self.metadata.tool_id
 
     def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
         """translates [uuid, value] into [tag, value] for tool input values"""
@@ -50,8 +58,6 @@ class WorkflowStep:
             out.append((component_tag, input_value))
         return out
 
-    def get_docstring(self) -> Optional[str]:
-        return self.metadata.label
 
     def __repr__(self) -> str:
-        return f'(WorkflowStep) step{self.metadata.step_id} - {self.get_tool_name()}'
+        return f'(WorkflowStep) step{self.metadata.step_id} - {self.tool_name}'

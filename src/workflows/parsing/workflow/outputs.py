@@ -11,8 +11,8 @@ def set_outputs(workflow: Workflow) -> None:
             if stepout.is_wflow_out:
                 toolout = stepout.tool_output
                 assert(toolout)
-                step_tag = workflow.tag_manager.get(step.get_uuid())
-                toolout_tag = step.tool.tag_manager.get(toolout.get_uuid())
+                step_tag = workflow.tag_manager.get(step.uuid)
+                toolout_tag = step.tool.tag_manager.get(toolout.uuid)
                 workflow_output = WorkflowOutput(
                     step_tag=step_tag,
                     toolout_tag=toolout_tag,

@@ -61,7 +61,7 @@ class Workflow:
             if relevant_inputs:
                 return relevant_inputs[0]
         elif input_uuid is not None:
-            relevant_inputs = [x for x in self.inputs if x.get_uuid() == input_uuid]
+            relevant_inputs = [x for x in self.inputs if x.uuid == input_uuid]
             if relevant_inputs:
                 return relevant_inputs[0]
         else:
@@ -69,11 +69,8 @@ class Workflow:
 
     def get_step_tag_by_step_id(self, step_id: int) -> str:
         """uuids provide access to identifier tags"""
-        step_uuid = self.steps[step_id].get_uuid()
+        step_uuid = self.steps[step_id].uuid
         return self.tag_manager.get(step_uuid)
-
-    def get_uuid(self) -> str:
-        return self.metadata.uuid
 
     def list_steps(self) -> list[WorkflowStep]:
         the_list = list(self.steps.values())
@@ -84,7 +81,7 @@ class Workflow:
         """used near end of runtime once tags are stable"""
         out: dict[str, WorkflowStep] = {}
         for step in self.list_steps():
-            tag = self.tag_manager.get(step.get_uuid())
+            tag = self.tag_manager.get(step.uuid)
             out[tag] = step
         return out
 
@@ -92,14 +89,14 @@ class Workflow:
         """used near end of runtime once tags are stable"""
         out: dict[str, WorkflowInput] = {}
         for w_input in self.inputs:
-            tag = self.tag_manager.get(w_input.get_uuid())
+            tag = self.tag_manager.get(w_input.uuid)
             out[tag] = w_input
         return out
     
     def get_outputs_tags(self) -> dict[str, WorkflowOutput]:
         out: dict[str, WorkflowOutput] = {}
         for w_output in self.outputs:
-            tag = self.tag_manager.get(w_output.get_uuid())
+            tag = self.tag_manager.get(w_output.uuid)
             out[tag] = w_output
         return out
     

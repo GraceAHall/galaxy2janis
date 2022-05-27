@@ -91,7 +91,7 @@ class StepTextDefinition:
         workflow_inputs = [x for x in workflow_inputs if x is not None]
         out_str: str = ''
         for wflow_inp in workflow_inputs:
-            input_tag = self.workflow.tag_manager.get(wflow_inp.get_uuid())
+            input_tag = self.workflow.tag_manager.get(wflow_inp.uuid)
             dtype_string = wflow_inp.get_janis_datatype_str()
             out_str += snippets.workflow_input_snippet(input_tag, dtype_string)
         return out_str
@@ -116,11 +116,11 @@ class StepTextDefinition:
         return snippets.post_task_snippet()
     
     def get_step_tag(self) -> str:
-        return self.workflow.tag_manager.get(self.step.get_uuid())
+        return self.workflow.tag_manager.get(self.step.uuid)
     
     def get_tool_tag(self) -> str:
         tool = self.step.tool
-        return tool.tag_manager.get(tool.get_uuid())
+        return tool.tag_manager.get(tool.uuid)
 
     def format_unlinked_inputs(self) -> str:
         lines: list[ToolInputLine] = []

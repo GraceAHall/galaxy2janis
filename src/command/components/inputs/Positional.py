@@ -16,7 +16,8 @@ class Positional(BaseCommandComponent):
         self.value_record: PositionalValueRecord = PositionalValueRecord()
         self.value_record.add(value)
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         # get name from galaxy param if available
         if self.gxparam:
             return self.gxparam.name
@@ -26,11 +27,12 @@ class Positional(BaseCommandComponent):
             pseudo_name = 'positional'
         return pseudo_name.strip('$')
     
-    def get_default_value(self) -> Any:
+    @property
+    def default_value(self) -> Any:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
         if self.gxparam:
-            default = self.gxparam.get_default()
+            default = self.gxparam.default
         elif self.value_record.get_observed_env_var():
             default = self.value_record.get_observed_env_var()
         else:
@@ -38,21 +40,24 @@ class Positional(BaseCommandComponent):
         return default
         #return utils.sanitise_default_value(default)
 
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         if self.forced_optionality is not None:
             return self.forced_optionality
-        elif self.gxparam and self.gxparam.is_optional():
+        elif self.gxparam and self.gxparam.optional:
             return True
         elif all(self.presence_array):
             return False
         return True
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return False
     
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         if self.gxparam:
-            return self.gxparam.get_docstring()
+            return self.gxparam.docstring
         return ''
         #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
@@ -81,6 +86,6 @@ class Positional(BaseCommandComponent):
         return True
 
     def __str__(self) -> str:
-        return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'
+        return f'{str(self.default_value):20}{str(self.optional):>10}'
 
 

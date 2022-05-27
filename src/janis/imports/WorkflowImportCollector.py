@@ -117,10 +117,10 @@ class WorkflowImportCollector:
         return imports
 
     def init_tool_definition_import(self, step: WorkflowStep) -> Import:
-        tool_path = step.get_tool_definition_path()
+        tool_path = step.tool_definition_path
         tool_path = tool_path.rsplit('.py')[0]
         tool_path = tool_path.replace('/', '.')
-        tool_tag = step.tool.tag_manager.get(step.tool.get_uuid()) #type: ignore
+        tool_tag = step.tool.tag_manager.get(step.tool.uuid)
         return Import(
             path=tool_path, 
             entity=tool_tag,

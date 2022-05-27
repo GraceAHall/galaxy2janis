@@ -6,6 +6,7 @@ from typing import Type
 
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from runtime.settings.settings import create_tool_settings_for_step
+from workflows.analysis.tool_values.component_updates import update_component_knowledge
 
 from workflows.entities.workflow.workflow import Workflow
 from workflows.entities.step.step import WorkflowStep
@@ -29,9 +30,12 @@ if a value is still unknown for a given tool input, it
 is assigned the default or listed as a WorkflowInput (when it is a file type)
 """
 
-linkers: list[Type[ValueLinker]] = [
+knowledge_linkers: list[Type[ValueLinker]] = [
     CheetahValueLinker,
     InputDictValueLinker,
+]
+
+blind_linkers: list[Type[ValueLinker]] = [
     DefaultValueLinker,
     UnlinkedValueLinker
 ]
@@ -45,10 +49,22 @@ def link_tool_input_values(wsettings: WorkflowExeSettings, workflow: Workflow) -
         assert_all_components_assigned(step)
 
 def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow) -> None:
-    for linker in linkers:
+    # link values using cheetah cmdstr and input dict
+    for linker in knowledge_linkers:
         l = linker(esettings, step, workflow)
         l.link()
         logging.runtime_data(str(step.tool_values))
+    
+    # update component knowledge for components which have been linked so far
+    update_component_knowledge(step)
+    
+    # link remaining values from default, assign unlinked
+    for linker in blind_linkers:
+        l = linker(esettings, step, workflow)
+        l.link()
+        logging.runtime_data(str(step.tool_values))
+    
+    # migrate value types if necessary
     perform_migrations(step, workflow)
 
 def perform_migrations(step: WorkflowStep, workflow: Workflow):
@@ -58,5 +74,5 @@ def perform_migrations(step: WorkflowStep, workflow: Workflow):
 def assert_all_components_assigned(step: WorkflowStep) -> None:
     tool_inputs = step.tool.list_inputs() # type: ignore
     for component in tool_inputs:
-        if not step.tool_values.get(component.get_uuid()):
-            raise AssertionError(f'tool input "{component.get_name()}" has no assigned step value')
+        if not step.tool_values.get(component.uuid):
+            raise AssertionError(f'tool input "{component.name}" has no assigned step value')

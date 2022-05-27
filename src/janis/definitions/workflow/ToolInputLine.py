@@ -50,8 +50,8 @@ class ToolInputLine(ABC):
             case ConnectionInputValue():
                 step = self.workflow.steps[self.invalue.step_id]
                 toolout = step.outputs.get(self.invalue.step_output).tool_output
-                step_tag = self.workflow.tag_manager.get(step.get_uuid())
-                toolout_tag = step.tool.tag_manager.get(toolout.get_uuid()) # type: ignore
+                step_tag = self.workflow.tag_manager.get(step.uuid)
+                toolout_tag = step.tool.tag_manager.get(toolout.uuid) # type: ignore
                 text = f'w.{step_tag}.{toolout_tag}'
             case WorkflowInputInputValue():
                 input_tag = self.workflow.tag_manager.get(self.invalue.input_uuid)
@@ -85,7 +85,7 @@ class LinkedInputLine(ToolInputLine):
  
     @property
     def tag_and_value(self) -> str:
-        tag = self.step.tool.tag_manager.get(self.component.get_uuid()) # type: ignore
+        tag = self.step.tool.tag_manager.get(self.component.uuid) # type: ignore
         value = self.value_as_text()
         return f'{tag}={value},'
     

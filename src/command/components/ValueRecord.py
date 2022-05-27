@@ -43,13 +43,10 @@ class ValueRecord(ABC):
                 return str(obsval)
         return None
 
-    def get_most_common_value(self, no_env: bool=False) -> Optional[Any]:
+    def get_most_common_value(self) -> Optional[Any]:
         counts_dict = self.get_counts()
         counts_list = list(counts_dict.items())
         counts_list.sort(key=lambda x: x[1], reverse=True)
-        if no_env:
-            counts_list = [(val, count) for val, count in counts_list if not val.startswith('$')]
-
         if len(counts_list) > 0:
             return counts_list[0][0]
         else:

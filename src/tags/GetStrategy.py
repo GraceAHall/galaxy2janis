@@ -28,7 +28,7 @@
 #     def get(self, entity: Any) -> str:
 #         return TagManager().get(
 #             tag_type=self.tag_type,
-#             uuid=entity.get_uuid()
+#             uuid=entity.uuid
 #         )
 
 # def select_get_strategy(entity: Any) -> GetStrategy:

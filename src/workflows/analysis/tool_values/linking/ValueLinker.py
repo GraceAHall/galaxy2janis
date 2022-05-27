@@ -50,7 +50,7 @@ class ValueLinker(ABC):
         out: list[CommandComponent] = []
         # check to see if its already linked, if so, ignore, else link
         for component in self.step.tool.list_inputs():
-            if not self.step.tool_values.get(component.get_uuid()):
+            if not self.step.tool_values.get(component.uuid):
                 out.append(component)
         return out
 
@@ -147,13 +147,13 @@ class CheetahValueLinker(ValueLinker):
     def update_tool_values_static(self, component: Flag | Option, value: Any) -> None:
         register = self.step.tool_values
         inputval = value_factory.create_static(component, value)  # type: ignore
-        register.update_linked(component.get_uuid(), inputval)
+        register.update_linked(component.uuid, inputval)
         self.mark_linked(component)
     
     def update_tool_values_runtime(self, component: Flag | Option, value: Any) -> None:
         register = self.step.tool_values
         inputval = value_factory.create_runtime(component)  # type: ignore
-        register.update_linked(component.get_uuid(), inputval)
+        register.update_linked(component.uuid, inputval)
         self.mark_linked(component)
 
 
@@ -173,7 +173,7 @@ class InputDictValueLinker(ValueLinker):
 
                 if step_input:
                     value = value_factory.create(component, step_input, self.workflow)
-                    val_register.update_linked(component.get_uuid(), value)
+                    val_register.update_linked(component.uuid, value)
                     self.mark_linked(step_input)
     
     def is_directly_linkable(self, component: CommandComponent) -> bool:
@@ -196,7 +196,7 @@ class DefaultValueLinker(ValueLinker):
         val_register = self.step.tool_values
         for component in self.get_linkable_components():
             value = value_factory.create_default(component)
-            val_register.update_linked(component.get_uuid(), value)
+            val_register.update_linked(component.uuid, value)
 
 
 class UnlinkedValueLinker(ValueLinker):

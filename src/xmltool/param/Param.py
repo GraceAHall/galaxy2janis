@@ -10,20 +10,24 @@ class Param(ABC):
     name: str
     datatypes: list[str] = []
 
+    @property
     @abstractmethod
-    def get_default(self) -> Any:
+    def default(self) -> Any:
         ...
 
+    @property
     @abstractmethod
-    def get_docstring(self) -> str:
+    def docstring(self) -> str:
         ...
     
+    @property
     @abstractmethod
-    def is_optional(self) -> bool:
+    def optional(self) -> bool:
         ...
     
+    @property
     @abstractmethod
-    def is_array(self) -> bool:
+    def array(self) -> bool:
         ...
 
 

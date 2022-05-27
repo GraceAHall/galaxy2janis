@@ -20,10 +20,8 @@ class WorkflowInput:
     def __post_init__(self):
         self.uuid: str = str(uuid4())
 
-    def get_uuid(self) -> str:
-        return self.uuid
-
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         return 'None yet!'
         
     def get_janis_datatype_str(self) -> str:

@@ -25,11 +25,11 @@ cheetah text. since it doesn't appear, it must be optional.
 """
 
 def update_component_knowledge(step: WorkflowStep):
-    updater = InputUpdater(step.tool, step.tool_values)
+    updater = ToolInputUpdater(step.tool, step.tool_values)
     updater.update()
 
-
-class InputUpdater:
+# TODO this is bad  
+class ToolInputUpdater:
     def __init__(self, tool: Tool, valregister: InputValueRegister):
         self.tool = tool
         self.valregister = valregister
@@ -49,8 +49,8 @@ class InputUpdater:
         mark this as optional as its not referred to anywhere. must be optional
         """
         for component in self.tool.list_inputs():
-            comp_uuid = component.get_uuid()
-            if not component.is_optional():
+            comp_uuid = component.uuid
+            if not component.optional:
                 value = self.valregister.get(comp_uuid)
                 if isinstance(value, DefaultInputValue) and value.valtype == InputValueType.NONE:
                     self.update_component_optionality(component)

@@ -13,30 +13,35 @@ class InputOutput(BaseCommandComponent):
         self.gxparam = self.input_component.gxparam
         assert(self.gxparam)
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         if self.gxparam:
             return self.gxparam.name
         raise RuntimeError('an InputOutput must have an input_component with an attached gxparam')
 
-    def get_default_value(self) -> Any:
+    @property
+    def default_value(self) -> Any:
         raise NotImplementedError()
 
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
         return False
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         match self.gxparam:
             case CollectionOutputParam() | DataOutputParam():
-                return self.gxparam.is_array()
+                return self.gxparam.array
             case _:
                 pass
         return False
    
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         if self.gxparam:
-            return self.gxparam.get_docstring()
-        return f'output created during runtime. file relates to the {self.input_component.get_tag()} input'
+            return self.gxparam.docstring
+        return f'output created during runtime. file relates to the {self.input_component.name} input'
 
     def update(self, incoming: Any) -> None:
         raise NotImplementedError()

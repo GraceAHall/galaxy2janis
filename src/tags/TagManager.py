@@ -30,7 +30,7 @@ class TagManager:
 
         #starting_text = self._get_starting_text(tag_type, entity)
         basetag = format_tag(tag_type, entity)
-        uuid = entity.get_uuid()
+        uuid = entity.uuid
 
         self.uuids_basetags[uuid] = basetag
         if basetag not in self.basetags_uuids:

@@ -64,7 +64,7 @@ class JobFactory:
     def supply_remaining_job_dict_values(self) -> None:
         for param in self.xmltool.list_inputs():
             pname = self.format_param_name(param.name)     # param name
-            pvalue = self.format_param_value(param.get_default())  # param value
+            pvalue = self.format_param_value(param.default)  # param value
             self.handle_input_param(pname, pvalue)
         
     def set_job_parameters(self) -> None: 

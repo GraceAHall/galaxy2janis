@@ -11,14 +11,19 @@ class InputParam(Param):
         self.name: str = name
         self.datatypes: list[str] = []
         self.label: str = ''
-        self.helptext: str = ''
-        self.optional: bool = False
         self.argument: Optional[str] = None
+        self.helptext: str = ''
+        self._optional: bool = False
 
-    def get_default(self) -> Any:
+    def set_optionality(self, value: bool) -> None:
+        self._optional = value
+
+    @property
+    def default(self) -> Any:
         return None
 
-    def get_docstring(self) -> str:
+    @property
+    def docstring(self) -> str:
         return self.generic_get_docstring()
 
     def generic_get_docstring(self) -> str:
@@ -30,10 +35,12 @@ class InputParam(Param):
             return self.label
         return ''
     
-    def is_optional(self) -> bool:
-        return self.optional
+    @property
+    def optional(self) -> bool:
+        return self._optional
     
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return False
 
 
@@ -44,7 +51,8 @@ class TextParam(InputParam):
         self.value: Optional[str] = None
         self.datatypes: list[str] = ['String']
 
-    def get_default(self) -> Any:
+    @property
+    def default(self) -> Any:
         if self.value:
             return self.value
         return None
@@ -58,7 +66,8 @@ class IntegerParam(InputParam):
         self.max: Optional[str] = None
         self.datatypes: list[str] = ['Int']
 
-    def get_default(self) -> Any:
+    @property
+    def default(self) -> Any:
         if self.value:
             return self.value
         # elif self.min:
@@ -77,7 +86,8 @@ class FloatParam(InputParam):
         self.max: Optional[str] = None
         self.datatypes: list[str] = ['Float']
 
-    def get_default(self) -> Any:
+    @property
+    def default(self) -> Any:
         if self.value:
             return self.value
         elif self.min:
@@ -95,12 +105,14 @@ class BoolParam(InputParam):
         self.falsevalue: str = ''
         self.datatypes: list[str] = ['Boolean']
 
-    def get_default(self) -> str:
+    @property
+    def default(self) -> str:
         if self.checked:
             return self.truevalue
         return self.falsevalue
-    
-    def get_docstring(self) -> str:
+
+    @property
+    def docstring(self) -> str:
         docstring = self.generic_get_docstring()
         bool_values = [self.truevalue, self.falsevalue]
         bool_values = [v for v in bool_values if v != '']
@@ -108,7 +120,8 @@ class BoolParam(InputParam):
         bool_str = ', '.join(bool_values)
         return f'{docstring}. possible values: {bool_str}'
     
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         return True
 
     def get_all_values(self, nonempty: bool=False) -> list[str]:
@@ -132,7 +145,8 @@ class SelectParam(InputParam):
         self.multiple: bool = False
         self.datatypes: list[str] = ['String']
 
-    def get_default(self) -> Any:
+    @property
+    def default(self) -> Any:
         for option in self.options:
             if option.selected:
                 return option.value
@@ -140,19 +154,22 @@ class SelectParam(InputParam):
             return self.options[0].value
         return ''        
 
-    def get_docstring(self) -> str:
+    @property
+    def docstring(self) -> str:
         docstring = self.generic_get_docstring()
         option_values = [v.value for v in self.options]
         option_values.sort()
         option_str = ', '.join(option_values[:5])
         return f'{docstring}. possible values: {option_str}'
     
-    def is_optional(self) -> bool:
-        if self.multiple or self.optional:
+    @property
+    def optional(self) -> bool:
+        if self.multiple or self._optional:
             return True
         return False
     
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         if self.multiple:
             return True
         return False
@@ -171,7 +188,8 @@ class DataParam(InputParam):
         self.datatypes: list[str] = []
         self.multiple: bool = False
     
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return self.multiple
 
 
@@ -180,6 +198,7 @@ class DataCollectionParam(InputParam):
         super().__init__(name)
         self.datatypes: list[str] = []
     
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return True
 

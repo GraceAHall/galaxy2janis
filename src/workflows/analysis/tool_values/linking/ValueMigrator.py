@@ -1,5 +1,7 @@
 
 
+from command.components.CommandComponent import CommandComponent
+from command.components.inputs.Option import Option
 from tool.Tool import Tool
 
 from workflows.entities.workflow.workflow import Workflow
@@ -32,26 +34,30 @@ class ValueMigrator:
 
     def migrate(self) -> None:
         self.migrate_default_to_runtime()
-        #self.migrate_connection_to_workflowinput()
         self.migrate_runtime_to_workflowinput()
         self.migrate_static_to_default()
 
     def migrate_default_to_runtime(self) -> None:
         """
-        swap DefaultInputValue for RuntimeInputValue for InputValues
-        where the default doens't look right. ie environment variables
+        swap DefaultInputValue for RuntimeInputValue for InputValues.
+        needs to happen where:
+            - the tool input default doesn't look right. ie environment variables.
+            - the tool input default is None, but at the same time is not optional.
+
         forces the user to supply a value for this input. 
         """
         register = self.step.tool_values
         for uuid, value in register.linked:
-            if self.should_migrate_default_to_runtime(value):
-                component = self.tool.get_input(uuid)
+            component = self.tool.get_input(uuid)
+            if self.should_migrate_default_to_runtime(component, value):
                 input_value = value_utils.create_runtime(component)
                 register.update_linked(uuid, input_value)
     
-    def should_migrate_default_to_runtime(self, value: InputValue) -> bool:
-        if isinstance(value, DefaultInputValue):
-            if value.valtype == InputValueType.ENV_VAR:
+    def should_migrate_default_to_runtime(self, component: CommandComponent, value: InputValue) -> bool:
+        if isinstance(value, DefaultInputValue) or isinstance(value, StaticInputValue):
+            if value.valtype == InputValueType.NONE and not component.optional:
+                return True
+            elif value.valtype == InputValueType.ENV_VAR:
                 return True
         return False
 
@@ -71,7 +77,7 @@ class ValueMigrator:
     def should_migrate_static_to_default(self, uuid: str, value: InputValue) -> bool:
         if isinstance(value, StaticInputValue):
             component = self.tool.get_input(uuid)
-            if str(component.get_default_value()) == value.value:
+            if str(component.default_value) == value.value:
                 return True
         return False
 
@@ -109,7 +115,7 @@ class ValueMigrator:
             name=component_tag,
             step_id=step_id,
             step_tag=step_tag,
-            is_array=component.is_array(),
+            is_array=component.array,
             is_galaxy_input_step=False,
             janis_datatypes=component.janis_datatypes,
         )

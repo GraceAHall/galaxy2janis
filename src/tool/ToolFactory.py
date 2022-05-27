@@ -126,5 +126,5 @@ class ToolFactory:
         positionals = self.command.get_base_positionals()
         if not positionals:
             logging.no_base_cmd()
-        return [p.get_default_value() for p in positionals]
+        return [p.default_value for p in positionals]
     

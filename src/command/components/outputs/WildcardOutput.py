@@ -13,29 +13,34 @@ class WildcardOutput(BaseCommandComponent):
         super().__init__()
         self.verified: bool = False
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         if self.gxparam:
             return self.gxparam.name
         raise RuntimeError('an WildcardOutput must have a gxparam')
 
-    def get_default_value(self) -> Any:
+    @property
+    def default_value(self) -> Any:
         raise NotImplementedError()
     
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
         return False
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         match self.gxparam:
             case CollectionOutputParam() | DataOutputParam():
-                return self.gxparam.is_array()
+                return self.gxparam.array
             case _:
                 pass
         return False
    
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         if self.gxparam:
-            return self.gxparam.get_docstring()
+            return self.gxparam.docstring
         return 'output created during runtime. file is collected from working directory'
 
     def update(self, incoming: Any):

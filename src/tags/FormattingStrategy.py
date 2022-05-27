@@ -62,7 +62,7 @@ def get_starting_text(entity_type: str, entity: Any) -> str:
         case 'tool_input':
             return get_tool_input_name(entity)
         case 'tool_output':
-            basetag = entity.get_name()
+            basetag = entity.name
             if basetag.startswith('out'):
                 return basetag
             else:
@@ -71,7 +71,7 @@ def get_starting_text(entity_type: str, entity: Any) -> str:
             raise RuntimeError()
 
 def get_tool_input_name(component: CommandComponent) -> str:
-    default_name = component.get_name()
+    default_name = component.name
     if default_name.isnumeric() and component.gxparam:
         return component.gxparam.name.rsplit('.', 1)[-1]  # adv.reference -> reference (gxvarnames)
     return default_name

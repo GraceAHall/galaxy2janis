@@ -10,18 +10,22 @@ class OutputParam(Param):
         self.datatypes: list[str] = []
         self.wildcard_pattern: Optional[str] = None
 
-    def get_default(self) -> Any:
+    @property
+    def default(self) -> Any:
         return None
 
-    def get_docstring(self) -> str:
+    @property
+    def docstring(self) -> str:
         if self.label:
             return str(self.label)
         return ''
     
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         return False
     
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return False
 
 
@@ -30,7 +34,8 @@ class DataOutputParam(OutputParam):
         super().__init__(name)
         self.wildcard_pattern = wildcard_pattern
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         if self.wildcard_pattern and '*' in self.wildcard_pattern:
             return True
         return False
@@ -42,6 +47,7 @@ class CollectionOutputParam(OutputParam):
         self.wildcard_pattern = wildcard_pattern
         self.collection_type: str = 'list'
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return True
 

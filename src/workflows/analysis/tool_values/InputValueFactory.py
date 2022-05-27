@@ -88,7 +88,7 @@ class DefaultInputValueFactory(InputValueFactory):
         return value
 
     def get_value(self) -> Any:
-        return self.component.get_default_value()
+        return self.component.default_value
     
     def get_valtype(self) -> InputValueType:
         return select_input_value_type(self.component, self.get_value())
@@ -102,7 +102,7 @@ class WorkflowInputInputValueFactory(InputValueFactory):
     
     def create(self) -> WorkflowInputInputValue:
         return WorkflowInputInputValue(
-            input_uuid=self.workflow_input.get_uuid(),
+            input_uuid=self.workflow_input.uuid,
             comptype=self.get_comptype(),
             gxparam=self.component.gxparam
         )

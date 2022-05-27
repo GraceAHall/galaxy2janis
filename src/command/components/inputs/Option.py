@@ -17,45 +17,43 @@ class Option(BaseCommandComponent):
         self.value_record: OptionValueRecord = OptionValueRecord()
         self.value_record.add(values)
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         return self.prefix.strip('--')
 
-    def get_default_value(self, no_env: bool=False) -> Optional[Any]:
+    @property
+    def default_value(self) -> Any:
         """gets the default value for this component"""
         #if utils.datatypes_permit_default(self.janis_datatypes):
         default = None
         if self.gxparam:
-            default = self.gxparam.get_default()
+            default = self.gxparam.default
         if default is None:
-            default = self.value_record.get_most_common_value(no_env=no_env)
+            default = self.value_record.get_most_common_value()
         return default
-
-        # if default is None and self.value_record.get_observed_env_var():
-        #     default = self.value_record.get_observed_env_var()
-        # if default is None:
-        #     default = self.value_record.get_most_common_value()
-        return default
-        #return utils.sanitise_default_value(default)
-        
-    def is_optional(self) -> bool:
+    
+    @property
+    def optional(self) -> bool:
         if self.forced_optionality is not None:
             return self.forced_optionality
-        elif self.gxparam and self.gxparam.is_optional():
+        elif self.gxparam and self.gxparam.optional:
             return True
         elif all(self.presence_array):
             return False
         return True
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         if self.gxparam:
             if isinstance(self.gxparam, SelectParam):
                 if self.gxparam.multiple:
                     return True
         return False
 
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         if self.gxparam:
-            return self.gxparam.get_docstring()
+            return self.gxparam.docstring
         return ''
         #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
 
@@ -71,6 +69,6 @@ class Option(BaseCommandComponent):
         self.update_presence_array(cmdstr_index)
 
     def __str__(self) -> str:
-        return f'{str(self.prefix):30}{str(self.get_default_value()):20}{str(self.is_optional()):>10}'
+        return f'{str(self.prefix):30}{str(self.default_value):20}{str(self.optional):>10}'
 
 

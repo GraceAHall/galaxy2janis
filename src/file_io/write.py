@@ -22,7 +22,7 @@ def write_workflow_tools(workflow: Workflow) -> None:
     for step in workflow.list_steps():
         formatter = JanisToolFormatter(step.tool)
         tool_definition = formatter.to_janis_definition()
-        path = step.get_tool_definition_path()
+        path = step.tool_definition_path
         with open(path, 'w') as fp:
             fp.write(tool_definition)
 

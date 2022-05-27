@@ -15,7 +15,7 @@ from workflows.entities.workflow.workflow import WorkflowStep
 # GENERAL
 
 def format_docstring(entity: WorkflowStep | WorkflowInput | WorkflowOutput) -> Optional[str]:
-    raw_doc = entity.get_docstring()
+    raw_doc = entity.docstring
     if raw_doc:
         return raw_doc.replace('"', "'")
     return None

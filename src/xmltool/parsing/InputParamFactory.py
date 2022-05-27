@@ -46,8 +46,8 @@ class InputParamFactory:
     def map_common_fields(self, gxparam: GalaxyParam, param: InputParam) -> InputParam:
         param.label = str(gxparam.label)
         param.helptext = str(gxparam.help)
-        param.optional = bool(gxparam.optional)
         param.argument = gxparam.argument
+        param.set_optionality(bool(gxparam.optional))
         return param
 
     def init_text_param(self, gxparam: GalaxyParam) -> TextParam:

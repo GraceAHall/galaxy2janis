@@ -93,7 +93,7 @@ class JanisToolFormatter:
         )
 
     def format_docstring(self, component: CommandComponent) -> Optional[str]:
-        raw_doc = component.get_docstring()
+        raw_doc = component.docstring
         if raw_doc:
             return raw_doc.replace('"', "'")
         return None
@@ -104,7 +104,7 @@ class JanisToolFormatter:
             datatype=flag.get_janis_datatype_str(),
             position=flag.cmd_pos,
             prefix=flag.prefix,
-            default=flag.get_default_value(),
+            default=flag.default_value,
             doc=self.format_docstring(flag)
         )
     
@@ -121,10 +121,10 @@ class JanisToolFormatter:
         )
 
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
-        if isinstance(component, Option):
-            default = component.get_default_value(no_env=True)
-        else:
-            default = component.get_default_value()
+        default = component.default_value
+        # override env var default values to None
+        if isinstance(component, Option) and '$' in default:
+            default = None
         if self.should_quote(default, component):
             return f'"{default}"'
         return default
@@ -163,20 +163,20 @@ class JanisToolFormatter:
             case RedirectOutput():
                 return None
             case InputOutput():
-                input_comp_uuid = output.input_component.get_uuid()
+                input_comp_uuid = output.input_component.uuid
                 input_comp_tag = self.tool.tag_manager.get(input_comp_uuid)
                 return f'InputSelector("{input_comp_tag}")'
             case WildcardOutput():
                 return f'WildcardSelector("{output.gxparam.wildcard_pattern}")'
             case UncertainOutput():
-                return f'WildcardSelector("{output.get_default_value()}")'
+                return f'WildcardSelector("{output.default_value}")'
             case _:
                 pass
 
     def format_commandtool(self) -> str:
         container = self.tool.container
         return snippets.command_tool_builder_snippet(
-            toolname=self.tool.tag_manager.get(self.tool.get_uuid()),
+            toolname=self.tool.tag_manager.get(self.tool.uuid),
             base_command=self.tool.base_command,
             container=container.url if container else MISSING_CONTAINER_STRING,
             version=self.tool.metadata.version, # should this be based on get_main_requirement()?

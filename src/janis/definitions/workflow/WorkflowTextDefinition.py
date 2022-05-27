@@ -73,7 +73,7 @@ class WorkflowTextDefinition(ABC):
     def declaration(self) -> str:
         out_str = '# WORKFLOW DECLARATION\n'
         out_str += snippets.workflow_builder_snippet(
-            tag=self.workflow.tag_manager.get(self.workflow.get_uuid()),
+            tag=self.workflow.tag_manager.get(self.workflow.uuid),
             version=str(self.workflow.metadata.version),
             doc=self.workflow.metadata.annotation
         )
@@ -83,7 +83,7 @@ class WorkflowTextDefinition(ABC):
     def inputs(self) -> str:
         out_str = '# INPUTS\n'
         for inp in self.workflow.inputs:
-            tag = self.workflow.tag_manager.get(inp.get_uuid())
+            tag = self.workflow.tag_manager.get(inp.uuid)
             if inp.is_galaxy_input_step:
                 out_str += formatting.format_workflow_input(tag, inp)
         return out_str
@@ -97,8 +97,7 @@ class WorkflowTextDefinition(ABC):
     def outputs(self) -> str:
         out_str = '# OUTPUTS\n'
         for out in self.workflow.outputs:
-            uuid = out.get_uuid()
-            tag = self.workflow.tag_manager.get(uuid)
+            tag = self.workflow.tag_manager.get(out.uuid)
             out_str += formatting.format_workflow_output(tag, out)
         return out_str
         

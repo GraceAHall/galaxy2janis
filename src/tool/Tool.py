@@ -51,9 +51,6 @@ class Tool:
             entity=out
         )
 
-    def get_uuid(self) -> str:
-        return self.uuid
-
     def get_gxparam(self, query: str) -> Optional[Param]:
         param = self.gxparam_register.get(query, strategy='lca')
         if not param:
@@ -63,7 +60,7 @@ class Tool:
    
     def get_input(self, query_uuid: str) -> CommandComponent:
         for inp in self.inputs:
-            if query_uuid == inp.get_uuid():
+            if query_uuid == inp.uuid:
                 return inp
         raise RuntimeError(f'could not find {query_uuid} in tool inputs')
 
@@ -71,13 +68,13 @@ class Tool:
         return self.inputs
 
     def get_tags_inputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get(inp.get_uuid()): inp for inp in self.inputs}
+        return {self.tag_manager.get(inp.uuid): inp for inp in self.inputs}
     
     def list_outputs(self) -> list[CommandComponent]:
         return self.outputs
 
     def get_tags_outputs(self) -> dict[str, CommandComponent]:
-        return {self.tag_manager.get(out.get_uuid()): out for out in self.outputs}
+        return {self.tag_manager.get(out.uuid): out for out in self.outputs}
 
     def get_preprocessing(self) -> Optional[str]:
         raise NotImplementedError

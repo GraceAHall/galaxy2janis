@@ -66,7 +66,7 @@ def create_unlinked_workflowinput(workflow_input: WorkflowInput) -> InputValue:
 
 def cast_connection_to_workflowinput(value: ConnectionInputValue, winp: WorkflowInput) -> WorkflowInputInputValue:
     return WorkflowInputInputValue(
-        input_uuid=winp.get_uuid(),
+        input_uuid=winp.uuid,
         comptype=value.comptype,
         gxparam=value.gxparam
     )

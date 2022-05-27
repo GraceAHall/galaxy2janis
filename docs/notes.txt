@@ -3,6 +3,41 @@
 
 
 
+
+
+
+getting values
+- from cheetah cmdstr
+- from input dict
+
+update tool inputs
+
+getting values
+- from default value
+
+migrating values
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -----------------------------------------------
 
 #import re

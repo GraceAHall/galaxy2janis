@@ -12,10 +12,12 @@ class Flag(BaseCommandComponent):
         super().__init__()
         self.prefix = prefix
 
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         return self.prefix.strip('--')
 
-    def get_default_value(self) -> bool:
+    @property
+    def default_value(self) -> bool:
         if self.gxparam:
             return self.get_default_from_gxparam()
         else:
@@ -38,15 +40,18 @@ class Flag(BaseCommandComponent):
             return True
         return False
    
-    def is_optional(self) -> bool:
+    @property
+    def optional(self) -> bool:
         return True
 
-    def is_array(self) -> bool:
+    @property
+    def array(self) -> bool:
         return False
 
-    def get_docstring(self) -> Optional[str]:
+    @property
+    def docstring(self) -> Optional[str]:
         if self.gxparam:
-            return self.gxparam.get_docstring()
+            return self.gxparam.docstring
         return None
 
     def update(self, incoming: Any):
@@ -59,4 +64,4 @@ class Flag(BaseCommandComponent):
         self.update_presence_array(cmdstr_index)
         
     def __str__(self) -> str:
-        return f'{str(self.get_default_value()):20}{str(self.is_optional()):>10}'
+        return f'{str(self.default_value):20}{str(self.optional):>10}'
