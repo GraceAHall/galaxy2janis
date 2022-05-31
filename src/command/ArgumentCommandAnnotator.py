@@ -1,6 +1,5 @@
 
 
-
 from command.Command import Command
 from xmltool.param.Param import Param
 from xmltool.XMLToolDefinition import XMLToolDefinition
@@ -36,11 +35,11 @@ def argument_component_not_exists(gxparam: Param, xmltool: XMLToolDefinition, co
     return True
 
 def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
+    # check the prefix appears in the cmd text
     argument: str = gxparam.argument # type: ignore
     if argument is not None and argument in xmltool.raw_command:
         return True
     return False
-
 
 # main class
 
@@ -61,7 +60,7 @@ class ArgumentCommandAnnotator:
             argument_exists,
             argument_format,
             argument_component_not_exists,
-            argument_has_command_presence
+            argument_has_command_presence,
         ]
         for check in checks:
             if not check(gxparam, self.xmltool, self.command):

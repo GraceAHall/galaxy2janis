@@ -27,7 +27,7 @@ class SearchStrategy(ABC):
         """searches for a param using some concrete strategy"""
         ...
 
-class DefaultSearchStrategy(SearchStrategy):
+class ExactSearchStrategy(SearchStrategy):
     def search(self, query: str, params: list[Param]) -> Optional[Param]:
         """searches for a param using param name"""
         for param in params:

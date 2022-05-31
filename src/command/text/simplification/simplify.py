@@ -71,8 +71,8 @@ class TestSimplifier(CommandSimplifier):
 
 class XMLSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
-        flatten_multiline_strings,
         remove_cheetah_comments,
+        flatten_multiline_strings,
         replace_function_calls,
         replace_backticks,
         standardise_variable_format,

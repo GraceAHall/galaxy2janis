@@ -6,7 +6,7 @@ from typing import Optional
 from xmltool.param.Param import Param 
 from xmltool.param.ParamRegister import (
     ParamRegister,
-    DefaultSearchStrategy,
+    ExactSearchStrategy,
     LCASearchStrategy
 )
 
@@ -22,9 +22,9 @@ class InputParamRegister(ParamRegister):
     def add(self, param: Param) -> None:
         self.inputs.append(param)
     
-    def get(self, query: str, strategy: str='default') -> Optional[Param]:
+    def get(self, query: str, strategy: str='exact') -> Optional[Param]:
         strategy_map = {
-            'default': DefaultSearchStrategy(),
+            'exact': ExactSearchStrategy(),
             'lca': LCASearchStrategy(),
         }
         search_strategy = strategy_map[strategy]

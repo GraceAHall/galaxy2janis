@@ -5,7 +5,7 @@ from xmltool.param.OutputParam import OutputParam
 
 from xmltool.param.ParamRegister import (
     ParamRegister,
-    DefaultSearchStrategy,
+    ExactSearchStrategy,
     LCASearchStrategy,
     FilepathSearchStrategy
 )
@@ -24,10 +24,10 @@ class OutputParamRegister(ParamRegister):
         """adds a param to register. enforces unique param var names"""
         self.outputs.append(param)
 
-    def get(self, query: str, strategy: str='default') -> Optional[OutputParam]:
+    def get(self, query: str, strategy: str='exact') -> Optional[OutputParam]:
         """performs search using the specified search strategy"""
         strategy_map = {
-            'default': DefaultSearchStrategy(),
+            'exact': ExactSearchStrategy(),
             'lca': LCASearchStrategy(),
             'filepath': FilepathSearchStrategy(),
         }

@@ -1,12 +1,12 @@
 
 
 from command.Command import Command
+from command.components.inputs.Flag import Flag
 import runtime.logging.logging as logging
 from command.components.outputs.RedirectOutput import RedirectOutput
 from command.components.outputs.create import create_output
 from command.components.CommandComponent import CommandComponent
 from xmltool.XMLToolDefinition import XMLToolDefinition
-from xmltool.param.OutputParam import OutputParam
 from xmltool.param.Param import Param
     
 
@@ -16,7 +16,7 @@ def extract_outputs(xmltool: XMLToolDefinition, command: Command) -> list[Comman
 
 class OutputExtractor:
     def __init__(self, xmltool: XMLToolDefinition, command: Command):
-        self.galaxy_outputs = xmltool.list_outputs()
+        self.xmltool = xmltool
         self.command = command
 
     def extract(self) -> list[CommandComponent]:
@@ -42,7 +42,7 @@ class OutputExtractor:
 
     def attempt_redirect_gxparam_link(self, r: RedirectOutput) -> None:
         if not r.gxparam:
-            for query_param in self.galaxy_outputs:
+            for query_param in self.xmltool.list_outputs():
                 if query_param.wildcard_pattern is not None:
                     if query_param.wildcard_pattern == r.file_token.text:
                         r.gxparam = query_param
@@ -68,14 +68,14 @@ class OutputExtractor:
         # usually just because they have a file collection strategy
         # like from_work_dir or a <discover_datatsets> tag as a child
         out: list[CommandComponent] = []
-        for gxparam in self.galaxy_outputs:
+        for gxparam in self.xmltool.list_outputs():
             if self.should_create_wildcard_output(gxparam):
                 out.append(create_output('wildcard', gxparam))
         return out
 
     def get_uncertain_outputs(self, existing_outputs: list[CommandComponent]) -> list[CommandComponent]:
         out: list[CommandComponent] = []
-        for gxparam in self.galaxy_outputs:
+        for gxparam in self.xmltool.list_outputs():
             if self.should_create_uncertain_output(gxparam, existing_outputs):
                 logging.uncertain_output()
                 out.append(create_output('uncertain', gxparam))
@@ -83,9 +83,9 @@ class OutputExtractor:
 
     # CHECKS
     def should_create_input_output(self, component: CommandComponent) -> bool:
-        """test to see if this *command component* should spawn InputOutput"""
-        if component.gxparam and isinstance(component.gxparam, OutputParam):
-            return True
+        if not isinstance(component, Flag):
+            if component.gxparam and self.xmltool.outputs.get(component.gxparam.name):
+                return True
         return False
 
     def should_create_wildcard_output(self, gxparam: Param) -> bool:
@@ -114,4 +114,4 @@ class OutputExtractor:
     def verify_outputs(self, outputs: list[CommandComponent]) -> None:
         # just checks we have the same number of outputs identified as CommandComponents
         # as there are in the xmltool's listed output params
-        assert(len(self.galaxy_outputs) == len(outputs))
+        assert(len(self.xmltool.list_outputs()) == len(outputs))

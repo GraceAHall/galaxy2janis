@@ -31,13 +31,13 @@ class XMLToolDefinition:
     outputs: OutputParamRegister
     tests: TestRegister
 
-    def get_input(self, query: str, strategy: str='default') -> Optional[Param]:
+    def get_input(self, query: str, strategy: str='exact') -> Optional[Param]:
         return self.inputs.get(query.lstrip('$'), strategy=strategy)
     
     def list_inputs(self) -> list[Param]:
         return self.inputs.list()
 
-    def get_output(self, query: str, strategy: str='default') -> Optional[Param]:
+    def get_output(self, query: str, strategy: str='exact') -> Optional[Param]:
         return self.outputs.get(query.lstrip('$'), strategy=strategy)
     
     def list_outputs(self) -> list[OutputParam]:

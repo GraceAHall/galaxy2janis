@@ -100,6 +100,34 @@
             ]
         },
         {
+            "name": "cutadapt",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/cutadapt", 
+                "--xml", "cutadapt.xml",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
+        {
+            "name": "cutadapt_downloaded",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "parsed/workflows/rna_seq_reads_to_counts/wrappers/cutadapt-660cffd8d92a", 
+                "--xml", "cutadapt.xml",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
+        {
             "name": "unicycler",
             "type": "python",
             "request": "launch",
@@ -110,6 +138,7 @@
                 "tool",
                 "--dir", "test/data/tools/unicycler", 
                 "--xml", "unicycler.xml",
+                "--dev-no-test-cmdstrs"
             ]
         },
         {
