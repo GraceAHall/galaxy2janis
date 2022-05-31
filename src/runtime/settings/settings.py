@@ -58,7 +58,7 @@ def _make_parse_tool_args(metadata: StepMetadata, wsettings: WorkflowExeSettings
         return {
             'dir': None,
             'xml': None,
-            'remote_url': metadata.get_build_url(),
+            'remote_url': metadata.get_url(),
             'download_dir': wsettings.get_xml_wrappers_dir(),
             'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.tool_id}',
             'cachedir': wsettings.container_cachedir,

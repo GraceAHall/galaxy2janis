@@ -106,6 +106,10 @@ def workflow_step_array_connections():
     logger = getLogger('workflow')
     logger.warning('workflow step array connections')
 
+def container_version_mismatch():
+    logger = getLogger('tool')
+    logger.warning('container version mismatch')
+
 # def has_bash_script():
 #     logger = getLogger('tool')
 #     logger.warning('bash script')

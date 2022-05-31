@@ -1,6 +1,9 @@
 
 
+
+import runtime.logging.logging as logging
 from abc import ABC, abstractmethod
+from datetime import datetime
 from dataclasses import dataclass
 from typing import Any, Optional
 from containers.GA4GHInteractor import GA4GHInteractor
@@ -20,10 +23,6 @@ image_presets = {
 }
 
 
-@dataclass
-class SimilarityScore:
-    score: float
-    obj: Any
 
 
 class BiocontainerFetcher(ABC):
@@ -54,6 +53,22 @@ class ContainerBiocontainerFetcher(BiocontainerFetcher):
         )
 
 
+
+
+@dataclass
+class SimilarityScore:
+    score: float
+    obj: Any
+
+
+ 
+# class GA4GHVersionData:
+#     def __init__(self, **kwargs: dict[str, str]):
+#         self.image_name = kwargs['image_name']
+#         self.image_type = kwargs['image_type']
+#         self.image_type = kwargs['image_type']
+
+
 class CondaBiocontainerFetcher(BiocontainerFetcher):
 
     def fetch(self, tool_id: str, tool_version: str, requirement: Requirement) -> Optional[Container]:
@@ -63,17 +78,16 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
         image = self.get_image_preset()
         if not image:
             image = self.get_image_GA4GH()
-        
-        if image:
-            return Container(
-                galaxy_id=self.tool_id,
-                galaxy_version=self.tool_version,
-                url=image['image_name'],
-                image_type=image['image_type'],
-                registry_host=image['registry_host'],
-                requirement_id=self.requirement.get_text(),
-                requirement_version=self.requirement.get_version()
-            )
+            if image:
+                return Container(
+                    galaxy_id=self.tool_id,
+                    galaxy_version=self.tool_version,
+                    url=image['image_name'],
+                    image_type=image['image_type'],
+                    registry_host=image['registry_host'],
+                    requirement_id=self.requirement.get_text(),
+                    requirement_version=self.requirement.get_version()
+                )
         return None
 
     def get_image_preset(self) -> Optional[dict[str, str]]:
@@ -111,7 +125,7 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
         result_similarities.sort(key = lambda x: x.score, reverse=True)
         return result_similarities[0].obj
 
-    def select_most_similar_version(self, tool_data: dict[str, Any]) -> dict[str, str]:
+    def select_most_similar_version(self, tool_data: dict[str, Any]) -> dict[str, Any]:
         vm = self.version_matcher
         target_version = self.requirement.get_version()
         selected: Optional[dict[str, str]] = None
@@ -125,15 +139,29 @@ class CondaBiocontainerFetcher(BiocontainerFetcher):
         # if not selected:
         #     selected = vm.get_version_trimmed_inexact(query_versions, target_version)
 
-    def select_image(self, data: dict[str, Any]) -> dict[str, str]:
-        images = [x for x in data['images'] if x['image_type'] != 'Conda']
+    def select_image(self, data: dict[str, Any]) -> dict[str, Any]:
+        images = self.sort_dates(data['images'])
+        if not images:
+            logging.no_container()
+        selected = self.select_from_available(images)
+        if selected:
+            return selected
+        else:
+            logging.container_version_mismatch()
+            return images[0] 
+
+    def select_from_available(self, images: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
         for image in images:
             if image['registry_host'] == 'quay.io/':
                 return image
         for image in images:
             if image['registry_host'] == 'depot.galaxyproject.org/singularity/':
                 return image
-        return images[0]
+        return None
+
+    def sort_dates(self, images: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return sorted(images, key=lambda x: datetime.strptime(x['updated'], "%Y-%m-%dT%H:%M:%SZ"), reverse=True)
+
 
         
 

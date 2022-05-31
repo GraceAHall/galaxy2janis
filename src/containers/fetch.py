@@ -1,4 +1,5 @@
 
+import tempfile
 
 import runtime.logging.logging as logging
 from typing import Optional
@@ -9,6 +10,7 @@ from xmltool.XMLToolDefinition import XMLToolDefinition
 from containers.Container import Container
 from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
 
+DISABLE_CACHE = True
 
 def fetch_container(esettings: ToolExeSettings, xmltool: XMLToolDefinition) -> Optional[Container]:
     cache: ContainerCache = load_cache(esettings.container_cachedir)
@@ -27,6 +29,9 @@ def fetch_from_cache(cache: ContainerCache, xmltool: XMLToolDefinition) -> Optio
     return None
 
 def load_cache(cache_path: str) -> ContainerCache:
+    if DISABLE_CACHE:
+        temp = tempfile.TemporaryFile()
+        cache_path = f'{tempfile.gettempdir()}/{temp.name}'
     return ContainerCache(cache_path)
 
 def fetch_online(xmltool: XMLToolDefinition) -> Optional[Container]:

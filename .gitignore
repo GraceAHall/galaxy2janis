@@ -19,7 +19,7 @@ TODO.txt
 galaxy_requirements.txt
 requirements.txt
 edge_cases.txt
-
+runs/input_data
 simple_workflow_original/
 simple_workflow_modified/
 
