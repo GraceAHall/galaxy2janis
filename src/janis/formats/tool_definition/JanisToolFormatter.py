@@ -9,7 +9,7 @@ from tool.Tool import Tool
 from command.components.CommandComponent import CommandComponent
 from command.components.inputs import Positional, Flag, Option
 from janis.imports.ToolImportHandler import ToolImportHandler
-import janis.definitions.tool.snippets as snippets
+import janis.formats.tool_definition.snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
 
@@ -123,8 +123,9 @@ class JanisToolFormatter:
     def get_wrapped_default_value(self, component: CommandComponent) -> str:
         default = component.default_value
         # override env var default values to None
-        if isinstance(component, Option) and '$' in default:
-            default = None
+        if isinstance(component, Option) and default is not None:
+            if '$' in default:
+                default = None
         if self.should_quote(default, component):
             return f'"{default}"'
         return default
@@ -167,7 +168,7 @@ class JanisToolFormatter:
                 input_comp_tag = self.tool.tag_manager.get(input_comp_uuid)
                 return f'InputSelector("{input_comp_tag}")'
             case WildcardOutput():
-                return f'WildcardSelector("{output.gxparam.wildcard_pattern}")'
+                return f'WildcardSelector("{output.default_value}")'
             case UncertainOutput():
                 return f'WildcardSelector("{output.default_value}")'
             case _:

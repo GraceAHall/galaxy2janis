@@ -90,7 +90,7 @@ strategy_map = {
 }
 
 
-AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | WorkflowInput | WorkflowStep | WorkflowOutput
+AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | UncertainOutput | WorkflowInput | WorkflowStep | WorkflowOutput
 
 class DatatypeAnnotator:
     def __init__(self) -> None:

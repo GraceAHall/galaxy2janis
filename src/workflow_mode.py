@@ -11,7 +11,7 @@ from workflows.parsing.workflow.workflow import parse_workflow
 from workflows.parsing.workflow.outputs import set_outputs
 from workflows.analysis.step_outputs.link import link_step_outputs_tool_outputs
 from workflows.analysis.tool_values.linking.link import link_tool_input_values
-
+from file_io.write import write_workflow
 
 """
 file ingests a galaxy workflow, then downloads and translates each tool
@@ -26,8 +26,8 @@ def workflow_mode(wsettings: WorkflowExeSettings) -> Workflow:
     link_step_outputs_tool_outputs(workflow)
     set_outputs(workflow)
     set_tool_paths(wsettings, workflow)
+    write_workflow(wsettings, workflow)
     return workflow
-
 
 
 # after parsing

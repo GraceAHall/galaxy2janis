@@ -30,7 +30,7 @@ def get_step_metadata_builtin(gxstep: dict[str, Any]) -> StepMetadata:
 def get_step_metadata_repo(gxstep: dict[str, Any]) -> StepMetadata:
     'toolshed.g2.bx.psu.edu/repos/devteam/picard/picard_MarkDuplicates/2.18.2.1'
     repo_url_split = gxstep['tool_id'].split('/')
-    tool_id = repo_url_split[4]
+    tool_id = repo_url_split[-2]
     return StepMetadata(
         uuid=gxstep['uuid'],
         step_id=gxstep['id'],

@@ -217,7 +217,8 @@
             "args": [
                 "workflow",
                 "test/data/workflows/transcriptomics/rna-seq-reads-to-counts.ga",
-                "--outdir", "parsed/workflows"
+                "--outdir", "parsed/workflows",
+                "--dev-no-test-cmdstrs"
             ]
         },
         {

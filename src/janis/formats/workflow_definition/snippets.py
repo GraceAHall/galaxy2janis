@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from typing import Optional
-from janis.definitions.workflow.ToolInputLine import ToolInputLine
+from janis.formats.workflow_definition.ToolInputLine import ToolInputLine
 from janis.imports.Import import Import
 from workflows.entities.step.tool_values import InputValue
 

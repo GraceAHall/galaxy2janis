@@ -24,7 +24,6 @@ class Workflow:
     steps: dict[int, WorkflowStep] = field(default_factory=dict)
     inputs: list[WorkflowInput] = field(default_factory=list)
     outputs: list[WorkflowOutput] = field(default_factory=list)
-    #steps_inputs_uuid_map: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())

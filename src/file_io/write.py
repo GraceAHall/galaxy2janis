@@ -4,12 +4,10 @@ from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from tool.Tool import Tool
 from workflows.entities.workflow.workflow import Workflow
 
-from janis.definitions.tool.JanisToolFormatter import JanisToolFormatter
-from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition
-#from janis.definitions.workflow.WorkflowTextDefinition import BulkWorkflowTextDefinition
+from janis.formats.tool_definition.JanisToolFormatter import JanisToolFormatter
+from janis.formats.workflow_definition.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition
+from janis.formats.workflow_inputs.inputs import format_input_dict
 
-WFLOW_TEXT_DEFINITION_CLS = BulkWorkflowTextDefinition
-#WFLOW_TEXT_DEFINITION_CLS = StepwiseWorkflowTextDefinition
 
 def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
     formatter = JanisToolFormatter(tool)
@@ -26,18 +24,33 @@ def write_workflow_tools(workflow: Workflow) -> None:
         with open(path, 'w') as fp:
             fp.write(tool_definition)
 
-def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    # tool definitions
+def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None: 
     write_workflow_tools(workflow)
+    write_workflow_definitions(esettings, workflow)
 
-    # workflow definitions
-    text_def = WFLOW_TEXT_DEFINITION_CLS(esettings, workflow)
-    wflow_path = esettings.get_janis_workflow_path()
-    write_main_page(wflow_path, text_def)
+
+def write_workflow_definitions(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
+    # inputs dict
+    write_inputs_dict(esettings, workflow)
+
+    # main workflow page
+    text_def = BulkWorkflowTextDefinition(esettings, workflow)
+    #text_def = StepwiseWorkflowTextDefinition(esettings, workflow)
+    write_main_page(esettings, text_def)
+    
+    # individual step pages if necessary
     if isinstance(text_def, StepwiseWorkflowTextDefinition):
         write_step_pages(text_def)
-    
-def write_main_page(path: str, text_def: WorkflowTextDefinition) -> None:
+
+def write_inputs_dict(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
+    FMT = 'yaml'
+    path = esettings.get_janis_input_dict_path(format=FMT)
+    text = format_input_dict(workflow, format=FMT)
+    with open(path, 'w') as fp:
+        fp.write(text)
+
+def write_main_page(esettings: WorkflowExeSettings, text_def: WorkflowTextDefinition) -> None:
+    path = esettings.get_janis_workflow_path()
     with open(path, 'w') as fp:
         fp.write(text_def.format())
         

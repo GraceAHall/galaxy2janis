@@ -21,6 +21,9 @@ class WorkflowExeSettings:
     def get_janis_workflow_path(self) -> str:
         return f'{self.outdir}/workflow.py'
     
+    def get_janis_input_dict_path(self, format: str='yaml') -> str:
+        return f'{self.outdir}/inputs.{format}'
+    
     def get_janis_workflow_configfile_path(self) -> str:
         return f'{self.outdir}/config.py'
 

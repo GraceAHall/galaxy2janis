@@ -11,7 +11,6 @@ from tool_mode import tool_mode
 from workflow_mode import workflow_mode
 from runtime.settings.settings import load_tool_settings, load_workflow_settings
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
-from file_io.write import write_tool, write_workflow
 
 """
 gxtool2janis program entry point
@@ -40,31 +39,27 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     esettings: ToolExeSettings = load_tool_settings(args)
-    tool = tool_mode(esettings)
-    write_tool(esettings, tool)
+    tool_mode(esettings)
 
 def try_run_tool_mode(args: dict[str, Optional[str]]):
-    esettings: ToolExeSettings = load_tool_settings(args)
     try: 
-        tool = tool_mode(esettings)
-        write_tool(esettings, tool)
+        esettings: ToolExeSettings = load_tool_settings(args)
+        tool_mode(esettings)
     except Exception as e:
-        logging.tool_exception()
         print(e)
+        logging.tool_exception()
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
     esettings: WorkflowExeSettings = load_workflow_settings(args)
-    workflow = workflow_mode(esettings)
-    write_workflow(esettings, workflow)
+    workflow_mode(esettings)
 
 def try_run_workflow_mode(args: dict[str, Optional[str]]):
-    esettings: WorkflowExeSettings = load_workflow_settings(args)
     try: 
-        workflow = workflow_mode(esettings)
-        write_workflow(esettings, workflow)
+        esettings: WorkflowExeSettings = load_workflow_settings(args)
+        workflow_mode(esettings)
     except Exception as e:
-        logging.workflow_exception()
         print(e)
+        logging.workflow_exception()
     
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ class UncertainOutput(BaseCommandComponent):
     def name(self) -> str:
         if self.gxparam:
             return self.gxparam.name
-        raise RuntimeError('an UnknownOutput must have a gxparam')
+        raise RuntimeError('an UncertainOutput must have a gxparam')
 
     @property
     def default_value(self) -> str:

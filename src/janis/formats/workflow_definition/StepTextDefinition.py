@@ -12,10 +12,10 @@ from workflows.entities.workflow.workflow import Workflow
 from janis.imports.Import import Import
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector
 
-import janis.definitions.workflow.snippets as snippets
-import janis.definitions.workflow.formatting as formatting
-from janis.definitions.workflow.ToolInputLine import LinkedInputLine, ToolInputLine, UnlinkedInputLine
-from janis.definitions.workflow.ordering import order
+import janis.formats.workflow_definition.snippets as snippets
+import janis.formats.workflow_definition.formatting as formatting
+from janis.formats.workflow_definition.ToolInputLine import LinkedInputLine, ToolInputLine, UnlinkedInputLine
+from janis.formats.workflow_definition.ordering import order
 
 
 @dataclass

@@ -20,8 +20,8 @@ class WildcardOutput(BaseCommandComponent):
         raise RuntimeError('an WildcardOutput must have a gxparam')
 
     @property
-    def default_value(self) -> Any:
-        raise NotImplementedError()
+    def default_value(self) -> str:
+        return self.gxparam.wildcard_pattern
     
     @property
     def optional(self) -> bool:

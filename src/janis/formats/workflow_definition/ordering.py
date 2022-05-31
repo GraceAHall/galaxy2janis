@@ -6,7 +6,7 @@
 from abc import ABC, abstractmethod
 from workflows.entities.step.tool_values import ConnectionInputValue, WorkflowInputInputValue
 
-from janis.definitions.workflow.ToolInputLine import ToolInputLine
+from janis.formats.workflow_definition.ToolInputLine import ToolInputLine
 
 
 class LineOrderingStrategy(ABC):

@@ -5,7 +5,7 @@ from xmltool.load import load_xmltool
 from command.command import gen_command
 from containers.fetch import fetch_container
 from tool.generate import gen_tool
-
+from file_io.write import write_tool
 # TODO future 
 #from xmltool.tests import write_tests
 
@@ -25,4 +25,5 @@ def tool_mode(esettings: ToolExeSettings):
     command = gen_command(esettings, xmltool)
     container = fetch_container(esettings, xmltool)
     tool = gen_tool(xmltool, command, container)
+    write_tool(esettings, tool)
     return tool

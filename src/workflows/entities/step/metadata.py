@@ -21,12 +21,13 @@ class StepMetadata:
     tool_definition_path: Optional[str] = None
 
     def get_url(self) -> str:
-        try: 
-            return self.get_url_via_version()
-        except Exception as e:
-            print(e)
-            assert(self.changeset_revision)
-            return self.get_url_via_revision(self.changeset_revision)
+        assert(self.changeset_revision)
+        return self.get_url_via_revision(self.changeset_revision)
+        # try: 
+        #     return self.get_url_via_version()
+        # except Exception as e:
+        #     print(e)
+        #     return self.get_url_via_revision(self.changeset_revision)
 
     def get_url_via_revision(self, changeset_revision: str) -> str:
         return f'https://{self.shed}/repos/{self.owner}/{self.repo_name}/archive/{changeset_revision}.tar.gz'

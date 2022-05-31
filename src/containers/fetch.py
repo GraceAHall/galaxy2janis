@@ -10,7 +10,7 @@ from xmltool.XMLToolDefinition import XMLToolDefinition
 from containers.Container import Container
 from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
 
-DISABLE_CACHE = True
+DISABLE_CACHE = False
 
 def fetch_container(esettings: ToolExeSettings, xmltool: XMLToolDefinition) -> Optional[Container]:
     cache: ContainerCache = load_cache(esettings.container_cachedir)

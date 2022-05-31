@@ -5,13 +5,13 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import os
 
-from janis.definitions.workflow.StepTextDefinition import StepTextDefinition
+from janis.formats.workflow_definition.StepTextDefinition import StepTextDefinition
 from runtime.settings.ExeSettings import WorkflowExeSettings
 from workflows.entities.workflow.workflow import WorkflowStep
 from workflows.entities.workflow.workflow import Workflow
 from janis.imports.WorkflowImportCollector import WorkflowImportCollector
-import janis.definitions.workflow.snippets as snippets
-import janis.definitions.workflow.formatting as formatting
+import janis.formats.workflow_definition.snippets as snippets
+import janis.formats.workflow_definition.formatting as formatting
 from janis.imports.Import import Import
 
 

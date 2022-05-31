@@ -5,7 +5,7 @@
 
 from typing import Optional
 from janis.imports.Import import Import, ImportType
-import janis.definitions.workflow.snippets as snippets
+import janis.formats.workflow_definition.snippets as snippets
 from workflows.entities.workflow.input import WorkflowInput
 from workflows.entities.workflow.output import WorkflowOutput
 from workflows.entities.workflow.workflow import WorkflowStep
@@ -54,5 +54,4 @@ def format_workflow_output(tag: str, output: WorkflowOutput) -> str:
 
 
 
-# STEP
 
