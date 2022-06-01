@@ -167,6 +167,20 @@
                 "--xml", "quast.xml",
             ]
         },
+        {
+            "name": "mark_duplicates",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "runs/rna_seq_reads_to_counts/wrappers/picard-2a17c789e0a5", 
+                "--xml", "picard_MarkDuplicates.xml",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
         // WORKFLOWS
         {
             "name": "shovill test",

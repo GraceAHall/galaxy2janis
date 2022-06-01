@@ -45,46 +45,54 @@ def msg_downloading_tool(url: str):
     print(f'downloading tool repo from {url}')
 
 
-# info
+# debug
 # (just runtime data and info messages which don't impact program)
 def runtime_data(data: str):
     logger = getLogger('tool')
-    logger.info(str(data))
+    logger.debug(str(data))
 
 def evaluation_failed():
     logger = getLogger('tool')
-    logger.info('cheetah evaluation failed')
+    logger.debug('cheetah evaluation failed')
 
 
-# warning
-# (things that MAY cause issues)
+# info
+# (things that MAY cause issues or just metric collecting)
+
 def has_preprocessing():
     logger = getLogger('tool')
-    logger.warning('preprocessing')
+    logger.info('preprocessing')
 
 def has_postprocessing():
     logger = getLogger('tool')
-    logger.warning('postprocessing')
+    logger.info('postprocessing')
 
 def has_backtick_statement():
     logger = getLogger('tool')
-    logger.warning('backtick statement')
+    logger.info('backtick statement')
 
 def has_multiline_str():
     logger = getLogger('tool')
-    logger.warning('multiline string')
+    logger.info('multiline string')
 
 def has_repeat():
     logger = getLogger('tool')
-    logger.warning('repeat param')
+    logger.info('repeat param')
 
 def has_cheetah_loop(text: Optional[str]=None):
     logger = getLogger('tool')
-    logger.warning(f'cheetah loop:\t{text}')
+    logger.info(f'cheetah loop:\t{text}')
 
 def has_cheetah_function():
     logger = getLogger('tool')
-    logger.warning('cheetah function')
+    logger.info('cheetah function')
+
+def no_base_cmd():
+    logger = getLogger('tool')
+    logger.info('no base cmd')
+
+# warning
+# (things that WILL cause issues and require human editing in the workflow)
 
 def uncertain_output():
     logger = getLogger('tool')
@@ -94,53 +102,44 @@ def unlinked_input_connection():
     logger = getLogger('workflow')
     logger.warning('unknown input')
 
-def has_configfile():
-    logger = getLogger('tool')
-    logger.warning('configfile')
-
 def zero_length_tag():
     logger = getLogger('tool')
     logger.warning('zero length tag')
 
-def workflow_step_array_connections():
-    logger = getLogger('workflow')
-    logger.warning('workflow step array connections')
+def no_inputs():
+    logger = getLogger('tool')
+    logger.warning('no inputs')
+
+def no_outputs():
+    logger = getLogger('tool')
+    logger.warning('no outputs')
+
+def no_container():
+    logger = getLogger('tool')
+    logger.warning('no container')
+
+def no_ga4gh_data():
+    logger = getLogger('tool')
+    logger.warning('no ga4gh data')
 
 def container_version_mismatch():
     logger = getLogger('tool')
     logger.warning('container version mismatch')
 
-# def has_bash_script():
-#     logger = getLogger('tool')
-#     logger.warning('bash script')
-
-
-
-
-
 # error
-# (things that WILL cause issues)
-def no_container():
-    logger = getLogger('tool')
-    logger.error('no container')
+# (unsupported features)
 
-def no_ga4gh_data():
+def has_configfile():
     logger = getLogger('tool')
-    logger.error('no ga4gh data')
+    logger.error('configfile')
 
-def no_inputs():
-    logger = getLogger('tool')
-    logger.error('no inputs')
+def workflow_step_array_connections():
+    logger = getLogger('workflow')
+    logger.error('workflow step array connections')
+ 
+# critical
+# (program failed - uncaught exceptions)
 
-def no_outputs():
-    logger = getLogger('tool')
-    logger.error('no outputs')
-
-def no_base_cmd():
-    logger = getLogger('tool')
-    logger.error('no base cmd')
-
-# critical (exceptions)
 def tool_exception():
     logger = getLogger('tool')
     logger.critical('exception')

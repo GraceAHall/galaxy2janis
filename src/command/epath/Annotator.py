@@ -82,8 +82,8 @@ class OptionAnnotator(Annotator):
             self.update_epath_components(pos, component)
 
     def get_delim(self) -> str:
-        if self.positions[self.ptr + 1].token.type == TokenType.KV_LINKER:
-            return self.positions[self.ptr].token.text
+        if self.ntoken.type == TokenType.KV_LINKER:
+            return self.ntoken.text
         return ' ' # fallback default
 
     def get_option_values(self) -> list[str]:

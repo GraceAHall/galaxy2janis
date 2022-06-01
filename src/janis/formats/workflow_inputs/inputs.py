@@ -63,13 +63,16 @@ def format_input_dict(workflow: Workflow, format: str='yaml') -> str:
     else:
         raise RuntimeError('wrong format')
 
+
+YAML_NONE = 'null'
+
 def to_yaml(input_list: RuntimeInputList) -> str:
     out: str = ''
     out += f'{INFO_TEXT}\n'
     for section, inputs in input_list.formatted:
         out += f'# {section}\n'
         for name in inputs:
-            out += f'{name}: None\n'
+            out += f'{name}: {YAML_NONE}\n'
         out += '\n'
     return out
 

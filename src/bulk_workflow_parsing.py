@@ -32,14 +32,14 @@ class WorkflowModeRunner:
         thread worker target function
         """
         print(job.workflow_file)
-        command = f'python src/gxtool2janis.py workflow {job.workflow_dir}/{job.workflow_file}'
+        command = f'python src/gxtool2janis.py workflow {job.workflow_dir}/{job.workflow_file} --dev-no-test-cmdstrs'
         subprocess.run(command, shell=True)
         #subprocess.run(command, shell=True, check=True)
 
     def run(self) -> None:
         wflowdirs = self.get_workflow_directories()
         details = self.get_job_details(wflowdirs)
-        self.run_jobs(details=details, threads=10)
+        self.run_jobs(details=details, threads=8)
     
     def get_workflow_directories(self) -> list[str]:
         #banned_dirs = set(['mine'])

@@ -33,7 +33,7 @@ class ToolModeRunner:
         thread worker target function
         """
         print(job.xmlfile)
-        command = f'python src/gxtool2janis.py tool --dir {job.xmldir} --xml {job.xmlfile}'
+        command = f'python src/gxtool2janis.py tool --dir {job.xmldir} --xml {job.xmlfile} --dev-no-test-cmdstrs'
         subprocess.run(command, shell=True)
         #subprocess.run(command, shell=True, check=True)
 

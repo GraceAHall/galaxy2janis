@@ -35,6 +35,7 @@ class LogFile:
     def status(self) -> str:
         level_map: dict[str, int] = {
             'OK': 10,
+            'INFO': 20,
             'WARNING': 30,
             'ERROR': 40,
             'CRITICAL': 50,
@@ -102,6 +103,7 @@ class ToolParsingReport:
     def log_statuses(self) -> dict[str, int]:
         counts: dict[str, int] = {
             'OK': 0,
+            'INFO': 0,
             'WARNING': 0,
             'ERROR': 0,
             'CRITICAL': 0,
