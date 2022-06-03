@@ -2,7 +2,7 @@
 from typing import Any, Optional, Tuple 
 import os 
 
-from xmltool.downloads import handle_downloads
+from galaxy_wrappers.download import handle_downloads
 
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from runtime.settings.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSettingsInitialiser
@@ -40,17 +40,17 @@ def load_workflow_settings(args: dict[str, Optional[str]]) -> WorkflowExeSetting
 def create_tool_settings_for_step(wsettings: WorkflowExeSettings, metadata: StepMetadata) -> ToolExeSettings:
     """generates ToolExeSettings for each tool to be parsed"""
     args = _make_parse_tool_args(metadata, wsettings)
-    return load_tool_settings(args, metadata.tool_id)
+    return load_tool_settings(args, metadata.wrapper.tool_id)
         
 def _make_parse_tool_args(metadata: StepMetadata, wsettings: WorkflowExeSettings) -> dict[str, Any]:
-    if metadata.is_inbuilt:
+    if metadata.wrapper.inbuilt:
         tool_dir, xml_filename = _get_builtin_tool_path(metadata)
         return {
             'dir': tool_dir,
             'xml': xml_filename,
             'remote_url': None,
             'download_dir': None,
-            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.tool_id}',
+            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.wrapper.tool_id}',
             'cachedir': wsettings.container_cachedir,
             'dev_no_test_cmdstrs': wsettings.dev_no_test_cmdstrs
         }
@@ -58,9 +58,9 @@ def _make_parse_tool_args(metadata: StepMetadata, wsettings: WorkflowExeSettings
         return {
             'dir': None,
             'xml': None,
-            'remote_url': metadata.get_url(),
+            'remote_url': metadata.wrapper.url,
             'download_dir': wsettings.get_xml_wrappers_dir(),
-            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.tool_id}',
+            'outdir': f'{wsettings.get_janis_tools_dir()}/{metadata.wrapper.tool_id}',
             'cachedir': wsettings.container_cachedir,
             'dev_no_test_cmdstrs': wsettings.dev_no_test_cmdstrs
         }
@@ -68,10 +68,10 @@ def _make_parse_tool_args(metadata: StepMetadata, wsettings: WorkflowExeSettings
 def _get_builtin_tool_path(metadata: StepMetadata) -> Tuple[str, str]:
     tool_directories = _get_builtin_tool_directories()
     for directory in tool_directories:
-        xmlfile = utils.get_xmlfile_by_tool_id(directory, metadata.tool_id)
+        xmlfile = utils.get_xmlfile_by_tool_id(directory, metadata.wrapper.tool_id)
         if xmlfile:
             return directory, xmlfile
-    raise RuntimeError(f'cannot locate builtin tool {metadata.tool_id}') 
+    raise RuntimeError(f'cannot locate builtin tool {metadata.wrapper.tool_id}') 
 
 def _get_builtin_tool_directories() -> list[str]:
     out: list[str] = []

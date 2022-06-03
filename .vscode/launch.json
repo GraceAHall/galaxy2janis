@@ -13,6 +13,13 @@
             "console": "integratedTerminal",
         },
         {
+            "name": "scrape_toolshed",
+            "type": "python",
+            "request": "launch",
+            "program": "src/galaxy_wrappers/scraping/scraping.py",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "rip galaxy types",
             "type": "python",
             "request": "launch",

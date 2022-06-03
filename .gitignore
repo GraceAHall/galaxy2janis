@@ -22,7 +22,7 @@ edge_cases.txt
 runs
 simple_workflow_original/
 simple_workflow_modified/
-
+temp/
 super_simple_workflow/
 super_simple_unicycler/
 super_simple_quast/

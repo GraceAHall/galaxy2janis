@@ -23,7 +23,6 @@ def handle_downloads(intended_tool_id: str, esettings: ToolExeSettings) -> ToolE
     esettings.xmlfile = handler.xmlfile
     return esettings
 
-
 class DownloadHandler:
     def __init__(self, intended_tool_id: str, wrappers_dir: str, url: str):
         self.intended_tool_id = intended_tool_id

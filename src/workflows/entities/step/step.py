@@ -32,7 +32,7 @@ class WorkflowStep:
 
     @property
     def tool_name(self) -> str:
-        return self.metadata.tool_id
+        return self.metadata.wrapper.tool_id
 
     @property
     def tool_definition_path(self) -> str:

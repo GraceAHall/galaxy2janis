@@ -54,7 +54,7 @@ def get_starting_text(entity_type: str, entity: Any) -> str:
             else:
                 return f'{entity.step_tag}_{entity.name}' # type: ignore
         case 'workflow_step':
-            return entity.metadata.tool_id # type: ignore
+            return entity.metadata.wrapper.tool_id # type: ignore
         case 'workflow_output':
             return f'{entity.step_tag}_{entity.toolout_tag}' # type: ignore
         case 'tool':
