@@ -2,18 +2,44 @@
 
 
 
-from dataclasses import dataclass, field
-from typing import Optional
+from datetime import datetime
 
+from runtime.settings.formats import JANIS_DATE_FMT
+from runtime.settings.formats import QUAY_DATE_FMT
 
+"""
+yes, this is meant to be written and read to disk. how did you know
+"""
 
-
-@dataclass
 class Container: 
-    galaxy_id: str
-    galaxy_version: str
-    url: str = field(repr=False)
-    image_type: str = field(repr=False)
-    registry_host: str = field(repr=False)
-    requirement_id: Optional[str] = field(repr=False, default=None)
-    requirement_version: Optional[str] = field(repr=False, default=None)
+    def __init__(self, info: dict[str, str]):
+        self.image_type: str = info['image_type']
+        self.repo: str = info['repo']
+        self.tag: str = info['tag']
+        self.url: str = info['url']
+        self._timestamp: str = info['_timestamp']
+
+    @property
+    def registry_host(self) -> str:
+        return self.url.split('/', 1)[0]
+
+    @property
+    def tool_name(self) -> str:
+        return self.repo
+
+    @property
+    def tool_version(self) -> str:
+        if self.registry_host == 'quay.io':
+            return self.tag.split('--', 1)[0]
+        raise NotImplementedError()
+
+    @property
+    def timestamp(self) -> str:
+        """map the timestamp from different formats to unified output"""
+        if self.registry_host == 'quay.io': 
+            date = datetime.strptime(self._timestamp, QUAY_DATE_FMT)
+        else:
+            raise NotImplementedError()
+        return date.strftime(JANIS_DATE_FMT)
+
+

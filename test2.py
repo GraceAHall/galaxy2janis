@@ -1,25 +1,34 @@
 
-from Cheetah.Template import Template
 
 
-templateDef = """
-<HTML>
-<HEAD><TITLE>\$input.reference</TITLE></HEAD>
-<BODY>
-$contents
-## this is a single-line Cheetah comment and won't appear in the output
-#* This is a multi-line comment and won't appear in the output
-   blah, blah, blah
-*#
-</BODY>
-</HTML>"""
+from janis_core.types.common_data_types import Directory
 
-nameSpace = {
-    'input' : {
-        'reference': 'WTFFF'
-    },
-    'contents': 'Hello World!'
-}
+from janis_core import (
+    CommandToolBuilder, 
+    String,
+    ToolInput, 
+    ToolOutput,
+    WildcardSelector
+)
 
-t = Template(templateDef, searchList=[nameSpace])
-print(t)
+tool1 = CommandToolBuilder(
+    tool="tool1",
+    version="0.1",
+    container="quay.io/biocontainers/python:3.10",
+    base_command=['echo'],
+    inputs=[
+        ToolInput(
+            'text',
+            String,
+            default='hello!',
+            position=1,
+	    )
+    ],
+    outputs=[
+        ToolOutput(
+            'workdir',
+            Directory,
+            selector=WildcardSelector("."),
+	    )
+    ]
+)

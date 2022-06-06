@@ -5,7 +5,7 @@ import os
 import unittest
 
 from containers.Container import Container
-from containers.ContainerFetcher import CondaBiocontainerFetcher
+from containers.Fetcher import CondaRequirementFetcher
 from containers.ContainerCache import ContainerCache
 from xmltool.requirements import CondaRequirement
 
@@ -50,7 +50,7 @@ class TestContainerFetching(unittest.TestCase):
             fp.write('{}')
     
     def test_simple_fetching(self) -> None:
-        cf = CondaBiocontainerFetcher()
+        cf = CondaRequirementFetcher()
         container = cf.fetch(
             SIMPLE_GXTOOL_ID,
             SIMPLE_GXTOOL_VERSION,
@@ -59,7 +59,7 @@ class TestContainerFetching(unittest.TestCase):
         self.assertEquals(container, SIMPLE_CONTAINER)
     
     def test_hard_fetching(self) -> None:
-        cf = CondaBiocontainerFetcher()
+        cf = CondaRequirementFetcher()
         container = cf.fetch(
             HARD_GXTOOL_ID,
             HARD_GXTOOL_VERSION,

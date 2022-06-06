@@ -3,7 +3,7 @@ import runtime.logging.logging as logging
 from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.load import load_xmltool
 from command.command import gen_command
-from containers.fetch import fetch_container
+from containers.fetching.fetch import fetch_container
 from tool.generate import gen_tool
 from file_io.write import write_tool
 # TODO future 

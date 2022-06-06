@@ -25,7 +25,7 @@ def gen_command_string(
     requirement: Optional[str]=None) -> CommandString:
 
     if xmltool and not requirement:
-        requirement = xmltool.get_main_requirement().get_text()
+        requirement = xmltool.get_main_requirement().name
     assert(requirement)
 
     statements = _gen_command_statements(the_string, xmltool)

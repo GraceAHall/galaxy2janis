@@ -6,7 +6,7 @@ from typing import Any
 from workflows.entities.step.metadata import StepMetadata
 from galaxy_wrappers.wrappers.Wrapper import Wrapper
 from galaxy_wrappers.wrappers.WrapperCache import WrapperCache
-from galaxy_wrappers.scraping.single import scrape_single_repo
+from galaxy_wrappers.requests.versions import request_installable_revision
 import galaxy_wrappers.scraping.utils as utils
 
 
@@ -31,29 +31,28 @@ def get_wrapper_builtin(gxstep: dict[str, Any]) -> Wrapper:
     raise NotImplementedError()
 
 def get_wrapper_toolshed(gxstep: dict[str, Any]) -> Wrapper:
-    wrappers = get_local_wrappers(gxstep)
+    wrappers = get_local(gxstep)
     if not wrappers:
-        wrappers = get_toolshed_wrappers(gxstep)
+        wrappers = get_toolshed(gxstep)
     return most_recent(wrappers)
         
-def get_local_wrappers(gxstep: dict[str, Any]) -> list[Wrapper]:
-    owner, repo, tool_id, tool_version = gxstep['tool_id'].split('/')[2:6]
+def get_local(gxstep: dict[str, Any]) -> list[Wrapper]:
     cache = WrapperCache(utils.WRAPPER_DATA_PATH)
     return cache.get(
-        owner=owner,
-        repo=repo,
-        tool_id=tool_id,
-        tool_version=tool_version
+        owner=gxstep['tool_shed_repository']['owner'],
+        repo=gxstep['tool_shed_repository']['name'],
+        tool_id=gxstep['tool_id'].rsplit('/', 2)[-2],
+        tool_build=gxstep['tool_version']
     )
 
-def get_toolshed_wrappers(gxstep: dict[str, Any]) -> list[Wrapper]:
+def get_toolshed(gxstep: dict[str, Any]) -> list[Wrapper]:
     # scrape toolshed for wrappers and update cache
-    scrape_single_repo(
-        owner=gxstep['tool_shed_repository']['owner'],
-        repo=gxstep['tool_shed_repository']['name']
-    )
+    cache = WrapperCache(utils.WRAPPER_DATA_PATH)
+    wrappers = request_installable_revision(gxstep)
+    for wrapper in wrappers:
+        cache.add(wrapper)
     # confirm can now load wrapper details from cache
-    local_wrappers = get_local_wrappers(gxstep)
+    local_wrappers = get_local(gxstep)
     if not local_wrappers:
         raise RuntimeError()
     return local_wrappers

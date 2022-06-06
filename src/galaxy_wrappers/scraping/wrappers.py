@@ -1,11 +1,12 @@
 
 
+from abc import ABC, abstractmethod
 import requests
 import tarfile
 import shutil
 import os
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 from xml.etree import ElementTree as et
 
 from galaxy.tool_util.parser import get_tool_source
@@ -20,6 +21,17 @@ THREADS = 10
 def scrape_wrappers() -> None:
     scraper = WrapperScraper()
     scraper.scrape()
+
+
+class ScrapeStrategy(ABC):
+    def __init__(self, owner: str, repo: str, revision: str):
+        self.owner = owner
+        self.repo = repo
+        self.revision = revision
+
+    @abstractmethod
+    def scrape(self) -> None:
+        raise NotImplementedError()
 
 
 @dataclass
@@ -57,17 +69,19 @@ class Revision:
                 info['repo'] = self.repo
                 info['revision'] = self.revision
                 info['date_created'] = self.date_created
+                info['requirements'] = []
+                raise NotImplementedError()
                 out.append(Wrapper(info))
         return out
     
-    def get_info(self, path: str) -> Optional[dict[str, str]]:
+    def get_info(self, path: str) -> Optional[dict[str, Any]]:
         tree = et.parse(path)
         root = tree.getroot()
         if root.tag == 'tool':
             tool_source = get_tool_source(path)  # TODO macro paths????
             return {
                 'tool_id': tool_source.parse_id(),  # type: ignore
-                'tool_version': tool_source.parse_version()  # type: ignore
+                'tool_build': tool_source.parse_version()  # type: ignore
             }
         return None
 

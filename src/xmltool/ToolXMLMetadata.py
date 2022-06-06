@@ -51,7 +51,7 @@ class ToolXMLMetadata:
     def get_req_similarity_scores(self) -> list[Tuple[Requirement, float]]:
         scores: list[Tuple[Requirement, float]] = []
         for req in self.requirements:
-            similarity = global_align(req.get_text(), self.id)
+            similarity = global_align(req.name, self.id)
             scores.append((req, similarity))
         return scores
              

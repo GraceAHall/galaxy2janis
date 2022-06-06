@@ -3,7 +3,7 @@
 from typing import Optional
 from xmltool.load import XMLToolDefinition
 from command.command import Command
-from containers.fetch import Container
+from containers.Container import Container
 from tool.Tool import Tool
 from tool.ToolFactory import ToolFactory
 

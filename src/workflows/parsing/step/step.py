@@ -29,8 +29,3 @@ def parse_tool_step(wsettings: WorkflowExeSettings, step: dict[str, Any], workfl
     return wstep
 
 
-
-
-    
-
-

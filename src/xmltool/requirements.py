@@ -16,49 +16,68 @@ EXAMPLE
 @dataclass
 class Requirement(ABC):
     """models a tool XML requirement"""
-    @abstractmethod
-    def get_text(self) -> str:
-        ...
 
+    @property
     @abstractmethod
-    def get_version(self) -> str:
+    def name(self) -> str:
         ...
     
+    @property
     @abstractmethod
-    def get_type(self) -> str:
+    def version(self) -> str:
         ...
+    
+    # @abstractmethod
+    # def to_dict(self) -> dict[str, str]:
+    #     ...
+
 
 
 @dataclass
 class CondaRequirement(Requirement):
-    name: str
-    version: str
+    _name: str
+    _version: str
+    subtype: str = 'conda'
 
-    def get_text(self) -> str:
-        return self.name
+    @property
+    def name(self) -> str:
+        return self._name
 
-    def get_version(self) -> str:
-        return self.version
+    @property
+    def version(self) -> str:
+        return self._version
     
-    def get_type(self) -> str:
-        return 'conda'
+    # def to_dict(self) -> dict[str, str]:
+    #     return {
+    #         'type': self.subtype,
+    #         'name': self.name,
+    #         'version': self.version
+    #     }
 
 
 @dataclass
 class ContainerRequirement(Requirement):
-    uri: str
-    container_type: str
+    url: str
+    flavour: str
+    registry_host: str
+    image_type: str
+    subtype: str = 'container'
 
-    def get_text(self) -> str:
-        return self.uri
+    @property
+    def name(self) -> str:
+        return self.url.rsplit('/', 1)[-1].split(':', 1)[0]
+    
+    @property
+    def version(self) -> str:
+        return self.url.rsplit('/', 1)[-1].split(':', 1)[-1]
 
-    def get_version(self) -> str:
-        raise NotImplementedError
-
-    def get_type(self) -> str:
-        return self.container_type
-
-
+    # def to_dict(self) -> dict[str, str]:
+    #     return {
+    #         'type': self.subtype,
+    #         'url': self._url,
+    #         'flavour': self._flavour,
+    #         'registry_host': self._registry_host
+    #     }
 
 
 

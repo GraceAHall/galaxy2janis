@@ -32,7 +32,7 @@ class WrapperCache:
     def get(
         self, 
         tool_id: Optional[str]=None,
-        tool_version: Optional[str]=None,
+        tool_build: Optional[str]=None,
         owner: Optional[str]=None,
         repo: Optional[str]=None,
         revision: Optional[str]=None
@@ -48,8 +48,8 @@ class WrapperCache:
         # this can be more elegant ofc
         if tool_id:
             wrappers = [x for x in wrappers if x['tool_id'] == tool_id]
-        if tool_version:
-            wrappers = [x for x in wrappers if x['tool_version'] == tool_version]
+        if tool_build:
+            wrappers = [x for x in wrappers if x['tool_build'] == tool_build]
         if owner:
             wrappers = [x for x in wrappers if x['owner'] == owner]
         if repo:
