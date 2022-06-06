@@ -34,22 +34,6 @@ class WorkflowStep:
     def tool_name(self) -> str:
         return self.metadata.wrapper.tool_id
 
-    @property
-    def tool_definition_path(self) -> str:
-        if self.metadata.tool_definition_path:
-            return self.metadata.tool_definition_path
-        raise RuntimeError()
-    
-    def set_tool_definition_path(self, path: str) -> None:
-        self.metadata.tool_definition_path = path
-
-    @property
-    def step_definition_path(self) -> str:
-        raise NotImplementedError()
-
-    def set_step_definition_path(self, folder: str) -> None:
-        raise NotImplementedError()
-
     def get_tool_tags_values(self) -> list[Tuple[str, InputValue]]:
         """translates [uuid, value] into [tag, value] for tool input values"""
         out: list[Tuple[str, InputValue]] = []

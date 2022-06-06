@@ -25,18 +25,19 @@ def workflow_mode(wsettings: WorkflowExeSettings) -> Workflow:
     link_tool_input_values(wsettings, workflow)
     link_step_outputs_tool_outputs(workflow)
     set_outputs(workflow)
-    set_tool_paths(wsettings, workflow)
+    #set_tool_paths(wsettings, workflow)
     write_workflow(wsettings, workflow)
     return workflow
 
 
-# after parsing
-def set_tool_paths(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
-    # set the text definition filepath for each tool
-    tooldir = wsettings.get_janis_tools_dir()
-    for step in workflow.list_steps():
-        path = f'{tooldir}/{step.tool.metadata.id}/{step.tool.metadata.id}.py'
-        step.set_tool_definition_path(path)
+# # after parsing
+# def set_tool_paths(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
+#     # set the text definition filepath for each tool
+#     #tooldir = wsettings.get_janis_tools_dir()
+#     for step in workflow.list_steps():
+#         #path = f'{tooldir}/{step.tool.metadata.id}/{step.tool.metadata.id}.py'
+#         path = f'{step.tool.metadata.id}/{step.tool.metadata.id}.py'
+#         step.set_tool_definition_path(path)
 
 
 

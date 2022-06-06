@@ -156,6 +156,20 @@
             ]
         },
         {
+            "name": "bellerophon",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "test/data/tools/bellerophon", 
+                "--xml", "bellerophon.xml",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
+        {
             "name": "quast",
             "type": "python",
             "request": "launch",

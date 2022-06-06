@@ -16,16 +16,16 @@ def write_tool(esettings: ToolExeSettings, tool: Tool) -> None:
     with open(tool_path, 'w') as fp:
         fp.write(tool_definition)
 
-def write_workflow_tools(workflow: Workflow) -> None:
+def write_workflow_tools(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
     for step in workflow.list_steps():
         formatter = JanisToolFormatter(step.tool)
         tool_definition = formatter.to_janis_definition()
-        path = step.tool_definition_path
+        path = f'{esettings.outdir}/{step.metadata.tool_definition_path}'
         with open(path, 'w') as fp:
             fp.write(tool_definition)
 
 def write_workflow(esettings: WorkflowExeSettings, workflow: Workflow) -> None: 
-    write_workflow_tools(workflow)
+    write_workflow_tools(esettings, workflow)
     write_workflow_definitions(esettings, workflow)
 
 
