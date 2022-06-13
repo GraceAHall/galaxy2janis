@@ -15,12 +15,22 @@ from .tool_values import InputValue, InputValueRegister
 class WorkflowStep:
     """represents a galaxy tool step"""
     metadata: StepMetadata
-    inputs: StepInputRegister
-    outputs: StepOutputRegister
-    tool: Tool
 
     def __post_init__(self):
+        self.inputs: StepInputRegister = StepInputRegister()
+        self.outputs: StepOutputRegister = StepOutputRegister()
         self.tool_values: InputValueRegister = InputValueRegister()
+        self._tool: Optional[Tool] = None  
+        # self._tool is a workaround. 
+        # must register the step before parsing the tool so the tag is set
+        # reason: the tag determines file paths. I don't think there's 
+        # another way.
+
+    @property
+    def tool(self) -> Tool:
+        if self._tool:
+            return self._tool
+        raise RuntimeError('step has no Tool')
 
     @property
     def uuid(self) -> str:

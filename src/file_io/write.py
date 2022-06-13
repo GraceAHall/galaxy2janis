@@ -44,13 +44,13 @@ def write_workflow_definitions(esettings: WorkflowExeSettings, workflow: Workflo
 
 def write_inputs_dict(esettings: WorkflowExeSettings, workflow: Workflow) -> None:
     FMT = 'yaml'
-    path = esettings.get_janis_input_dict_path(format=FMT)
+    path = esettings.outpaths.inputs(format=FMT)
     text = format_input_dict(workflow, format=FMT)
     with open(path, 'w') as fp:
         fp.write(text)
 
 def write_main_page(esettings: WorkflowExeSettings, text_def: WorkflowTextDefinition) -> None:
-    path = esettings.get_janis_workflow_path()
+    path = esettings.outpaths.workflow()
     with open(path, 'w') as fp:
         fp.write(text_def.format())
         

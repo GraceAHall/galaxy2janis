@@ -4,8 +4,8 @@
 
 from datetime import datetime
 
-from runtime.settings.formats import JANIS_DATE_FMT
-from runtime.settings.formats import QUAY_DATE_FMT
+from runtime.dates import JANIS_DATE_FMT
+from runtime.dates import QUAY_DATE_FMT
 
 """
 yes, this is meant to be written and read to disk. how did you know

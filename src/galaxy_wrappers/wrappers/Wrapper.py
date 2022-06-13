@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 
 
-from runtime.settings.formats import JANIS_DATE_FMT
+from runtime.dates import JANIS_DATE_FMT
 from xmltool.requirements import Requirement
 
 

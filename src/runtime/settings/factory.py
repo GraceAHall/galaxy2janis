@@ -2,6 +2,17 @@
 
 from typing import Any, Optional
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from file_io.formats.paths import UnifiedPathManager
+
+
+def create_workflow_settings(args: dict[str, Optional[str]]) -> WorkflowExeSettings:
+    initialiser = WorkflowSettingsInitialiser()
+    return initialiser.init_settings(args)
+
+def create_tool_settings(args: dict[str, Optional[str]]) -> ToolExeSettings:
+    initialiser = ToolSettingsInitialiser()
+    return initialiser.init_settings(args)
+
 
 
 

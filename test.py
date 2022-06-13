@@ -62,24 +62,46 @@ tool2 = CommandToolBuilder(
     ]
 )
 
+
+
+
+#file 1
 w = WorkflowBuilder("my_workflow")
+
+
+
+
+
+
+
+
+
+
+
+
+#file 2
+
+w.input()
 w.step(
     'step1',
     tool1(
         text='hihi!'
     )
 )
+w.output(
+	"out_step1_workdir",
+	Directory,
+	source=(w.step1, "workdir")
+)
+
+
+
+#file 3
 w.step(
     'step2',
     tool2(
         workdir=w.step1.workdir,
     )
-)
-
-w.output(
-	"out_step1_workdir",
-	Directory,
-	source=(w.step1, "workdir")
 )
 w.output(
 	"out_step2_workdir",

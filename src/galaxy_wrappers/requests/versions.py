@@ -7,8 +7,8 @@ from bioblend.toolshed import ToolShedInstance
 
 from xmltool.requirements import CondaRequirement, ContainerRequirement, Requirement
 from galaxy_wrappers.wrappers.Wrapper import Wrapper
-from runtime.settings.formats import JANIS_DATE_FMT
-from runtime.settings.formats import TOOLSHED_DATE_FMT
+from runtime.dates import JANIS_DATE_FMT
+from runtime.dates import TOOLSHED_DATE_FMT
 
 
 def request_installable_revision(gxstep: dict[str, Any]) -> list[Wrapper]:

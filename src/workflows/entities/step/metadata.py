@@ -15,23 +15,3 @@ class StepMetadata:
     workflow_outputs: list[dict[str, Any]]
     label: Optional[str] = None
 
-    @property
-    def tool_definition_path(self) -> str:
-        return f'tools/{self.wrapper.tool_id}/{self.wrapper.tool_id}.py'
-    
-    @property
-    def step_definition_path(self) -> str:
-        raise NotImplementedError()
-        return f'{self.wrapper.tool_id}/{self.wrapper.tool_id}.py'
-
-    
-    
-
-
-
-
-
-        
-
-
-

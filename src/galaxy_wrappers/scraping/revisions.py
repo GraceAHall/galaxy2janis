@@ -5,7 +5,7 @@ from typing import Any, Tuple
 
 from bs4 import Tag
 
-from runtime.settings.formats import TOOLSHED_DATE_FMT, JANIS_DATE_FMT
+from runtime.dates import TOOLSHED_DATE_FMT, JANIS_DATE_FMT
 import galaxy_wrappers.scraping.utils as utils
 
 NEW_REPOS_ONLY = True

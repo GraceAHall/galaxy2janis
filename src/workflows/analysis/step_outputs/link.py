@@ -15,7 +15,7 @@ Assigns eaech StepOutput the underlying ToolOutput
 """
 
 # module entry
-def link_step_outputs_tool_outputs(workflow: Workflow):
+def link_tool_outputs(workflow: Workflow):
     for step in workflow.list_steps():
         linker = StepToolOutputLinker(step, workflow)
         linker.link()

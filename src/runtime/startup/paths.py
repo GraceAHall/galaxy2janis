@@ -4,19 +4,13 @@
 import os
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
-default_folders = []
-#     'runtimefiles'
-# ]
 
-default_files = []
-#     'runtimefiles/tool_name_tagregister.json',
-#     'runtimefiles/tool_input_tagregister.json',
-#     'runtimefiles/tool_output_tagregister.json',
-#     'runtimefiles/workflow_name_tagregister.json',
-#     'runtimefiles/workflow_step_tagregister.json',
-#     'runtimefiles/workflow_input_tagregister.json',
-#     'runtimefiles/workflow_output_tagregister.json'
-# ]
+def setup_workfow_folder_structure(esettings: WorkflowExeSettings) -> None:
+    WorkflowFileValidator().validate(esettings)
+
+def setup_workfow_folder_structure(esettings: WorkflowExeSettings) -> None:
+    WorkflowFileValidator().validate(esettings)
+
 
 def init_files(filepaths: list[str]) -> None:
     for path in filepaths:
@@ -56,7 +50,7 @@ class WorkflowFileInitialiser:
         files = self.get_files_to_init()
         safe_init_folders(folders)
         init_files(files)
-        init_cache_dir(self.esettings.get_container_cache_path())
+        init_cache_dir(self.esettings.container_cache_path)
     
     def get_folders_to_init(self) -> list[str]:
         folders: list[str] = default_folders
@@ -102,3 +96,49 @@ class ToolFileInitialiser:
         #files.append(es.get_janis_definition_path())
         return list(set(files))
 
+
+class WorkflowFileValidator:
+
+    def validate(self, esettings: WorkflowExeSettings) -> None:
+        self.esettings = esettings
+
+    def validate_paths(self) -> None:
+        """checks that all necessary input files exist"""
+        validation_files = self.get_validation_files()
+        for filepath in validation_files:
+            if not os.path.exists(filepath):
+                raise InputError(f'file does not exist: {filepath}')
+
+    def get_validation_files(self) -> list[str]:
+        validation_files = [
+            self.esettings.workflow,
+        ]
+        return [f for f in validation_files if type(f) is str]
+
+
+class ToolFileValidator:
+    
+    def validate(self, esettings: ToolExeSettings) -> None:
+        """validates input, output, and runtime files"""
+        self.esettings = esettings
+        self.validate_paths()
+
+    def validate_paths(self) -> None:
+        """checks that all necessary input files exist"""
+        validation_files = self.get_validation_files()
+        for filepath in validation_files:
+            if not os.path.exists(filepath):
+                raise InputError(f'file does not exist: {filepath}')
+
+    def get_validation_files(self) -> list[str]:
+        validation_files = [
+            self.esettings.get_xml_path(),
+        ]
+        return [f for f in validation_files if type(f) is str]
+
+    def validate_xml(self) -> None:
+        """checks that the provided xml is tool xml"""
+        tree = et.parse(self.esettings.get_xml_path())
+        root = tree.getroot()
+        if root.tag != 'tool':
+            raise InputError(f'{self.esettings.get_xml_path()} is not tool xml')

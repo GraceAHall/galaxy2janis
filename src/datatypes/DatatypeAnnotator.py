@@ -90,9 +90,19 @@ strategy_map = {
 }
 
 
+
 AnnotatableConstructs = Positional | Flag | Option | RedirectOutput | InputOutput | WildcardOutput | UncertainOutput | WorkflowInput | WorkflowStep | WorkflowOutput
 
+
 class DatatypeAnnotator:
+    """
+    annotates a compatible object with a datatype.
+    creates a new instance of DatatypeRegister on init.
+    should be created as infrequently as possible, as it
+    loads datatypes from disk in the process (and there are lots of
+    datatypes)
+    """
+
     def __init__(self) -> None:
         self.datatype_register = DatatypeRegister()
 

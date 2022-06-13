@@ -10,6 +10,24 @@ from galaxy_wrappers.requests.versions import request_installable_revision
 import galaxy_wrappers.scraping.utils as utils
 
 
+"""
+This module parses a galaxy step (.ga format) and produces StepMetadata.
+During the process it identifies which toolshed Wrapper will be used.
+
+The Wrapper is an important part of StepMetadata. 
+It contains information about the tool_id, tool_build, revision,
+date_created, conda requirements etc
+
+Local information about Wrappers is stored in data/wrappers/wrappers.json.
+If information about which Wrapper to use is not available locally, 
+API requests are made to the galaxy toolshed to determine the most suitable wrapper. 
+its information is then known and saved to the json file. 
+
+The WrapperCache class is responsible for presenting our local knowledgebank of
+wrappers during this phase.
+"""
+
+
 def parse_step_metadata(gxstep: dict[str, Any]) -> StepMetadata:
     return StepMetadata(
         wrapper=get_wrapper(gxstep),

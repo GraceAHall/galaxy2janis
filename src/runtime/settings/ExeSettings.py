@@ -4,38 +4,16 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from file_io.formats.paths import PathManager
+
+
 @dataclass
 class WorkflowExeSettings:
-    workflow: str
-    outdir: str
-    container_cachedir: str
+    workflow_path: str 
+    container_cache_path: str
     dev_no_test_cmdstrs: bool
     dev_no_partial_eval: bool
-
-    def get_container_cache_path(self) -> str:
-        return self.container_cachedir
-        
-    def get_logfile_path(self) -> str:
-        return f'{self.outdir}/workflow.log'
-
-    def get_janis_workflow_path(self) -> str:
-        return f'{self.outdir}/workflow.py'
-    
-    def get_janis_input_dict_path(self, format: str='yaml') -> str:
-        return f'{self.outdir}/inputs.{format}'
-    
-    def get_janis_workflow_configfile_path(self) -> str:
-        return f'{self.outdir}/config.py'
-
-    def get_xml_wrappers_dir(self) -> str:
-        return f'{self.outdir}/wrappers'
-    
-    def get_janis_tools_dir(self) -> str:
-        return f'{self.outdir}/tools'
-
-    def get_janis_steps_dir(self) -> str:
-        return f'{self.outdir}/steps'
-
+    outpaths: PathManager
 
 
 @dataclass

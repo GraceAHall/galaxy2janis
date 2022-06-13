@@ -66,6 +66,9 @@ class Workflow:
         else:
             raise RuntimeError('get_input needs to be supplied either step_id or input_uuid')
 
+    def get_step_by_step_id(self, step_id: int) -> WorkflowStep:
+        return self.steps[step_id]
+
     def get_step_tag_by_step_id(self, step_id: int) -> str:
         """uuids provide access to identifier tags"""
         step_uuid = self.steps[step_id].uuid

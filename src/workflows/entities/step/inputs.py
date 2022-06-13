@@ -45,8 +45,11 @@ class StepInputRegister:
     galaxy varnames are linked to actual Param objects.
     allows getting the value of an input by supplying a galaxy varname.
     """
-    def __init__(self, step_inputs: list[StepInput]):
-        self.register = step_inputs
+    def __init__(self):
+        self.register: list[StepInput] = []
+
+    def add(self, step_input: StepInput) -> None:
+        self.register.append(step_input)
 
     def get(self, gxvarname: str) -> Optional[StepInput]:
         for inp in self.register:

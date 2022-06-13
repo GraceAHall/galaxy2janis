@@ -17,8 +17,11 @@ class StepOutput:
 
 
 class StepOutputRegister:
-    def __init__(self, step_outputs: list[StepOutput]):
-        self.register = step_outputs
+    def __init__(self):
+        self.register: list[StepOutput] = []
+
+    def add(self, step_output: StepOutput) -> None:
+        self.register.append(step_output)
 
     def get(self, gxvarname: str) -> StepOutput:
         for output in self.register:

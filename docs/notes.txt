@@ -2,6 +2,68 @@
 
 
 
+-----
+paths
+-----
+
+
+
+
+
+startup: 
+    - create folder structure using PathManager()
+    - delete all folders if exist - start 100% fresh.
+    - then do override logic: if wrappers folder exists, leave it, else create
+
+step parsing:
+    - read metadata of each step
+    - 
+
+downloading wrappers:
+    - to know tool name and create a step tag
+    - 
+- 
+- tags: settle step tags ASAP. after which, can ask where any file should read/write to/from
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tools
+    tool
+        - tool-@adf2123qd   [wrapper][optional]
+        - tool.py           janis def
+        - tool.log          janis log
+
+workflows unified
+    workflow
+        - tools
+        - wrappers
+        - workflow.log
+        - workflow.py
+
+workflows stepwise
+    workflow
+        - steps
+        - tools
+        - wrappers
+        - workflow.log
+        - workflow.py
+
+
+
+
 
 
 

@@ -16,14 +16,7 @@ tool1 = CommandToolBuilder(
     version="0.1",
     container="quay.io/biocontainers/python:3.10",
     base_command=['echo'],
-    inputs=[
-        ToolInput(
-            'text',
-            String,
-            default='hello!',
-            position=1,
-	    )
-    ],
+    inputs=myinputs,
     outputs=[
         ToolOutput(
             'workdir',
@@ -33,3 +26,11 @@ tool1 = CommandToolBuilder(
     ]
 )
 
+myinputs = [
+    ToolInput(
+        'text',
+        String,
+        default='hello!',
+        position=1,
+    )
+],
