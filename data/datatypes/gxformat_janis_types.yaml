@@ -1,0 +1,170 @@
+bai:
+  source: janis
+  classname: BAI
+  extensions: .bai
+  import_path: janis_bioinformatics.data_types.bai
+bam:
+  source: janis
+  classname: BAM
+  extensions: .bam
+  import_path: janis_bioinformatics.data_types.bam
+bed:
+  source: janis
+  classname: bed
+  extensions: .bed
+  import_path: janis_bioinformatics.data_types.bed
+bed.gz:
+  source: janis
+  classname: BedGz
+  extensions: .bed.gz
+  import_path: janis_bioinformatics.data_types.bed
+tabix:
+  source: janis
+  classname: BedTABIX
+  extensions: .bed.gz
+  import_path: janis_bioinformatics.data_types.bed
+vcf.gz:
+  source: janis
+  classname: CompressedVcf
+  extensions: .vcf.gz
+  import_path: janis_bioinformatics.data_types.vcf
+tar.gz:
+  source: janis
+  classname: TarFileGz
+  extensions: .tar.gz
+  import_path: janis_unix.data_types.tarfile
+cram:
+  source: janis
+  classname: Cram
+  extensions: .cram
+  import_path: janis_bioinformatics.data_types.cram
+crai:
+  source: janis
+  classname: Crai
+  extensions: .crai
+  import_path: janis_bioinformatics.data_types.crai
+csv:
+  source: janis
+  classname: csv
+  extensions: .csv
+  import_path: janis_unix.data_types.csv
+directory:
+  source: janis
+  classname: Directory
+  extensions: 
+  import_path: janis_core.types.common_data_types
+fasta:
+  source: janis
+  classname: Fasta
+  extensions: .fasta,.fa,.fna
+  import_path: janis_bioinformatics.data_types.fasta
+fai:
+  source: janis
+  classname: FastaFai
+  extensions: .fai
+  import_path: janis_bioinformatics.data_types.fasta
+fasta.gz:
+  source: janis
+  classname: FastaGz
+  extensions: .fasta.gz,.fa.gz,.fna.gz
+  import_path: janis_bioinformatics.data_types.fasta
+fastq:
+  source: janis
+  classname: Fastq
+  extensions: .fq,.fastq
+  import_path: janis_bioinformatics.data_types.fastq
+fastqsanger:
+  source: janis
+  classname: Fastq
+  extensions: .fq,.fastq
+  import_path: janis_bioinformatics.data_types.fastq
+fastqillumina:
+  source: janis
+  classname: Fastq
+  extensions: .fq,.fastq
+  import_path: janis_bioinformatics.data_types.fastq
+fastq.gz:
+  source: janis
+  classname: FastqGz
+  extensions: .fq.gz,.fastq.gz
+  import_path: janis_bioinformatics.data_types.fastq
+fastqsanger.gz:
+  source: janis
+  classname: FastqGz
+  extensions: .fq.gz,.fastq.gz
+  import_path: janis_bioinformatics.data_types.fastq
+fastqillumina.gz:
+  source: janis
+  classname: FastqGz
+  extensions: .fq.gz,.fastq.gz
+  import_path: janis_bioinformatics.data_types.fastq
+gz:
+  source: janis
+  classname: Gunzipped
+  extensions: .gz
+  import_path: janis_unix.data_types.gunzipped
+html:
+  source: janis
+  classname: HtmlFile
+  extensions: .html
+  import_path: janis_unix.data_types.html
+json:
+  source: janis
+  classname: JsonFile
+  extensions: .json
+  import_path: janis_unix.data_types.json
+kallisto.idx:
+  source: janis
+  classname: KallistoIdx
+  extensions: .kallisto.idx
+  import_path: janis_bioinformatics.tools.kallisto.data_types
+sam:
+  source: janis
+  classname: Sam
+  extensions: .sam
+  import_path: janis_bioinformatics.data_types.sam
+string:
+  source: janis
+  classname: String
+  extensions: 
+  import_path: janis_core.types.common_data_types
+color:
+  source: janis
+  classname: String
+  extensions: 
+  import_path: janis_core.types.common_data_types
+text:
+  source: janis
+  classname: String
+  extensions: 
+  import_path: janis_core.types.common_data_types
+tar:
+  source: janis
+  classname: TarFile
+  extensions: .tar
+  import_path: janis_unix.data_types.tarfile
+txt:
+  source: janis
+  classname: TextFile
+  extensions: .txt
+  import_path: janis_unix.data_types.text
+text:
+  source: janis
+  classname: TextFile
+  extensions: .txt
+  import_path: janis_unix.data_types.text
+tsv:
+  source: janis
+  classname: Tsv
+  extensions: .tsv
+  import_path: janis_unix.data_types.tsv
+vcf:
+  source: janis
+  classname: Vcf
+  extensions: .vcf
+  import_path: janis_bioinformatics.data_types.vcf
+zip:
+  source: janis
+  classname: ZipFile
+  extensions: .zip
+  import_path: janis_unix.data_types.zipfile

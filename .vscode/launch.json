@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "abricate",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--dir", "sample/tools/abricate", 
+                "--xml", "abricate.xml",
+                "--dev-no-test-cmdstrs"
+            ]
+        },
+        {
+            "name": "simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "sample/workflows/simple_workflow.ga",
+                "--outdir", "parsed/workflows",
+                "--dev-no-test-cmdstrs"
+            ]
+        }
+    ]
+}

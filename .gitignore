@@ -1,0 +1,9 @@
+docs/
+venv/
+parsed/
+test/data/
+*.log
+*.tmp
+*.pyc
+.vscode
+__pycache__
