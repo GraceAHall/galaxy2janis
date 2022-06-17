@@ -1,6 +1,6 @@
 
 
-from command.command import Command
+from command.Command import Command
 
 
 from .mock_commandstring import MOCK_CMDSTR1

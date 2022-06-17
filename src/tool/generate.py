@@ -2,7 +2,7 @@
 
 from typing import Optional
 from xmltool.load import XMLToolDefinition
-from command.command import Command
+from command.Command import Command
 from containers.fetch import Container
 from tool.Tool import Tool
 from tool.ToolFactory import ToolFactory

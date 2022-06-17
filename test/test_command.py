@@ -11,7 +11,7 @@ from startup.settings import load_tool_settings
 from startup.ExeSettings import ToolExeSettings
 from xmltool.load import load_xmltool, XMLToolDefinition
 
-from command.command import gen_command
+from command.gen_command import gen_command
 
 
 class TestCommandInference(unittest.TestCase):

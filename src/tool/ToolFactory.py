@@ -7,7 +7,7 @@ import runtime.logging.logging as logging
 from typing import Optional
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
-from command.command import Command
+from command.Command import Command
 from containers.fetch import Container
 from datatypes.DatatypeAnnotator import DatatypeAnnotator
 from .outputs import extract_outputs
