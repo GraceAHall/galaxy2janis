@@ -5,31 +5,43 @@ import keyword
 import builtins
 
 import runtime.logging.logging as logging
-from command.components.inputs.Positional import Positional
-from command.components.inputs.Flag import Flag
-from command.components.inputs.Option import Option
 
-# from command.components.outputs.InputOutput import InputOutput
-# from command.components.outputs.RedirectOutput import RedirectOutput
-# from command.components.outputs.WildcardOutput import WildcardOutput
-#OutputComponent = InputOutput | RedirectOutput | WildcardOutput
 
+python_keys = set(keyword.kwlist)
+builtin_keys = set(dir(builtins))
+janis_keys = set([
+    "identifier",
+    "tool",
+    "scatter",
+    "ignore_missing",
+    "output",
+    "outputs",
+    "input",
+    "inputs"
+])
+keywords = python_keys | builtin_keys | janis_keys
+
+
+def replace_keywords(tag: str, entity: Any) -> str:
+    if tag in keywords:
+        tag = _append_datatype(tag, entity)
+    return tag
 
 def encode(tag: str) -> str:
     return fr'{tag}'
 
 def numeric(tag: str, entity: Any) -> str:
-    if tag.replace('.','',1).isnumeric():  # removes '.' then checks if all chars are digits
-        match entity:
-            case Positional():
-                tag = f'positional_{entity.cmd_pos}'
-            case Flag() | Option():
-                tag = _prepend_component_type(tag, entity)
-            case _:
-                pass
+    """
+    if tag is just a number, prepend the component type. 
+    """
+    if tag.replace('.','',1).isnumeric():  
+        tag = _prepend_component_type(entity.cmd_pos, entity)
     return tag
 
 def numeric_start(tag: str, entity: Any) -> str:
+    """
+    if tag starts with a number, prepend the component type. 
+    """
     if len(tag) > 0 and tag[0].isnumeric():
         tag = _prepend_component_type(tag, entity)
     return tag
@@ -74,42 +86,10 @@ def non_alphanumeric(tag: str, entity: Any) -> str:
     tag = tag.replace("@", 'at')
     return tag
 
-
-python_keys = set(keyword.kwlist)
-builtin_keys = set(dir(builtins))
-janis_keys = set([
-    "identifier",
-    "tool",
-    "scatter",
-    "ignore_missing",
-    "output",
-    "outputs",
-    "input",
-    "inputs"
-])
-keywords = python_keys | builtin_keys | janis_keys
-
-def replace_keywords(tag: str, entity: Any) -> str:
-    if tag in keywords:
-        tag = _append_datatype(tag, entity)
-    return tag
-
-def _strip_numerals(tag: str) -> str:  # ??? y
-    return tag.lstrip('0123456789')
-
 def _prepend_component_type(tag: str, entity: Any) -> str:
-    match entity:
-        case Positional():
-            tag = f'input_{tag}'
-        case Flag():
-            tag = f'flag_{tag}'
-        case Option():
-            tag = f'option_{tag}'
-        case _:
-            pass
-            ## if isinstance(entity, OutputComponent):
-            #     tag = f'out_{tag}'
-    return tag
+    entity_type: str = entity.__class__.__name__
+    entity_type = entity_type.lower()
+    return f'{entity_type}_{tag}'
 
 def _append_datatype(tag: str, entity: Any) -> str:
     dtype = entity.janis_datatypes[0].classname.lower()
@@ -117,4 +97,6 @@ def _append_datatype(tag: str, entity: Any) -> str:
         tag = f"{tag}_{dtype}"
     return tag
 
+def _strip_numerals(tag: str) -> str:  # ??? y
+    return tag.lstrip('0123456789')
 

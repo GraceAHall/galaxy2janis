@@ -1,8 +1,7 @@
 
 
 from typing import Any
-from .FormattingStrategy import format_tag
-
+from .strategies import format_tag
 
 
 class TagManager:
@@ -24,12 +23,13 @@ class TagManager:
     def get_base_tag(self, uuid: str) -> str:
         return self.uuids_basetags[uuid]
 
-    def register(self, tag_type: str, entity: Any) -> None:
-        if tag_type not in self.permitted_entities:
-            raise RuntimeError(f'cannot register a {tag_type}')
+    def register(self, entity: Any) -> None:
+        entity_type = entity.__class__.__name__
+        if entity_type not in self.permitted_entities:
+            raise RuntimeError(f'cannot register a {entity_type}')
 
-        #starting_text = self._get_starting_text(tag_type, entity)
-        basetag = format_tag(tag_type, entity)
+        #starting_text = self._get_starting_text(entity_type, entity)
+        basetag = format_tag(entity_type, entity)
         uuid = entity.uuid
 
         self.uuids_basetags[uuid] = basetag
@@ -48,24 +48,11 @@ class TagManager:
 
 class ToolTagManager(TagManager):
     permitted_entities: set[str] = set(
-        ['tool', 'tool_input', 'tool_output']
+        ['Tool', 'Positional', 'Flag', 'Option', 'RedirectOutput', 'WildcardOutput', 'InputOutput']
     )
 
 class WorkflowTagManager(TagManager):
     permitted_entities: set[str] = set(
-        ['workflow', 'workflow_input', 'workflow_step', 'workflow_output']
+        ['Workflow', 'WorkflowInput', 'WorkflowStep', 'WorkflowOutput']
     )
-
-
-
-    # def _generate_all_tags(self) -> set[str]:
-    #     tags: set[str] = set()
-    #     for basetag, uuid_list in self.basetags_uuids.items():
-    #         if len(uuid_list) == 1:
-    #             tags.add(basetag)
-    #         else:
-    #             for i in range(len(uuid_list)):
-    #                 tags.add(f'{basetag}{i+1}')
-    #     return tags
-
 

@@ -9,7 +9,7 @@ from typing import Optional
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
 from command.Command import Command
-from containers.fetch import Container
+from containers import Container
 from .outputs import extract_outputs
 
 class ToolFactory:

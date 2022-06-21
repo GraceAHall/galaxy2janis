@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import uuid4
 
 from workflows.entities.step.step import WorkflowStep
-from tags.TagManager import WorkflowTagManager
+from tags import WorkflowTagManager
 from .metadata import WorkflowMetadata
 from .output import WorkflowOutput
 from .input import WorkflowInput
@@ -28,31 +28,19 @@ class Workflow:
     def __post_init__(self):
         self.uuid: str = str(uuid4())
         self.tag_manager: WorkflowTagManager = WorkflowTagManager()
-        self.tag_manager.register(
-            tag_type='workflow',
-            entity=self
-        )
+        self.tag_manager.register(self)
 
     def add_step(self, step: WorkflowStep) -> None:
         self.steps[step.metadata.step_id] = step
-        self.tag_manager.register(
-            tag_type='workflow_step',
-            entity=step
-        )
+        self.tag_manager.register(step)
     
     def add_input(self, w_inp: WorkflowInput) -> None:
         self.inputs.append(w_inp)
-        self.tag_manager.register(
-            tag_type='workflow_input',
-            entity=w_inp
-        )
+        self.tag_manager.register(w_inp)
     
     def add_output(self, w_out: WorkflowOutput) -> None:
         self.outputs.append(w_out)
-        self.tag_manager.register(
-            tag_type='workflow_output',
-            entity=w_out
-        )
+        self.tag_manager.register(w_out)
 
     def get_input(self, step_id: Optional[int]=None, input_uuid: Optional[str]=None) -> Optional[WorkflowInput]:
         if step_id is not None:

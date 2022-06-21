@@ -6,12 +6,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from dataclasses import dataclass
 from typing import Any, Optional
-from containers.GA4GHInteractor import GA4GHInteractor
-from containers.VersionMatcher import VersionMatcher
-from utils.general_utils import global_align
 
-from containers.Container import Container
+from utils.general_utils import global_align
 from xmltool.requirements import Requirement
+
+from .GA4GHInteractor import GA4GHInteractor
+from .VersionMatcher import VersionMatcher
+from .Container import Container
 
 
 image_presets = {
@@ -21,8 +22,6 @@ image_presets = {
         'registry_host': 'hub.docker.com/'
     }
 }
-
-
 
 
 class BiocontainerFetcher(ABC):

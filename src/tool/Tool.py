@@ -5,8 +5,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
-from containers.Container import Container
-from tags.TagManager import ToolTagManager
+from containers import Container
+from tags import ToolTagManager
 from xmltool.ToolXMLMetadata import ToolXMLMetadata
 from xmltool.param.InputParamRegister import InputParamRegister
 from xmltool.param.Param import Param
@@ -32,24 +32,15 @@ class Tool:
     def __post_init__(self):
         self.uuid: str = str(uuid4())
         self.tag_manager: ToolTagManager = ToolTagManager()
-        self.tag_manager.register(
-            tag_type='tool',
-            entity=self
-        )
+        self.tag_manager.register(self)
 
     def add_input(self, inp: CommandComponent) -> None:
         self.inputs.append(inp)
-        self.tag_manager.register(
-            tag_type='tool_input',
-            entity=inp
-        )
-    
+        self.tag_manager.register(inp)
+
     def add_output(self, out: CommandComponent) -> None:
         self.outputs.append(out)
-        self.tag_manager.register(
-            tag_type='tool_output',
-            entity=out
-        )
+        self.tag_manager.register(out)
 
     def get_gxparam(self, query: str) -> Optional[Param]:
         param = self.gxparam_register.get(query, strategy='lca')

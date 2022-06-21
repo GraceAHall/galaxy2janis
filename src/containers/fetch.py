@@ -1,14 +1,16 @@
 
+import runtime.logging.logging as logging
 import tempfile
 
-import runtime.logging.logging as logging
 from typing import Optional
-from containers.ContainerCache import ContainerCache
+
 from runtime.settings.ExeSettings import ToolExeSettings
 from xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
 from xmltool.XMLToolDefinition import XMLToolDefinition
-from containers.Container import Container
-from containers.ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
+
+from .ContainerCache import ContainerCache
+from .Container import Container
+from .ContainerFetcher import BiocontainerFetcher, CondaBiocontainerFetcher, ContainerBiocontainerFetcher
 
 DISABLE_CACHE = False
 

@@ -2,10 +2,11 @@
 
 
 import runtime.logging.logging as logging
-from typing import Any, Optional
+import json
 import requests
 from requests import Response
-import json
+from typing import Any, Optional
+
 
 class GA4GHInteractor:
 

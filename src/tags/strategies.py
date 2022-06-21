@@ -1,15 +1,14 @@
 
 
-from abc import ABC, abstractmethod
-from typing import Any
-from command.components.CommandComponent import CommandComponent
-import tags.formatting_rules as rules
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any
 
-# rules = [
-#     formatting_rules.non_alphanumeric,
-#     formatting_rules.prohibited_key
-#     formatting_rules.capitalisation,
-# ]
+if TYPE_CHECKING:
+    from command.components.CommandComponent import CommandComponent
+
+from abc import ABC, abstractmethod
+import tags.rules as rules
+
 
 class FormattingStrategy(ABC):
 
@@ -46,22 +45,22 @@ class ToolNameStrategy(FormattingStrategy):
 
 def get_starting_text(entity_type: str, entity: Any) -> str:
     match entity_type:
-        case 'workflow':
+        case 'Workflow':
             return entity.metadata.name # type: ignore
-        case 'workflow_input':
+        case 'WorkflowInput':
             if entity.is_galaxy_input_step: # type: ignore
                 return f'in_{entity.name}' # type: ignore
             else:
                 return f'{entity.step_tag}_{entity.name}' # type: ignore
-        case 'workflow_step':
+        case 'WorkflowStep':
             return entity.metadata.tool_id # type: ignore
-        case 'workflow_output':
+        case 'WorkflowOutput':
             return f'{entity.step_tag}_{entity.toolout_tag}' # type: ignore
-        case 'tool':
+        case 'Tool':
             return entity.metadata.id # type: ignore
-        case 'tool_input':
+        case 'Positional' | 'Flag' | 'Option':
             return get_tool_input_name(entity)
-        case 'tool_output':
+        case 'RedirectOutput' | 'WildcardOutput' | 'InputOutput':
             basetag = entity.name
             if basetag.startswith('out'):
                 return basetag
@@ -78,14 +77,19 @@ def get_tool_input_name(component: CommandComponent) -> str:
 
 
 STRATEGIES = {
-    'workflow': GenericFormattingStrategy(),
-    'workflow_input': GenericFormattingStrategy(),
-    'workflow_step': GenericFormattingStrategy(),
-    'workflow_output': GenericFormattingStrategy(),
-    'tool': ToolNameStrategy(),
-    'tool_input': GenericFormattingStrategy(),
-    'tool_output': GenericFormattingStrategy(),
+    'Workflow': GenericFormattingStrategy(),
+    'WorkflowInput': GenericFormattingStrategy(),
+    'WorkflowStep': GenericFormattingStrategy(),
+    'WorkflowOutput': GenericFormattingStrategy(),
+    'Tool': ToolNameStrategy(),
+    'Positional': GenericFormattingStrategy(),
+    'Flag': GenericFormattingStrategy(),
+    'Option': GenericFormattingStrategy(),
+    'RedirectOutput': GenericFormattingStrategy(),
+    'WildcardOutput': GenericFormattingStrategy(),
+    'InputOutput': GenericFormattingStrategy(),
 }
+
 
 def format_tag(entity_type: str, entity: Any) -> str:
     starting_text = get_starting_text(entity_type, entity)
