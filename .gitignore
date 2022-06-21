@@ -1,7 +1,10 @@
 docs/
 venv/
 parsed/
+showcase/
 test/data/
+placeholder
+data/wrappers
 *.log
 *.tmp
 *.pyc

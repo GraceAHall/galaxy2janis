@@ -25,7 +25,7 @@ class WorkflowSettingsInitialiser:
     def format_cachedir(self, args: dict[str, Optional[str]]) -> str:
         if args['cachedir']:
             return args['cachedir']
-        return 'container_uri_cache.json'
+        return 'data/containers/container_uri_cache.json'
 
 
 class ToolSettingsInitialiser:
@@ -53,7 +53,7 @@ class ToolSettingsInitialiser:
     def format_cachedir(self, args: dict[str, Optional[str]]) -> str:
         if args['cachedir']:
             return args['cachedir']
-        return 'container_uri_cache.json'
+        return 'data/containers/container_uri_cache.json'
     
     def format_download_dir(self, args: dict[str, Optional[str]]) -> str:
         if args['download_dir']:

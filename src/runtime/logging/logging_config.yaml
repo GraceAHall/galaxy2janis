@@ -9,12 +9,12 @@ handlers:
   tool_file:
     level: WARNING
     class: logging.FileHandler
-    filename: placeholder
+    filename: placeholder  # must be set when the path is known!
     formatter: default
   workflow_file:
     level: WARNING
     class: logging.FileHandler
-    filename: placeholder
+    filename: placeholder  # must be set when the path is known!
     formatter: default
   console:
     level: INFO

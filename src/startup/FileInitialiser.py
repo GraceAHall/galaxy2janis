@@ -7,6 +7,13 @@ from file_io.initialisation import init_folder
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 
 
+data_folders = set([
+    'data/containers',
+    'data/datatypes',
+    'data/wrappers',
+    'data/xml',
+])
+
 
 class FileInitialiser(ABC):
 
@@ -35,6 +42,7 @@ class WorkflowFileInitialiser(FileInitialiser):
 
     def get_folders_to_init(self) -> list[str]:
         folders: set[str] = set()
+        folders = folders | data_folders
         folders.add(self.esettings.outdir)
         folders.add(self.esettings.get_xml_wrappers_dir())
         folders.add(self.esettings.get_janis_tools_dir())
@@ -43,7 +51,7 @@ class WorkflowFileInitialiser(FileInitialiser):
 
     def get_files_to_init(self) -> dict[str, str]:
         files: dict[str, str] = dict()
-        files[self.esettings.get_container_cache_path()] = '{}'
+        files[self.esettings.container_cachedir] = '{}'
         files[self.esettings.get_janis_workflow_path()] = ''
         return files
 

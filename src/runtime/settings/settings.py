@@ -2,7 +2,7 @@
 from typing import Any, Optional, Tuple 
 import os 
 
-from xmltool.downloads import handle_downloads
+from wrappers.wrappers import fetch_wrapper
 
 from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
 from runtime.settings.SettingsInitialiser import ToolSettingsInitialiser, WorkflowSettingsInitialiser
@@ -25,7 +25,10 @@ def load_tool_settings(args: dict[str, Optional[str]], tool_id: Optional[str]=No
     ToolArgsValidator().validate(args)
     esettings = ToolSettingsInitialiser().init_settings(args)
     if esettings.remote_url and tool_id:
-        esettings = handle_downloads(tool_id, esettings)
+        path = fetch_wrapper(tool_id, esettings)
+        assert('/' in path)
+        esettings.xmldir = path.rsplit('/', 1)[0]
+        esettings.xmlfile = path.rsplit('/', 1)[-1]
     ToolFileValidator().validate(esettings)
     ToolFileInitialiser(esettings).initialise()
     return esettings

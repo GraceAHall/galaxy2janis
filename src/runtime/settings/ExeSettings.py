@@ -12,9 +12,6 @@ class WorkflowExeSettings:
     dev_no_test_cmdstrs: bool
     dev_no_partial_eval: bool
 
-    def get_container_cache_path(self) -> str:
-        return self.container_cachedir
-        
     def get_logfile_path(self) -> str:
         return f'{self.outdir}/workflow.log'
 
