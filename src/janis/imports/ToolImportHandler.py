@@ -4,7 +4,7 @@ from typing import Any
 from command.components.CommandComponent import CommandComponent
 from command.components.outputs import InputOutput, WildcardOutput
 from command.components.outputs.UncertainOutput import UncertainOutput
-from datatypes.JanisDatatype import JanisDatatype
+from datatypes import JanisDatatype
 
 selector_map: dict[Any, str] = {
     InputOutput: 'from janis_core import InputSelector',

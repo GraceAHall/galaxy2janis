@@ -11,7 +11,7 @@ from workflows.entities.workflow.workflow import Workflow
 from workflows.entities.workflow.metadata import WorkflowMetadata
 from workflows.parsing.step.step import parse_tool_step
 from workflows.parsing.workflow.inputs import parse_input_step
-from datatypes.DatatypeAnnotator import DatatypeAnnotator
+import datatypes
 
 
 def parse_workflow(wsettings: WorkflowExeSettings) -> Workflow:
@@ -23,7 +23,6 @@ class WorkflowParser:
     """models a galaxy workflow"""
     def __init__(self, wsettings: WorkflowExeSettings):
         self.wsettings = wsettings
-        self.datatype_annotator: DatatypeAnnotator = DatatypeAnnotator()
 
     def parse(self) -> Workflow:
         self.tree = self.load_tree(self.wsettings.workflow)
@@ -52,14 +51,14 @@ class WorkflowParser:
         for step in self.tree['steps'].values():
             if step['type'] in ['data_input', 'data_collection_input']:
                 workflow_input = parse_input_step(step)
-                self.datatype_annotator.annotate(workflow_input)  # type: ignore
+                datatypes.annotate(workflow_input)  # type: ignore
                 self.workflow.add_input(workflow_input)
 
     def set_tool_steps(self) -> None:
         for step in self.tree['steps'].values():
             if step['type'] == 'tool':
                 workflow_step = parse_tool_step(self.wsettings, step, self.workflow)
-                self.datatype_annotator.annotate(workflow_step)  # type: ignore
+                datatypes.annotate(workflow_step)  # type: ignore
                 self.workflow.add_step(workflow_step)
 
 

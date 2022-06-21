@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from command.components.CommandComponent import CommandComponent
-from datatypes.JanisDatatype import JanisDatatype
+from datatypes import JanisDatatype
 
 
 @dataclass

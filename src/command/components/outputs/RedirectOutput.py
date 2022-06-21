@@ -8,7 +8,7 @@ from typing import Any, Optional, Tuple
 from xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from command.components.ValueRecord import PositionalValueRecord
 from command.components.linux import Stream
-from datatypes.formatting import format_janis_str
+from datatypes import format_janis_str
 
 class RedirectOutput(BaseCommandComponent):
     def __init__(self, tokens: Tuple[Token, Token]):

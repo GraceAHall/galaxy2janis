@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from datatypes.JanisDatatype import JanisDatatype
+from datatypes import JanisDatatype
 from workflows.entities.workflow.workflow import WorkflowStep
 from workflows.entities.workflow.workflow import Workflow
 from .Import import Import, ImportType

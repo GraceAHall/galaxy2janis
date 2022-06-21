@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass, field
 from typing import Optional
-from datatypes.JanisDatatype import JanisDatatype
-from datatypes.formatting import format_janis_str
+from datatypes import JanisDatatype
+from datatypes import format_janis_str
 from uuid import uuid4
 
 

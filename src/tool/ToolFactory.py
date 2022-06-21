@@ -4,12 +4,12 @@
 
 
 import runtime.logging.logging as logging
+import datatypes
 from typing import Optional
 from tool.Tool import Tool
 from xmltool.load import XMLToolDefinition
 from command.Command import Command
 from containers.fetch import Container
-from datatypes.DatatypeAnnotator import DatatypeAnnotator
 from .outputs import extract_outputs
 
 class ToolFactory:
@@ -17,7 +17,6 @@ class ToolFactory:
         self.xmltool = xmltool
         self.command = command
         self.container = container
-        self.datatype_annotator = DatatypeAnnotator() # really? here??
 
     def create(self) -> Tool:
         tool = Tool(
@@ -36,7 +35,7 @@ class ToolFactory:
         if not inputs:
             logging.no_inputs()
         for inp in inputs:
-            self.datatype_annotator.annotate(inp)
+            datatypes.annotate(inp)
             tool.add_input(inp)
 
     def supply_outputs(self, tool: Tool) -> None:
@@ -44,7 +43,7 @@ class ToolFactory:
         if not outputs:
             logging.no_outputs()
         for out in outputs:
-            self.datatype_annotator.annotate(out)
+            datatypes.annotate(out)
             tool.add_output(out)
 
     def get_base_command(self) -> list[str]:

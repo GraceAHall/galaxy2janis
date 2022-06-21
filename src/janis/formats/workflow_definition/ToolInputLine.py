@@ -10,7 +10,7 @@ from workflows.entities.workflow.workflow import WorkflowStep
 
 from workflows.entities.step.tool_values import ConnectionInputValue, DefaultInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
 from workflows.entities.workflow.workflow import Workflow
-from datatypes.default import DEFAULT_DATATYPE
+from datatypes import DEFAULT_DATATYPE
 
 
 class ToolInputLine(ABC):

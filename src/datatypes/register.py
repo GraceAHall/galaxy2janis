@@ -1,59 +1,56 @@
 
 
 
-from dataclasses import dataclass
-from typing import Optional
 import yaml
+from typing import Optional
 
-from .JanisDatatype import JanisDatatype
+from .janis import JanisDatatype
 
 
-@dataclass
-class DatatypeDetails:
-    datatypes: list[JanisDatatype]
-    is_optional: bool
-    is_array: bool
-    is_stdout: bool
-
+def factory(dtype: dict[str, str]) -> JanisDatatype:
+    return JanisDatatype(
+        format=dtype['format'],
+        source=dtype['source'],
+        classname=dtype['classname'],
+        extensions=dtype['extensions'],
+        import_path=dtype['import_path']
+    )
 
 class DatatypeRegister:
     def __init__(self):
         self.datatype_definitions_path = 'data/datatypes/gxformat_combined_types.yaml'
-        self.dtype_map: dict[str, JanisDatatype] = {}
-        self.load_yaml_to_dtype_map()
-        #self.ext_to_raw_map = self.index_by_ext(self.format_datatype_map)
+        self.dtype_map: dict[str, JanisDatatype] = self._load()
 
     def get(self, datatype: str) -> Optional[JanisDatatype]:
         if datatype in self.dtype_map:
             return self.dtype_map[datatype]
 
-    def load_yaml_to_dtype_map(self) -> None:
+    def _load(self) -> dict[str, JanisDatatype]:
         """
         func loads the combined datatype yaml then converts it to dict with format as keys
         provides structue where we can search all the galaxy and janis types given what we see
         in galaxy 'format' attributes.
         """
+        out: dict[str, JanisDatatype] = {}
         with open(self.datatype_definitions_path, 'r') as fp:
             datatypes = yaml.safe_load(fp)
-        for dtype in datatypes['types']:
-            self.update_dtype_map(dtype)
+        for type_data in datatypes['types']:
+            janistype = factory(type_data)
+            out[type_data['format']] = janistype
+            out[type_data['classname']] = janistype # two keys per datatype
+        return out
 
-    def update_dtype_map(self, dtype: dict[str, str]) -> None:
-        # add new elem if not exists
-        fmt: str = dtype['format']
-        # add this type
-        new_type = JanisDatatype(
-            format=dtype['format'],
-            source=dtype['source'],
-            classname=dtype['classname'],
-            extensions=dtype['extensions'],
-            import_path=dtype['import_path']
-        )
-        self.dtype_map[fmt] = new_type
-        self.dtype_map[dtype['classname']] = new_type # two keys per datatype
 
-        
+# SINGLETON
+register = DatatypeRegister()
 
+
+# @dataclass
+# class DatatypeDetails:
+#     datatypes: list[JanisDatatype]
+#     is_optional: bool
+#     is_array: bool
+#     is_stdout: bool
 
 
 

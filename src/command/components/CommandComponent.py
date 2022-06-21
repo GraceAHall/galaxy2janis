@@ -3,9 +3,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Protocol
-from datatypes.JanisDatatype import JanisDatatype
+from datatypes import JanisDatatype
 from xmltool.param.Param import Param
-from datatypes.formatting import format_janis_str
+from datatypes import format_janis_str
 from uuid import uuid4
 
 

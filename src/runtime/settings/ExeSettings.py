@@ -34,7 +34,6 @@ class WorkflowExeSettings:
         return f'{self.outdir}/steps'
 
 
-
 @dataclass
 class ToolExeSettings:
     download_dir: str

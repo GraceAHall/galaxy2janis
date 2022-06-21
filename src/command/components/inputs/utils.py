@@ -1,7 +1,7 @@
 
 
 from typing import Any
-from datatypes.JanisDatatype import JanisDatatype
+from datatypes import JanisDatatype
 
 
 def datatypes_permit_default(janis_datatypes: list[JanisDatatype]) -> bool:

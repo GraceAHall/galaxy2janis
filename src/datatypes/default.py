@@ -1,6 +1,6 @@
 
 
-from datatypes.JanisDatatype import JanisDatatype
+from .janis import JanisDatatype
 
 DEFAULT_DATATYPE = JanisDatatype(
     format='file',
