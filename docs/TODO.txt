@@ -1,0 +1,588 @@
+
+
+parse steps & register (tags done)
+then PathManager can be created 
+
+
+Bernie Notes
+
+- PDF submit!!! Friday 
+- gxtool2janis - soft release 
+- live watching people use gxtool2janis and see their approach / issues
+
+
+REFACTOR
+- delete mock_old.py
+
+----------------------------
+For BYOD showcase [23-06-22]
+----------------------------
+
+    DOCS
+    - properly define current capabilities
+    - define things which are not supported 
+    - outline list of in-development features
+    - docs to guide editing process
+        - check the base_command looks right
+        - check the input data arguments are right
+        - check positionals - common source of error
+        - check outputs 
+
+    CODE
+    - modules from BYOD showcase version:
+        - wrappers
+        - tags
+        - 
+    - remote_url (ExeSettings) -> owner, repo, revision
+    - folder structure
+    - file structure (sections)
+    - logging
+    - user messages
+        UserMessage:
+            subtype: MessageType
+            contents: str 
+            file_reference: str
+            line_reference: Tuple[int, int] (start stop, can be same line, dictates how its printed)
+    - dump partial cheetah evaluation to pre/post step for each w.step
+    - arrays (hopefully)
+    - test on tools-iuc, fix bugs
+
+    - paths
+        - settings.py
+        - SettingsInitialiser.py
+        - FileInitialiser.py
+    - basic messages (but no TextFormat, PathManager etc)
+        - should be logged to logfiles
+        - write the messages at the top of workflow.py
+        - things which need attention: 
+            - tool: no inputs
+            - tool: no outputs
+            - tool: has configfile
+            - tool: repeat param
+            - tool: no base command (surely should always check this anyway?)
+            - tool: no container
+            - step: unresolved input
+    - dump partial cheetah evaluated pre-step and post-step to strings under each w.step
+        - perform partial cheetah evaluation
+        - define where the pre, main and post are
+        - save to Tool object 
+    - arrays (hopefully)
+    - stabilise & test
+
+----------------------------
+For BYOD showcase [23-06-22]
+----------------------------
+
+
+
+learn to package code and install into environment
+
+Protocol vs ABC 
+
+CommandComponent should be protocol because no unified features of different components 
+ComponentOrderingStrategy should be ABC because all child classes store same info and perform same method, just the strategy is different
+
+
+
+
+Order
+
+TextFormat 
+    - need to break down stuff into smaller pieces 
+    - eg workflow
+    - depending on how we want to write out the file, may need to write
+        IMPORTS 
+        MESSAGES
+        INPUTS
+        STEP1 IMPORT
+        STEP2 IMPORT 
+        STEP3 IMPORT
+        OUTPUTS
+    - or 
+        IMPORTS
+        MESSGES
+        INPUTS
+        STEP1 TITLE
+        STEP1 INPUTS
+        STEP1 PRE
+        STEP1 MAIN
+        STEP1 POST
+        etc
+
+    - accepts a step / tool / workflow etc 
+    - produces a string representation we can write to file
+    - break down the components into individual pieces 
+    - will be a TextFormat for 
+
+PathManager
+
+step directory structure
+
+    workflow.py
+        INPUTS
+        STEP1
+        STEP2
+        STEP3
+        OUTPUTS
+
+    step.py
+        TOOL IMPORT # hate this
+        INPUTS
+        PRE-STEP (dump of partial cheetah evaluated text as String type?) [Optional]
+            - please select a container - common include....
+        MAIN
+        POST-STEP (dump of partial cheetah evaluated text as String) [Optional]
+
+logging
+    configfiles (unsupported)
+    Arrays?
+
+messaging
+
+CLI
+    tools-minimal
+
+Arrays properly 
+
+
+v0.1 TODO
+
+- get into pypi
+
+- step goes in own directory
+    - acts as subworkflow
+    - workflow.py
+        - step1
+            - step.py
+            - tool.py
+            - wrapper.xml
+            - logs
+
+- macro resolved wrapper goes into wrapper.xml file
+
+- CLI 
+    - (workflow) --tools-minimal:  only includes tool arguments in translation if relevant to this workflow
+    - if argument does not appear in the partial cheetah evaluated text, dont include. 
+    - process
+        - create partially evaluated cheetah 
+        - replace lines with original if survived
+        - set this as the xmlcommandstring
+        - proceed as normal
+        - profit????
+
+- logging
+    - configfile / array / pre-step / post-step 
+    - line numbers or line spans
+    - pre-step & post-step
+        - step.py: 
+            tool.py needs your attention!
+        - tool.py:  
+            (pre-step)
+            galaxy wrapper contains pre-execution logic.
+            please review wrapper_command.xml lines 2-13 and add / edit / remove 
+            any inputs which may have not been translated correctly.
+            (post-step)
+            galaxy wrapper contains post-execution logic.
+            please review wrapper_command.xml lines 89-103 and add / edit / remove 
+            any output which may have not been translated correctly.
+            if the wrapper is performing additional commands which are necessary,
+            you will need to create another workflow step 
+            in future versions this may be handled automatically.
+        Step() needs to get messages from parsing both workflow.ga1 and the wrapper.xml
+
+    - configfiles
+        - """NOT SUPPORTED""" message
+        - print note about what has been done
+    - arrays
+        - """NOT SUPPORTED""" message
+        - print notes about what has been done
+            - "inputs_fastq (--inputs) was cast from Array(Fastq) to Fastq"
+            - this really is kinda bad. can't I just detect this shit? 
+            - 
+
+- arrays
+    - collapse every array anywhere to single item
+
+- messaging
+    - top of workflow.py
+    - step1/fastqc.py needs your attention!
+    - step2/quast.py needs your attention!
+
+- docs about how to edit translated workflow
+    - ?
+
+
+Web app idea: test tool
+- set some values for the tool inputs
+- it spits out a command string
+- 'does this look right?'
+
+
+
+
+
+
+
+
+
+
+
+
+TODO 
+- draft presentation
+    - what should the audience take away? 
+    - learning
+    - its use case and why its valuable
+    - challenges 
+
+
+
+
+
+
+
+
+
+
+
+Updates
+Fornight starting 2-06-22:
+
+- wrapper version not build
+    - built scrapers for galaxy toolshed
+    - scaped info into local API
+    - wrapper fetching from step to cache lookup and possible download
+    - swapped to galaxy API approach
+    - Container and Wrapper classes more concrete
+    - NOTE: did not fix picard_MarkDuplicates wrapper issue. 
+        - tool version in workflow is 2.18.2.1 (requirement is picard 2.18.2)
+        - tool version with fix is 2.18.2.2 (wrapper version bumped) (requirement is picard 2.18.2)
+        - as wrapper version is bumped, unsure if the tool inputs are identical across 
+    - FUTURE: multiple galaxy API request attempts with timeout?
+
+- switched to quay.io API for container dates
+    - much better in general and faster than GA4GH
+
+- get rid of absolute path for imports:
+    - from parsed.workflows.simple_workflow.tools.unicycler.unicycler import unicycler 
+    - from tools.unicycler.unicycler import unicycler  (correct)
+
+
+TODO:
+- mothur tools should not be supported 
+    - look at the xml
+
+- step format  
+    - fucking circular imports?????
+    - w.step, w.input etc etc are just methods
+    - need to have the instantiated w object, unless we can use **kwargs or something? 
+
+- command string for step
+    - refresh command which updates the command string
+
+- File / String compatability
+
+- Tools which execute python file in $__tool_directory__?
+
+- pre step
+    - options:
+        - resolve at runtime 
+            - method: 
+                - galaxy cheetah templating
+                - 
+            - pros
+            - cons
+        - show to user 
+            - method
+            - pros
+            - cons
+    - simple text - handle? see chicViewpoint.xml pre-step
+        - ie just basic commands and 1+ #if with no #elif or #else  (defs no nested #ifs)
+        - 
+    - complex text - show to user with line number references?
+
+    - what does the pre-step often do? 
+        - mainly revolves around setting up file names and folder structure 
+        - ln -s     localises and names a file
+        - mkdir     creates dir
+        - #set      sets env var
+        - #if (mostly just to know when to do the things above)
+        - #for (again, mainly to set stuff above)
+    - do we need to show the user pre-step for this tool, or is everything ok? 
+    - 'see wrappers/fastqc/rgFastQC line 52 for context'
+    - Janis UnixTool?
+    - Janis CommandToolBuilder() is just an __init__() method
+
+- post step
+    - what does the post-step often do? 
+        - mv [source] [dest]
+        - cp
+        - samtools
+
+- cutadapt wrapper translation is bad -> bugfix?
+
+
+BUGS:
+- #if #else causing multiple instances of variable
+    - trimmomatic.xml mrsa_illumina 
+    - r1_ext, r2_ext
+    - fastq_in_extension1, fastq_in_extension2
+    - don't even know why these are being interpreted as a variable
+
+
+---- GAPS ----
+
+section: title
+    issue:
+    plan:
+    time:
+
+MUST-HAVES
+
+workflow: step inputs (data)
+    issue:  often complex cheetah manipulates data inputs. 
+            due to symlinks, name formatting, extension formatting, handling arrays
+            causes them to not be directly linkable to tool inputs. 
+            causes the same tool input to be appear 
+    plan:   better user information / messages, user interaction?
+            - put the command line string which would be generated below - ask users if this looks right
+            - point them in the direction of the tool definition in same file
+    time: 1 day
+
+workflow: step outputs
+    issue: for some outputs, cannot be sure if the output was created by the tool,
+            or by galaxy post-processing command. 
+    plan: direct user - create blank post-step and force the user to look at it and do something
+    future: post-processing step
+    time: best solution in 1 day
+
+presentation: 
+    pypi package
+    'how do i install it?'
+    'are there any docs?'
+    'how to debug?'
+    compare side by side raw:edited screenshots not diff
+
+janis: File / String compatability
+    issue: not allowed to provide 'input.fa' (String) as a value for a File type. 
+    plan: spend 1 hour tops. Direct users to declare workflow inputs, and have their values set in the inputs.yaml file. 
+    time: ?
+
+tool: configfiles
+    issue: tools 
+    plan: DO SOMETHING AT LEAST... dump text IDK
+    time: multiple days
+
+workflow: arrays
+    issue: current array handling is inconsistent and designed to just make things work
+    plan: properly handle arrays...
+    time: multiple days
+
+
+
+QUALITY OF LIFE
+
+janis: null (None) inputs in inputs.yaml 
+    issue: None values not allowed in inputs.yaml. doesn't make sense, because the step value is allowed to be None
+    plan: ?
+    time: ?
+
+workflow: setting 'None' for non-optional tool inputs
+    issue: need to manually set tool input as optional=True where the value (from step or inputs.yaml) is (correctly) None
+    plan: put step and tool together so user can alter tool
+    future: make optionality detection better (using conditional constructs)
+    time: hours
+
+
+
+tool: last two components ambiguity
+    issue: are the last two words an option (--prefix and value), or a flag and positional?
+    plan: user input - "hey user - is this an option, or two seperate arguments?"
+    time: hours
+
+
+
+COMPLETE 
+
+tool: tags 
+    issue: 'if' or 'in' or 'input' etc as tool input name (either python or cwl hates this)
+    plan: more robust tag formatting (increase list of banned tags etc)
+    time: DONE
+
+workflow: inputs.yaml
+    issue: have to manually create 
+    plan: automate this (easy)
+    time: DONE
+
+
+
+
+
+TODAY:
+1. Run your tools against many other galaxy workflows (as many as you can find from the galaxy training materials, preferably the RNAseq / DNAseq one), and try to identify what are the gaps in the current implementation
+2. Document what your tool can't do currently, and what's the future plan to handle these (if anything); and if not, what are the challenges?
+3. Select one or two workflows as examples, do the translation to Janis, and document how you fix it manually to get it working
+
+
+emboss suite has CRITICAL errors
+
+
+CLI 
+    - tool
+        --remote-xml: download online rather than use local xmkdir and xmlfile
+        --restart: wipes the output folder - all downloaded wrappers (potentially tool translations etc?) will no longer be present
+        --dev-alias-tracing: turns off alias tracing
+        --dev-no-test-cmdstrs: turns off test cmdstrs
+    - workflow
+        --dev-no-partial-eval: turn off partial cheetah evaluation
+        --minimal: how much output text (normal is current: print every tool input)
+        --format: single page, or page for each step
+        --show-xml: display xml snippets related to each tool input, display xml snippets which were skipped
+
+Production-level code
+    - Error handling
+    - Top 10 / top 20 most common tools parsed correctly galaxy 
+      (a friend - Cameron Hyde - scraped these stats, will send next week)
+        - featurecounts unpaired quote bug 
+        - multiqc configfile
+    - 3 Workflows parsed correctly
+
+Integrate into Janis and release
+    - camelCase for tag formatting
+
+
+
+from meeting
+    - simulate user experience: 
+        - do manual tweaks to functional workflow & document changes made
+        - better ability to direct users to the areas which may need intervention
+    - run tool translation on every tool (estimate stability / performance)
+    - run workflow translation on more workflows (estimate stability / performance)
+    - future: [HIGH] [MEDIUM] [LOW] confidence
+
+Idea:
+    - we already have parsing ability (can identify constructs of text)
+    - can use this to provide syntax highlighting to provide tutorials
+    - eg nextflow steps, inputs, outputs, GO statement, etc
+    - similar to regexr
+
+
+
+TODO Version 1:
+
+Tool
+    - Code refactors 
+        - download cache [DONE]
+        - cheetah evaluation:
+            - workaround for $input [DONE]
+            - cheetah try except whole process? [FUTURE]
+    - logging
+        - galaxy vs gxtool2janis logs [MOSTLY DONE - logger.level is still an issue]
+    - Error handling 
+    - top 10 / top 20 most common tools parsed correctly galaxy
+        - featurecounts unpaired quote bug 
+        - multiqc
+    - CLI settings  
+        --remote-xml: download online rather than use local xmkdir and xmlfile
+        --restart: wipes the output folder - all downloaded wrappers (potentially tool translations etc?) will no longer be present
+        --dev-alias-tracing: turns off alias tracing
+        --dev-no-test-cmdstrs: turns off test cmdstrs
+    - integration into janis github 
+
+
+workflow
+    - get most recent version of wrapper (wrapper bugs witnessed)
+    - outputs
+    - Code refactors
+    - Error handling
+    - three workflows parsed, can be translated by janis to wdl/cwl
+
+    - integration into janis github
+    - CWL/WDL definitions formatting (janis)
+
+
+Next Features:
+
+Tool
+    - html files: quast / rgFastQC $report_html.files_path
+    - arrays?
+    - TTestCases: janis tool test parsing and evaluation functions (from xml to janis definition)
+    - CommandComponent.weight (ENUM) 
+        - how much this command component can be trusted as the truth
+        - may be used to override previous understanding of identified command components
+
+Workflow
+    - arrays
+    - pre/post tasks as steps? (featureCounts.xml - good example of post processing to create outputs)
+
+
+
+NOTE check janis-patterns github for tricky situations
+
+OFFLINE
+<repeat> elems (and any templating errors caused by repeats)
+creating TTestCases
+
+
+lr_align.scores: ''
+lr_align.low_score: None
+min_anchor_seg_len: None
+
+str($min_anchor_seg_len) == 'None'
+should equal ''
+
+str($lr_align.scores) == ?
+should equal ''
+
+
+
+Today
+
+- prokka $input final positional not appearing
+- BUG simple workflow 
+    min_length=108 should be min_length=None
+    the values in step input dict already account for default values
+
+
+
+
+
+
+
+
+Questions:
+input connections vs workflow outputs
+    input connections: [inputname]=(w.step3_fastqc.text_file)
+    workflow output: source=(w.step3_fastqc, "text_file")
+
+WORKFLOWS
+- writing to workflow.py, tools/ folder, config into a workflow_config.yml etc. 
+!! ASK JIAAN    
+- metadata (and datatypes)
+- datastructures within janis - are they often dicts? base classes of dictifiable? 
+- how does janis parse datatypes
+- parsing cheetah in sections to resolve some values which are hidden
+    - normal cheetah templating will fail.
+    - can't just create a command line string for workflow steps because runtimevalues are unresolved. 
+    - steps:
+        - create list of all options which have not been linked to a value (still unresolved after basic process)
+        - for each, find all references to the option
+        - get the enclosing cheetah constructs
+        - try to template just these sections
+        - interpret the output string
+    - if this fails, call component.get_default_value() and just go with that
+
+- add default value T/F for flags depending on whether its witnessed every command string
+
+logging
+ - python logging package
+ - needs to be done better in general :/ maybe runtime temp config file? 
+ - couldnt create selector (make OutputParam.selector not Optional)
+ - complex regex in selector
+ - uses configfile
+ - needs user input (datatype / command line references) *
+ - unresolved container url
+ 
+
+
+

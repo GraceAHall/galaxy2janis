@@ -4,7 +4,7 @@
 from typing import Any
 from containers.Container import Container
 from containers.fetching.Fetcher import Fetcher
-from xmltool.requirements import Requirement
+from gx.xmltool.requirements import Requirement
 import containers.fetching.utils as utils
 
 

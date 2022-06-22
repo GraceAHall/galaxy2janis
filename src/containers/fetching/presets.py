@@ -2,7 +2,7 @@
 
 
 from containers.Container import Container
-from xmltool.requirements import Requirement
+from gx.xmltool.requirements import Requirement
 
 
 image_presets = {

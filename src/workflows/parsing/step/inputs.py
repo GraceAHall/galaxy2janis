@@ -1,11 +1,11 @@
 
-import runtime.logging.logging as logging
+import logs.logging as logging
 from typing import Any
 
-from runtime.settings.ExeSettings import ToolExeSettings
+import settings.tool.settings as tsettings
 from workflows.parsing.tool_state import load_tool_state
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.inputs import (
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.inputs import (
     StepInput, 
     StepInputRegister,
     WorkflowInputStepInput,
@@ -15,7 +15,7 @@ from workflows.entities.step.inputs import (
 )
 
 
-def parse_step_inputs(step: dict[str, Any], workflow: Workflow, esettings: ToolExeSettings) -> StepInputRegister:
+def parse_step_inputs(step: dict[str, Any], workflow: Workflow) -> StepInputRegister:
     parser = ToolStepInputParser(step, workflow, esettings)
     return parser.parse()
 
@@ -49,10 +49,9 @@ def init_static_step_input(name: str, value: Any) -> StepInput:
 
 # main class
 class ToolStepInputParser:
-    def __init__(self, step: dict[str, Any], workflow: Workflow, esettings: ToolExeSettings):
+    def __init__(self, step: dict[str, Any], workflow: Workflow):
         self.step = step
         self.workflow = workflow
-        self.esettings = esettings
         self.inputs: dict[str, StepInput] = {}
 
     def parse(self) -> StepInputRegister:

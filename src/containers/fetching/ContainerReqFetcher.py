@@ -2,7 +2,7 @@
 
 
 from containers.Container import Container
-from xmltool.requirements import ContainerRequirement
+from gx.xmltool.requirements import ContainerRequirement
 from .Fetcher import Fetcher
 
 

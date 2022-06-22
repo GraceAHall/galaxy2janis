@@ -3,11 +3,11 @@
 
 
 from typing import Any
-from workflows.entities.step.metadata import StepMetadata
-from galaxy_wrappers.wrappers.Wrapper import Wrapper
-from galaxy_wrappers.wrappers.WrapperCache import WrapperCache
-from galaxy_wrappers.requests.versions import request_installable_revision
-import galaxy_wrappers.scraping.utils as utils
+from entities.workflow.step.metadata import StepMetadata
+from gx.wrappers.wrappers.Wrapper import Wrapper
+from gx.wrappers.wrappers.WrapperCache import WrapperCache
+from gx.wrappers.requests.versions import request_installable_revision
+import gx.wrappers.scraping.utils as utils
 
 
 """

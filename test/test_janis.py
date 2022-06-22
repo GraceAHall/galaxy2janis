@@ -9,7 +9,7 @@ from mock.mock_xmltool import MOCK_XMLTOOL
 from mock.mock_command import MOCK_COMMAND
 from mock.mock_container import MOCK_CONTAINER
 
-from file_io.write import write_tool
+from janis.write import write_tool
 from tool.generate import gen_tool
 
 

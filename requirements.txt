@@ -10,7 +10,9 @@ galaxy-web-framework@git+https://github.com/galaxyproject/galaxy.git@release_21.
 galaxy-web-stack@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_stack
 galaxy-app@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/app
 
-# TODO add
-# wget
-# tarfile
-# filelock
+janis-pipelines==0.11.6
+refgenconf==0.12.2
+biopython==1.79
+beautifulsoup4==4.11.1
+filelock==3.7.0
+regex==2022.6.2

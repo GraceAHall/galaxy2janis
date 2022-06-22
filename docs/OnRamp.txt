@@ -1,0 +1,50 @@
+
+===============
+OnRamp Meetings
+===============
+
+
+Would be good to have projector & whiteboard 
+
+- At each OnRamp, have (at least) one person bring up their code and explain a problem they're having
+- Get the 'brains trust' to suggest changes and make comments. 
+- Can use the whiteboard to sketch out ideas / concepts
+
+
+Why? 
+
+- Two types of ppl in these communities
+	- spectators (reddit: lurkers)
+	- active participants
+
+- Both are 100% valid.
+	- Spectators are often newer members who lack confidence or think their skills aren't as good
+	- Active participants are more seasoned members who want to share their knowledge and nut out a problem
+
+- OnRamp could fit the 'masterclass' model
+	- Spectators get a masterclass where they can watch the process. Entertaining and educational
+	- Active participants get the chance to apply expertise and teach
+
+- Over time, some spectators will start to get involved as active participants! 
+
+
+This ticks another box which is lacking: mentorship
+
+- Industry: larger software teams. 
+    - Code review 
+    - mentoring by more senior devs
+    - community which you can ask for help
+
+- Academia: Small software teams (or working alone). 
+    - None of the above. 
+    - Mostly use free online resources (youtube, stackoverflow) for eductation
+
+
+OnRamp could foster a culture of code review, and a community where devs can connect within parkville precint
+
+
+not all OnRampers are software engineers
+organising comittee - RSE asia australia unconference
+https://www.qcif.edu.au/support/hacky-hour/
+justin bedaeux
+

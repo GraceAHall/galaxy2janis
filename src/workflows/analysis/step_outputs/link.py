@@ -1,11 +1,11 @@
 
 from typing import Optional
-from command.components.CommandComponent import CommandComponent
-from tool.Tool import Tool
+from shellparser.components.CommandComponent import CommandComponent
+from entities.tool.Tool import Tool
 
-from workflows.entities.step.outputs import StepOutput
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.step import WorkflowStep
+from entities.workflow.step.outputs import StepOutput
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.step import WorkflowStep
 
 
 
@@ -15,10 +15,11 @@ Assigns eaech StepOutput the underlying ToolOutput
 """
 
 # module entry
-def link_tool_outputs(workflow: Workflow):
+def link_workflow_tool_outputs(workflow: Workflow) -> Workflow:
     for step in workflow.list_steps():
         linker = StepToolOutputLinker(step, workflow)
         linker.link()
+    return workflow
 
 
 class StepToolOutputLinker:

@@ -1,4 +1,0 @@
-
-
-
-from .GalaxyManager import GalaxyManager

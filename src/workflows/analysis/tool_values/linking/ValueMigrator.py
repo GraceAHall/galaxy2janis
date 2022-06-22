@@ -1,14 +1,14 @@
 
 
-from command.components.CommandComponent import CommandComponent
-from command.components.inputs.Option import Option
-from tool.Tool import Tool
+from shellparser.components.CommandComponent import CommandComponent
+from shellparser.components.inputs.Option import Option
+from entities.tool.Tool import Tool
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.step import WorkflowStep
-from workflows.entities.workflow.input import WorkflowInput
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.step import WorkflowStep
+from entities.workflow.input import WorkflowInput
 
-from workflows.entities.step.tool_values import (
+from entities.workflow.step.tool_values import (
     InputValue, 
     InputValueType, 
     DefaultInputValue, 

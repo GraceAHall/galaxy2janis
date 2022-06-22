@@ -1,16 +1,14 @@
 
 #sys.path.append('./galaxy/lib')
 
-import runtime.logging.logging as logging
+import logs.logging as logging
 import sys
-
 from typing import Optional
-from startup.CLIparser import CLIparser
 
+from cli import CLIparser
 from tool_mode import tool_mode
 from workflow_mode import workflow_mode
-from runtime.settings.settings import load_tool_settings, load_workflow_settings
-from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
+from fileio.write import write_tool
 
 """
 gxtool2janis program entry point
@@ -38,25 +36,27 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
             pass
 
 def run_tool_mode(args: dict[str, Optional[str]]):
-    esettings: ToolExeSettings = load_tool_settings(args)
-    tool_mode(esettings)
+    tool = tool_mode(args)
+    write_tool(tool)
+
+def run_workflow_mode(args: dict[str, Optional[str]]):
+    workflow_mode(args)
+
+
+
+# for bulk parsing stat runs
 
 def try_run_tool_mode(args: dict[str, Optional[str]]):
     try: 
-        esettings: ToolExeSettings = load_tool_settings(args)
-        tool_mode(esettings)
+        tool = tool_mode(args)
+        write_tool(tool)
     except Exception as e:
         print(e)
         logging.tool_exception()
 
-def run_workflow_mode(args: dict[str, Optional[str]]):
-    esettings: WorkflowExeSettings = load_workflow_settings(args)
-    workflow_mode(esettings)
-
 def try_run_workflow_mode(args: dict[str, Optional[str]]):
     try: 
-        esettings: WorkflowExeSettings = load_workflow_settings(args)
-        workflow_mode(esettings)
+        workflow_mode(args)
     except Exception as e:
         print(e)
         logging.workflow_exception()

@@ -4,12 +4,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from xmltool.param.Param import Param
-from command.components.CommandComponent import CommandComponent
+from gx.xmltool.param.Param import Param
+from shellparser.components.CommandComponent import CommandComponent
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.workflow.input import WorkflowInput
-from workflows.entities.step.tool_values import (
+from entities.workflow.workflow import Workflow
+from entities.workflow.input import WorkflowInput
+from entities.workflow.step.tool_values import (
     InputValue, 
     ConnectionInputValue, 
     RuntimeInputValue, 
@@ -19,7 +19,7 @@ from workflows.entities.step.tool_values import (
     WorkflowInputInputValue
 )
 from workflows.analysis.tool_values.utils import select_input_value_type
-from workflows.entities.step.inputs import ConnectionStepInput
+from entities.workflow.step.inputs import ConnectionStepInput
 
 
 @dataclass

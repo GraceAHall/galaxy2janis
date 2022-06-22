@@ -1,11 +1,11 @@
 
 
 
-from workflows.entities.workflow.output import WorkflowOutput
-from workflows.entities.workflow.workflow import Workflow
+from entities.workflow.output import WorkflowOutput
+from entities.workflow.workflow import Workflow
 
 
-def set_outputs(workflow: Workflow) -> None:
+def init_workflow_outputs(workflow: Workflow) -> Workflow:
     for step in workflow.list_steps():
         for stepout in step.outputs.list():
             if stepout.is_wflow_out:
@@ -19,3 +19,4 @@ def set_outputs(workflow: Workflow) -> None:
                     janis_datatypes=stepout.janis_datatypes
                 )
                 workflow.add_output(workflow_output)
+    return workflow

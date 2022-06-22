@@ -3,16 +3,16 @@
 
 
 from typing import Any
-from runtime.settings.ExeSettings import ToolExeSettings
+import settings.tool.settings as tsettings
 
-from xmltool.param.InputParam import BoolParam
+from gx.xmltool.param.InputParam import BoolParam
 
-from xmltool.load import load_xmltool
-from xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.xmltool.load import load_xmltool
+from gx.xmltool.XMLToolDefinition import XMLToolDefinition
 
 
-def resolve_values(esettings: ToolExeSettings, gxstep: dict[str, Any]) -> dict[str, Any]:
-    xmltool = load_xmltool(esettings)
+def resolve_values(gxstep: dict[str, Any]) -> dict[str, Any]:
+    xmltool = load_xmltool()
     resolver = StepValueResolver(gxstep, xmltool)
     return resolver.resolve()
 

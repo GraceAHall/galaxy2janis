@@ -3,13 +3,13 @@
 
 from typing import Any
 
-from command.components.CommandComponent import CommandComponent
-from command.components.inputs.Flag import Flag
+from shellparser.components.CommandComponent import CommandComponent
+from shellparser.components.inputs.Flag import Flag
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.workflow.input import WorkflowInput
+from entities.workflow.workflow import Workflow
+from entities.workflow.input import WorkflowInput
 
-from workflows.entities.step.inputs import (
+from entities.workflow.step.inputs import (
     ConnectionStepInput, 
     RuntimeStepInput, 
     StaticStepInput, 
@@ -17,7 +17,7 @@ from workflows.entities.step.inputs import (
     WorkflowInputStepInput
 )
 
-from workflows.entities.step.tool_values import (
+from entities.workflow.step.tool_values import (
     InputValue, 
     ConnectionInputValue, 
     WorkflowInputInputValue

@@ -1,0 +1,13 @@
+
+
+
+Test Cases
+- filetype checks?
+- input format -> list[str] vs str? array vs single elem
+- do you want the tests to be executed during parsing, or written into the janis tool definition file (like bam clsmethod 'basic_test' etc)
+
+
+
+
+
+

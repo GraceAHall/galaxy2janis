@@ -1,0 +1,177 @@
+
+
+
+problem:
+
+    rgFastQC.xml
+    -f          $format     $input_file_sl
+    RAW_STRING  ENV_VAR     ENV_VAR
+    -> Option(prefix='-f', observed_value='$format $input_file_sl')
+
+solutions:
+
+    - ENV_VARs can only be key: val type options (not arrays)
+    - (similar) only STRINGS and NUMBERs or comma seperated lists can be arrays after a prefix
+    - the last option we always assume is key: val rather than array 
+      (prevents issues around positionals at end of cmdline) 
+    - write all three, parse tools and see which has highest hitrate
+
+
+wildcard selector contents:
+    <data name="outfile" format="jpg" from_work_dir="out.*" label="${tool.name} on ${on_string}: Assembly Graph Image">
+
+bandage:
+'out.$output_format' what is the out doing? is this just positional? oh yeah its just creating the file format
+
+
+
+Multiline strings:
+
+#if $lib_repeat
+    lib='
+    #for $i in range(len($lib_repeat))
+        lib$i
+    #end for
+    '
+
+
+
+bool param which is actually 2 key-vals
+
+<param name="singlestrand" type="boolean" argument="--singlestrand"
+            label="Predict genes independently on each strand"
+            help="This allows overlapping genes on opposite strands."
+            truevalue="--singlestrand=true" falsevalue="--singlestrand=false" checked="false" />
+
+
+assign_primary_output:
+
+    <data name="output" format="tabular" label="${tool.name} on ${on_string}">
+        <discover_datasets directory="split" pattern="(?P&lt;designation&gt;.+)\.tab" format="tabular" visible="true" assign_primary_output="true"/>
+        <filter>split_output_cond['split_output_selector'] == 'no'</filter>
+    </data>
+
+
+templating a string list (abyss)
+(in='reads1.fa reads2.fa'):
+
+#if str($se_reads) != 'None'
+    se='
+    #for $v in $se_reads
+        $v
+    #end for
+    '
+#end if
+
+temporary alias in for loop
+#if $input_cond.library_type == "single"
+    #for i, e in enumerate($input_cond.inS)
+        cp '$e'
+
+dynamic setting kwarg (abyss)
+
+#for $i, $v in enumerate($long_seqs)
+    long${i}='$v'
+#end for
+
+
+echo to template a string
+#if $col:
+    -c #echo ','.join($col)#
+    -o #echo ','.join($op)#
+#end if
+
+
+More abyss shit:
+
+Library pea has reads in two files, pea_1.fa and pea_2.fa.
+Library peb has reads in two files, peb_1.fa and peb_2.fa.
+Single-end reads are stored in two files, se1.fa and se2.fa.
+
+lib='pea peb' \
+pea='pea_1.fa pea_2.fa' peb='peb_1.fa peb_2.fa' \
+se='se1.fa se2.fa'
+
+
+
+GEMINI
+
+gemini @BINARY@
+-f '$tabixed_file'
+-a $a.a_selector
+#if $a.a_selector == 'extract':
+    #set $types = []
+    #set $elements = []
+    #set $column_names = []
+    #set $operations = []
+    #for $action in $a.actions:
+        $types.append(str($action.column_type))
+        $elements.append(str($action.element_to_extract).strip())
+        $column_names.append(str($action.column_name).strip())
+        $operations.append(str($action.operation))
+    #end for
+
+    -t #echo ",".join($types)
+    -e '#echo ",".join($elements)#'
+    -o #echo ",".join($operations)
+    -c '#echo ",".join($column_names)#'
+#else:
+    -c '${a.column_name}'
+#end if
+#if str($annotate_source.ext) != "bed":
+    $region_only
+#end if
+'$outfile'
+
+
+statement across multiple lines (gc_skew.xml)
+
+ln -s -f
+#if $reference_genome.reference_genome_source == "history"
+    '$reference_genome.history_item'
+#else
+    '$reference_genome.builtin.fields.path'
+#end if
+reference.fa &&
+
+
+
+cheetah functions:
+
+    #def text_to_rstringarray($text)
+        #set $list = $text.strip().rstrip(',').split(',')
+
+        #set $rstringarray = "c("
+
+        #for $i in range(len($list))
+            #set $elem = $list[$i].strip()
+            #if $elem != ""
+                #set $rstringarray += '"'
+                #set $rstringarray += $elem
+                #set $rstringarray += '"'
+                #if $i != len($list) - 1
+                    #set $rstringarray += ','
+                #end if
+            #end if
+        #end for
+
+        #set $rstringarray += ')'
+        #return $rstringarray
+        
+    #end def
+
+
+
+SQL INSIDE A SET DIRECTIVE INSIDE AN IF STATEMENT
+DISGUSTING
+
+#if str($query.oformat.report.format) == 'maf':
+    #set $q = $q + ' v LEFT JOIN (SELECT DISTINCT gene, is_hgnc, hgnc_id, entrez_id, chrom FROM gene_detailed) g1 ON v.gene = g1.gene AND v.chrom = g1.chrom LEFT JOIN (SELECT DISTINCT gene, is_hgnc, hgnc_id, entrez_id, transcript, chrom, ensembl_gene_id FROM gene_detailed) g2 ON g1.gene = g2.gene AND (v.transcript = g2.transcript OR v.transcript=g2.ensembl_gene_id)'
+#end if
+
+
+
+
+
+
+

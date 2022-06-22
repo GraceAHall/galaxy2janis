@@ -3,16 +3,15 @@
 
 from typing import Any
 
-from workflows.entities.step.metadata import StepMetadata
+from entities.workflow.step.metadata import StepMetadata
 
 from .inputs import parse_step_inputs
 from .outputs import parse_step_outputs
 from .metadata import parse_step_metadata
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.step import WorkflowStep
-from runtime.settings.ExeSettings import WorkflowExeSettings
-from runtime.settings.settings import load_tool_settings
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.step import WorkflowStep
+import settings.workflow.settings as wsettings
 from tool_mode import tool_mode
 
 

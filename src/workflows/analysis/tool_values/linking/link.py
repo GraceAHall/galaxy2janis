@@ -1,15 +1,14 @@
 
 
 # module entry
-import runtime.logging.logging as logging
+import logs.logging as logging
 from typing import Type
 
-from runtime.settings.ExeSettings import ToolExeSettings, WorkflowExeSettings
-from runtime.settings.settings import create_tool_settings_for_step
+import settings.tool.settings as tsettings
 from workflows.analysis.tool_values.component_updates import update_component_knowledge
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.step import WorkflowStep
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.step import WorkflowStep
 
 from .ValueMigrator import ValueMigrator
 from .ValueLinker import (
@@ -41,14 +40,15 @@ blind_linkers: list[Type[ValueLinker]] = [
 ]
 
 
-def link_tool_values(wsettings: WorkflowExeSettings, workflow: Workflow) -> None:
+def link_workflow_tool_values(workflow: Workflow) -> Workflow:
     for step in workflow.list_steps():
         tsettings = create_tool_settings_for_step(wsettings, step.metadata)
         step.inputs.assign_gxparams(step.tool)  # is this needed?
         link_step_values(tsettings, step, workflow)
         assert_all_components_assigned(step)
+    return workflow
 
-def link_step_values(esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow) -> None:
+def link_step_values(step: WorkflowStep, workflow: Workflow) -> None:
     # link values using cheetah cmdstr and input dict
     for linker in knowledge_linkers:
         l = linker(esettings, step, workflow)

@@ -1,4 +1,61 @@
 
+Tool Method
+    Galaxy - Wrapper
+    Nextflow - Process
+    CWL - Tool
+
+- load files -> xmltool / nextflowtool / cwltool
+- 
+
+
+Notes from BYOD work
+- prioritise features common across languages
+    - ie dont do cheetah test templating because its Galaxy specific
+- 
+
+
+=======================
+Tech (discrete modules)
+=======================
+
+Constant
+- Entities
+- Formats
+- Outputting (paths, folder structure, using formats)
+- Container fetching
+- Tags
+
+Extendable
+- Datatype Inference
+- Logging
+- Parser
+
+Interfaces
+- Loading workflow files
+- Lexer
+
+
+
+================
+Command / Script
+================
+
+Galaxy:
+- cheetah pass  (escape \$ for env var)
+- Bash pass 
+
+Nextflow:
+- substitute NF values pass (escape \$ for env var)
+- Bash pass 
+
+CWL:
+- ah hahaha
+- 
+
+
+
+
+
 
 
 

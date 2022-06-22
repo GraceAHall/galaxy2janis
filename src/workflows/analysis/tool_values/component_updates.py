@@ -2,15 +2,15 @@
 
 
 
-from tool.Tool import Tool
+from entities.tool.Tool import Tool
 
-from command.components.CommandComponent import CommandComponent
-from command.components.inputs.Option import Option
-from command.components.inputs.Positional import Positional
-from workflows.entities.step.step import WorkflowStep
+from shellparser.components.CommandComponent import CommandComponent
+from shellparser.components.inputs.Option import Option
+from shellparser.components.inputs.Positional import Positional
+from entities.workflow.step.step import WorkflowStep
 
 
-from workflows.entities.step.tool_values import (
+from entities.workflow.step.tool_values import (
     InputValue, 
     StaticInputValue, 
     InputValueType, 

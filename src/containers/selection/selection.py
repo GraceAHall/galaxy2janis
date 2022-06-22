@@ -1,9 +1,9 @@
 
 
 
-import runtime.logging.logging as logging
+import logs.logging as logging
 from typing import Optional
-from xmltool.requirements import Requirement
+from gx.xmltool.requirements import Requirement
 from containers.Container import Container
 
 

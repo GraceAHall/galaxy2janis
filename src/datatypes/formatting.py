@@ -1,7 +1,7 @@
 
 
 
-from datatypes.JanisDatatype import JanisDatatype
+from .janis import JanisDatatype
 
 
 def format_janis_str(datatypes: list[JanisDatatype], is_optional: bool, is_array: bool) -> str:

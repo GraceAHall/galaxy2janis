@@ -6,7 +6,7 @@ import requests
 from typing import Any, Optional
 from requests import Response
 
-import runtime.logging.logging as logging
+import logs.logging as logging
 
 
 

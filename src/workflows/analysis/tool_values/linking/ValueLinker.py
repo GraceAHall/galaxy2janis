@@ -1,28 +1,28 @@
 
 
-import runtime.logging.logging as logging
+import logs.logging as logging
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Optional
 
-from runtime.settings.ExeSettings import ToolExeSettings
-from command.components.CommandComponent import CommandComponent
-from command.components.inputs.Flag import Flag
-from command.components.inputs.Option import Option
+import settings.tool.settings as tsettings
+from shellparser.components.CommandComponent import CommandComponent
+from shellparser.components.inputs.Flag import Flag
+from shellparser.components.inputs.Option import Option
 
-from workflows.entities.workflow.workflow import Workflow
-from workflows.entities.step.step import WorkflowStep
-from workflows.entities.step.inputs import ConnectionStepInput, StepInput, WorkflowInputStepInput
-from workflows.entities.step.tool_values import InputValue
+from entities.workflow.workflow import Workflow
+from entities.workflow.step.step import WorkflowStep
+from entities.workflow.step.inputs import ConnectionStepInput, StepInput, WorkflowInputStepInput
+from entities.workflow.step.tool_values import InputValue
 
-from command.cheetah.evaluation import sectional_evaluate
-from command.text.simplification.aliases import resolve_aliases
-from xmltool.load import load_xmltool
-from command.cmdstr.cmdstr import gen_command_string
+from shellparser.cheetah.evaluation import sectional_evaluate
+from shellparser.text.simplification.aliases import resolve_aliases
+from gx.xmltool.load import load_xmltool
+from shellparser.cmdstr.cmdstr import gen_command_string
 
-from command.text.load import load_xml_command_cheetah_eval
+from shellparser.text.load import load_xml_command_cheetah_eval
 import workflows.analysis.tool_values.create_value as value_factory
 import workflows.analysis.tool_values.utils as value_utils
-import command.text.regex.utils as regex_utils
+import shellparser.text.regex.utils as regex_utils
 
 
 class ValueLinker(ABC):
@@ -36,8 +36,7 @@ class ValueLinker(ABC):
     templates the <command> with the step input dict, then uses the templated <command> 
     to locate arguments and pull their value
     """
-    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
-        self.esettings = esettings
+    def __init__(self, step: WorkflowStep, workflow: Workflow):
         self.step = step
         self.workflow = workflow
 
@@ -69,16 +68,16 @@ class CheetahValueLinker(ValueLinker):
     updates knowledge of components (mainly optionality). 
     """
 
-    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
-        super().__init__(esettings, step, workflow)
+    def __init__(selfstep: WorkflowStep, workflow: Workflow):
+        super().__init__(step, workflow)
         self.cmdstr: str = self.prepare_command()
 
     def prepare_command(self) -> str:
-        text = load_xml_command_cheetah_eval(self.esettings)
+        text = load_xml_command_cheetah_eval()
         text = sectional_evaluate(text, inputs=self.step.inputs.to_dict())
         text = resolve_aliases(text)
 
-        xmltool = load_xmltool(self.esettings)
+        xmltool = load_xmltool()
         cmdstr = gen_command_string(source='xml', the_string=text, xmltool=xmltool)
         stmtstr = cmdstr.main.cmdline
         
@@ -201,8 +200,8 @@ class DefaultValueLinker(ValueLinker):
 
 class UnlinkedValueLinker(ValueLinker):
 
-    def __init__(self, esettings: ToolExeSettings, step: WorkflowStep, workflow: Workflow):
-        super().__init__(esettings, step, workflow)
+    def __init__(self, step: WorkflowStep, workflow: Workflow):
+        super().__init__(step, workflow)
         self.permitted_inputs = [WorkflowInputStepInput, ConnectionStepInput]
 
     def link(self) -> None:
