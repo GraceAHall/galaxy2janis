@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from gx.wrappers.wrappers.Wrapper import Wrapper
+from gx.wrappers import Wrapper
 
 
 @dataclass

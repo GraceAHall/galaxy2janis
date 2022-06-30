@@ -3,8 +3,8 @@
 from datetime import datetime
 from typing import Optional
 from formats.workflow_definition.ToolInputLine import ToolInputLine
-from fileio.imports.Import import Import
-from entities.workflow.step.tool_values import InputValue
+from formats.imports.Import import Import
+from entities.workflow import InputValue
 
 DATE_FORMAT = "%Y-%m-%d"
 

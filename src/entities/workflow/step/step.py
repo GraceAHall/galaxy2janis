@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from entities.tool.Tool import Tool
+from ..registers.StepInputRegister import StepInputRegister
+from ..registers.StepOutputRegister import StepOutputRegister
 from .metadata import StepMetadata
-from .inputs import StepInputRegister
-from .outputs import StepOutputRegister
 from .tool_values import InputValue, InputValueRegister
 
 

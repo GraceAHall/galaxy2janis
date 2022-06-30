@@ -3,9 +3,11 @@
 from typing import Any, Optional
 
 from .Fetcher import Fetcher
-from containers.Container import Container
+from ..Container import Container
 from gx.xmltool.requirements import Requirement
+
 import containers.fetching.utils as utils
+from utils.general import global_align
 
 
 class GA4GHFetcher(Fetcher):

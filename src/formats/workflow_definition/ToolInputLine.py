@@ -6,10 +6,10 @@ from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.Option import Option
 from shellparser.components.inputs.Positional import Positional
-from entities.workflow.workflow import WorkflowStep
+from entities.workflow import WorkflowStep
 
-from entities.workflow.step.tool_values import ConnectionInputValue, DefaultInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
-from entities.workflow.workflow import Workflow
+from entities.workflow import ConnectionInputValue, DefaultInputValue, InputValue, InputValueType, StaticInputValue, WorkflowInputInputValue
+from entities.workflow import Workflow
 from datatypes.default import DEFAULT_DATATYPE
 
 

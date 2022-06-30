@@ -1,13 +1,16 @@
 
-import logs.logging as logging
+
+
 import json
+import datatypes
+
 from typing import Any, Optional
 
-import settings.workflow.settings as wsettings
+from setup import do_workflow_setup
 
-import datatypes
-from entities.workflow.metadata import WorkflowMetadata
-from entities.workflow.workflow import Workflow
+from entities.workflow import WorkflowMetadata
+from entities.workflow import Workflow
+
 from workflows.parsing.workflow.inputs import parse_input_step
 from workflows.parsing.step.step import parse_tool_step
 
@@ -19,7 +22,7 @@ from workflows.analysis.tool_values.linking.link import link_workflow_tool_value
 from workflows.analysis.step_outputs.link import link_workflow_tool_outputs
 from workflows.parsing.workflow.outputs import init_workflow_outputs
 
-
+from fileio import write_workflow
 
 """
 this file is the overall orchestrator to parse 
@@ -31,45 +34,43 @@ the order here seems weird but trust me there is reason.
 """
 
 def workflow_mode(args: dict[str, Optional[str]]) -> None:
-    # setup
-    esettings = load_workflow_settings(args)
-    logging.configure_workflow_logging(esettings)
-    logging.msg_parsing_workflow(esettings.workflow_path)
+    do_workflow_setup(args)
+    workflow = Workflow()
+    workflow = ingest_framework(workflow)
 
-    # main
-    parser = WorkflowParser(esettings)
-    workflow = parser.init_workflow()
-    workflow = parser.init_workflow_inputs(workflow)
-    workflow = parser.init_workflow_steps(workflow)
+    factory = WorkflowFactory()
+    workflow = factory.init_workflow()
+    workflow = factory.init_workflow_inputs(workflow)
+    workflow = factory.init_workflow_steps(workflow)
     
     # by this point, step_tags & tool_ids are known
     # need to take a brief pause to init output folder structure 
     # and download wrappers.
-    init_workflow_folders(workflow, esettings)
-    fetch_workflow_wrappers(workflow, esettings)
+    init_workflow_folders(workflow)
+    fetch_workflow_wrappers(workflow)
     
     # can now access all files (including wrapper xml) 
-    # for loading, logging, writing definitions etc
-    workflow = parser.init_workflow_step_inputs(workflow)
-    workflow = parser.init_workflow_step_outputs(workflow)
+    # for loading, , writing definitions etc
+    workflow = factory.init_workflow_step_inputs(workflow)
+    workflow = factory.init_workflow_step_outputs(workflow)
 
     # galaxy workflow parsed at this point
     # now must parse tools to janis, create
     # values for tool inputs in each step 
     # finalise workflow inputs / outputs etc
     workflow = parse_workflow_tools(workflow)
-    workflow = link_workflow_tool_values(workflow, esettings)
+    workflow = link_workflow_tool_values(workflow)
     workflow = link_workflow_tool_outputs(workflow)
     workflow = init_workflow_outputs(workflow)
 
-    write_workflow(esettings, workflow)
+    write_workflow(workflow)
 
 
 
-class WorkflowParser:
+class WorkflowFactory:
     
     def __init__(self):
-        self.tree = self.load_tree(wsettings.workflow_path)
+        self.tree = self.load_tree(w.workflow_path)
     
     def load_tree(self, path: str) -> dict[str, Any]:
         # TODO should probably check the workflow type (.ga, .ga2)

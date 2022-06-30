@@ -4,7 +4,7 @@
 
 
 from abc import ABC, abstractmethod
-from entities.workflow.step.tool_values import ConnectionInputValue, WorkflowInputInputValue
+from entities.workflow import ConnectionInputValue, WorkflowInputInputValue
 
 from formats.workflow_definition.ToolInputLine import ToolInputLine
 

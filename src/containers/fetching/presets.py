@@ -1,7 +1,7 @@
 
 
 
-from containers.Container import Container
+from ..Container import Container
 from gx.xmltool.requirements import Requirement
 
 

@@ -4,7 +4,7 @@ import os
 import json
 from typing import Any, Optional
 
-import settings.tool.settings as tsettings
+import settings
 from galaxy.model import Job, JobParameter
 from gx.interaction.mock import MockApp
 from galaxy.tool_util.verify.interactor import ToolTestDescription
@@ -101,7 +101,7 @@ class JobFactory:
             raise RuntimeError(f'test data {filename} could not be found at {data_path}')
 
     def get_test_data_path(self, filename: str) -> str:
-        return f'{tsettings.xml_dir()}/test-data/{filename}'
+        return f'{settings.tool.xml_dir()}/test-data/{filename}'
 
     def file_exists(self, filepath: str) -> bool:
         if os.path.exists(filepath):

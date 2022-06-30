@@ -6,13 +6,13 @@ then PathManager can be created
 
 Bernie Notes
 
-- PDF submit!!! Friday 
 - gxtool2janis - soft release 
 - live watching people use gxtool2janis and see their approach / issues
 
 
 REFACTOR
-- delete mock_old.py
+- consolidate inputs / outputs for steps, workflow into single InputRegister / OutputRegister class no? 
+
 
 ----------------------------
 For BYOD showcase [23-06-22]
@@ -29,10 +29,6 @@ For BYOD showcase [23-06-22]
         - check outputs 
 
     CODE
-    - modules from BYOD showcase version:
-        - wrappers
-        - tags
-        - 
     - remote_url (ExeSettings) -> owner, repo, revision
     - folder structure
     - file structure (sections)

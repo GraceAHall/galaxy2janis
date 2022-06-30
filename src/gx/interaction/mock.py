@@ -39,7 +39,7 @@ from galaxy.tools.data import ToolDataTableManager
 #from galaxy.datatypes.registry import example_datatype_registry_for_sample
 # terrible stuff from galaxy. not planning on a refactor.
 
-import settings.tool.settings as tsettings
+import settings
 import yaml
 
 
@@ -213,8 +213,8 @@ class MockAppConfig(Bunch):
         self.config_file = None
 
     def set_tool_data_attrs(self) -> None:
-        tool_data = f'{tsettings.xml_dir()}/tool-data'
-        tool_data_table_conf = f'{tsettings.xml_dir()}/tool_data_table_conf.xml.sample'
+        tool_data = f'{settings.tool.xml_dir()}/tool-data'
+        tool_data_table_conf = f'{settings.tool.xml_dir()}/tool_data_table_conf.xml.sample'
         if os.path.exists(tool_data):
             self.tool_data_path = tool_data
         if os.path.exists(tool_data_table_conf):

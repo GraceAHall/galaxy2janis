@@ -6,13 +6,13 @@ from dataclasses import dataclass
 import os
 
 from formats.workflow_definition.StepTextDefinition import StepTextDefinition
-import settings.workflow.settings as wsettings
-from entities.workflow.workflow import WorkflowStep
-from entities.workflow.workflow import Workflow
-from fileio.imports.WorkflowImportCollector import WorkflowImportCollector
+import settings
+from entities.workflow import WorkflowStep
+from entities.workflow import Workflow
+from formats.imports.WorkflowImportCollector import WorkflowImportCollector
 import formats.workflow_definition.snippets as snippets
 import formats.workflow_definition.formatting as formatting
-from fileio.imports.Import import Import
+from formats.imports.Import import Import
 
 
 class WorkflowTextDefinition(ABC):
@@ -148,14 +148,14 @@ class StepPage:
 
 class StepwiseWorkflowTextDefinition(WorkflowTextDefinition):
     def __init__(self, workflow: Workflow):
-        super().__init__(esettings, workflow)
+        super().__init__(workflow)
         self.step_pages: list[StepPage] = self.init_step_pages()
 
     def init_step_pages(self) -> list[StepPage]:
         pages: list[StepPage] = []
         for text_def in self.step_text_definitions:
             step_tag = text_def.get_step_tag()
-            step_dir = self.esettings.get_janis_steps_dir()
+            step_dir = settings.workflow.get_janis_steps_dir()
             step_file = f'{text_def.get_step_tag()}.py'
             step_path = os.path.join(step_dir, step_file)
             page = StepPage(

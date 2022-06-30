@@ -3,23 +3,24 @@ import logs.logging as logging
 import tempfile
 from typing import Optional
 
-from containers.ContainerCache import ContainerCache
 from gx.xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
-from containers.Container import Container
-from containers.fetching.Fetcher import Fetcher
-from containers.fetching.ContainerReqFetcher import ContainerReqFetcher
-#from containers.fetching.GA4GHFetcher import GA4GHFetcher
-from containers.fetching.QuayIOFetcher import QuayIOFetcher
+from paths import CONTAINER_CACHE
 
-from containers.fetching.presets import get_images_preset
-from containers.selection.selection import select_best_container_match
-from runtime.paths import CONTAINER_CACHE
+from .ContainerCache import ContainerCache
+from .Container import Container
+
+from .fetching.Fetcher import Fetcher
+from .fetching.ContainerReqFetcher import ContainerReqFetcher
+#from .fetching.GA4GHFetcher import GA4GHFetcher
+from .fetching.QuayIOFetcher import QuayIOFetcher
+from .fetching.presets import get_images_preset
+
+from .selection.selection import select_best_container_match
 
 DISABLE_CACHE = False
 
-def fetch_container(xmltool: XMLToolDefinition) -> Optional[Container]:
-    requirement = xmltool.metadata.get_main_requirement()
+def fetch_container(requirement: Requirement) -> Optional[Container]:
+    
     containers: list[Container] = []
     if not containers:
         containers = _fetch_cache(requirement)

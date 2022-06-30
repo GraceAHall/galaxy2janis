@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Any, Optional
 
-import gx.utils.general_utils as utils 
+import utils.general as utils 
 
 
 

@@ -14,7 +14,6 @@ class WorkflowInput:
     step_tag: Optional[str]
     is_array: bool
     is_galaxy_input_step: bool = False
-    gx_datatypes: list[str] = field(default_factory=list)
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)
 
     def __post_init__(self):
@@ -30,6 +29,4 @@ class WorkflowInput:
             is_optional=False,
             is_array=False
         )
-
-
 

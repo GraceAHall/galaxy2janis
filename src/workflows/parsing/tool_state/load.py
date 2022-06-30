@@ -4,7 +4,7 @@
 
 from typing import Any
 
-import settings.tool.settings as tsettings
+import settings
 from .expand import expand_tool_state
 from .flatten import get_flattened_tool_state
 from .resolve import resolve_values

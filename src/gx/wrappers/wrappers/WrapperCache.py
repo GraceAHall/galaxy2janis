@@ -2,7 +2,7 @@
 
 import json
 from typing import Optional
-from .Wrapper import Wrapper
+from gx.wrappers import Wrapper
 
 
 """

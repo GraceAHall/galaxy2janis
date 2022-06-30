@@ -2,7 +2,7 @@
 
 
 
-from entities.workflow.workflow import Workflow
+from entities.workflow import Workflow
 
 
 def parse_workflow_tools(workflow: Workflow) -> Workflow:

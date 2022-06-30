@@ -3,8 +3,8 @@
 from typing import Optional
 from gx.xmltool.load import XMLToolDefinition
 from shellparser.command import Command
-from containers.Container import Container
-from entities.tool.Tool import Tool
+from containers import Container
+from entities.tool import Tool
 from entities.tool.ToolFactory import ToolFactory
 
 

@@ -5,7 +5,7 @@
 from typing import Iterable
 from gx.wrappers.scraping.revisions import get_revisions_in_repo
 from gx.wrappers.scraping.wrappers import Revision
-from gx.wrappers.wrappers.WrapperCache import WrapperCache
+from wrappers.WrapperCache import WrapperCache
 import gx.wrappers.scraping.utils as utils
 
 

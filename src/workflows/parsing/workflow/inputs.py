@@ -2,7 +2,7 @@
 
 import json
 from typing import Any
-from entities.workflow.input import WorkflowInput
+from entities.workflow import WorkflowInput
 
 # INPUT STEP
 def parse_input_step(step: dict[str, Any]) -> WorkflowInput:

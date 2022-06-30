@@ -6,8 +6,9 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from gx.xmltool.citations import Citation
-from shellparser.cmdstr.utils import global_align
 from gx.xmltool.requirements import ContainerRequirement, CondaRequirement
+from utils.general import global_align
+
 
 Requirement = ContainerRequirement | CondaRequirement
 

@@ -3,9 +3,9 @@
 
 
 from typing import Any
-from entities.workflow.step.metadata import StepMetadata
-from gx.wrappers.wrappers.Wrapper import Wrapper
-from gx.wrappers.wrappers.WrapperCache import WrapperCache
+from entities.workflow import StepMetadata
+from gx.wrappers import Wrapper
+from gx.wrappers import WrapperCache
 from gx.wrappers.requests.versions import request_installable_revision
 import gx.wrappers.scraping.utils as utils
 

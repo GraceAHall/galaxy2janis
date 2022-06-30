@@ -1,6 +1,6 @@
 
 
-import settings.tool.settings as tsettings
+import settings
 from gx.xmltool.XMLToolDefinition import XMLToolDefinition
 
 

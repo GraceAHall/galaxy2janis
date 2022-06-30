@@ -10,9 +10,9 @@ from typing import Any, Optional
 from xml.etree import ElementTree as et
 
 from galaxy.tool_util.parser import get_tool_source
-from gx.wrappers.wrappers.Wrapper import Wrapper
+from gx.wrappers import Wrapper
 import gx.wrappers.scraping.utils as utils
-from gx.wrappers.wrappers.WrapperCache import WrapperCache
+from wrappers.WrapperCache import WrapperCache
 
 
 THREADS = 10

@@ -6,10 +6,10 @@ from typing import Any
 from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.Flag import Flag
 
-from entities.workflow.workflow import Workflow
-from entities.workflow.input import WorkflowInput
+from entities.workflow import Workflow
+from entities.workflow import WorkflowInput
 
-from entities.workflow.step.inputs import (
+from entities.workflow import (
     ConnectionStepInput, 
     RuntimeStepInput, 
     StaticStepInput, 
@@ -17,7 +17,7 @@ from entities.workflow.step.inputs import (
     WorkflowInputStepInput
 )
 
-from entities.workflow.step.tool_values import (
+from entities.workflow import (
     InputValue, 
     ConnectionInputValue, 
     WorkflowInputInputValue

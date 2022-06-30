@@ -10,5 +10,5 @@ from .manager import ToolTagManager
 from .manager import WorkflowTagManager
 
 # SINGLETONS
-tool = ToolTagManager()
+tool = ToolTagManager() 
 workflow = WorkflowTagManager()

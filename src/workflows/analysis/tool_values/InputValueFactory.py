@@ -7,9 +7,9 @@ from typing import Any, Optional
 from gx.xmltool.param.Param import Param
 from shellparser.components.CommandComponent import CommandComponent
 
-from entities.workflow.workflow import Workflow
-from entities.workflow.input import WorkflowInput
-from entities.workflow.step.tool_values import (
+from entities.workflow import Workflow
+from entities.workflow import WorkflowInput
+from entities.workflow import (
     InputValue, 
     ConnectionInputValue, 
     RuntimeInputValue, 
@@ -19,7 +19,7 @@ from entities.workflow.step.tool_values import (
     WorkflowInputInputValue
 )
 from workflows.analysis.tool_values.utils import select_input_value_type
-from entities.workflow.step.inputs import ConnectionStepInput
+from entities.workflow import ConnectionStepInput
 
 
 @dataclass

@@ -3,7 +3,7 @@
 
 
 from typing import Any
-import settings.tool.settings as tsettings
+import settings
 
 from gx.xmltool.param.InputParam import BoolParam
 

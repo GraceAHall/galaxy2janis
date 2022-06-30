@@ -4,8 +4,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Tuple
 
-from entities.workflow.input import WorkflowInput
-from entities.workflow.workflow import Workflow
+from entities.workflow import WorkflowInput
+from entities.workflow import Workflow
 
 
 @dataclass

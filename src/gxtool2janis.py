@@ -2,13 +2,17 @@
 #sys.path.append('./galaxy/lib')
 
 import logs.logging as logging
+
 import sys
-from typing import Optional
+from typing import Any, Optional
+
+import settings
+import paths
 
 from cli import CLIparser
 from tool_mode import tool_mode
 from workflow_mode import workflow_mode
-from fileio.write import write_tool
+from fileio import write_tool
 
 """
 gxtool2janis program entry point
@@ -21,8 +25,15 @@ def main():
     run_sub_program(args)
 
 def load_args() -> dict[str, Optional[str]]:
-    parser = CLIparser(sys.argv)
-    return parser.args
+    args = CLIparser(sys.argv).args
+    set_general_settings(args)
+    return args
+
+def set_general_settings(args: dict[str, Any] ) -> None:
+    settings.general.set_command(args['command']) 
+    settings.general.set_outdir(args['outdir'])
+    settings.general.set_dev_test_cmdstrs(args['dev_test_cmdstrs'])
+    paths.init_manager(settings.general.command)
 
 def run_sub_program(args: dict[str, Optional[str]]) -> None:
     match args['command']:
@@ -37,11 +48,10 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     tool = tool_mode(args)
-    write_tool(tool)
+    write_tool(tool)  # I dont like this design, but it may be necessary
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
     workflow_mode(args)
-
 
 
 # for bulk parsing stat runs

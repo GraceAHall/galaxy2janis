@@ -4,10 +4,10 @@ import requests
 import tarfile
 from typing import Optional
 
-import fileio.xml as xml_utils
+import utils.galaxy as utils
 from gx.wrappers.downloads.cache import DownloadCache
 
-from runtime.paths import DOWNLOADED_WRAPPERS_DIR
+from paths import DOWNLOADED_WRAPPERS_DIR
 CACHE: DownloadCache = DownloadCache(DOWNLOADED_WRAPPERS_DIR)
 
 
@@ -25,7 +25,7 @@ def fetch_wrapper(owner: str, repo: str, revision: str, tool_id: str) -> str:
 def _fetch_cache(repo: str, revision: str, tool_id: str) -> Optional[str]:
     wrapper = CACHE.get(repo, revision)
     if wrapper:
-        xml = xml_utils.get_xml_by_tool_id(wrapper, tool_id)
+        xml = utils.get_xml_by_id(wrapper, tool_id)
         if xml:
             return f'{wrapper}/{xml}'
     return None

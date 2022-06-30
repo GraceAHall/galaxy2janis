@@ -2,10 +2,10 @@
 
 
 from typing import Any
-from containers.Container import Container
-from containers.fetching.Fetcher import Fetcher
+from ..Container import Container
+from ..fetching.Fetcher import Fetcher
 from gx.xmltool.requirements import Requirement
-import containers.fetching.utils as utils
+from . import utils
 
 
 class QuayIOFetcher(Fetcher):

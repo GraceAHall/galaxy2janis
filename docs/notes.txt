@@ -1,38 +1,97 @@
 
-Tool Method
-    Galaxy - Wrapper
-    Nextflow - Process
-    CWL - Tool
-
-- load files -> xmltool / nextflowtool / cwltool
-- 
 
 
-Notes from BYOD work
+REMEMBER: Think about whether code would work on webapp
+
+- paths module
+    - refactor into module 
+    - each TextEntity 
+
+- formatting module
+    - TextRenderer
+        - has render() (recursive: each subentity is rendered, then this object is rendered)
+        - has messages
+        - has imports property? 
+        - has curation_state property?
+        - has confidence property?
+        - can ask paths module where it will appear 
+        - can ask paths module where something else will appear
+
+FROMWDL  (WdlParser)
+noteworthy components:
+- translate_expr()
+    - WDL ternary conditionals translated to j.If()
+    - translates WDL expressions (WDL.Expr.Apply) to janis operators (j.AndOperator etc)
+    - 
+
+
+FROMCWL  (CWlParser)
+- Tag formatting very simple, spread throughout multiple functions within parser
+- Datatype formatting very simple (single function) but may be fine like this
+- Regex patterns spread throughout (parse_number_from_string())
+- Lexing very simple (parse_basic_expression(), parse_number_from_string())
+- Parser very simple (convert_javascript_token())
+- Parser returns '<expr>{token}</expr>' for anything it cant handle
+
+
+============
+MODULES TODO
+============
+- Tags                  [DONE]
+- Containers            [DONE]
+- Settings              [DONE]
+- Galaxy Wrappers       [DONE]
+- FileIO (incl paths)   []
+
+==================
+FUNCTIONALITY TODO
+==================
+- arrays
+- configfiles
+- multiple statements
+
+
+
+
+
+
+
+Modules                 
+- Datatypes             [PATIALLY DONE][shared]
+- Formats               [PATIALLY DONE][shared]
+- Logging               [][shared]
+- Messaging             [][]
+
+Language Specific
+- Parser                []
+- Lexer                 []
+- Ingestion             []
+
+Features 
+- Multiple statements   []
+- Configfiles           []
+- Arrays                []
+
+
+
+Entities (merged with janis_core)
+- Workflow
+- WorkflowInput
+- Tool
+
+
+
+
+
+
+
+
+
+
+Notes from BYOD meetings
 - prioritise features common across languages
     - ie dont do cheetah test templating because its Galaxy specific
 - 
-
-
-=======================
-Tech (discrete modules)
-=======================
-
-Constant
-- Entities
-- Formats
-- Outputting (paths, folder structure, using formats)
-- Container fetching
-- Tags
-
-Extendable
-- Datatype Inference
-- Logging
-- Parser
-
-Interfaces
-- Loading workflow files
-- Lexer
 
 
 

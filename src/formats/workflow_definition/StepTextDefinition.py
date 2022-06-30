@@ -5,12 +5,12 @@ from dataclasses import dataclass
 from typing import Tuple
 from shellparser.components.CommandComponent import CommandComponent
 
-from entities.workflow.workflow import WorkflowStep
-from entities.workflow.step.tool_values import DefaultInputValue, InputValue
-from entities.workflow.workflow import Workflow
+from entities.workflow import WorkflowStep
+from entities.workflow import DefaultInputValue, InputValue
+from entities.workflow import Workflow
 
-from fileio.imports.Import import Import
-from fileio.imports.WorkflowImportCollector import WorkflowImportCollector
+from formats.imports.Import import Import
+from formats.imports.WorkflowImportCollector import WorkflowImportCollector
 
 import formats.workflow_definition.snippets as snippets
 import formats.workflow_definition.formatting as formatting

@@ -1,6 +1,10 @@
 
 
 import argparse
+
+from paths import DEFAULT_TOOL_OUTDIR
+from paths import DEFAULT_WORKFLOW_OUTDIR
+
 from typing import Optional
 
 useage_str = '''
@@ -42,6 +46,12 @@ class CLIparser:
                             help="comma separated list of [owner],[repo],[toolid],[revision] if downloading wrapper from toolshed. example: devteam,picard,picard_MarkDuplicates,29:1aac2a13842a",
                             type=str
                             )
+        parser.add_argument("-o",
+                            "--outdir",
+                            help="output folder to place translation", 
+                            type=str,
+                            default=DEFAULT_TOOL_OUTDIR
+                            )
         parser.add_argument("--dev-test-cmdstrs", 
                             help="only use xml <command> for tool inference. do not evaluate test cases.", 
                             default=False,
@@ -58,6 +68,12 @@ class CLIparser:
         parser.add_argument("workflow", 
                             help="path to workflow.ga file to parse.", 
                             type=str)
+        parser.add_argument("-o",
+                            "--outdir",
+                            help="output folder to place translation", 
+                            type=str,
+                            default=DEFAULT_WORKFLOW_OUTDIR
+                            )
         parser.add_argument("--dev-test-cmdstrs", 
                             help="only use xml <command> for tool inference. do not evaluate test cases.", 
                             default=False,

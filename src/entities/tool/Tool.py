@@ -5,7 +5,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from shellparser.components.CommandComponent import CommandComponent
-from containers.Container import Container
+from containers import Container
 from gx.xmltool.ToolXMLMetadata import ToolXMLMetadata
 from gx.xmltool.param.InputParamRegister import InputParamRegister
 from gx.xmltool.param.Param import Param
@@ -30,6 +30,7 @@ class Tool:
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())
+        tags.tool.new_tool()
         tags.tool.register(self)
 
     def add_input(self, inp: CommandComponent) -> None:

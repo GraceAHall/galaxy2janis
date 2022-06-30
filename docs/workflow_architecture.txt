@@ -1,0 +1,24 @@
+
+A 'step' can contain a tool or workflow (as workflows are tools too)
+Workflow cannot therefore be singleton
+
+
+believe it may be possible to register each entity and only reference via uuid
+
+process {
+    inputs      []
+    operations  []
+    outputs     []
+}
+
+workflow --------
+inputs:  [uuid, uuid, uuid]
+steps:   [uuid, uuid, uuid, uuid]
+outputs: [uuid]
+
+step --------
+inputs:             [uuid, uuid]
+tool/subworkflow:   uuid
+outputs:            [uuid, uuid]
+
+

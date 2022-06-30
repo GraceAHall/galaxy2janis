@@ -1,7 +1,7 @@
 
 
-
 from Bio import pairwise2
+
 
 def global_align(pattern: str, template: str) -> int:
     pattern = pattern.lower()
@@ -26,4 +26,5 @@ def is_float(the_string: str) -> bool:
         except ValueError:
             pass
     return False
+
 

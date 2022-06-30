@@ -4,11 +4,11 @@
 
 
 from typing import Optional
-from fileio.imports.Import import Import, ImportType
+from formats.imports.Import import Import, ImportType
 import formats.workflow_definition.snippets as snippets
-from entities.workflow.input import WorkflowInput
-from entities.workflow.output import WorkflowOutput
-from entities.workflow.workflow import WorkflowStep
+from entities.workflow import WorkflowInput
+from entities.workflow import WorkflowOutput
+from entities.workflow import WorkflowStep
 
 
 

@@ -2,10 +2,10 @@
 import logs.logging as logging
 from typing import Any
 
-import settings.tool.settings as tsettings
+import settings
 from workflows.parsing.tool_state import load_tool_state
-from entities.workflow.workflow import Workflow
-from entities.workflow.step.inputs import (
+from entities.workflow import Workflow
+from entities.workflow import (
     StepInput, 
     StepInputRegister,
     WorkflowInputStepInput,

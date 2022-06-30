@@ -4,7 +4,7 @@
 import logs.logging as logging
 from typing import Optional
 from gx.xmltool.requirements import Requirement
-from containers.Container import Container
+from ..Container import Container
 
 
 

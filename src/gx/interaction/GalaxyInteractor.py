@@ -18,7 +18,7 @@ from galaxy.model import History
 
 from gx.interaction.mock import MockApp, MockObjectStore
 
-import settings.tool.settings as tsettings
+import settings
 from gx.interaction.cmdstrings.loaders.TestCommandLoader import TestCommandLoader
 from gx.interaction.cmdstrings.loaders.XMLCommandLoader import XMLCommandLoader
 
@@ -97,7 +97,7 @@ class GalaxyInteractor:
 
     def _init_tool(self) -> GxTool:
         app = self.get_app()
-        tool_source = get_tool_source(tsettings.tool_path)
+        tool_source = get_tool_source(settings.tool.tool_path)
         tool = create_tool_from_source(app, tool_source)
         tool.assert_finalized()
         return tool

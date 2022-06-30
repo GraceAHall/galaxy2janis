@@ -4,15 +4,15 @@ import logs.logging as logging
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Optional
 
-import settings.tool.settings as tsettings
+import settings
 from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.Option import Option
 
-from entities.workflow.workflow import Workflow
-from entities.workflow.step.step import WorkflowStep
-from entities.workflow.step.inputs import ConnectionStepInput, StepInput, WorkflowInputStepInput
-from entities.workflow.step.tool_values import InputValue
+from entities.workflow import Workflow
+from entities.workflow import WorkflowStep
+from entities.workflow import ConnectionStepInput, StepInput, WorkflowInputStepInput
+from entities.workflow import InputValue
 
 from shellparser.cheetah.evaluation import sectional_evaluate
 from shellparser.text.simplification.aliases import resolve_aliases

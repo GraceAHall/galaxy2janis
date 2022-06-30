@@ -6,8 +6,8 @@
 from typing import Any
 
 from shellparser.components.CommandComponent import CommandComponent
-from entities.workflow.step.tool_values import InputValueType
-import gx.utils.general_utils as utils
+from entities.workflow import InputValueType
+import utils.general as utils
 
 
 def select_input_value_type(component: CommandComponent, value: Any) -> InputValueType:

@@ -7,6 +7,12 @@ from typing import Optional
 
 
 class DownloadCache:
+    """
+    keeps track of the location of downloaded wrapper folders.
+    DownloadCache.get() will return the local path to a tool xml if already downloaded
+    DownloadCache.add() saves a tar as a download and notes its path. 
+    """
+
     def __init__(self, wrappers_folder: str):
         self.directory = wrappers_folder
         self.cache: set[str] = self._load()

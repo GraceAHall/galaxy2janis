@@ -1,8 +1,8 @@
 
 
 from typing import Any
-from entities.workflow.step.outputs import StepOutput
-from entities.workflow.step.outputs import StepOutputRegister
+from entities.workflow import StepOutput
+from entities.workflow import StepOutputRegister
 
 
 def parse_step_outputs(gxstep: dict[str, Any]) -> StepOutputRegister:

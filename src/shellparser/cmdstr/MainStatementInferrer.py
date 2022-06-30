@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from shellparser.cmdstr.DynamicCommandStatement import DynamicCommandStatement
-from shellparser.cmdstr.utils import global_align
+from utils.general import global_align
 
 
 

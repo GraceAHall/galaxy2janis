@@ -1,12 +1,9 @@
 
 
-
-workflow_path: str 
-dev_test_cmdstrs: bool
+workflow_path: str
 dev_partial_eval: bool
 
-
-def set_workflow(value: str) -> None:
+def set_path(value: str) -> None:
     global workflow_path
     workflow_path = value
 

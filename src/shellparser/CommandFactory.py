@@ -1,7 +1,7 @@
 
 
 
-import settings.tool.settings as tsettings
+import settings
 from gx.xmltool.XMLToolDefinition import XMLToolDefinition
 
 from shellparser.text.load import load_xml_command, load_test_commands
@@ -43,7 +43,7 @@ class CommandFactory:
     def gen_cmdstrs(self) -> list[CommandString]:
         # note ordering: xml then test
         cmdstrs = [self.xmlcmdstr]
-        if tsettings.dev_test_cmdstrs:
+        if settings.tool.dev_test_cmdstrs:
             cmdstrs += self.gen_cmdstrs_from_tests()
         return cmdstrs
 

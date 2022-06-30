@@ -1,17 +1,15 @@
 
 
-from dataclasses import dataclass, field
 from typing import Optional
 from uuid import uuid4
 
-from entities.workflow.step.step import WorkflowStep
+from .step.step import WorkflowStep
 from .metadata import WorkflowMetadata
 from .output import WorkflowOutput
 from .input import WorkflowInput
 import tags
 
 
-@dataclass
 class Workflow:
     """
     a Workflow() is the final representation of the galaxy workflow
@@ -20,14 +18,22 @@ class Workflow:
     each input, step, and output is stored with step_id as key. 
     that way everything can be referenced properly. 
     """
-    metadata: WorkflowMetadata
-    steps: dict[int, WorkflowStep] = field(default_factory=dict)
-    inputs: list[WorkflowInput] = field(default_factory=list)
-    outputs: list[WorkflowOutput] = field(default_factory=list)
-
-    def __post_init__(self):
+    def __init__(self):
+        self.inputs: list[WorkflowInput] = []
+        self.steps: dict[int, WorkflowStep] = {}
+        self.outputs: list[WorkflowOutput] = []
         self.uuid: str = str(uuid4())
+        self._metadata: Optional[WorkflowMetadata] = None
         tags.workflow.register(self)
+
+    @property
+    def metadata(self) -> WorkflowMetadata:
+        if self._metadata:
+            return self._metadata
+        raise RuntimeError('no metadata set')
+
+    def set_metadata(self, metadata: WorkflowMetadata) -> None:
+        self._metadata = metadata
 
     def add_step(self, step: WorkflowStep) -> None:
         self.steps[step.metadata.step_id] = step

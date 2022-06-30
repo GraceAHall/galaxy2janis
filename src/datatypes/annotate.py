@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from shellparser.components.inputs import Positional, Flag, Option
     from shellparser.components.outputs import RedirectOutput, InputOutput, WildcardOutput
-    from entities.workflow.input import WorkflowInput
-    from entities.workflow.workflow import WorkflowStep
-    from entities.workflow.output import WorkflowOutput
+    from entities.workflow import WorkflowInput
+    from entities.workflow import WorkflowStep
+    from entities.workflow import WorkflowOutput
 
 from .default import DEFAULT_DATATYPE
 from .janis import JanisDatatype

@@ -1,11 +1,11 @@
 
 from typing import Optional
 from shellparser.components.CommandComponent import CommandComponent
-from entities.tool.Tool import Tool
+from entities.tool import Tool
 
-from entities.workflow.step.outputs import StepOutput
-from entities.workflow.workflow import Workflow
-from entities.workflow.step.step import WorkflowStep
+from entities.workflow import StepOutput
+from entities.workflow import Workflow
+from entities.workflow import WorkflowStep
 
 
 

@@ -4,11 +4,12 @@
 import logs.logging as logging
 from typing import Type
 
-import settings.tool.settings as tsettings
+import settings
 from workflows.analysis.tool_values.component_updates import update_component_knowledge
 
-from entities.workflow.workflow import Workflow
-from entities.workflow.step.step import WorkflowStep
+from entities.tool import Tool
+from entities.workflow import Workflow
+from entities.workflow import WorkflowStep
 
 from .ValueMigrator import ValueMigrator
 from .ValueLinker import (
@@ -42,11 +43,16 @@ blind_linkers: list[Type[ValueLinker]] = [
 
 def link_workflow_tool_values(workflow: Workflow) -> Workflow:
     for step in workflow.list_steps():
-        tsettings = create_tool_settings_for_step(wsettings, step.metadata)
-        step.inputs.assign_gxparams(step.tool)  # is this needed?
-        link_step_values(tsettings, step, workflow)
+        settings.tool = create_tool_settings_for_step(settings.workflow, step.metadata)
+        assign_gxparams(step.tool, step.inputs)  # is this needed?
+        link_step_values(settings.tool, step, workflow)
         assert_all_components_assigned(step)
     return workflow
+
+def assign_gxparams(self, tool: Tool) -> None:
+    for step_input in self.register:
+        step_input.gxparam = tool.get_gxparam(step_input.gxvarname)
+ 
 
 def link_step_values(step: WorkflowStep, workflow: Workflow) -> None:
     # link values using cheetah cmdstr and input dict

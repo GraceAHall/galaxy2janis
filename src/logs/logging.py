@@ -1,13 +1,13 @@
 
 from logging import getLogger, config
 from typing import Optional
+
 import warnings
 import yaml
 import sys 
 
-import settings.tool.settings as tsettings
-import settings.workflow.settings as wsettings
-from runtime.paths import LOGGING_CONFIG
+import settings
+import paths
 
 # -------------
 # configuration
@@ -15,15 +15,15 @@ from runtime.paths import LOGGING_CONFIG
 
 # logging 
 def configure_tool_logging() -> None:
-    with open(LOGGING_CONFIG, "r") as fp:
+    with open(paths.LOGGING_CONFIG, "r") as fp:
         the_dict = yaml.safe_load(fp)
-        the_dict['handlers']['tool_file']['filename'] = tsettings.logfile_path()
+        the_dict['handlers']['tool_file']['filename'] = settings.tool.logfile_path()
     config.dictConfig(the_dict)
 
 def configure_workflow_logging() -> None:
-    with open(LOGGING_CONFIG, "r") as fp:
+    with open(paths.LOGGING_CONFIG, "r") as fp:
         the_dict = yaml.safe_load(fp)
-        the_dict['handlers']['workflow_file']['filename'] = wsettings.logfile_path()
+        the_dict['handlers']['workflow_file']['filename'] = settings.workflow.logfile_path()
     config.dictConfig(the_dict)
 
 
@@ -38,10 +38,10 @@ def configure_warnings() -> None:
 
 # messages
 def msg_parsing_tool():
-    print(f'parsing tool {tsettings.tool_path}')
+    print(f'parsing tool {settings.tool.tool_path}')
 
 def msg_parsing_workflow():
-    print(f'parsing workflow {wsettings.workflow_path}')
+    print(f'parsing workflow {settings.workflow.workflow_path}')
 
 def msg_downloading_tool(url: str):
     print(f'downloading wrapper from {url}')

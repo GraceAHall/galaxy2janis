@@ -5,10 +5,10 @@ from shellparser.components.outputs.InputOutput import InputOutput
 from shellparser.components.outputs.RedirectOutput import RedirectOutput
 from shellparser.components.outputs.UncertainOutput import UncertainOutput
 from shellparser.components.outputs.WildcardOutput import WildcardOutput
-from entities.tool.Tool import Tool
+from entities.tool import Tool
 from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs import Positional, Flag, Option
-from fileio.imports.ToolImportHandler import ToolImportHandler
+from formats.imports.ToolImportHandler import ToolImportHandler
 import formats.tool_definition.snippets as snippets
 MISSING_CONTAINER_STRING = r'[NOTE] could not find a relevant container'
 
