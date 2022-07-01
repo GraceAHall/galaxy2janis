@@ -17,6 +17,8 @@ REMEMBER: Think about whether code would work on webapp
         - can ask paths module where it will appear 
         - can ask paths module where something else will appear
 
+
+
 FROMWDL  (WdlParser)
 noteworthy components:
 - translate_expr()
@@ -42,6 +44,10 @@ MODULES TODO
 - Settings              [DONE]
 - Galaxy Wrappers       [DONE]
 - FileIO (incl paths)   []
+
+
+SETUP ----> need to know the tool name (tool mode) or workflow name (workflow mode) to set outdir. 
+
 
 ==================
 FUNCTIONALITY TODO

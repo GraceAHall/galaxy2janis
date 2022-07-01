@@ -41,19 +41,6 @@ class JanisToolFormatter:
     def format_path_appends(self) -> str:
         return snippets.path_append_snippet()
     
-    def format_metadata(self) -> str:
-        metadata = self.tool.metadata
-        return snippets.metadata_snippet(
-            description=metadata.description,
-            version=metadata.version,
-            help=metadata.help,
-            wrapper_owner=metadata.owner,
-            wrapper_creator=metadata.creator,
-            doi=metadata.get_doi_citation(),
-            url=metadata.url,
-            citation=metadata.get_main_citation()
-        )
-
     def format_inputs(self) -> str:
         inputs = self.tool.get_tags_inputs()
         out_str: str = ''
@@ -68,7 +55,7 @@ class JanisToolFormatter:
         flags.sort()
         options.sort()
 
-        out_str += 'inputs = ['
+=        out_str += 'inputs = ['
         out_str += '\n\t# Positionals'
         for tag, positional in positionals:
             self.import_handler.update(positional)

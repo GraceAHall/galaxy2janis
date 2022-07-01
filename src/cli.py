@@ -1,11 +1,8 @@
 
 
 import argparse
-
-from paths import DEFAULT_TOOL_OUTDIR
-from paths import DEFAULT_WORKFLOW_OUTDIR
-
 from typing import Optional
+
 
 useage_str = '''
 gxtool2janis command [OPTIONS]
@@ -50,7 +47,6 @@ class CLIparser:
                             "--outdir",
                             help="output folder to place translation", 
                             type=str,
-                            default=DEFAULT_TOOL_OUTDIR
                             )
         parser.add_argument("--dev-test-cmdstrs", 
                             help="only use xml <command> for tool inference. do not evaluate test cases.", 
@@ -72,7 +68,6 @@ class CLIparser:
                             "--outdir",
                             help="output folder to place translation", 
                             type=str,
-                            default=DEFAULT_WORKFLOW_OUTDIR
                             )
         parser.add_argument("--dev-test-cmdstrs", 
                             help="only use xml <command> for tool inference. do not evaluate test cases.", 

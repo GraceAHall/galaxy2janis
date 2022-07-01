@@ -13,24 +13,18 @@ import paths
 # configuration
 # -------------
 
+
 # logging 
-def configure_tool_logging() -> None:
+def configure_logging() -> None:
     with open(paths.LOGGING_CONFIG, "r") as fp:
         the_dict = yaml.safe_load(fp)
-        the_dict['handlers']['tool_file']['filename'] = settings.tool.logfile_path()
+        the_dict['handlers']['janis_log']['filename'] = paths.manager.janis_log()
+        the_dict['handlers']['message_log']['filename'] = paths.manager.message_log()
     config.dictConfig(the_dict)
-
-def configure_workflow_logging() -> None:
-    with open(paths.LOGGING_CONFIG, "r") as fp:
-        the_dict = yaml.safe_load(fp)
-        the_dict['handlers']['workflow_file']['filename'] = settings.workflow.logfile_path()
-    config.dictConfig(the_dict)
-
 
 # warnings configuration
 def configure_warnings() -> None:
     warnings.filterwarnings("ignore")
-
 
 # -------
 # logging

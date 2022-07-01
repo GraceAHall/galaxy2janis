@@ -1,9 +1,7 @@
 
 
 
-
 command: str
-outdir: str
 dev_test_cmdstrs: bool
 
 # setting

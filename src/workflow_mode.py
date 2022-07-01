@@ -1,12 +1,12 @@
 
 
-
+import logs.logging as logging
 import json
 import datatypes
 
 from typing import Any, Optional
 
-from setup import do_workflow_setup
+from setup import workflow_setup
 
 from entities.workflow import WorkflowMetadata
 from entities.workflow import Workflow
@@ -34,7 +34,8 @@ the order here seems weird but trust me there is reason.
 """
 
 def workflow_mode(args: dict[str, Optional[str]]) -> None:
-    do_workflow_setup(args)
+    workflow_setup(args)
+    logging.msg_parsing_workflow()
     workflow = Workflow()
     workflow = ingest_framework(workflow)
 

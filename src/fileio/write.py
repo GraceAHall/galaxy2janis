@@ -10,7 +10,7 @@ from formats.tool_definition.JanisToolFormatter import JanisToolFormatter
 from formats.workflow_definition.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition
 from formats.workflow_inputs.inputs import format_input_dict
 
-from paths import DEFAULT_TOOL_OUTDIR
+import paths
 
 
 
@@ -18,7 +18,7 @@ from paths import DEFAULT_TOOL_OUTDIR
 def write_tool(tool: Tool) -> None:
     formatter = JanisToolFormatter(tool)
     tool_definition = formatter.to_janis_definition()
-    path = format_tool_def_path(tool)
+    path = paths.manager.tool(tool)
     with open(path, 'w') as fp:
         fp.write(tool_definition)
 
@@ -27,7 +27,6 @@ def write_step(step: WorkflowStep) -> None:
 
 def write_workflow(workflow: Workflow) -> None:
     raise NotImplementedError()
-
 
 def format_tool_def_path(tool: Tool) -> str:
     basename = settings.tool.xml_basename()

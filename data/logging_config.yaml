@@ -6,12 +6,12 @@ formatters:
     format: '[%(asctime)s] [%(levelname)-8s] [%(name)s] %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S'
 handlers:
-  tool_file:
+  janis_log:
     level: WARNING
     class: logging.FileHandler
     filename: placeholder
     formatter: default
-  workflow_file:
+  message_log:
     level: WARNING
     class: logging.FileHandler
     filename: placeholder
@@ -31,8 +31,8 @@ loggers:
     handlers: [galaxy_console]
   tool:
     level: INFO
-    handlers: [console, tool_file]
+    handlers: [console, janis_log]
   workflow:
     level: INFO
-    handlers: [console, workflow_file]
+    handlers: [console, message_log]
 version: 1

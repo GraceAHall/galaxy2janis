@@ -1,21 +1,32 @@
 
 
-import settings
 
 from abc import ABC, abstractmethod
 from typing import Optional
 
 from entities.workflow import WorkflowStep
-
+import settings
 
 
 class PathManager(ABC):
-    """specifies folder and file paths for output files"""
     
-    @abstractmethod
-    def outdir(self) -> str:
-        """specifies parent output directory"""
-        ...
+    _subfolders: list[str]
+
+    """specifies folder and file paths for output files"""
+    def __init__(self, project_dir: str):
+        self._project_dir = project_dir
+
+    def project_dir(self) -> str:
+        return self._project_dir
+    
+    def subfolders(self) -> list[str]:
+        return self._subfolders
+
+    def janis_log(self) -> str:
+        return f'{self._project_dir}/logs/janis.log'
+    
+    def message_log(self) -> str:
+        return f'{self._project_dir}/logs/messages.log'
     
     @abstractmethod
     def workflow(self) -> str:
@@ -46,10 +57,9 @@ class PathManager(ABC):
 class ToolModePathManager(PathManager):
     """specifies folder and file paths for output files"""
     
-    folder_structure: list[str] = []
-
-    def outdir(self) -> str:
-        return settings.general.outdir
+    _subfolders: list[str] = [
+        'logs'
+    ]
 
     def workflow(self) -> str:
         raise NotImplementedError()  # not needed for tool mode
@@ -61,7 +71,7 @@ class ToolModePathManager(PathManager):
         raise NotImplementedError()  # not needed for tool mode
 
     def tool(self, step: Optional[WorkflowStep]=None) -> str:
-        return f'{settings.general.outdir}/{settings.tool.tool_id}/{settings.tool.tool_id}.py'
+        return f'{self._project_dir}/{settings.tool.tool_id}/{settings.tool.tool_id}.py'
 
     def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
         raise NotImplementedError()
@@ -71,20 +81,17 @@ class ToolModePathManager(PathManager):
 class WorkflowModePathManager(PathManager):
     """specifies folder and file paths for output files"""
 
-    folder_structure: list[str] = [
+    _subfolders: list[str] = [
+        'logs',
         'tools',
         'wrappers',
-        'logs'
     ]
     
-    def outdir(self) -> str:
-        return settings.general.outdir
-
     def workflow(self) -> str:
-        return f'{settings.general.outdir}/workflow.py'
+        return f'{self._project_dir}/workflow.py'
     
     def inputs(self, format: str='yaml') -> str:
-        return f'{settings.general.outdir}/inputs.{format}'
+        return f'{self._project_dir}/inputs.{format}'
     
     def step(self, step: Optional[WorkflowStep]=None) -> str:
         raise NotImplementedError()  # no .py file for a step using this format
@@ -92,41 +99,41 @@ class WorkflowModePathManager(PathManager):
     def tool(self, step: Optional[WorkflowStep]=None) -> str:
         assert(step)
         tool_id = step.metadata.wrapper.tool_id
-        return f'{settings.general.outdir}/tools/{tool_id}.py'
+        return f'{self._project_dir}/tools/{tool_id}.py'
 
     def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
         assert(step)
         tool_id = step.metadata.wrapper.tool_id
         revision = step.metadata.wrapper.revision  
-        return f'{settings.general.outdir}/wrappers/{tool_id}-{revision}'
+        return f'{self._project_dir}/wrappers/{tool_id}-{revision}'
 
 
 # # workflow mode 
 # class StepwiseFormatPathManager:
-#     folder_structure: list[str] = [
+#     _subfolders: list[str] = [
 #         'steps'
 #     ]
     
 #     def workflow(self) -> str:
-#         return f'{settings.general.outdir}/workflow.py'
+#         return f'{self.outdir}/workflow.py'
     
 #     def inputs(self, format: str='yaml') -> str:
-#         return f'{settings.general.outdir}/inputs.{format}'
+#         return f'{self.outdir}/inputs.{format}'
     
 #     def step(self, step: Optional[WorkflowStep]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
-#         return f'{settings.general.outdir}/{step_tag}/{step_tag}_step.py'
+#         return f'{self.outdir}/{step_tag}/{step_tag}_step.py'
     
 #     def tool(self, step: Optional[WorkflowStep]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
 #         tool_id = step.metadata.wrapper.tool_id
-#         return f'{settings.general.outdir}/{step_tag}/{tool_id}.py'
+#         return f'{self.outdir}/{step_tag}/{tool_id}.py'
     
 #     def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
 #         tool_id = step.metadata.wrapper.tool_id  
 #         revision = step.metadata.wrapper.revision  
-#         return f'{settings.general.outdir}/{step_tag}/{tool_id}-{revision}'
+#         return f'{self.outdir}/{step_tag}/{tool_id}-{revision}'
      
 
 

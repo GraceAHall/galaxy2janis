@@ -1,7 +1,8 @@
 
+import logs.logging as logging
 from typing import Any
 
-from setup import do_tool_setup
+from setup import tool_setup
 from gx.xmltool.load import load_xmltool
 
 from shellparser.command import gen_command
@@ -19,7 +20,8 @@ each step involves a single module
 """
 
 def tool_mode(args: dict[str, Any]) -> Tool:
-    do_tool_setup(args)
+    tool_setup(args)
+    logging.msg_parsing_tool()
     xmltool = load_xmltool()
     command = gen_command(xmltool)
     container = fetch_container(xmltool.metadata.get_main_requirement())

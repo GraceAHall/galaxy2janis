@@ -7,13 +7,8 @@ import utils.galaxy as utils
 
 ### TOOL ###
 
-def _local_mode() -> bool:
+def _has_xml() -> bool:
     if settings.tool.tool_path:
-        return True
-    return False
-
-def _remote_mode() -> bool:
-    if settings.tool.owner and settings.tool.repo and settings.tool.revision:
         return True
     return False
 
@@ -23,16 +18,10 @@ def _valid_xml() -> bool:
         return True
     return False
 
-
 def validate_tool_settings() -> None:
     # both local & remote params not given
-    if not _local_mode() and not _remote_mode():
-        raise InputError('please supply either --local or --remote')
-    
-    # local params but not valid xml
-    if _local_mode() and not _valid_xml():
-        raise InputError('please check xml file path')
-
+    if not _has_xml() or not _valid_xml():
+        raise RuntimeError('no valid xml file')
 
 
 ### WORKFLOW ###

@@ -4,15 +4,14 @@
 import logs.logging as logging
 
 import sys
-from typing import Any, Optional
+import fileio
 
-import settings
-import paths
+from typing import Optional
 
+from setup import general_setup
 from cli import CLIparser
 from tool_mode import tool_mode
 from workflow_mode import workflow_mode
-from fileio import write_tool
 
 """
 gxtool2janis program entry point
@@ -22,18 +21,12 @@ parses cli settings then hands execution to other files based on command
 def main():
     logging.configure_warnings()
     args = load_args()
+    general_setup(args)
     run_sub_program(args)
 
 def load_args() -> dict[str, Optional[str]]:
-    args = CLIparser(sys.argv).args
-    set_general_settings(args)
-    return args
-
-def set_general_settings(args: dict[str, Any] ) -> None:
-    settings.general.set_command(args['command']) 
-    settings.general.set_outdir(args['outdir'])
-    settings.general.set_dev_test_cmdstrs(args['dev_test_cmdstrs'])
-    paths.init_manager(settings.general.command)
+    cli = CLIparser(sys.argv)
+    return cli.args
 
 def run_sub_program(args: dict[str, Optional[str]]) -> None:
     match args['command']:
@@ -48,7 +41,7 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     tool = tool_mode(args)
-    write_tool(tool)  # I dont like this design, but it may be necessary
+    fileio.write_tool(tool)  # I dont like this design, but it may be necessary
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
     workflow_mode(args)
@@ -59,7 +52,7 @@ def run_workflow_mode(args: dict[str, Optional[str]]):
 def try_run_tool_mode(args: dict[str, Optional[str]]):
     try: 
         tool = tool_mode(args)
-        write_tool(tool)
+        fileio.write_tool(tool)
     except Exception as e:
         print(e)
         logging.tool_exception()

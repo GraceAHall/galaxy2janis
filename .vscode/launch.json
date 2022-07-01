@@ -16,6 +16,31 @@
                 "--local", "test/data/tools/abricate/abricate.xml", 
             ]
         },
+        {
+            "name": "abricate_fmt1",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--remote", "iuc,abricate,abricate,10:c2ef298da409", 
+            ]
+        },
+        {
+            "name": "abricate_fm2",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--remote", "iuc,abricate,abricate,c2ef298da409", 
+                "--outdir", "abricate_parsed"
+            ]
+        },
     ]
 }
         

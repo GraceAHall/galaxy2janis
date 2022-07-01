@@ -43,7 +43,7 @@ class CommandFactory:
     def gen_cmdstrs(self) -> list[CommandString]:
         # note ordering: xml then test
         cmdstrs = [self.xmlcmdstr]
-        if settings.tool.dev_test_cmdstrs:
+        if settings.general.dev_test_cmdstrs:
             cmdstrs += self.gen_cmdstrs_from_tests()
         return cmdstrs
 
