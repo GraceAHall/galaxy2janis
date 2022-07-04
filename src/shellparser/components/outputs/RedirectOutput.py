@@ -1,16 +1,16 @@
 
 
 from __future__ import annotations
+from typing import Optional, Tuple
 
-from shellparser.components.CommandComponent import BaseCommandComponent
+from .OutputComponent import OutputComponent
 from shellparser.text.tokens.Tokens import Token
-from typing import Any, Optional, Tuple
+
 from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from shellparser.components.ValueRecord import PositionalValueRecord
 from shellparser.components.linux import Stream
-from datatypes.formatting import format_janis_str
 
-class RedirectOutput(BaseCommandComponent):
+class RedirectOutput(OutputComponent):
     def __init__(self, tokens: Tuple[Token, Token]):
         super().__init__()
         self.redirect_token = tokens[0]
@@ -37,10 +37,6 @@ class RedirectOutput(BaseCommandComponent):
         return self.redirect_token.text + ' ' + self.file_token.text
 
     @property
-    def default_value(self) -> Any:
-        raise NotImplementedError()
-
-    @property
     def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
         return False
@@ -61,26 +57,10 @@ class RedirectOutput(BaseCommandComponent):
         return ''
         #return f'examples: {", ".join(self.value_record.get_unique_values()[:5])}'
     
-    def get_janis_datatype_str(self) -> str:
-        """gets the janis datatypes then formats into a string for writing definitions"""
-        datatype_str = format_janis_str(
-            datatypes=self.janis_datatypes,
-            is_optional=self.optional,
-            is_array=self.array
-        )
-        return f'Stdout({datatype_str})'
-    
     def is_append(self) -> bool:
         if self.redirect_token.text == '>>':
             return True
         return False
-
-    def update(self, incoming: Any):
-        # transfer galaxy param reference
-        if not self.gxparam and incoming.gxparam:
-            self.gxparam = incoming.gxparam
-        # add values
-        self.value_record.record += incoming.value_record.record
 
     def extract_stream(self) -> Stream:
         match self.redirect_token.text[0]:

@@ -53,7 +53,7 @@ def has_env_var(value: Any) -> bool:
     return False
 
 def has_numeric_datatype(component: CommandComponent) -> bool:
-    datatypes = set([x.classname for x in component.janis_datatypes])
+    #datatypes = set([x.classname for x in component.janis_datatypes])
     exclusions = ['Int', 'Float']
     if any([x in datatypes for x in exclusions]): 
         return True

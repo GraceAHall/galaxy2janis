@@ -10,7 +10,6 @@ from gx.xmltool.load import XMLToolDefinition
 from shellparser.command import Command
 from containers import Container
 from .outputs import extract_outputs
-import datatypes
 
 
 class ToolFactory:
@@ -36,7 +35,6 @@ class ToolFactory:
         if not inputs:
             logging.no_inputs()
         for inp in inputs:
-            datatypes.annotate(inp)
             tool.add_input(inp)
 
     def supply_outputs(self, tool: Tool) -> None:
@@ -44,7 +42,6 @@ class ToolFactory:
         if not outputs:
             logging.no_outputs()
         for out in outputs:
-            datatypes.annotate(out)
             tool.add_output(out)
 
     def get_base_command(self) -> list[str]:

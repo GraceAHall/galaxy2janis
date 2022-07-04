@@ -2,7 +2,7 @@
 
 
 # files
-DATATYPES = 'data/datatypes/gxformat_combined_types.yaml'
+DATATYPES_YAML = 'data/datatypes/gxformat_combined_types.yaml'
 WRAPPER_CACHE = 'data/wrappers.json'
 CONTAINER_CACHE = 'data/container_url_cache.json'
 LOGGING_CONFIG = 'data/logging_config.yaml'

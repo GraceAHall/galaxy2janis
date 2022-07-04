@@ -1,41 +1,26 @@
 
 
 from entities.workflow.step.step import WorkflowStep
-import settings
+from fileio.text.tool.ToolRender import ToolRender
 
 from entities.tool import Tool
 from entities.workflow import Workflow
 
-from formats.tool_definition.JanisToolFormatter import JanisToolFormatter
-from formats.workflow_definition.WorkflowTextDefinition import BulkWorkflowTextDefinition, StepwiseWorkflowTextDefinition, WorkflowTextDefinition
-from formats.workflow_inputs.inputs import format_input_dict
-
 import paths
 
 
-
-
 def write_tool(tool: Tool) -> None:
-    formatter = JanisToolFormatter(tool)
-    tool_definition = formatter.to_janis_definition()
-    path = paths.manager.tool(tool)
+    render = ToolRender(entity=tool, render_imports=True)
+    page = render.render()
+    path = paths.manager.tool()
     with open(path, 'w') as fp:
-        fp.write(tool_definition)
+        fp.write(page)
 
 def write_step(step: WorkflowStep) -> None:
     raise NotImplementedError()
 
 def write_workflow(workflow: Workflow) -> None:
     raise NotImplementedError()
-
-def format_tool_def_path(tool: Tool) -> str:
-    basename = settings.tool.xml_basename()
-    if settings.tool.forced_outdir:
-        folder = settings.tool.forced_outdir
-    else:
-        parent = DEFAULT_TOOL_OUTDIR
-        folder = f'{parent}/{basename}'
-    return f'{folder}/{basename}.py'
 
 
 # def write_workflow_tools(workflow: Workflow) -> None:

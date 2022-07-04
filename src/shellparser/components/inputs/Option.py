@@ -4,11 +4,11 @@ from typing import Any, Optional
 from gx.xmltool.param.InputParam import SelectParam
 
 from shellparser.components.ValueRecord import OptionValueRecord
-from shellparser.components.CommandComponent import BaseCommandComponent
+from .InputComponent import InputComponent
 from gx.xmltool.param.Param import Param
 
 
-class Option(BaseCommandComponent):
+class Option(InputComponent):
     def __init__(self, prefix: str, values: list[str], delim: str) -> None:
         super().__init__()
         self.prefix = prefix
@@ -38,8 +38,6 @@ class Option(BaseCommandComponent):
             return self.forced_optionality
         elif self.gxparam and self.gxparam.optional:
             return True
-        elif all(self.presence_array):
-            return False
         return True
 
     @property
@@ -64,9 +62,6 @@ class Option(BaseCommandComponent):
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam
-        # presence
-        cmdstr_index = len(incoming.presence_array) - 1
-        self.update_presence_array(cmdstr_index)
 
     def __str__(self) -> str:
         return f'{str(self.prefix):30}{str(self.default_value):20}{str(self.optional):>10}'

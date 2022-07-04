@@ -1,17 +1,74 @@
 
 
 
+from typing import Optional, Tuple
 from dataclasses import dataclass
 from fileio.text.TextRender import TextRender
-from shellparser.components.CommandComponent import CommandComponent
+
+from shellparser.components.inputs.Flag import Flag
+from shellparser.components.inputs.InputComponent import InputComponent
+from shellparser.components.inputs.Positional import Positional
+from shellparser.components.inputs.Option import Option
+
+from .. import formatting
+from .. import ordering
+
+from datatypes import get_datatype
+import tags
 
 
 @dataclass
 class ToolInputRender(TextRender):
-    entity: CommandComponent
+    def __init__(self, entity: InputComponent, render_imports: bool=False):
+        super().__init__(render_imports)
+        self.entity = entity
+
+    @property
+    def imports(self) -> list[Tuple[str, str]]:
+        jtypes = get_datatype(self.entity)
+        imports: list[Tuple[str, str]] = []
+        imports = [(j.import_path, j.classname) for j in jtypes]
+
+        # TODO opportunity for decorator
+        if self.entity.array:
+            imports.append(('janis_core', 'Array'))
+
+        # TODO opportunity for decorator
+        imports = list(set(imports))
+        return ordering.order_imports(imports)
 
     def render(self) -> str:
-        raise NotImplementedError()
-        
-    def collect_imports(self) -> list[str]:
-        raise NotImplementedError()
+        e = self.entity
+        prefix = self.get_component_prefix()
+        kv_space = self.get_separation()
+        doc = formatting.format_docstring(e)
+        out_str: str = ''
+        out_str += '\tToolInput(\n'
+        out_str += f"\t\t'{tags.tool.get(e.uuid)}',\n"
+        out_str += f"\t\t{formatting.format_datatype_string(e)},\n"  # TODO decouple!
+        out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
+        out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''
+        out_str += f"\t\tposition={e.cmd_pos},\n"
+        out_str += f"\t\tdefault={formatting.get_wrapped_default(e)},\n"
+        out_str += f'\t\tdoc="{doc}",\n' if doc else ''
+        out_str += '\t)'
+        return out_str
+
+    def get_component_prefix(self) -> Optional[str]:
+        e = self.entity
+        match e:
+            case Positional():
+                return None
+            case Flag():
+                return e.prefix
+            case Option():
+                return e.prefix if e.delim == ' ' else e.prefix + e.delim
+            case _:
+                raise RuntimeError
+    
+    def get_separation(self) -> bool:
+        if isinstance(self.entity, Option) and self.entity.delim == ' ':
+            return True
+        return False
+
+

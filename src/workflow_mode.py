@@ -2,7 +2,6 @@
 
 import logs.logging as logging
 import json
-import datatypes
 
 from typing import Any, Optional
 
@@ -99,7 +98,6 @@ class WorkflowFactory:
         for step in self.tree['steps'].values():
             if step['type'] in ['data_input', 'data_collection_input']:
                 workflow_input = parse_input_step(step)
-                datatypes.annotate(workflow_input)  # type: ignore
                 workflow.add_input(workflow_input)
         return workflow
     
@@ -127,7 +125,6 @@ class WorkflowFactory:
                 # TODO HERE
                 inputs = parse_step_inputs()
                 for inp in inputs:
-                    datatypes.annotate(workflow_step)  # type: ignore
                     workflow_step.inputs.add(inp)
         return workflow
     
@@ -139,7 +136,6 @@ class WorkflowFactory:
                 # TODO HERE
                 outputs = parse_step_outputs()
                 for output in outputs:
-                    datatypes.annotate(workflow_step)  # type: ignore
                     workflow_step.outputs.add(output)
         return workflow
 

@@ -3,12 +3,12 @@
 
 
 from __future__ import annotations
-from shellparser.components.CommandComponent import BaseCommandComponent
-from typing import Any, Optional
+from .OutputComponent import OutputComponent
+from typing import Optional
 from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 
-class WildcardOutput(BaseCommandComponent):
+class WildcardOutput(OutputComponent):
     def __init__(self):
         super().__init__()
         self.verified: bool = False
@@ -17,12 +17,8 @@ class WildcardOutput(BaseCommandComponent):
     def name(self) -> str:
         if self.gxparam:
             return self.gxparam.name
-        raise RuntimeError('an WildcardOutput must have a gxparam')
+        raise RuntimeError('a WildcardOutput must have a gxparam')
 
-    @property
-    def default_value(self) -> str:
-        return self.gxparam.wildcard_pattern
-    
     @property
     def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
@@ -43,7 +39,5 @@ class WildcardOutput(BaseCommandComponent):
             return self.gxparam.docstring
         return 'output created during runtime. file is collected from working directory'
 
-    def update(self, incoming: Any):
-        pass
 
 

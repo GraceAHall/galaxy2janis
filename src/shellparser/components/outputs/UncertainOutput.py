@@ -3,12 +3,12 @@
 
 
 from __future__ import annotations
-from shellparser.components.CommandComponent import BaseCommandComponent
+from .OutputComponent import OutputComponent
 from typing import Optional
 from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 
-class UncertainOutput(BaseCommandComponent):
+class UncertainOutput(OutputComponent):
 
     @property
     def name(self) -> str:
@@ -16,10 +16,6 @@ class UncertainOutput(BaseCommandComponent):
             return self.gxparam.name
         raise RuntimeError('an UncertainOutput must have a gxparam')
 
-    @property
-    def default_value(self) -> str:
-        return '__UNKNOWN_OUTPUT__'
-    
     @property
     def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
@@ -39,8 +35,5 @@ class UncertainOutput(BaseCommandComponent):
         if self.gxparam:
             return self.gxparam.docstring
         return 'output created during runtime. file is collected from working directory'
-
-    def update(self, incoming: UncertainOutput) -> None:
-        raise NotImplementedError()
 
 

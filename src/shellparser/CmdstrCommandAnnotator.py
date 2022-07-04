@@ -17,10 +17,6 @@ class CmdstrCommandAnnotator:
         self.epath_count: int = 0
 
     def annotate(self) -> None:
-        self.analyse_cmdstrs()
-        self.cleanup()
-
-    def analyse_cmdstrs(self) -> None:
         for cmdstr in self.cmdstrs:
             for epath in cmdstr.main.get_execution_paths():
                 logging.runtime_data(str(epath))
@@ -38,14 +34,4 @@ class CmdstrCommandAnnotator:
 
     def update_command(self, epath: ExecutionPath) -> None:
         for component in epath.get_components():
-            component.update_presence_array(self.epath_count)
             self.command.update(component)
-
-    def cleanup(self) -> None:
-        # just one thing to do
-        self.update_components_presence_array()
-
-    def update_components_presence_array(self) -> None:
-        for component in self.command.list_inputs():
-            component.update_presence_array(self.epath_count - 1, fill_false=True)
-    

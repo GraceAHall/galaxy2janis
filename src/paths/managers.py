@@ -71,7 +71,7 @@ class ToolModePathManager(PathManager):
         raise NotImplementedError()  # not needed for tool mode
 
     def tool(self, step: Optional[WorkflowStep]=None) -> str:
-        return f'{self._project_dir}/{settings.tool.tool_id}/{settings.tool.tool_id}.py'
+        return f'{self._project_dir}/{settings.tool.tool_id}.py'
 
     def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
         raise NotImplementedError()

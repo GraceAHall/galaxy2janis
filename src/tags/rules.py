@@ -92,7 +92,7 @@ def _prepend_component_type(tag: str, entity: Any) -> str:
     return f'{entity_type}_{tag}'
 
 def _append_datatype(tag: str, entity: Any) -> str:
-    dtype = entity.janis_datatypes[0].classname.lower()
+    #dtype = entity.janis_datatypes[0].classname.lower()
     if not tag.endswith(dtype): # don't add the dtype if its already been added
         tag = f"{tag}_{dtype}"
     return tag

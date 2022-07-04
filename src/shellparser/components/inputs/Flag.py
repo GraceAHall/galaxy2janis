@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Any, Optional
 from gx.xmltool.param.InputParam import BoolParam
 
-from shellparser.components.CommandComponent import BaseCommandComponent
+from .InputComponent import InputComponent
 from gx.xmltool.param.Param import Param
 
 
-class Flag(BaseCommandComponent):
+class Flag(InputComponent):
     def __init__(self, prefix: str, name: Optional[str]=None) -> None:
         super().__init__()
         self.prefix = prefix
@@ -18,12 +18,6 @@ class Flag(BaseCommandComponent):
 
     @property
     def default_value(self) -> bool:
-        if self.gxparam:
-            return self.get_default_from_gxparam()
-        else:
-            return self.get_default_from_presence()
-    
-    def get_default_from_gxparam(self) -> bool:
         if isinstance(self.gxparam, BoolParam):
             if self.gxparam.checked and self.gxparam.truevalue == self.prefix:
                 return True
@@ -35,11 +29,6 @@ class Flag(BaseCommandComponent):
                 return False
         return False
     
-    def get_default_from_presence(self) -> bool:
-        if all([self.presence_array]):
-            return True
-        return False
-   
     @property
     def optional(self) -> bool:
         return True
@@ -59,9 +48,6 @@ class Flag(BaseCommandComponent):
         # gxparam transfer
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam
-        # presence
-        cmdstr_index = len(incoming.presence_array) - 1
-        self.update_presence_array(cmdstr_index)
         
     def __str__(self) -> str:
         return f'{str(self.default_value):20}{str(self.optional):>10}'

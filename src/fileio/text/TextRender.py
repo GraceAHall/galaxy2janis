@@ -1,8 +1,7 @@
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any
+from typing import Tuple
 
 from messages import Message
 
@@ -18,25 +17,32 @@ class Confidence(Enum):
     HIGH    = auto()
 
 
-@dataclass
 class TextRender(ABC):
-    entity: Any
-    messages: list[Message]
-    
-    def __post_init__(self):
-        self.imports: list[str] = self.collect_imports() # ???
+    """
+    A TextRender is a text representation of an entity (tool input, step etc) but includes other information like imports and messages related to that entity. 
+    Similar to __str__ or __repr__ dunder methods but not coupled to the class. Used to create the output definitions users will receive.
+    """
+
+    def __init__(self, render_imports: bool=False):
+        self.render_imports = render_imports
+        self.messages: list[Message] = []
         self.curation_state: CurationState = CurationState.RAW
         self.confidence: Confidence = Confidence.LOW
+
+    @property
+    @abstractmethod
+    def imports(self) -> list[Tuple[str, str]]:
+        """
+        collects all imports this entity will need.
+        each import should be returned as [path(module), object]. 
+        """
+        ...
 
     @abstractmethod
     def render(self) -> str:
         """renders an entity to text"""
         ...
     
-    @abstractmethod
-    def collect_imports(self) -> list[str]:
-        """collects all imports this entity will need"""
-        ...
 
 
 

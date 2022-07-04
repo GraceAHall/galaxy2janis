@@ -10,6 +10,8 @@ from gx.xmltool.ToolXMLMetadata import ToolXMLMetadata
 from gx.xmltool.param.InputParamRegister import InputParamRegister
 from gx.xmltool.param.Param import Param
 from uuid import uuid4
+from shellparser.components.inputs.InputComponent import InputComponent
+from shellparser.components.outputs.OutputComponent import OutputComponent
 import tags
 
 
@@ -25,19 +27,19 @@ class Tool:
     gxparam_register: InputParamRegister
     container: Optional[Container]
     base_command: list[str]
-    inputs: list[CommandComponent] = field(default_factory=list)
-    outputs: list[CommandComponent] = field(default_factory=list)
+    inputs: list[InputComponent] = field(default_factory=list)
+    outputs: list[OutputComponent] = field(default_factory=list)
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())
         tags.tool.new_tool()
         tags.tool.register(self)
 
-    def add_input(self, inp: CommandComponent) -> None:
+    def add_input(self, inp: InputComponent) -> None:
         self.inputs.append(inp)
         tags.tool.register(inp)
     
-    def add_output(self, out: CommandComponent) -> None:
+    def add_output(self, out: OutputComponent) -> None:
         self.outputs.append(out)
         tags.tool.register(out)
 
@@ -54,17 +56,11 @@ class Tool:
                 return inp
         raise RuntimeError(f'could not find {query_uuid} in tool inputs')
 
-    def list_inputs(self) -> list[CommandComponent]:
+    def list_inputs(self) -> list[InputComponent]:
         return self.inputs
 
-    def get_tags_inputs(self) -> dict[str, CommandComponent]:
-        return {tags.tool.get(inp.uuid): inp for inp in self.inputs}
-    
-    def list_outputs(self) -> list[CommandComponent]:
+    def list_outputs(self) -> list[OutputComponent]:
         return self.outputs
-
-    def get_tags_outputs(self) -> dict[str, CommandComponent]:
-        return {tags.tool.get(out.uuid): out for out in self.outputs}
 
     def get_preprocessing(self) -> Optional[str]:
         raise NotImplementedError

@@ -32,8 +32,9 @@ class ValueRecord(ABC):
         """returns true if all observed values are castable to float"""
         ...
 
+    @property
     @abstractmethod
-    def get_unique_values(self) -> list[str]:
+    def unique_values(self) -> list[str]:
         """returns all unique witnessed values"""
         ...
 
@@ -75,7 +76,8 @@ class PositionalValueRecord(ValueRecord):
             return True
         return False
 
-    def get_unique_values(self) -> list[str]:
+    @property
+    def unique_values(self) -> list[str]:
         values = list(set([obsval for obsval in self.record]))
         values.sort()
         return values
@@ -109,7 +111,8 @@ class OptionValueRecord(ValueRecord):
                 return False
         return True
 
-    def get_unique_values(self) -> list[str]:
+    @property
+    def unique_values(self) -> list[str]:
         str_vals = [' '.join(obsval) for obsval in self.record]
         str_vals = list(set(str_vals))
         str_vals.sort()

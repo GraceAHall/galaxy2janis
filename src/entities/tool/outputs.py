@@ -3,9 +3,11 @@
 from shellparser.Command import Command
 from shellparser.components.inputs.Flag import Flag
 import logs.logging as logging
+
 from shellparser.components.outputs.RedirectOutput import RedirectOutput
 from shellparser.components.outputs.create import create_output
 from shellparser.components.CommandComponent import CommandComponent
+
 from gx.xmltool.XMLToolDefinition import XMLToolDefinition
 from gx.xmltool.param.Param import Param
     
@@ -13,6 +15,7 @@ from gx.xmltool.param.Param import Param
 def extract_outputs(xmltool: XMLToolDefinition, command: Command) -> list[CommandComponent]:
     extractor = OutputExtractor(xmltool, command)
     return extractor.extract()
+
 
 class OutputExtractor:
     def __init__(self, xmltool: XMLToolDefinition, command: Command):

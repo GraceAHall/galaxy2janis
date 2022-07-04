@@ -4,6 +4,12 @@ parse steps & register (tags done)
 then PathManager can be created 
 
 
+
+INTEGRATION
+BUGS
+- abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
+
+
 Bernie Notes
 
 - gxtool2janis - soft release 

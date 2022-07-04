@@ -12,6 +12,7 @@ from shellparser.components.inputs import spawn_component
 from gx.xmltool.param.Param import Param 
 
 
+
 class Updater(ABC):
     command: Command
     incoming: Positional | Flag | Option | RedirectOutput
@@ -135,7 +136,7 @@ class RedirectOutputUpdater(Updater):
         self.command = command
         self.incoming = incoming
         if self.should_merge():
-            self.merge()
+            pass
         else:
             self.add()
 
@@ -145,8 +146,7 @@ class RedirectOutputUpdater(Updater):
         return False
     
     def merge(self) -> None:
-        if self.command.redirect:
-            self.command.redirect.update(self.incoming)
+        raise RuntimeError("can't update an output")
     
     def add(self) -> None:
         self.command.redirect = self.incoming
@@ -169,7 +169,7 @@ class Command:
         return False
 
     def list_inputs(self, include_base_cmd: bool=True) -> list[CommandComponent]:
-        components: list[Positional | Option | Flag] = []
+        components: list[CommandComponent] = []
         if include_base_cmd:
             components += self.get_positionals()
         else:

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "abricate",
+            "name": "basic",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -17,7 +17,7 @@
             ]
         },
         {
-            "name": "abricate_fmt1",
+            "name": "--remote",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -29,7 +29,7 @@
             ]
         },
         {
-            "name": "abricate_fm2",
+            "name": "--outdir",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -41,6 +41,17 @@
                 "--outdir", "abricate_parsed"
             ]
         },
+        {
+            "name": "unicycler",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/unicycler/unicycler.xml", 
+            ]
+        },
     ]
 }
-        

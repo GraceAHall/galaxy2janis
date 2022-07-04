@@ -4,12 +4,12 @@
 from __future__ import annotations
 from typing import Any, Optional
 from shellparser.components.ValueRecord import PositionalValueRecord
-from shellparser.components.CommandComponent import BaseCommandComponent
-#import shellparser.components.inputs.utils as utils
+
 import shellparser.text.regex.scanners as scanners
+from .InputComponent import InputComponent
 from gx.xmltool.param.Param import Param
 
-class Positional(BaseCommandComponent):
+class Positional(InputComponent):
     def __init__(self, value: str) -> None:
         super().__init__()
         self.before_opts: bool = False
@@ -44,10 +44,8 @@ class Positional(BaseCommandComponent):
     def optional(self) -> bool:
         if self.forced_optionality is not None:
             return self.forced_optionality
-        elif self.gxparam and self.gxparam.optional:
-            return True
-        elif all(self.presence_array):
-            return False
+        elif self.gxparam: 
+            return self.gxparam.optional
         return True
 
     @property
@@ -68,10 +66,7 @@ class Positional(BaseCommandComponent):
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam
-        # update presence
-        cmdstr_index = len(incoming.presence_array) - 1
-        self.update_presence_array(cmdstr_index)
-    
+
     def has_single_value(self) -> bool:
         counts = self.value_record.get_counts()
         if len(counts) == 1:
@@ -79,7 +74,7 @@ class Positional(BaseCommandComponent):
         return False
     
     def values_are_variables(self) -> bool:
-        str_values = self.value_record.get_unique_values()
+        str_values = self.value_record.unique_values
         for val in str_values:
             if not scanners.get_variables_fmt1(val) and not scanners.get_variables_fmt2(val):
                 return False

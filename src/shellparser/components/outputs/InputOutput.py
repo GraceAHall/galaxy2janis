@@ -1,12 +1,14 @@
 
 
 from __future__ import annotations
-from shellparser.components.CommandComponent import CommandComponent, BaseCommandComponent
+from .OutputComponent import OutputComponent
+
 from typing import Any, Optional
 from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
+from shellparser.components.CommandComponent import CommandComponent
 
 
-class InputOutput(BaseCommandComponent):
+class InputOutput(OutputComponent):
     def __init__(self, input_component: CommandComponent):
         super().__init__()
         self.input_component = input_component
