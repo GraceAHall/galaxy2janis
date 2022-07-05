@@ -4,7 +4,7 @@ from __future__ import annotations
 from .OutputComponent import OutputComponent
 
 from typing import Any, Optional
-from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
+from gx.gxtool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from shellparser.components.CommandComponent import CommandComponent
 
 

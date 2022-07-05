@@ -1,13 +1,13 @@
 
 
 from shellparser.Command import Command
-from gx.xmltool.param.Param import Param
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.param.Param import Param
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.Option import Option
-from gx.xmltool.param.InputParam import BoolParam, SelectParam
+from gx.gxtool.param.InputParam import BoolParam, SelectParam
 from shellparser.components.inputs import spawn_component 
-import gx.xmltool.param.utils as param_utils
+import gx.gxtool.param.utils as param_utils
 import shellparser.text.regex.scanners as scanners
 
 

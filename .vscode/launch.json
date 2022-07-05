@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "basic",
+            "name": "basic tool",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -42,7 +42,7 @@
             ]
         },
         {
-            "name": "unicycler",
+            "name": "unicycler tool",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
@@ -51,6 +51,30 @@
             "args": [
                 "tool",
                 "--local", "test/data/tools/unicycler/unicycler.xml", 
+            ]
+        },
+        {
+            "name": "super simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/super_simple_workflow.ga", 
+            ]
+        },
+        {
+            "name": "simple workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/simple_workflow.ga", 
             ]
         },
     ]

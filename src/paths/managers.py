@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from entities.workflow import WorkflowStep
+from entities.workflow.step.metadata import StepMetadata
 import settings
 
 
@@ -39,17 +39,17 @@ class PathManager(ABC):
         ...
     
     @abstractmethod
-    def step(self, step: Optional[WorkflowStep]=None) -> str:
+    def step(self, metadata: Optional[StepMetadata]=None) -> str:
         """specifies where the provided step should be written"""
         ...
     
     @abstractmethod
-    def tool(self, step: Optional[WorkflowStep]=None) -> str:
+    def tool(self, metadata: Optional[StepMetadata]=None) -> str:
         """specifies where the provided tool should be written"""
         ...
     
     @abstractmethod
-    def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
+    def wrapper(self, metadata: Optional[StepMetadata]=None) -> str:
         """specifies where the macro resolved galaxy wrapper.xml should be written"""
         ...
 
@@ -67,13 +67,13 @@ class ToolModePathManager(PathManager):
     def inputs(self, format: str='yaml') -> str:
         raise NotImplementedError()  # not needed for tool mode
     
-    def step(self, step: Optional[WorkflowStep]=None) -> str:
+    def step(self, metadata: Optional[StepMetadata]=None) -> str:
         raise NotImplementedError()  # not needed for tool mode
 
-    def tool(self, step: Optional[WorkflowStep]=None) -> str:
+    def tool(self, metadata: Optional[StepMetadata]=None) -> str:
         return f'{self._project_dir}/{settings.tool.tool_id}.py'
 
-    def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
+    def wrapper(self, metadata: Optional[StepMetadata]=None) -> str:
         raise NotImplementedError()
 
 
@@ -93,18 +93,18 @@ class WorkflowModePathManager(PathManager):
     def inputs(self, format: str='yaml') -> str:
         return f'{self._project_dir}/inputs.{format}'
     
-    def step(self, step: Optional[WorkflowStep]=None) -> str:
+    def step(self, metadata: Optional[StepMetadata]=None) -> str:
         raise NotImplementedError()  # no .py file for a step using this format
     
-    def tool(self, step: Optional[WorkflowStep]=None) -> str:
-        assert(step)
-        tool_id = step.metadata.wrapper.tool_id
+    def tool(self, metadata: Optional[StepMetadata]=None) -> str:
+        assert(metadata)
+        tool_id = metadata.wrapper.tool_id
         return f'{self._project_dir}/tools/{tool_id}.py'
 
-    def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
-        assert(step)
-        tool_id = step.metadata.wrapper.tool_id
-        revision = step.metadata.wrapper.revision  
+    def wrapper(self, metadata: Optional[StepMetadata]=None) -> str:
+        assert(metadata)
+        tool_id = metadata.wrapper.tool_id
+        revision = metadata.wrapper.revision  
         return f'{self._project_dir}/wrappers/{tool_id}-{revision}'
 
 
@@ -120,16 +120,16 @@ class WorkflowModePathManager(PathManager):
 #     def inputs(self, format: str='yaml') -> str:
 #         return f'{self.outdir}/inputs.{format}'
     
-#     def step(self, step: Optional[WorkflowStep]=None) -> str:
+#     def step(self, metadata: Optional[StepMetadata]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
 #         return f'{self.outdir}/{step_tag}/{step_tag}_step.py'
     
-#     def tool(self, step: Optional[WorkflowStep]=None) -> str:
+#     def tool(self, metadata: Optional[StepMetadata]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
 #         tool_id = step.metadata.wrapper.tool_id
 #         return f'{self.outdir}/{step_tag}/{tool_id}.py'
     
-#     def wrapper(self, step: Optional[WorkflowStep]=None) -> str:
+#     def wrapper(self, metadata: Optional[StepMetadata]=None) -> str:
 #         step_tag = tags.workflow.get(step.uuid)
 #         tool_id = step.metadata.wrapper.tool_id  
 #         revision = step.metadata.wrapper.revision  

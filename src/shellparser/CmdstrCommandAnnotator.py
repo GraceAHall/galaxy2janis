@@ -1,7 +1,7 @@
 
 import logs.logging as logging
 
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from shellparser.Command import Command 
 from shellparser.cmdstr.CommandString import CommandString
 from shellparser.epath.ExecutionPath import ExecutionPath

@@ -1,17 +1,17 @@
 
 
-
-
 from dataclasses import dataclass, field
 from typing import Optional
-from shellparser.components.CommandComponent import CommandComponent
-from containers import Container
-from gx.xmltool.ToolXMLMetadata import ToolXMLMetadata
-from gx.xmltool.param.InputParamRegister import InputParamRegister
-from gx.xmltool.param.Param import Param
 from uuid import uuid4
+
+from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
+from gx.gxtool.param.InputParamRegister import InputParamRegister
+from gx.gxtool.param.Param import Param
+
+from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.InputComponent import InputComponent
 from shellparser.components.outputs.OutputComponent import OutputComponent
+
 import tags
 
 
@@ -25,7 +25,7 @@ class Tool:
     uuid: str = field(init=False)
     metadata: ToolXMLMetadata
     gxparam_register: InputParamRegister
-    container: Optional[Container]
+    container: Optional[str]
     base_command: list[str]
     inputs: list[InputComponent] = field(default_factory=list)
     outputs: list[OutputComponent] = field(default_factory=list)

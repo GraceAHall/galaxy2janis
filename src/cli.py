@@ -48,11 +48,6 @@ class CLIparser:
                             help="output folder to place translation", 
                             type=str,
                             )
-        parser.add_argument("--dev-test-cmdstrs", 
-                            help="only use xml <command> for tool inference. do not evaluate test cases.", 
-                            default=False,
-                            action='store_true'
-                            )
         args = parser.parse_args(argv[2:])
         out: dict[str, Optional[str]] = args.__dict__
         out['command'] = self.command
@@ -69,10 +64,6 @@ class CLIparser:
                             help="output folder to place translation", 
                             type=str,
                             )
-        parser.add_argument("--dev-test-cmdstrs", 
-                            help="only use xml <command> for tool inference. do not evaluate test cases.", 
-                            default=False,
-                            action='store_true')
         parser.add_argument("--dev-partial-eval", 
                             help="turn off partial cheetah evaluation when identifying tool values",
                             default=False,

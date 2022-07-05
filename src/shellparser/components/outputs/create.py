@@ -8,7 +8,7 @@ from .UncertainOutput import UncertainOutput
 
 from shellparser.text.tokens.Tokens import Token
 from shellparser.components.CommandComponent import CommandComponent
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 
 # acts as a factory

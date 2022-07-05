@@ -1,10 +1,9 @@
 
 
 
-import settings
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 
-from shellparser.text.load import load_xml_command, load_test_commands
+from shellparser.text.load import load_xml_command
 from shellparser.cmdstr.CommandString import CommandString
 from shellparser.cmdstr.cmdstr import gen_command_string
 
@@ -42,19 +41,10 @@ class CommandFactory:
 
     def gen_cmdstrs(self) -> list[CommandString]:
         # note ordering: xml then test
-        cmdstrs = [self.xmlcmdstr]
-        if settings.general.dev_test_cmdstrs:
-            cmdstrs += self.gen_cmdstrs_from_tests()
-        return cmdstrs
+        return [self.xmlcmdstr]
 
     def gen_cmdstr_from_xml(self) -> CommandString:
         text = load_xml_command()
         return gen_command_string(source='xml', the_string=text, xmltool=self.xmltool)
 
-    def gen_cmdstrs_from_tests(self) -> list[CommandString]:
-        cmdstrs: list[CommandString] = []
-        for text in load_test_commands():
-            cmdstr = gen_command_string(source='test', the_string=text, xmltool=self.xmltool)
-            cmdstrs.append(cmdstr)
-        return cmdstrs
 

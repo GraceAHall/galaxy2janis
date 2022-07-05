@@ -5,12 +5,13 @@ import settings
 from typing import Any
 from gx.wrappers import fetch_wrapper
 from utils.galaxy import get_xml_id
+import utils.galaxy as utils
 
 
 def tool_setup(args: dict[str, Any]) -> None:
     update_tool_settings(args)
     handle_wrapper_download()
-    settings.validation.validate_tool_settings()
+    validate_tool_settings()
 
 def update_tool_settings(args: dict[str, Any]) -> None:
     if args['local']:
@@ -36,5 +37,24 @@ def handle_wrapper_download() -> None:
             settings.tool.tool_id
         )
         settings.tool.set_tool_path(path)
+
+
+### VALIDATION ###
+
+def validate_tool_settings() -> None:
+    # both local & remote params not given
+    if not _has_xml() or not _valid_xml():
+        raise RuntimeError('no valid xml file')
+
+def _has_xml() -> bool:
+    if settings.tool.tool_path:
+        return True
+    return False
+
+def _valid_xml() -> bool:
+    path = settings.tool.tool_path
+    if utils.is_tool_xml(path):
+        return True
+    return False
 
 

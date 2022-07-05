@@ -5,7 +5,7 @@ import logs.logging as logging
 
 from typing import Optional
 
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 from shellparser.cheetah.ConstructTracker import ConstructTracker
 from shellparser.cmdstr.utils import split_lines, split_to_words

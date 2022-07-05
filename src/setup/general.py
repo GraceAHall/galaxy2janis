@@ -13,7 +13,6 @@ from paths import DEFAULT_WORKFLOW_OUTDIR
 def general_setup(args: dict[str, Any]) -> None:
     outdir = format_outdir(args)
     settings.general.set_command(args['command']) 
-    settings.general.set_dev_test_cmdstrs(args['dev_test_cmdstrs'])
     paths.init_manager(settings.general.command, outdir)
     setup_file_structure()
     logging.configure_logging()

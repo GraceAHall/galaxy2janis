@@ -9,7 +9,7 @@ from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs import Positional, Flag, Option
 from shellparser.components.outputs import RedirectOutput
 from shellparser.components.inputs import spawn_component
-from gx.xmltool.param.Param import Param 
+from gx.gxtool.param.Param import Param 
 
 
 

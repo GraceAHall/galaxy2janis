@@ -10,7 +10,7 @@ from shellparser.text.regex.scanners import get_statement_delims
 from shellparser.text.regex.utils import get_quoted_sections
 from shellparser.text.tokens.RealisedTokenValues import RealisedTokenFactory
 from shellparser.text.tokens.TokenFactory import TokenFactory
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 
 
 def gen_command_statement(statement: str, xmltool: Optional[XMLToolDefinition]=None) -> DynamicCommandStatement:
@@ -22,7 +22,8 @@ def gen_command_string(
     source: str, 
     the_string: str, 
     xmltool: Optional[XMLToolDefinition]=None,
-    requirement: Optional[str]=None) -> CommandString:
+    requirement: Optional[str]=None
+    ) -> CommandString:
 
     if xmltool and not requirement:
         requirement = xmltool.get_main_requirement().name

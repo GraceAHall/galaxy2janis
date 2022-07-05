@@ -103,7 +103,7 @@ class WorkflowTextDefinition(ABC):
     def init_step_text_definitions(self) -> list[StepTextDefinition]:
         step_defs: list[StepTextDefinition] = []
         step_count = 0
-        for step in list(self.workflow.list_steps()):
+        for step in list(self.workflow.steps()):
             step_count += 1
             step_def = self.init_step_definition(step_count, step)
             step_defs.append(step_def)

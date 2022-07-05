@@ -7,7 +7,7 @@ from typing import Optional
 import regex as re
 from shellparser.cheetah.ConstructTracker import Construct
 
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 class TokenType(Enum):
     FUNCTION_CALL   = auto()

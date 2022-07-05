@@ -1,27 +1,34 @@
 
 
 import logs.logging as logging
+import settings
 import json
+import tags
 
 from typing import Any, Optional
-
 from setup import workflow_setup
 
-from entities.workflow import WorkflowMetadata
 from entities.workflow import Workflow
+from entities.workflow import WorkflowOutput
 
-from workflows.parsing.workflow.inputs import parse_input_step
-from workflows.parsing.step.step import parse_tool_step
+from gx.gxworkflow.parsing.metadata import ingest_metadata
+from gx.gxworkflow.parsing.input_step import ingest_input_steps
+from gx.gxworkflow.parsing.tool_step import ingest_tool_steps
 
-from workflows.parsing.step.inputs import parse_step_inputs
-from workflows.parsing.step.outputs import parse_step_outputs
-
-from workflows.parsing.tools.tools import parse_workflow_tools
-from workflows.analysis.tool_values.linking.link import link_workflow_tool_values
-from workflows.analysis.step_outputs.link import link_workflow_tool_outputs
-from workflows.parsing.workflow.outputs import init_workflow_outputs
+from gx.gxworkflow.analysis.tool_values.linking.link import link_workflow_tool_values
 
 from fileio import write_workflow
+
+# from workflows.parsing.workflow.inputs import parse_input_step
+# from workflows.parsing.step.step import parse_tool_step
+
+# from workflows.parsing.step.inputs import parse_step_inputs
+# from workflows.parsing.step.outputs import parse_step_outputs
+
+# from workflows.parsing.tools.tools import parse_workflow_tools
+# from gx.gxworkflow.analysis.step_outputs.link import link_workflow_tool_outputs
+# from workflows.parsing.workflow.outputs import init_workflow_outputs
+
 
 """
 this file is the overall orchestrator to parse 
@@ -35,110 +42,38 @@ the order here seems weird but trust me there is reason.
 def workflow_mode(args: dict[str, Optional[str]]) -> None:
     workflow_setup(args)
     logging.msg_parsing_workflow()
+    gxworkflow = load_tree()
     workflow = Workflow()
-    workflow = ingest_framework(workflow)
 
-    factory = WorkflowFactory()
-    workflow = factory.init_workflow()
-    workflow = factory.init_workflow_inputs(workflow)
-    workflow = factory.init_workflow_steps(workflow)
+    # parse inputs & steps.
+    # parse each tool needed in each step. 
+    ingest_metadata(workflow, gxworkflow)
+    ingest_input_steps(workflow, gxworkflow)
+    ingest_tool_steps(workflow, gxworkflow)
+    link_workflow_tool_values(workflow)
+    #link_tool_step_outputs(workflow)
+    #create_workflow_outputs(workflow)
     
-    # by this point, step_tags & tool_ids are known
-    # need to take a brief pause to init output folder structure 
-    # and download wrappers.
-    init_workflow_folders(workflow)
-    fetch_workflow_wrappers(workflow)
-    
-    # can now access all files (including wrapper xml) 
-    # for loading, , writing definitions etc
-    workflow = factory.init_workflow_step_inputs(workflow)
-    workflow = factory.init_workflow_step_outputs(workflow)
-
-    # galaxy workflow parsed at this point
-    # now must parse tools to janis, create
-    # values for tool inputs in each step 
-    # finalise workflow inputs / outputs etc
-    workflow = parse_workflow_tools(workflow)
-    workflow = link_workflow_tool_values(workflow)
-    workflow = link_workflow_tool_outputs(workflow)
-    workflow = init_workflow_outputs(workflow)
-
     write_workflow(workflow)
 
 
+def load_tree() -> dict[str, Any]:
+    # TODO should probably check the workflow type (.ga, .ga2)
+    # and internal format is valid
+    with open(settings.workflow.workflow_path, 'r') as fp:
+        return json.load(fp)
 
-class WorkflowFactory:
-    
-    def __init__(self):
-        self.tree = self.load_tree(w.workflow_path)
-    
-    def load_tree(self, path: str) -> dict[str, Any]:
-        # TODO should probably check the workflow type (.ga, .ga2)
-        # and internal format is valid
-        with open(path, 'r') as fp:
-            return json.load(fp)
-
-    def init_workflow(self) -> Workflow:
-        """could also just create empty workflow but that sucks"""
-        metadata = self.parse_metadata()
-        return Workflow(metadata)
-
-    def parse_metadata(self) -> WorkflowMetadata:
-        """scrape basic workflow metadata"""
-        return WorkflowMetadata(
-            name=self.tree['name'],
-            uuid=self.tree['uuid'],
-            annotation=self.tree['annotation'],
-            version=self.tree['version'],
-            tags=self.tree['tags']
-        )
-
-    def init_workflow_inputs(self, workflow: Workflow) -> Workflow:
-        """registers each galaxy 'input step' as a workflow input"""
-        for step in self.tree['steps'].values():
-            if step['type'] in ['data_input', 'data_collection_input']:
-                workflow_input = parse_input_step(step)
-                workflow.add_input(workflow_input)
-        return workflow
-    
-    def init_workflow_steps(self, workflow: Workflow) -> Workflow:
-        """
-        Basic initialisation for each step. 
-        Exists because we must finalise step tags 
-        before doing other operations.
-        """
-        for step in self.tree['steps'].values():
-            if step['type'] == 'tool':
-                workflow_step = parse_tool_step(step)
-                workflow.add_step(workflow_step)
-        return workflow
-    
-    def init_workflow_step_inputs(self, workflow: Workflow) -> Workflow:
-        """
-        for each step, ingest tool_state into 
-        register of inputs. inputs are resolved 
-        to underlying values for some params.
-        """
-        for step_id, step in self.tree['steps'].items():
-            if step['type'] == 'tool':
-                workflow_step = workflow.get_step_by_step_id(step_id)
-                # TODO HERE
-                inputs = parse_step_inputs()
-                for inp in inputs:
-                    workflow_step.inputs.add(inp)
-        return workflow
-    
-    def init_workflow_step_outputs(self, workflow: Workflow) -> Workflow:
-        """for each step, identify outputs"""
-        for step_id, step in self.tree['steps'].items():
-            if step['type'] == 'tool':
-                workflow_step = workflow.get_step_by_step_id(step_id)
-                # TODO HERE
-                outputs = parse_step_outputs()
-                for output in outputs:
-                    workflow_step.outputs.add(output)
-        return workflow
-
-
-
+def create_workflow_outputs(workflow: Workflow) -> Workflow:
+    for step in workflow.steps:
+        for stepout in step.outputs.list():
+            if stepout.is_wflow_out:
+                toolout = stepout.tool_output
+                assert(toolout)
+                workflow_output = WorkflowOutput(
+                    step_tag=tags.workflow.get(step.uuid),
+                    toolout_tag=tags.tool.get(toolout.uuid),
+                    janis_datatypes=stepout.janis_datatypes
+                )
+                workflow.add_output(workflow_output)
+    return workflow
 

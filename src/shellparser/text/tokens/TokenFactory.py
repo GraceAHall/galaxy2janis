@@ -6,7 +6,7 @@ from typing import Optional
 from shellparser.text.tokens.Tokens import Token, TokenType
 from shellparser.text.regex import scanners as scanners
 from shellparser.text.regex.utils import get_base_variable
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 import shellparser.text.tokens.utils as token_utils
 
 class TokenOrderingStrategy(ABC):

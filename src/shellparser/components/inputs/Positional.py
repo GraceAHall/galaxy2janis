@@ -7,7 +7,7 @@ from shellparser.components.ValueRecord import PositionalValueRecord
 
 import shellparser.text.regex.scanners as scanners
 from .InputComponent import InputComponent
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 class Positional(InputComponent):
     def __init__(self, value: str) -> None:

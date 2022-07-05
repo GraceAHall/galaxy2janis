@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import Optional, Protocol
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 
 # defines what a CommandComponent should look like

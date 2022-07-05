@@ -3,7 +3,7 @@ import logs.logging as logging
 import tempfile
 from typing import Optional
 
-from gx.xmltool.requirements import Requirement, CondaRequirement, ContainerRequirement
+from gx.gxtool.requirements import Requirement, CondaRequirement, ContainerRequirement
 from paths import CONTAINER_CACHE
 
 from .ContainerCache import ContainerCache
@@ -19,8 +19,7 @@ from .selection.selection import select_best_container_match
 
 DISABLE_CACHE = False
 
-def fetch_container(requirement: Requirement) -> Optional[Container]:
-    
+def fetch_container(requirement: Requirement) -> Optional[str]:
     containers: list[Container] = []
     if not containers:
         containers = _fetch_cache(requirement)
@@ -32,7 +31,8 @@ def fetch_container(requirement: Requirement) -> Optional[Container]:
         logging.no_container()
         return None
     else:
-        return select_best_container_match(containers, requirement)
+        container = select_best_container_match(containers, requirement)
+        return container.url
     
 def _fetch_cache(requirement: Requirement) -> list[Container]:
     cache = _load_cache()

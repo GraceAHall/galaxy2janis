@@ -3,7 +3,7 @@ import logs.logging as logging
 from typing import Any
 
 from setup import tool_setup
-from gx.xmltool.load import load_xmltool
+from gx.gxtool.load import load_xmltool
 
 from shellparser.command import gen_command
 from containers import fetch_container

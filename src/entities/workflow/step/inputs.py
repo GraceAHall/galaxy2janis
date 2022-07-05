@@ -3,17 +3,15 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Optional
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 
 @dataclass
 class StepInput(ABC):
-    gxvarname: str
+    gxparam: Param
 
     def __post_init__(self):
         self.linked: bool = False
-        self.gxparam: Optional[Param] = None
 
 
 @dataclass

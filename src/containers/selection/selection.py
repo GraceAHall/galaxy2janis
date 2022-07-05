@@ -1,19 +1,14 @@
 
 
 
-import logs.logging as logging
-from typing import Optional
-from gx.xmltool.requirements import Requirement
+from gx.gxtool.requirements import Requirement
 from ..Container import Container
 
 
 
-def select_best_container_match(containers: list[Container], requirement: Requirement) -> Optional[Container]:
+def select_best_container_match(containers: list[Container], requirement: Requirement) -> Container:
     containers = select_version_matches(containers, requirement)
     containers = sort_by_create_date(containers)
-    if not containers:
-        logging.no_container()
-        return None
     return containers[0]
 
 def select_version_matches(containers: list[Container], requirement: Requirement) -> list[Container]:

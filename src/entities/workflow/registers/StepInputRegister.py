@@ -20,7 +20,7 @@ class StepInputRegister:
 
     def get(self, gxvarname: str) -> Optional[StepInput]:
         for inp in self.register:
-            if inp.gxvarname == gxvarname:
+            if inp.gxparam.name == gxvarname:
                 return inp
         return None
     
@@ -31,11 +31,11 @@ class StepInputRegister:
         the_dict: dict[str, Any] = {}
         static_inputs = [inp for inp in self.list() if isinstance(inp, StaticStepInput)]
         for inp in static_inputs:
-            self.update_dict(inp, the_dict)
+            self._update_dict(inp, the_dict)
         return the_dict
 
-    def update_dict(self, inp: StaticStepInput, the_dict: dict[str, Any]) -> None:
-        name_heirarchy = inp.gxvarname.split('.')
+    def _update_dict(self, inp: StaticStepInput, the_dict: dict[str, Any]) -> None:
+        name_heirarchy = inp.gxparam.name.split('.')
         node = the_dict
         for i, elem in enumerate(name_heirarchy):
             if i < len(name_heirarchy) - 1:

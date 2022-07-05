@@ -5,7 +5,7 @@ from abc import ABC
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Tuple
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 
 class InputValueType(Enum):

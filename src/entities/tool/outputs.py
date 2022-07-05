@@ -8,8 +8,8 @@ from shellparser.components.outputs.RedirectOutput import RedirectOutput
 from shellparser.components.outputs.create import create_output
 from shellparser.components.CommandComponent import CommandComponent
 
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
-from gx.xmltool.param.Param import Param
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.param.Param import Param
     
 
 def extract_outputs(xmltool: XMLToolDefinition, command: Command) -> list[CommandComponent]:

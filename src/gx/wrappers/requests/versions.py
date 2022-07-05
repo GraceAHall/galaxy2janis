@@ -5,7 +5,7 @@ from typing import Any
 from datetime import datetime
 from bioblend.toolshed import ToolShedInstance
 
-from gx.xmltool.requirements import CondaRequirement, ContainerRequirement, Requirement
+from gx.gxtool.requirements import CondaRequirement, ContainerRequirement, Requirement
 from gx.wrappers import Wrapper
 from runtime.dates import JANIS_DATE_FMT
 from runtime.dates import TOOLSHED_DATE_FMT

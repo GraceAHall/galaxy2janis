@@ -1,14 +1,30 @@
 
 
-
 import settings
 
 from typing import Any
+from runtime.exceptions import InputError
+import utils.galaxy as utils
+
 
 def workflow_setup(args: dict[str, Any]) -> None:
     update_workflow_settings(args)
-    settings.validation.validate_workflow_settings()
+    validate_workflow_settings()
 
 def update_workflow_settings(args: dict[str, Any]) -> None:
-    raise NotImplementedError()
+    settings.workflow.set_path(args['workflow'])
+    settings.workflow.set_dev_partial_eval(args['dev_partial_eval'])
+
+
+### VALIDATION ###
+
+def validate_workflow_settings() -> None:
+    if not _valid_workflow():
+        raise InputError('please check workflow file path')
+
+def _valid_workflow() -> bool:
+    path = settings.workflow.workflow_path
+    if utils.is_galaxy_workflow(path):
+        return True
+    return False
 

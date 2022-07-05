@@ -3,7 +3,7 @@
 
 from shellparser.components.inputs import Flag, Option
 from shellparser.text.tokens.Tokens import Token, TokenType
-from gx.xmltool.param.InputParam import BoolParam, SelectParam
+from gx.gxtool.param.InputParam import BoolParam, SelectParam
 import shellparser.text.regex.scanners as scanners
 
 NON_VALUE_TOKENTYPES = set([

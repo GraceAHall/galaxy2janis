@@ -51,7 +51,7 @@ def wildcard_output_strategy(wildcard_output: WildcardOutput) -> list[str]:
     return gxtypes
 
 def workflow_input_strategy(inp: WorkflowInput) -> list[str]:
-    return inp.gx_datatypes
+    return inp.janis_datatypes
 
 def workflow_output_strategy(output: WorkflowOutput) -> list[str]:
     return output.gx_datatypes

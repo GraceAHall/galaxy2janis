@@ -6,11 +6,8 @@ import requests
 from typing import Any
 from bs4 import BeautifulSoup, Tag
 
-
 # FILE IO 
-REPO_DATA_PATH = 'data/wrappers/repos.json'
-REVISION_DATA_PATH = 'data/wrappers/revisions.json'
-WRAPPER_DATA_PATH = 'data/wrappers/wrappers.json'
+
 
 def load_data(path: str) -> dict[str, Any]:
     """lockfile?"""

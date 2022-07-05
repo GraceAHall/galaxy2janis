@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from .OutputComponent import OutputComponent
 from shellparser.text.tokens.Tokens import Token
 
-from gx.xmltool.param.OutputParam import DataOutputParam, CollectionOutputParam
+from gx.gxtool.param.OutputParam import DataOutputParam, CollectionOutputParam
 from shellparser.components.ValueRecord import PositionalValueRecord
 from shellparser.components.linux import Stream
 

@@ -1,7 +1,7 @@
 
 
 from typing import Type
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from shellparser.Command import Command
 from shellparser.epath.ExecutionPath import ExecutionPath
 from shellparser.text.tokens.Tokens import TokenType

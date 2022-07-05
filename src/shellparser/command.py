@@ -3,7 +3,7 @@
 
 from shellparser.CommandFactory import CommandFactory
 from shellparser.Command import Command
-from gx.xmltool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 
 
 

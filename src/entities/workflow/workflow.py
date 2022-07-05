@@ -19,12 +19,17 @@ class Workflow:
     that way everything can be referenced properly. 
     """
     def __init__(self):
-        self.inputs: list[WorkflowInput] = []
-        self.steps: dict[int, WorkflowStep] = {}
-        self.outputs: list[WorkflowOutput] = []
         self.uuid: str = str(uuid4())
+        self.inputs: list[WorkflowInput] = []
+        self.outputs: list[WorkflowOutput] = []
+        self._steps: list[WorkflowStep] = []
         self._metadata: Optional[WorkflowMetadata] = None
-        tags.workflow.register(self)
+    
+    @property
+    def steps(self) -> list[WorkflowStep]:
+        the_list = self._steps
+        the_list.sort(key=lambda x: x.metadata.step_id)
+        return the_list
 
     @property
     def metadata(self) -> WorkflowMetadata:
@@ -34,18 +39,19 @@ class Workflow:
 
     def set_metadata(self, metadata: WorkflowMetadata) -> None:
         self._metadata = metadata
-
-    def add_step(self, step: WorkflowStep) -> None:
-        self.steps[step.metadata.step_id] = step
-        tags.workflow.register(step)
+        tags.workflow.register(self)
     
     def add_input(self, w_inp: WorkflowInput) -> None:
-        self.inputs.append(w_inp)
         tags.workflow.register(w_inp)
+        self.inputs.append(w_inp)
+
+    def add_step(self, step: WorkflowStep) -> None:
+        tags.workflow.register(step)
+        self.steps.append(step)
     
     def add_output(self, w_out: WorkflowOutput) -> None:
-        self.outputs.append(w_out)
         tags.workflow.register(w_out)
+        self.outputs.append(w_out)
 
     def get_input(self, step_id: Optional[int]=None, input_uuid: Optional[str]=None) -> Optional[WorkflowInput]:
         if step_id is not None:
@@ -59,43 +65,11 @@ class Workflow:
         else:
             raise RuntimeError('get_input needs to be supplied either step_id or input_uuid')
 
-    def get_step_by_step_id(self, step_id: int) -> WorkflowStep:
-        return self.steps[step_id]
-
-    def get_step_tag_by_step_id(self, step_id: int) -> str:
-        """uuids provide access to identifier tags"""
-        step_uuid = self.steps[step_id].uuid
-        return tags.workflow.get(step_uuid)
-
-    def list_steps(self) -> list[WorkflowStep]:
-        the_list = list(self.steps.values())
-        the_list.sort(key=lambda x: x.metadata.step_id)
-        return the_list
-
-    def get_tool_steps_tags(self) -> dict[str, WorkflowStep]:
-        """used near end of runtime once tags are stable"""
-        out: dict[str, WorkflowStep] = {}
-        for step in self.list_steps():
-            tag = tags.workflow.get(step.uuid)
-            out[tag] = step
-        return out
-
-    def get_inputs_tags(self) -> dict[str, WorkflowInput]:
-        """used near end of runtime once tags are stable"""
-        out: dict[str, WorkflowInput] = {}
-        for w_input in self.inputs:
-            tag = tags.workflow.get(w_input.uuid)
-            out[tag] = w_input
-        return out
-    
-    def get_outputs_tags(self) -> dict[str, WorkflowOutput]:
-        out: dict[str, WorkflowOutput] = {}
-        for w_output in self.outputs:
-            tag = tags.workflow.get(w_output.uuid)
-            out[tag] = w_output
-        return out
-    
-
-
-    
+    def get_step(self, step_uuid: Optional[str]) -> WorkflowStep:
+        if not step_uuid:
+            raise RuntimeError('please provide step_uuid')
+        for step in self._steps:
+            if step.uuid == step_uuid:
+                return step
+        raise RuntimeError('cannot find workflow step')
 

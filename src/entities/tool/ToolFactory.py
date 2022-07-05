@@ -1,19 +1,15 @@
 
 
-
-
-
 import logs.logging as logging
 from typing import Optional
 from entities.tool import Tool
-from gx.xmltool.load import XMLToolDefinition
+from gx.gxtool.load import XMLToolDefinition
 from shellparser.command import Command
-from containers import Container
 from .outputs import extract_outputs
 
 
 class ToolFactory:
-    def __init__(self, xmltool: XMLToolDefinition, command: Command, container: Optional[Container]) -> None:
+    def __init__(self, xmltool: XMLToolDefinition, command: Command, container: Optional[str]) -> None:
         self.xmltool = xmltool
         self.command = command
         self.container = container

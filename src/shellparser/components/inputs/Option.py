@@ -1,11 +1,11 @@
 
 from __future__ import annotations
 from typing import Any, Optional
-from gx.xmltool.param.InputParam import SelectParam
+from gx.gxtool.param.InputParam import SelectParam
 
 from shellparser.components.ValueRecord import OptionValueRecord
 from .InputComponent import InputComponent
-from gx.xmltool.param.Param import Param
+from gx.gxtool.param.Param import Param
 
 
 class Option(InputComponent):

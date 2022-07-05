@@ -43,8 +43,8 @@ MODULES TODO
 - Containers            [DONE]
 - Settings              [DONE]
 - Galaxy Wrappers       [DONE]
-- FileIO (incl paths)   []
-- datatypes             []  
+- FileIO (incl paths)   [DONE]
+- datatypes             [DONE]  
     # note: CWL has edam 'format' for File type. this is like specifying BAM etc.  
 - remove testcmdstr references. will only be single pass of simplified <command>! 
 

@@ -7,7 +7,7 @@ tool-data
 test/data
 !test/data/cheetah_simplification
 playground
-
+data/wrappers
 *.log
 *.pyc
 *.tmp

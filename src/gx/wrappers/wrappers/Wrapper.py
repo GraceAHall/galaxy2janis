@@ -4,7 +4,7 @@ from typing import Any
 
 
 from runtime.dates import JANIS_DATE_FMT
-from gx.xmltool.requirements import Requirement
+from gx.gxtool.requirements import Requirement
 
 
 class Wrapper:
