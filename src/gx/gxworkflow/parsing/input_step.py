@@ -1,7 +1,7 @@
 
 
-import json
 from typing import Any
+import json
 
 from entities.workflow import WorkflowInput
 from entities.workflow import Workflow
@@ -18,7 +18,7 @@ def parse_input_step(step: dict[str, Any]) -> WorkflowInput:
         name=format_input_step_name(step),
         step_id=step['id'],
         step_tag=None,
-        is_array=format_input_step_array(step),
+        array=format_input_step_array(step),
         is_galaxy_input_step=True,
         gx_datatypes=format_input_step_datatypes(step),
     )

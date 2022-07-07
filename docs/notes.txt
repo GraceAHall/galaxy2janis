@@ -1,6 +1,21 @@
 
 
 
+FILEIO TextRender
+- @property imports has same logic for anything that just collects datatypes (workflowinput, workflowoutput, toolinput, tooloutput)
+
+
+uuids
+- anytime we need to refer to registered external entity
+- ConnectionInputValue ->    step_uuid = WorkflowStep.uuid
+- ConnectionInputValue ->    output_uuid = StepOutput.uuid
+- WorkflowInputInputValue -> input_uuid = WorkflowInput.uuid
+
+InputValue
+- add UnknownInputValue
+
+
+
 REMEMBER: Think about whether code would work on webapp
 
 - paths module

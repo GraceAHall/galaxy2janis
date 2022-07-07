@@ -13,6 +13,8 @@ from cli import CLIparser
 from tool_mode import tool_mode
 from workflow_mode import workflow_mode
 
+import paths
+
 """
 gxtool2janis program entry point
 parses cli settings then hands execution to other files based on command
@@ -41,7 +43,8 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     tool = tool_mode(args)
-    fileio.write_tool(tool)  # I dont like this design, but it may be necessary
+    path = paths.manager.tool()
+    fileio.write_tool(tool, path=path)  # I dont like this design, but it may be necessary
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
     workflow_mode(args)

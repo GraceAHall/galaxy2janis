@@ -12,7 +12,6 @@ from entities.workflow import Workflow
 class RuntimeInputList:
     def __init__(self, workflow: Workflow):
         self.inputs = workflow.inputs
-        self.tag_manager = workflow.tag_manager
 
     @property
     def formatted(self) -> list[Tuple[str, list[str]]]:
@@ -47,35 +46,6 @@ class RuntimeInputList:
         return f'{inputs[0].step_tag}'
 
 
-INFO_TEXT = """
-# This file contains workflow inputs which need to be provided by the user.
-# Organised as follows: 
-#     1. input data for the workflow
-#     2. runtime values for each step
-"""
-
-def format_input_dict(workflow: Workflow, format: str='yaml') -> str:
-    input_list = RuntimeInputList(workflow)
-    if format == 'yaml':
-        return to_yaml(input_list)
-    elif format == 'dict':
-        return to_dict(input_list)
-    else:
-        raise RuntimeError('wrong format')
 
 
-YAML_NONE = 'null'
-
-def to_yaml(input_list: RuntimeInputList) -> str:
-    out: str = ''
-    out += f'{INFO_TEXT}\n'
-    for section, inputs in input_list.formatted:
-        out += f'# {section}\n'
-        for name in inputs:
-            out += f'{name}: {YAML_NONE}\n'
-        out += '\n'
-    return out
-
-def to_dict(input_list: RuntimeInputList) -> str:
-    raise NotImplementedError()
 

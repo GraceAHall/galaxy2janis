@@ -19,12 +19,18 @@ class Confidence(Enum):
 
 class TextRender(ABC):
     """
-    A TextRender is a text representation of an entity (tool input, step etc) but includes other information like imports and messages related to that entity. 
-    Similar to __str__ or __repr__ dunder methods but not coupled to the class. Used to create the output definitions users will receive.
+    A TextRender is a text representation of an entity (tool input, workflow step etc).
+    Similar to __str__ or __repr__ dunder methods but not coupled to the class. 
+    Includes other information like imports and messages related to that entity. 
+    Used to create the output definitions users will receive. 
+    \n
+    Accounts for all the different ways the entity could be rendered. 
+    Example 1: whether or not imports will be rendered here
+    Example 2: how messages are 
+    displayed to the user etc. 
     """
 
-    def __init__(self, render_imports: bool=False):
-        self.render_imports = render_imports
+    def __init__(self):
         self.messages: list[Message] = []
         self.curation_state: CurationState = CurationState.RAW
         self.confidence: Confidence = Confidence.LOW

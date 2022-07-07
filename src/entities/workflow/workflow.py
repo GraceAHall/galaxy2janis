@@ -10,6 +10,7 @@ from .input import WorkflowInput
 import tags
 
 
+
 class Workflow:
     """
     a Workflow() is the final representation of the galaxy workflow

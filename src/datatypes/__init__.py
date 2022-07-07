@@ -1,5 +1,5 @@
 
 
-from .main import get_datatype
+from .main import get
 from .JanisDatatype import JanisDatatype
 

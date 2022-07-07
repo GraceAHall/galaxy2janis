@@ -1,5 +1,6 @@
 
 
+import datatypes
 import logs.logging as logging
 import settings
 import json
@@ -16,6 +17,7 @@ from gx.gxworkflow.parsing.input_step import ingest_input_steps
 from gx.gxworkflow.parsing.tool_step import ingest_tool_steps
 
 from gx.gxworkflow.analysis.tool_values.linking.link import link_workflow_tool_values
+from gx.gxworkflow.analysis.step_outputs.link import link_workflow_tool_outputs
 
 from fileio import write_workflow
 
@@ -26,7 +28,6 @@ from fileio import write_workflow
 # from workflows.parsing.step.outputs import parse_step_outputs
 
 # from workflows.parsing.tools.tools import parse_workflow_tools
-# from gx.gxworkflow.analysis.step_outputs.link import link_workflow_tool_outputs
 # from workflows.parsing.workflow.outputs import init_workflow_outputs
 
 
@@ -42,18 +43,16 @@ the order here seems weird but trust me there is reason.
 def workflow_mode(args: dict[str, Optional[str]]) -> None:
     workflow_setup(args)
     logging.msg_parsing_workflow()
+
     gxworkflow = load_tree()
     workflow = Workflow()
 
-    # parse inputs & steps.
-    # parse each tool needed in each step. 
     ingest_metadata(workflow, gxworkflow)
     ingest_input_steps(workflow, gxworkflow)
     ingest_tool_steps(workflow, gxworkflow)
     link_workflow_tool_values(workflow)
-    #link_tool_step_outputs(workflow)
-    #create_workflow_outputs(workflow)
-    
+    link_workflow_tool_outputs(workflow)
+    create_workflow_outputs(workflow)
     write_workflow(workflow)
 
 
@@ -72,7 +71,7 @@ def create_workflow_outputs(workflow: Workflow) -> Workflow:
                 workflow_output = WorkflowOutput(
                     step_tag=tags.workflow.get(step.uuid),
                     toolout_tag=tags.tool.get(toolout.uuid),
-                    janis_datatypes=stepout.janis_datatypes
+                    janis_datatypes=datatypes.get(stepout)
                 )
                 workflow.add_output(workflow_output)
     return workflow

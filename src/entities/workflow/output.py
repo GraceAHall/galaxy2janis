@@ -13,6 +13,8 @@ class WorkflowOutput:
     step_tag: str
     toolout_tag: str # wtf ???
     janis_datatypes: list[JanisDatatype]
+    array: bool = False
+    optional: bool = False
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())

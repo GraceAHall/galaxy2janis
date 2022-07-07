@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 from typing import Tuple
 from fileio.text.TextRender import TextRender
-from fileio.text.tool.ToolInputRender import ToolInputRender
+from fileio.text.tool.ToolInputText import ToolInputText
 
 from shellparser.components.inputs.InputComponent import InputComponent
 
@@ -16,7 +16,7 @@ from .. import ordering
 from .. import formatting
 
 @dataclass
-class ToolInputSectionRender(TextRender):
+class ToolInputSectionText(TextRender):
     def __init__(self, entity: list[InputComponent], render_imports: bool=False):
         super().__init__(render_imports)
         self.entity = entity
@@ -25,7 +25,7 @@ class ToolInputSectionRender(TextRender):
     def imports(self) -> list[Tuple[str, str]]:
         imports: list[Tuple[str, str]] = []
         for inp in self.entity:
-            imports += ToolInputRender(inp).imports
+            imports += ToolInputText(inp).imports
         imports = list(set(imports))
         return ordering.order_imports(imports)
 
@@ -39,17 +39,17 @@ class ToolInputSectionRender(TextRender):
 
         out_str += '\n\t# Positionals\n'
         for positional in self._get_positionals():
-            render = ToolInputRender(positional)
+            render = ToolInputText(positional)
             out_str += f'{render.render()},\n'
 
         out_str += '\n\t# Flags\n'
         for flag in self._get_flags():
-            render = ToolInputRender(flag)
+            render = ToolInputText(flag)
             out_str += f'{render.render()},\n'
 
         out_str += '\n\t# Options\n'
         for option in self._get_options():
-            render = ToolInputRender(option)
+            render = ToolInputText(option)
             out_str += f'{render.render()},\n'
         
         out_str += '\n]\n'

@@ -6,9 +6,7 @@ from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.InputComponent import InputComponent
 from shellparser.components.inputs.Option import Option
 
-from datatypes import JanisDatatype
-from datatypes import get_datatype
-
+import datatypes
 
 def format_docstring(component: CommandComponent) -> Optional[str]:
     raw_doc = component.docstring
@@ -29,7 +27,7 @@ def get_wrapped_default(component: InputComponent) -> Optional[str]:
     return default
 
 def should_quote(default: Any, component: CommandComponent) -> bool:
-    jtypes = get_datatype(component)
+    jtypes = datatypes.get(component)
     jclasses = [x.classname for x in jtypes]
     if 'Int' in jclasses or 'Float' in jclasses:
         return False
@@ -37,7 +35,7 @@ def should_quote(default: Any, component: CommandComponent) -> bool:
         return False
     return True
 
-def datatypes_permit_default(janis_datatypes: list[JanisDatatype]) -> bool:
+def datatypes_permit_default(janis_datatypes: list[datatypes.JanisDatatype]) -> bool:
     # check datatypes aren't empty
     if len(janis_datatypes) == 0:
         raise RuntimeError('component.janis_datatypes must be set before a default value can be given')
@@ -67,7 +65,7 @@ def format_datatype_string(entity: FormattableEntity) -> str:
     #     dtype = types[0].classname
 
     e = entity
-    jtypes = get_datatype(e)
+    jtypes = datatypes.get(e)
     dtype = jtypes[0].classname  # TODO hack to remove UnionType. 
     
     if not e.optional and not e.array: # not array not optional

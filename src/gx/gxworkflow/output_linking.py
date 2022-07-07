@@ -11,12 +11,14 @@ from entities.workflow import WorkflowStep
 
 """
 Links step outputs to underlying tool outputs. 
-Assigns eaech StepOutput the underlying ToolOutput
+Assigns eaech StepOutput the underlying ToolOutput.
+This is needed because the tool is no longer a galaxy tool - its now a translated janis definition. 
+Need to make sure we can find the janis tool output for each galaxy step output
 """
 
 # module entry
 def link_workflow_tool_outputs(workflow: Workflow) -> Workflow:
-    for step in workflow.steps():
+    for step in workflow.steps:
         linker = StepToolOutputLinker(step, workflow)
         linker.link()
     return workflow

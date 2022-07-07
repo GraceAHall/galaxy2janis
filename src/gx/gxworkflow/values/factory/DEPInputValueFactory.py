@@ -11,11 +11,8 @@ from entities.workflow import Workflow
 from entities.workflow import WorkflowInput
 from entities.workflow import (
     InputValue, 
-    ConnectionInputValue, 
-    RuntimeInputValue, 
     StaticInputValue, 
-    DefaultInputValue,
-    InputValueType,
+    ConnectionInputValue, 
     WorkflowInputInputValue
 )
 from gx.gxworkflow.analysis.tool_values.utils import select_input_value_type
@@ -84,7 +81,7 @@ class DefaultInputValueFactory(InputValueFactory):
             comptype=self.get_comptype(),
             gxparam=self.component.gxparam
         )
-        value.is_default_value = True
+        value.is_default = True
         return value
 
     def get_value(self) -> Any:

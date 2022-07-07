@@ -3,8 +3,8 @@
 from typing import Tuple
 from entities.tool.Tool import Tool
 
-from fileio.text.tool.ToolInputSectionRender import ToolInputSectionRender
-from fileio.text.tool.ToolOutputSectionRender import ToolOutputSectionRender
+from fileio.text.tool.ToolInputSectionText import ToolInputSectionText
+from fileio.text.tool.ToolOutputSectionText import ToolOutputSectionText
 
 from runtime.dates import JANIS_DATE_FMT
 from fileio.text.TextRender import TextRender
@@ -13,7 +13,6 @@ from datetime import datetime
 import tags
 import textwrap
 
-from dataclasses import dataclass
 from fileio.text.TextRender import TextRender
 
 from .. import ordering
@@ -58,7 +57,7 @@ def get_contributors(tool: Tool) -> list[str]:
         contributors += [f'Wrapper creator: {tool.metadata.creator}']
     return contributors
 
-def builder_snipper(tool: Tool) -> str:
+def builder_snippet(tool: Tool) -> str:
     container = f'"{tool.container}"' if tool.container else None
     return f"""\
 {tags.tool.get(tool.uuid)} = CommandToolBuilder(
@@ -83,7 +82,7 @@ def translate_snippet(tool: Tool) -> str:
     )
 
 
-tool_class_imports = [
+core_imports = [
     ("janis_core", "CommandToolBuilder"),
     ("janis_core", "ToolMetadata"),
     ("janis_core", "ToolInput"),
@@ -91,10 +90,9 @@ tool_class_imports = [
 ]
 
 
-@dataclass
-class ToolRender(TextRender):
-    def __init__(self, entity: Tool, render_imports: bool=False):
-        super().__init__(render_imports)
+class ToolText(TextRender):
+    def __init__(self, entity: Tool):
+        super().__init__()
         self.entity = entity
 
     @property
@@ -102,9 +100,9 @@ class ToolRender(TextRender):
         inputs = self.entity.list_inputs()
         outputs = self.entity.list_outputs()
         imports: list[Tuple[str, str]] = []
-        imports += tool_class_imports
-        imports += ToolInputSectionRender(inputs).imports
-        imports += ToolOutputSectionRender(outputs).imports
+        imports += core_imports
+        imports += ToolInputSectionText(inputs).imports
+        imports += ToolOutputSectionText(outputs).imports
         imports = list(set(imports))
         return ordering.order_imports(imports)
 
@@ -113,12 +111,12 @@ class ToolRender(TextRender):
         outputs = self.entity.list_outputs()
         out_str: str = ''
         out_str += f'{note_snippet(self.entity)}\n'
+        # messages here?
         out_str += f'{syspath_snippet()}\n'
-        if self.render_imports:
-            out_str += f'{formatting.format_imports(self.imports)}\n'
+        out_str += f'{formatting.format_imports(self.imports)}\n'
         out_str += f'\n{metadata_snippet(self.entity)}\n'
-        out_str += f'{ToolInputSectionRender(inputs).render()}\n'
-        out_str += f'{ToolOutputSectionRender(outputs).render()}\n'
-        out_str += f'{builder_snipper(self.entity)}\n'
+        out_str += f'{ToolInputSectionText(inputs).render()}\n'
+        out_str += f'{ToolOutputSectionText(outputs).render()}\n'
+        out_str += f'{builder_snippet(self.entity)}\n'
         out_str += f'\n{translate_snippet(self.entity)}\n'
         return out_str

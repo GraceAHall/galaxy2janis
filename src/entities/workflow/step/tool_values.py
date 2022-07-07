@@ -1,11 +1,10 @@
 
 
-
-from abc import ABC
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Tuple
-from gx.gxtool.param.Param import Param
+
+from shellparser.components.inputs.InputComponent import InputComponent
 
 
 class InputValueType(Enum):
@@ -16,61 +15,50 @@ class InputValueType(Enum):
     BOOLEAN         = auto()
     NONE            = auto()
 
+enum_map = {
+    'runtime': InputValueType.RUNTIME,
+    'env_var': InputValueType.ENV_VAR,
+    'string': InputValueType.STRING,
+    'numeric': InputValueType.NUMERIC,
+    'boolean': InputValueType.BOOLEAN,
+    'NONE': InputValueType.NONE
+}
 
 @dataclass
-class InputValue(ABC):
-    comptype: str # this should really be an enum
-    gxparam: Optional[Param]
+class StaticInputValue:
+    value: str
+    _valtypestr: str
+    comptype: Optional[str] = None
+    default: bool = False
+    linked: bool = False
 
     def __post_init__(self):
-        self.is_default_value: bool = False
-        self.linked: bool = False
-
-    @property
-    def abstract_value(self) -> str:
-        if isinstance(self, StaticInputValue) or isinstance(self, DefaultInputValue):
-            return str(self.value)
-        elif isinstance(self, ConnectionInputValue):
-            return f'step {self.step_id} {self.step_output}'
-        else:
-            return 'uuid'
-
+        self.valtype = enum_map[self._valtypestr]
 
 @dataclass
-class ConnectionInputValue(InputValue):
-    step_id: int
-    step_output: str 
-
+class ConnectionInputValue:
+    step_uuid: str
+    output_uuid: str
+    comptype: Optional[str] = None
+    linked: bool = False
 
 @dataclass
-class WorkflowInputInputValue(InputValue):
+class WorkflowInputInputValue:
     input_uuid: str
+    comptype: Optional[str] = None
     is_runtime: bool = False
+    linked: bool = False
 
 
-@dataclass
-class StaticInputValue(InputValue):
-    value: str
-    valtype: InputValueType
 
-
-@dataclass
-class DefaultInputValue(InputValue):
-    value: str
-    valtype: InputValueType
-
-
-@dataclass
-class RuntimeInputValue(InputValue):
-    """
-    RuntimeInputValues are eventually migrated to WorkflowInputInputValues.
-    This is a temporary class and will never be present in a finalised workflow. ?
-    """
-    pass
-
+InputValue = ConnectionInputValue | WorkflowInputInputValue | StaticInputValue
 
 class InputValueRegister:
     def __init__(self):
+        # TODO this will change. Need to account for subworkflows. 
+        # inputs_params could be list[InputComponent] when step is toolstep
+        # inputs_params could be list[WorkflowInput] in step is subworkflow
+        self.input_params: list[InputComponent] 
         self.linked_values: dict[str, InputValue] = {}
         self.unlinked_values: list[InputValue] = []
 
@@ -97,7 +85,6 @@ class InputValueRegister:
         self.linked_values[uuid] = value
     
     def update_unlinked(self, value: InputValue) -> None:
-        value.linked = False
         self.unlinked_values.append(value)
     
     def __str__(self) -> str:

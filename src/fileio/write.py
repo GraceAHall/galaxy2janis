@@ -1,7 +1,7 @@
 
 
 from entities.workflow.step.step import WorkflowStep
-from fileio.text.tool.ToolRender import ToolRender
+from fileio.text.tool.ToolText import ToolText
 
 from entities.tool import Tool
 from entities.workflow import Workflow
@@ -9,18 +9,31 @@ from entities.workflow import Workflow
 import paths
 
 
-def write_tool(tool: Tool) -> None:
-    render = ToolRender(entity=tool, render_imports=True)
-    page = render.render()
-    path = paths.manager.tool()
+def write_workflow(workflow: Workflow, path: str) -> None:
+    for step in workflow.steps:
+        path = paths.manager.tool(metadata=step.metadata)
+        write_tool(step.tool, path)
+    raise NotImplementedError()
+
+def write_step(step: WorkflowStep, path: str) -> None:
+    raise NotImplementedError()
+
+def write_tool(tool: Tool, path: str) -> None:
+    text = ToolText(entity=tool, render_imports=True)
+    page = text.render()
     with open(path, 'w') as fp:
         fp.write(page)
 
-def write_step(step: WorkflowStep) -> None:
+def write_inputs() -> None:
     raise NotImplementedError()
 
-def write_workflow(workflow: Workflow) -> None:
+def write_config() -> None:
     raise NotImplementedError()
+
+
+
+
+
 
 
 # def write_workflow_tools(workflow: Workflow) -> None:

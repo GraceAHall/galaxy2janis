@@ -13,19 +13,19 @@ from shellparser.components.inputs.Option import Option
 from .. import formatting
 from .. import ordering
 
-from datatypes import get_datatype
+import datatypes
 import tags
 
 
 @dataclass
-class ToolInputRender(TextRender):
-    def __init__(self, entity: InputComponent, render_imports: bool=False):
-        super().__init__(render_imports)
+class ToolInputText(TextRender):
+    def __init__(self, entity: InputComponent):
+        super().__init__()
         self.entity = entity
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = get_datatype(self.entity)
+        jtypes = datatypes.get(self.entity)
         imports: list[Tuple[str, str]] = []
         imports = [(j.import_path, j.classname) for j in jtypes]
 

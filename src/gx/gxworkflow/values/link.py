@@ -4,15 +4,12 @@
 import logs.logging as logging
 from typing import Type
 
-import settings
-from gx.gxworkflow.analysis.tool_values.component_updates import update_component_knowledge
+from .updates import update_component_knowledge
 
-from entities.tool import Tool
 from entities.workflow import Workflow
 from entities.workflow import WorkflowStep
 
-from .ValueMigrator import ValueMigrator
-from .ValueLinker import (
+from .linkers.cheetah import (
     ValueLinker,
     CheetahValueLinker, 
     InputDictValueLinker, 
@@ -63,11 +60,11 @@ def link_step_values(step: WorkflowStep, workflow: Workflow) -> None:
         logging.runtime_data(str(step.tool_values))
     
     # migrate value types if necessary
-    perform_migrations(step, workflow)
+    # perform_migrations(step, workflow)
 
-def perform_migrations(step: WorkflowStep, workflow: Workflow):
-    migrator = ValueMigrator(step, workflow)
-    migrator.migrate()
+# def perform_migrations(step: WorkflowStep, workflow: Workflow):
+#     migrator = ValueMigrator(step, workflow)
+#     migrator.migrate()
 
 def assert_all_components_assigned(step: WorkflowStep) -> None:
     tool_inputs = step.tool.list_inputs() # type: ignore

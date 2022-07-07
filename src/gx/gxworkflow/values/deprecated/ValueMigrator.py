@@ -16,7 +16,7 @@ from entities.workflow import (
     StaticInputValue
     
 )
-import gx.gxworkflow.analysis.tool_values.create_value as value_utils
+import gx.gxworkflow.analysis.tool_values.factory as value_utils
 import tags
 import datatypes
 
@@ -114,9 +114,9 @@ class ValueMigrator:
             name=tags.tool.get(component.uuid),
             step_id=self.step.metadata.step_id,
             step_tag=tags.workflow.get(self.step.uuid),
-            is_array=component.array,
+            array=component.array,
             is_galaxy_input_step=False,
-            janis_datatypes=datatypes.get_datatype(component),
+            janis_datatypes=datatypes.get(component),
         )
 
 

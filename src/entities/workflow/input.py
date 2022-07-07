@@ -12,7 +12,8 @@ class WorkflowInput:
     name: str
     step_id: int
     step_tag: Optional[str]
-    is_array: bool
+    array: bool
+    optional: bool = False
     is_galaxy_input_step: bool = False
     gx_datatypes: list[str] = field(default_factory=list)
     janis_datatypes: list[JanisDatatype] = field(default_factory=list)

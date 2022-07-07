@@ -13,7 +13,7 @@ from shellparser.components.outputs.WildcardOutput import WildcardOutput
 from .. import formatting
 from .. import ordering
 
-from datatypes import get_datatype
+from datatypes import get
 import tags
 
 
@@ -33,14 +33,14 @@ def format_selector_str(output: OutputComponent) -> Optional[str]:
 
 
 @dataclass
-class ToolOutputRender(TextRender):
+class ToolOutputText(TextRender):
     def __init__(self, entity: OutputComponent, render_imports: bool=False):
         super().__init__(render_imports)
         self.entity = entity
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = get_datatype(self.entity)
+        jtypes = get(self.entity)
         imports: list[Tuple[str, str]] = []
         imports = [(j.import_path, j.classname) for j in jtypes]
 
