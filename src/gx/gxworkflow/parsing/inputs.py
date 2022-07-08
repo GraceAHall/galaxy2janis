@@ -7,17 +7,16 @@ from entities.workflow import WorkflowInput
 from entities.workflow import Workflow
 
 
-def ingest_input_steps(workflow: Workflow, gxworkflow: dict[str, Any]) -> None:
-    for step in gxworkflow['steps'].values():
+def ingest_workflow_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
+    for step in galaxy['steps'].values():
         if step['type'] in ['data_input', 'data_collection_input']:
             workflow_input = parse_input_step(step)
-            workflow.add_input(workflow_input)
+            step['janis_uuid'] = workflow_input.uuid # crucial!
+            janis.add_input(workflow_input)
 
 def parse_input_step(step: dict[str, Any]) -> WorkflowInput:
     return WorkflowInput(
         name=format_input_step_name(step),
-        step_id=step['id'],
-        step_tag=None,
         array=format_input_step_array(step),
         is_galaxy_input_step=True,
         gx_datatypes=format_input_step_datatypes(step),

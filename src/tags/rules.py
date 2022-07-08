@@ -5,7 +5,7 @@ import keyword
 import builtins
 
 import logs.logging as logging
-
+import datatypes
 
 python_keys = set(keyword.kwlist)
 builtin_keys = set(dir(builtins))
@@ -92,9 +92,10 @@ def _prepend_component_type(tag: str, entity: Any) -> str:
     return f'{entity_type}_{tag}'
 
 def _append_datatype(tag: str, entity: Any) -> str:
-    #dtype = entity.janis_datatypes[0].classname.lower()
-    if not tag.endswith(dtype): # don't add the dtype if its already been added
-        tag = f"{tag}_{dtype}"
+    jtypes = datatypes.get(entity)
+    jclass = jtypes[0].classname.lower()
+    if not tag.endswith(jclass): # don't add the dtype if its already been added
+        tag = f"{tag}_{jclass}"
     return tag
 
 def _strip_numerals(tag: str) -> str:  # ??? y

@@ -1,9 +1,35 @@
 
+-------------------------
+New approach to ingestion
+-------------------------
+
+- relational database like
+    - think like relational database 
+    - entities first in logical order (ie steps before step outputs)
+    - connections last after all entities exist
+
+- Liason class 
+    - holds the galaxy workflow (json) and the janis Workflow
+    - entities are linked between these using the Liason class 
+    - think like 2 storey shopping mall building layout: 2 layers
+    - ie if i am looking at a galaxy step and i want to get the equivalent janis step, the liason will be able to do that.
+    - clearly defines how entities are linked between the two workflows. 
+
+    - fromcwl and fromwdl use odd methods to find the entity they want
+    - ie when making a connection:
+        - they know the emitting entity and receiving entity in the cwl workflow
+        - because janis is like a reskin of cwl, the same entities exist in the janis workflow being built
+        - they then can assume 'there will be an emitting entity and receiving entity in the janis workflow with the same names as the cwl versions'
+        - ie if a step name is 'fastqc' in the cwl workflow, a 'fastqc' step will already be available in the janis workflow. names match. 
+        - this relies on the fact that janis & cwl are the same. DOES NOT WORK for other languages. 
+        - additionally, this is way too coupled. if any changes are made to the linking process, everything will break and have to be changed in a million locations
+
+-------------------------
+-------------------------
 
 
 FILEIO TextRender
-- @property imports has same logic for anything that just collects datatypes (workflowinput, workflowoutput, toolinput, tooloutput)
-
+- code duplication: @property imports has same logic for anything that just collects datatypes (workflowinput, workflowoutput, toolinput, tooloutput)
 
 uuids
 - anytime we need to refer to registered external entity

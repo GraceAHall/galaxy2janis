@@ -1,34 +1,27 @@
 
 
-import datatypes
 import logs.logging as logging
 import settings
 import json
-import tags
 
 from typing import Any, Optional
 from setup import workflow_setup
 
 from entities.workflow import Workflow
-from entities.workflow import WorkflowOutput
 
 from gx.gxworkflow.parsing.metadata import ingest_metadata
-from gx.gxworkflow.parsing.input_step import ingest_input_steps
-from gx.gxworkflow.parsing.tool_step import ingest_tool_steps
+from gx.gxworkflow.parsing.inputs import ingest_workflow_inputs
+from gx.gxworkflow.parsing.step import ingest_workflow_steps
 
-from gx.gxworkflow.analysis.tool_values.linking.link import link_workflow_tool_values
-from gx.gxworkflow.analysis.step_outputs.link import link_workflow_tool_outputs
+# WORKING
+from gx.gxworkflow.parsing.tool_step.tool import ingest_workflow_steps_tools
+from gx.gxworkflow.parsing.tool_step.outputs import ingest_workflow_steps_outputs
+from gx.gxworkflow.parsing.tool_step.inputs import ingest_workflow_steps_inputs
+
+from gx.gxworkflow.values.link import link_step_tool_values
 
 from fileio import write_workflow
 
-# from workflows.parsing.workflow.inputs import parse_input_step
-# from workflows.parsing.step.step import parse_tool_step
-
-# from workflows.parsing.step.inputs import parse_step_inputs
-# from workflows.parsing.step.outputs import parse_step_outputs
-
-# from workflows.parsing.tools.tools import parse_workflow_tools
-# from workflows.parsing.workflow.outputs import init_workflow_outputs
 
 
 """
@@ -44,17 +37,17 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     workflow_setup(args)
     logging.msg_parsing_workflow()
 
-    gxworkflow = load_tree()
-    workflow = Workflow()
+    galaxy = load_tree()
+    janis = Workflow()
 
-    ingest_metadata(workflow, gxworkflow)
-    ingest_input_steps(workflow, gxworkflow)
-    ingest_tool_steps(workflow, gxworkflow)
-    link_workflow_tool_values(workflow)
-    link_workflow_tool_outputs(workflow)
-    create_workflow_outputs(workflow)
-    write_workflow(workflow)
-
+    ingest_metadata(janis, galaxy)
+    ingest_workflow_inputs(janis, galaxy)
+    ingest_workflow_steps(janis, galaxy)
+    ingest_workflow_steps_tools(janis)
+    ingest_workflow_steps_outputs(janis, galaxy)
+    ingest_workflow_steps_inputs(janis, galaxy)
+    link_step_tool_values(janis)
+    write_workflow(janis, path)
 
 def load_tree() -> dict[str, Any]:
     # TODO should probably check the workflow type (.ga, .ga2)
@@ -62,17 +55,5 @@ def load_tree() -> dict[str, Any]:
     with open(settings.workflow.workflow_path, 'r') as fp:
         return json.load(fp)
 
-def create_workflow_outputs(workflow: Workflow) -> Workflow:
-    for step in workflow.steps:
-        for stepout in step.outputs.list():
-            if stepout.is_wflow_out:
-                toolout = stepout.tool_output
-                assert(toolout)
-                workflow_output = WorkflowOutput(
-                    step_tag=tags.workflow.get(step.uuid),
-                    toolout_tag=tags.tool.get(toolout.uuid),
-                    janis_datatypes=datatypes.get(stepout)
-                )
-                workflow.add_output(workflow_output)
-    return workflow
+
 

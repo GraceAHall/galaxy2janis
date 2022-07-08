@@ -10,8 +10,6 @@ from datatypes.JanisDatatype import JanisDatatype
 @dataclass
 class WorkflowInput:
     name: str
-    step_id: int
-    step_tag: Optional[str]
     array: bool
     optional: bool = False
     is_galaxy_input_step: bool = False

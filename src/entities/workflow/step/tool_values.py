@@ -1,10 +1,13 @@
 
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Tuple
 
 from shellparser.components.inputs.InputComponent import InputComponent
+
+import tags
 
 
 class InputValueType(Enum):
@@ -21,37 +24,60 @@ enum_map = {
     'string': InputValueType.STRING,
     'numeric': InputValueType.NUMERIC,
     'boolean': InputValueType.BOOLEAN,
-    'NONE': InputValueType.NONE
+    'none': InputValueType.NONE
 }
 
 @dataclass
-class StaticInputValue:
+class InputValue(ABC):
+    component: InputComponent
+    linked: bool
+
+    @property
+    @abstractmethod
+    def abstract_value(self) -> str:
+        ...
+    
+    @property
+    def comptype(self) -> Optional[str]:
+        return type(self.component).__name__.lower() 
+    
+
+@dataclass
+class StaticInputValue(InputValue):
     value: str
     _valtypestr: str
-    comptype: Optional[str] = None
     default: bool = False
-    linked: bool = False
 
     def __post_init__(self):
         self.valtype = enum_map[self._valtypestr]
+    
+    @property
+    def abstract_value(self) -> str:
+        return self.value
+
 
 @dataclass
-class ConnectionInputValue:
+class ConnectionInputValue(InputValue):
     step_uuid: str
     output_uuid: str
-    comptype: Optional[str] = None
-    linked: bool = False
+    
+    @property
+    def abstract_value(self) -> str:
+        step_tag = tags.workflow.get(self.step_uuid)
+        output_tag = tags.workflow.get(self.output_uuid)
+        return f'step {step_tag}: {output_tag}'
+    
 
 @dataclass
-class WorkflowInputInputValue:
+class WorkflowInputInputValue(InputValue):
     input_uuid: str
-    comptype: Optional[str] = None
     is_runtime: bool = False
-    linked: bool = False
 
+    @property
+    def abstract_value(self) -> str:
+        input_tag = tags.workflow.get(self.input_uuid)
+        return f'workflow input: {input_tag}'
 
-
-InputValue = ConnectionInputValue | WorkflowInputInputValue | StaticInputValue
 
 class InputValueRegister:
     def __init__(self):
@@ -90,9 +116,9 @@ class InputValueRegister:
     def __str__(self) -> str:
         out: str = '\nInputValueRegister -----\n'
         out += f"{'[gxparam]':30}{'[input type]':30}{'[value]':30}\n"
-        for inp in self.linked_values.values():
-            param_name = inp.gxparam.name if inp.gxparam else 'none'
-            out += f'{param_name:30}{str(type(inp).__name__):30}{inp.abstract_value:30}\n'
+        for uuid, inp in self.linked_values.items():
+            component_tag = tags.tool.get(uuid)
+            out += f'{component_tag:30}{str(type(inp).__name__):30}{inp.abstract_value:30}\n'
         return out
 
 

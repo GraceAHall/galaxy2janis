@@ -50,7 +50,13 @@ class Tool:
             #raise RuntimeError(f'no gxparam named {query}')
         return param
    
-    def get_input(self, query_uuid: str) -> CommandComponent:
+    def get_input(self, query_uuid: str) -> Optional[CommandComponent]:
+        for inp in self.inputs:
+            if query_uuid == inp.uuid:
+                return inp
+        raise RuntimeError(f'could not find {query_uuid} in tool inputs')
+    
+    def get_input_via_param_name(self, query_uuid: str) -> CommandComponent:
         for inp in self.inputs:
             if query_uuid == inp.uuid:
                 return inp

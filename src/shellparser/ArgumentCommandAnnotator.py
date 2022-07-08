@@ -36,9 +36,17 @@ def argument_component_not_exists(gxparam: Param, xmltool: XMLToolDefinition, co
 
 def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
     # check the prefix appears in the cmd text
+    # TODO improve. this is very limited.
     argument: str = gxparam.argument # type: ignore
-    if argument is not None and argument in xmltool.raw_command:
-        return True
+    variable_fmt1: str = f'${gxparam.name}'
+    variable_fmt2: str = f'${{{gxparam.name}}}'
+    if argument is not None:
+        # options
+        if argument in xmltool.raw_command:
+            return True
+        # flags
+        if variable_fmt1 in xmltool.raw_command or variable_fmt2 in xmltool.raw_command:
+            return True
     return False
 
 # main class

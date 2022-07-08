@@ -13,11 +13,11 @@ class StepOutputRegister:
         self.register.append(step_output)
 
     def get(self, gxvarname: str) -> StepOutput:
+        raise RuntimeError(f'could not find output {gxvarname}')
         for output in self.register:
             if output.gx_varname == gxvarname:
                 return output
-        raise RuntimeError(f'could not find output {gxvarname}')
-
+    
     def list(self) -> list[StepOutput]:
         return self.register
 

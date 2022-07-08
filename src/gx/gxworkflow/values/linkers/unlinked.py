@@ -8,7 +8,7 @@ from entities.workflow import ConnectionStepInput, StepInput, WorkflowInputStepI
 from entities.workflow import InputValue
 
 from .ValueLinker import ValueLinker
-from factory import main as factory # lol bad logic
+from ..factory import main as factory # lol bad logic
 
 
 class UnlinkedValueLinker(ValueLinker):

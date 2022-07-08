@@ -17,7 +17,7 @@ from shellparser.text.simplification.aliases import resolve_aliases
 from shellparser.cmdstr.cmdstr import gen_command_string
 from shellparser.text.load import load_xml_command_cheetah_eval
 
-from factory import main as factory
+from ..factory import main as factory
 from .ValueLinker import ValueLinker
 
 from .. import utils as value_utils
@@ -133,8 +133,6 @@ class CheetahValueLinker(ValueLinker):
         """creates a workflow input for the tool input component"""
         return WorkflowInput(
             name=tags.tool.get(component.uuid),
-            step_id=self.step.metadata.step_id,
-            step_tag=tags.workflow.get(self.step.uuid),
             array=component.array,
             is_galaxy_input_step=False,
             janis_datatypes=datatypes.get(component),

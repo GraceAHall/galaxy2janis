@@ -9,13 +9,11 @@ from .updates import update_component_knowledge
 from entities.workflow import Workflow
 from entities.workflow import WorkflowStep
 
-from .linkers.cheetah import (
-    ValueLinker,
-    CheetahValueLinker, 
-    InputDictValueLinker, 
-    UnlinkedValueLinker, 
-    DefaultValueLinker
-)
+from .linkers.ValueLinker import ValueLinker 
+from .linkers.cheetah import CheetahValueLinker 
+from .linkers.stepinputs import StepInputsLinker 
+from .linkers.default import DefaultValueLinker 
+from .linkers.unlinked import UnlinkedValueLinker 
 
 """
 assigns values for each tool input 
@@ -29,7 +27,7 @@ is assigned the default or listed as a WorkflowInput (when it is a file type)
 
 knowledge_linkers: list[Type[ValueLinker]] = [
     CheetahValueLinker,
-    InputDictValueLinker,
+    StepInputsLinker,
 ]
 
 blind_linkers: list[Type[ValueLinker]] = [
@@ -38,7 +36,7 @@ blind_linkers: list[Type[ValueLinker]] = [
 ]
 
 
-def link_workflow_tool_values(workflow: Workflow) -> None:
+def link_step_tool_values(workflow: Workflow) -> None:
     for step in workflow.steps:
         link_step_values(step, workflow)
         assert_all_components_assigned(step)
@@ -58,15 +56,9 @@ def link_step_values(step: WorkflowStep, workflow: Workflow) -> None:
         l = linker(step, workflow)
         l.link()
         logging.runtime_data(str(step.tool_values))
-    
-    # migrate value types if necessary
-    # perform_migrations(step, workflow)
-
-# def perform_migrations(step: WorkflowStep, workflow: Workflow):
-#     migrator = ValueMigrator(step, workflow)
-#     migrator.migrate()
 
 def assert_all_components_assigned(step: WorkflowStep) -> None:
+    # just for safety
     tool_inputs = step.tool.list_inputs() # type: ignore
     for component in tool_inputs:
         if not step.tool_values.get(component.uuid):

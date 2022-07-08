@@ -112,8 +112,6 @@ class ValueMigrator:
         """creates a workflow input for the tool input component"""
         return WorkflowInput(
             name=tags.tool.get(component.uuid),
-            step_id=self.step.metadata.step_id,
-            step_tag=tags.workflow.get(self.step.uuid),
             array=component.array,
             is_galaxy_input_step=False,
             janis_datatypes=datatypes.get(component),

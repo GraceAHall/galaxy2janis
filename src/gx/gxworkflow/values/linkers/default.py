@@ -2,7 +2,7 @@
 
 
 from .ValueLinker import ValueLinker
-from factory import main as factory
+from ..factory import main as factory
 
 
 class DefaultValueLinker(ValueLinker):

@@ -3,12 +3,13 @@
 
 from abc import ABC
 from dataclasses import dataclass
+from typing import Optional
 from gx.gxtool.param.Param import Param
+from shellparser.components.inputs.InputComponent import InputComponent
 
 
 @dataclass
 class StepInput(ABC):
-    gxparam: Param
 
     def __post_init__(self):
         self.linked: bool = False
@@ -16,25 +17,23 @@ class StepInput(ABC):
 
 @dataclass
 class WorkflowInputStepInput(StepInput):
-    step_id: int
-
+    input_uuid: str
+    target: Optional[InputComponent]
 
 @dataclass
 class ConnectionStepInput(StepInput):
-    step_id: int
-    output_name: str
-
-
-@dataclass
-class StaticStepInput(StepInput):
-    value: str
-
+    step_uuid: str
+    output_uuid: str
+    target: Optional[InputComponent]
 
 @dataclass
 class RuntimeStepInput(StepInput):
-    value: str = 'RuntimeValue'
+    target: Optional[InputComponent]
 
-
+@dataclass
+class StaticStepInput(StepInput):
+    gxparam: Param
+    value: str
 
 
 

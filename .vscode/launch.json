@@ -54,6 +54,18 @@
             ]
         },
         {
+            "name": "fastqc tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/fastqc/rgFastQC.xml", 
+            ]
+        },
+        {
             "name": "super simple workflow",
             "type": "python",
             "request": "launch",

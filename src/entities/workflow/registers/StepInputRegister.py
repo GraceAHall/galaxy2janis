@@ -3,8 +3,13 @@
 
 
 from typing import Any, Optional
-from ..step.inputs import StepInput, StaticStepInput
-
+from ..step.inputs import (
+    ConnectionStepInput, 
+    StepInput, 
+    StaticStepInput, 
+    WorkflowInputStepInput,
+    RuntimeStepInput
+)
 
 class StepInputRegister:
     """
@@ -20,8 +25,16 @@ class StepInputRegister:
 
     def get(self, gxvarname: str) -> Optional[StepInput]:
         for inp in self.register:
-            if inp.gxparam.name == gxvarname:
-                return inp
+            match inp:
+                case StaticStepInput():
+                    if inp.gxparam.name == gxvarname:
+                        return inp
+                case WorkflowInputStepInput() | ConnectionStepInput() | RuntimeStepInput():
+                    if inp.target and inp.target.gxparam:
+                        if inp.target.gxparam.name == gxvarname:
+                            return inp
+                case _:
+                    pass
         return None
     
     def list(self) -> list[StepInput]:

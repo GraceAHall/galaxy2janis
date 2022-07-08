@@ -4,6 +4,7 @@ from typing import Any
 
 from entities.tool import Tool
 from entities.workflow.step.metadata import StepMetadata
+from entities.workflow.workflow import Workflow
 
 from tool_mode import tool_mode
 from gx.interaction import get_builtin_tool_path
@@ -11,10 +12,14 @@ from gx.interaction import get_builtin_tool_path
 import paths
 
 
+def ingest_workflow_steps_tools(janis: Workflow) -> None:
+    for step in janis.steps:
+        tool = parse_step_tool(step.metadata)
+        step.set_tool(tool)
+
 def parse_step_tool(metadata: StepMetadata) -> Tool:
     args = create_tool_settings_for_step(metadata)
     return tool_mode(args)
-
 
 def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
     if metadata.wrapper.inbuilt:

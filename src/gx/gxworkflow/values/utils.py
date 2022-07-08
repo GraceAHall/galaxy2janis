@@ -13,16 +13,13 @@ import tags
 
 
 def create_workflow_input(component: InputComponent) -> WorkflowInput:
-        """creates a workflow input for the tool input component"""
+    """creates a workflow input for a tool component"""
     return WorkflowInput(
         name=tags.tool.get(component.uuid),
-        step_id=self.step.metadata.step_id,
-        step_tag=tags.workflow.get(self.step.uuid),
         array=component.array,
         is_galaxy_input_step=False,
         janis_datatypes=datatypes.get(component),
     )
-
 
 def get_comptype(component: CommandComponent) -> str:
     return type(component).__name__.lower() 
