@@ -3,11 +3,11 @@
 from __future__ import annotations
 from typing import Optional
 
-from entities.tool.Tool import Tool
+from entities.tool import Tool
+
 from ..registers.StepInputRegister import StepInputRegister
 from ..registers.StepOutputRegister import StepOutputRegister
 from .metadata import StepMetadata
-from .tool_values import InputValueRegister
 
 
 class WorkflowStep:
@@ -17,7 +17,6 @@ class WorkflowStep:
         self.metadata = metadata
         self.inputs: StepInputRegister = StepInputRegister()
         self.outputs: StepOutputRegister = StepOutputRegister()
-        self.tool_values: InputValueRegister = InputValueRegister()
         self._tool: Optional[Tool] = None
 
     @property

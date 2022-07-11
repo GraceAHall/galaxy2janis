@@ -1,7 +1,7 @@
 
 from typing import Tuple
 
-from entities.workflow.workflow import Workflow
+from entities.workflow import Workflow
 from fileio.text.TextRender import TextRender
 
 from datetime import datetime

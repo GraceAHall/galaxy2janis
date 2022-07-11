@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Tuple
 
-from entities.workflow.step.step import WorkflowStep
-from entities.workflow.step.tool_values import ConnectionInputValue, DefaultInputValue, InputValue, StaticInputValue, WorkflowInputInputValue
-from entities.workflow.workflow import Workflow
+from entities.workflow import WorkflowStep
+from entities.workflow import ConnectionInputValue, InputValue, StaticInputValue, WorkflowInputInputValue
+from entities.workflow import Workflow
 from fileio.text.TextRender import TextRender
 
 import tags

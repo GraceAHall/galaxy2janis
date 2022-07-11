@@ -1,8 +1,8 @@
 
 
 
-from typing import Any
-from entities.workflow.input import WorkflowInput
+from typing import Any, Optional
+from entities.workflow import WorkflowInput
 
 from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.InputComponent import InputComponent
@@ -13,7 +13,7 @@ import tags
 
 
 def create_workflow_input(component: InputComponent) -> WorkflowInput:
-    """creates a workflow input for a tool component"""
+    """creates a workflow input from a tool component"""
     return WorkflowInput(
         name=tags.tool.get(component.uuid),
         array=component.array,
@@ -24,14 +24,14 @@ def create_workflow_input(component: InputComponent) -> WorkflowInput:
 def get_comptype(component: CommandComponent) -> str:
     return type(component).__name__.lower() 
 
-def select_input_value_type(component: CommandComponent, value: Any) -> str:
+def select_input_value_type(component: Optional[InputComponent], value: Any) -> str:
     """
     only StaticValueLinkingStrategy and DefaultValueLinkingStrategy 
     call this function. don't need to worry about CONNECTION and RUNTIME_VALUE
     """
     if is_bool(value):
         return 'boolean'
-    elif is_numeric(component, value):
+    elif component and is_numeric(component, value):
         return 'numeric'
     elif is_none(value):
         return 'none'

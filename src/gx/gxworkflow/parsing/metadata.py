@@ -4,7 +4,7 @@
 from typing import Any
 
 from entities.workflow import Workflow
-from entities.workflow.metadata import WorkflowMetadata
+from entities.workflow import WorkflowMetadata
 
 
 def ingest_metadata(janis: Workflow, galaxy: dict[str, Any]) -> None:

@@ -6,8 +6,8 @@ import warnings
 import yaml
 import sys 
 
-import settings
 import paths
+import settings
 
 # -------------
 # configuration

@@ -1,9 +1,10 @@
 
 
 
-from entities.workflow.step.step import WorkflowStep
 from entities.tool import Tool
 from entities.workflow import Workflow
+from entities.workflow import WorkflowStep
+
 from .Format import Format
 
 

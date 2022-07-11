@@ -3,8 +3,8 @@
 from typing import Any
 
 from entities.workflow import StepOutput
-from entities.workflow.step.step import WorkflowStep
-from entities.workflow.workflow import Workflow
+from entities.workflow import WorkflowStep
+from entities.workflow import Workflow
 
 import datatypes
 import mapping

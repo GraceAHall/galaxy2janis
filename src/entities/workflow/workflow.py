@@ -66,11 +66,11 @@ class Workflow:
         else:
             raise RuntimeError('get_input needs to be supplied either step_id or input_uuid')
 
-    def get_step(self, step_uuid: Optional[str]) -> WorkflowStep:
-        if not step_uuid:
-            raise RuntimeError('please provide step_uuid')
-        for step in self._steps:
-            if step.uuid == step_uuid:
-                return step
-        raise RuntimeError('cannot find workflow step')
+    # def get_step(self, step_uuid: Optional[str]) -> WorkflowStep:
+    #     if not step_uuid:
+    #         raise RuntimeError('please provide step_uuid')
+    #     for step in self._steps:
+    #         if step.uuid == step_uuid:
+    #             return step
+    #     raise RuntimeError('cannot find workflow step')
 

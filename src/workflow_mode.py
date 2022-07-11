@@ -12,13 +12,14 @@ from entities.workflow import Workflow
 from gx.gxworkflow.parsing.metadata import ingest_metadata
 from gx.gxworkflow.parsing.inputs import ingest_workflow_inputs
 from gx.gxworkflow.parsing.step import ingest_workflow_steps
-
-# WORKING
-from gx.gxworkflow.parsing.tool_step.tool import ingest_workflow_steps_tools
+from gx.gxworkflow.parsing.tool_step.tool import ingest_workflow_tools
 from gx.gxworkflow.parsing.tool_step.outputs import ingest_workflow_steps_outputs
-from gx.gxworkflow.parsing.tool_step.inputs import ingest_workflow_steps_inputs
 
-from gx.gxworkflow.values.link import link_step_tool_values
+from gx.gxworkflow.values import handle_tool_connection_inputs
+from gx.gxworkflow.values import handle_tool_runtime_inputs
+from gx.gxworkflow.values import handle_tool_static_inputs
+from gx.gxworkflow.values import handle_tool_default_inputs
+from gx.gxworkflow.values import handle_tool_unlinked_inputs
 
 from fileio import write_workflow
 
@@ -40,13 +41,20 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     galaxy = load_tree()
     janis = Workflow()
 
+    # ingesting workflow entities to internal
     ingest_metadata(janis, galaxy)
     ingest_workflow_inputs(janis, galaxy)
     ingest_workflow_steps(janis, galaxy)
-    ingest_workflow_steps_tools(janis)
-    ingest_workflow_steps_outputs(janis, galaxy)
-    ingest_workflow_steps_inputs(janis, galaxy)
-    link_step_tool_values(janis)
+    ingest_workflow_tools(janis)
+    ingest_workflow_steps_outputs(janis, galaxy) 
+
+    # assigning tool input values
+    handle_tool_connection_inputs(janis, galaxy)
+    handle_tool_runtime_inputs(janis, galaxy)
+    handle_tool_static_inputs(janis, galaxy)
+    handle_tool_default_inputs(janis, galaxy)
+
+    update_component_knowledge(janis)
     write_workflow(janis, path)
 
 def load_tree() -> dict[str, Any]:

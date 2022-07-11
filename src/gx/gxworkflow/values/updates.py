@@ -10,10 +10,10 @@ from shellparser.components.inputs.Positional import Positional
 from entities.workflow import WorkflowStep
 
 
-from entities.workflow import (
+from .values import (
     InputValue, 
     StaticInputValue, 
-    InputValueRegister 
+    StepInputRegister 
 )
 
 """
@@ -28,7 +28,7 @@ def update_component_knowledge(step: WorkflowStep):
 
 # TODO this is bad  
 class ToolInputUpdater:
-    def __init__(self, tool: Tool, valregister: InputValueRegister):
+    def __init__(self, tool: Tool, valregister: StepInputRegister):
         self.tool = tool
         self.valregister = valregister
 

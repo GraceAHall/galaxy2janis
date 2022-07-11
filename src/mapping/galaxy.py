@@ -1,14 +1,17 @@
 
 
-from typing import Any, Optional
-from entities.tool.Tool import Tool
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any, Optional
 
-from entities.workflow import Workflow
-from entities.workflow import WorkflowInput
-from entities.workflow import WorkflowStep
-from entities.workflow import StepOutput
-from shellparser.components.inputs.InputComponent import InputComponent
-from shellparser.components.outputs.OutputComponent import OutputComponent
+if TYPE_CHECKING:
+    from entities.tool.Tool import Tool
+    from entities.workflow import Workflow
+    from entities.workflow import WorkflowInput
+    from entities.workflow import WorkflowStep
+    from entities.workflow import StepOutput
+
+    from shellparser.components.inputs.InputComponent import InputComponent
+    from shellparser.components.outputs.OutputComponent import OutputComponent
 
 
 # split this file into mapping.workflow, mapping.tool?

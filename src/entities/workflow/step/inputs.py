@@ -17,8 +17,8 @@ class StepInput(ABC):
 
 @dataclass
 class WorkflowInputStepInput(StepInput):
-    input_uuid: str
     target: Optional[InputComponent]
+    input_uuid: str
 
 @dataclass
 class ConnectionStepInput(StepInput):

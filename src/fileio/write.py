@@ -1,17 +1,14 @@
 
 
-from entities.workflow.step.step import WorkflowStep
 from fileio.text.tool.ToolText import ToolText
 
 from entities.tool import Tool
 from entities.workflow import Workflow
-
-import paths
+from entities.workflow import WorkflowStep
 
 
 def write_workflow(workflow: Workflow, path: str) -> None:
     for step in workflow.steps:
-        path = paths.manager.tool(metadata=step.metadata)
         write_tool(step.tool, path)
     raise NotImplementedError()
 

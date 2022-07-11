@@ -2,9 +2,9 @@
 
 from abc import ABC, abstractmethod
 
-from entities.workflow.step.step import WorkflowStep
 from entities.tool import Tool
 from entities.workflow import Workflow
+from entities.workflow import WorkflowStep
 
 
 class Format(ABC):

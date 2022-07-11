@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from shellparser.components.inputs import Positional, Flag, Option
     from entities.workflow import WorkflowInput
     from entities.workflow import WorkflowOutput
-    from entities.workflow.step.inputs import StepInput
-    from entities.workflow.step.outputs import StepOutput
+    from entities.workflow import StepInput
+    from entities.workflow import StepOutput
 
 
 class DatatypeGetStrategy(ABC):

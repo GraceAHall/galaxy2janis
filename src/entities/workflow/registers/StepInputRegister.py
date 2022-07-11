@@ -1,59 +1,37 @@
 
 
+from typing import Optional, Tuple
+from gx.gxworkflow.values.values import InputValue
+from shellparser.components.inputs.InputComponent import InputComponent
 
+import tags
 
-from typing import Any, Optional
-from ..step.inputs import (
-    ConnectionStepInput, 
-    StepInput, 
-    StaticStepInput, 
-    WorkflowInputStepInput,
-    RuntimeStepInput
-)
 
 class StepInputRegister:
-    """
-    holds the data above. 
-    galaxy varnames are linked to actual Param objects.
-    allows getting the value of an input by supplying a galaxy varname.
-    """
     def __init__(self):
-        self.register: list[StepInput] = []
+        # TODO this will change. Need to account for subworkflows. 
+        # inputs_params could be list[InputComponent] when step is toolstep
+        # inputs_params could be list[WorkflowInput] in step is subworkflow
+        self.linked: list[Tuple[InputComponent, InputValue]] = []
+        self.unlinked: list[InputValue] = []
 
-    def add(self, step_input: StepInput) -> None:
-        self.register.append(step_input)
-
-    def get(self, gxvarname: str) -> Optional[StepInput]:
-        for inp in self.register:
-            match inp:
-                case StaticStepInput():
-                    if inp.gxparam.name == gxvarname:
-                        return inp
-                case WorkflowInputStepInput() | ConnectionStepInput() | RuntimeStepInput():
-                    if inp.target and inp.target.gxparam:
-                        if inp.target.gxparam.name == gxvarname:
-                            return inp
-                case _:
-                    pass
-        return None
+    def add(self, component: Optional[InputComponent], invalue: InputValue) -> None:
+        if component:
+            self.linked.append((component, invalue))
+        else:
+            self.unlinked.append(invalue)
     
-    def list(self) -> list[StepInput]:
-        return self.register
-    
-    def to_dict(self) -> dict[str, Any]:
-        the_dict: dict[str, Any] = {}
-        static_inputs = [inp for inp in self.list() if isinstance(inp, StaticStepInput)]
-        for inp in static_inputs:
-            self._update_dict(inp, the_dict)
-        return the_dict
+    def get(self, query_uuid: str) -> Optional[InputValue]:
+        for component, value in self.linked:
+            if component.uuid == query_uuid:
+                return value
 
-    def _update_dict(self, inp: StaticStepInput, the_dict: dict[str, Any]) -> None:
-        name_heirarchy = inp.gxparam.name.split('.')
-        node = the_dict
-        for i, elem in enumerate(name_heirarchy):
-            if i < len(name_heirarchy) - 1:
-                if elem not in the_dict:
-                    node[elem] = {}
-                node = node[elem]
-            else:
-                node[elem] = inp.value
+    def __str__(self) -> str:
+        out: str = '\nInputValueRegister -----\n'
+        out += f"{'[gxparam]':30}{'[input type]':30}{'[value]':30}\n"
+        for comp, inval in self.linked:
+            component_tag = tags.tool.get(comp.uuid)
+            out += f'{component_tag:30}{str(type(inval).__name__):30}{inval.abstract_value:30}\n'
+        return out
+
+

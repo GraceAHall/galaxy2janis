@@ -3,7 +3,7 @@
 
 from typing import Tuple
 
-from entities.workflow.output import WorkflowOutput
+from entities.workflow import WorkflowOutput
 from fileio.text.TextRender import TextRender
 
 import tags
