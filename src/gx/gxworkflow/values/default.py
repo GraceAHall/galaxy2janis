@@ -1,9 +1,12 @@
 
 
 
-from typing import Any
-from entities.workflow import WorkflowStep
-from entities.workflow import Workflow
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from entities.workflow import WorkflowStep
+    from entities.workflow import Workflow
 
 from shellparser.components.inputs.InputComponent import InputComponent
 
@@ -16,7 +19,7 @@ def handle_tool_default_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
             j_step = mapping.step(g_step['id'], janis, galaxy)
             for component in get_linkable_components(j_step):
                 input_value = factory.static(component, component.default_value, default=True)
-                j_step.inputs.add(component, input_value)
+                j_step.inputs.add(input_value)
 
 def get_linkable_components(j_step: WorkflowStep) -> list[InputComponent]:
     # tool components which don't yet appear in register

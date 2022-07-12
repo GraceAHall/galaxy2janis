@@ -2,8 +2,9 @@
 from typing import Any, Optional
 
 from shellparser.components.inputs.InputComponent import InputComponent
+from . import utils
 
-from .values import (
+from entities.workflow import (
     ConnectionInputValue, 
     WorkflowInputInputValue,
     StaticInputValue

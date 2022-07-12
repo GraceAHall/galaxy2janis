@@ -5,6 +5,7 @@ from typing import Optional
 
 from entities.tool import Tool
 
+# this module imports
 from ..registers.StepInputRegister import StepInputRegister
 from ..registers.StepOutputRegister import StepOutputRegister
 from .metadata import StepMetadata

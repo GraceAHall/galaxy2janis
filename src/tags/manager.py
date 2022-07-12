@@ -14,7 +14,7 @@ class TagManager(ABC):
         ...
     
     @abstractmethod
-    def get(self, uuid: str) -> None:
+    def get(self, uuid: str) -> str:
         ...
 
 

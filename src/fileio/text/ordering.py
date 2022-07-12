@@ -1,7 +1,9 @@
 
 
 
+from abc import ABC, abstractmethod
 from typing import Tuple
+from entities.workflow.step.inputs import ConnectionInputValue, InputValue, WorkflowInputInputValue
 
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.Option import Option
@@ -34,3 +36,63 @@ def _order_imports_length(imports: list[Tuple[str, str]]) -> list[Tuple[str, str
 def _order_imports_alphabetical(imports: list[Tuple[str, str]]) -> list[Tuple[str, str]]:
     imports.sort(key=lambda x: f'from {x[0]} import {x[1]}')
     return imports
+
+
+
+
+### INPUT VALUES ###
+
+class InputOrderingStrategy(ABC):
+    @abstractmethod
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        """orders input values and returns ordered list"""
+        ...
+
+class AlphabeticalStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        invalues.sort(key=lambda x: x.tag_and_value)
+        return invalues
+
+class CmdPosStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        top = [x for x in invalues if x.component]
+        bottom = [x for x in invalues if not x.component]
+        top.sort(key=lambda x: x.component.cmd_pos) # type: ignore
+        return top + bottom
+
+class RuntimeInputPriorityStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        invalues.sort(key=lambda x: isinstance(x, WorkflowInputInputValue) and x.is_runtime, reverse=True)
+        return invalues
+
+class WorkflowInputPriorityStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        invalues.sort(key=lambda x: isinstance(x, WorkflowInputInputValue), reverse=True)
+        return invalues
+
+class ConnectionPriorityStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        invalues.sort(key=lambda x: isinstance(x, ConnectionInputValue), reverse=True)
+        return invalues
+
+class UnlinkedPriorityStrategy(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        invalues.sort(key=lambda x: x.component is not None, reverse=True)
+        return invalues
+
+
+# changing the order of the objects below changes the 
+# ordering priority, as the last ordering method has the highest impact etc
+STRATEGIES = [
+    AlphabeticalStrategy(),
+    CmdPosStrategy(),
+    RuntimeInputPriorityStrategy(),
+    WorkflowInputPriorityStrategy(),
+    ConnectionPriorityStrategy(),
+    UnlinkedPriorityStrategy()
+]
+
+def order_step_inputs(invalues: list[InputValue]):
+    for strategy in STRATEGIES:
+        invalues = strategy.order(invalues)
+    return invalues

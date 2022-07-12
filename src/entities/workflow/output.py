@@ -10,8 +10,8 @@ from datatypes.JanisDatatype import JanisDatatype
 
 @dataclass
 class WorkflowOutput:
-    step_tag: str
-    toolout_tag: str # wtf ???
+    step_uuid: str
+    output_uuid: str 
     janis_datatypes: list[JanisDatatype]
     array: bool = False
     optional: bool = False

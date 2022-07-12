@@ -24,8 +24,9 @@ class TagGroup:
         return False
     
     def get(self, uuid: str) -> Optional[str]:
-        basetag = self.uuids_basetags[uuid]
-        return self._generate_tag(basetag, uuid)
+        if uuid in self.uuids_basetags:
+            basetag = self.uuids_basetags[uuid]
+            return self._generate_tag(basetag, uuid)
     
     def get_base_tag(self, uuid: str) -> str:
         return self.uuids_basetags[uuid]

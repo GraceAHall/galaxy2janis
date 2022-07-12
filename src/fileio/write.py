@@ -1,30 +1,85 @@
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from entities.tool import Tool
+    from entities.workflow import Workflow
+    from entities.workflow import WorkflowStep
+
+import shutil
+import paths
+
+from utils import galaxy as galaxy_utils
+from gx.wrappers.downloads.cache import DownloadCache
 from fileio.text.tool.ToolText import ToolText
+from .initialisation import init_folder
 
-from entities.tool import Tool
-from entities.workflow import Workflow
-from entities.workflow import WorkflowStep
+from .text.workflow.WorkflowText import WorkflowText
 
+download_cache: DownloadCache = DownloadCache(paths.DOWNLOADED_WRAPPERS_DIR)
 
-def write_workflow(workflow: Workflow, path: str) -> None:
-    for step in workflow.steps:
-        write_tool(step.tool, path)
-    raise NotImplementedError()
-
-def write_step(step: WorkflowStep, path: str) -> None:
-    raise NotImplementedError()
 
 def write_tool(tool: Tool, path: str) -> None:
-    text = ToolText(entity=tool, render_imports=True)
+    text = ToolText(tool)
     page = text.render()
     with open(path, 'w') as fp:
         fp.write(page)
 
-def write_inputs() -> None:
+def write_workflow(janis: Workflow) -> None:
+    write_tools(janis)
+    write_wrappers(janis)
+    #write_sub_workflows(janis)
+    write_main_workflow(janis)
+    #write_inputs(janis)
+    #write_config(janis)
+
+def write_tools(janis: Workflow) -> None:
+    for step in janis.steps:
+        tool_id = step.metadata.wrapper.tool_id
+        write_tool(step.tool, paths.manager.tool(tool_id))
+
+def write_wrappers(janis: Workflow) -> None:
+    for step in janis.steps:
+        src_files = get_wrapper_files_src(step)
+        dest = get_wrapper_files_dest(step)
+        init_folder(dest)
+        for src in src_files:
+            shutil.copy2(src, dest)
+
+def get_wrapper_files_src(step: WorkflowStep) -> list[str]:
+    repo = step.metadata.wrapper.repo
+    tool_id = step.metadata.wrapper.tool_id
+    revision = step.metadata.wrapper.revision
+    source_dir = download_cache.get(repo, revision)
+    assert(source_dir)
+    main_xml = galaxy_utils.get_xml_by_id(source_dir, tool_id)
+    assert(main_xml)
+    macro_xmls = galaxy_utils.get_macros(source_dir)
+    xmls = [main_xml] + macro_xmls
+    xmls = [f'{source_dir}/{xml}' for xml in xmls]
+    return xmls
+
+def get_wrapper_files_dest(step: WorkflowStep) -> str:
+    tool_id = step.metadata.wrapper.tool_id
+    revision = step.metadata.wrapper.revision
+    return paths.manager.wrapper(tool_id, revision)
+
+def write_main_workflow(janis: Workflow) -> None:
+    path = paths.manager.workflow()
+    text = WorkflowText(janis)
+    page = text.render()
+    with open(path, 'w') as fp:
+        fp.write(page)
+
+def write_inputs(janis: Workflow) -> None:
     raise NotImplementedError()
 
-def write_config() -> None:
+def write_sub_workflows(janis: Workflow) -> None:
+    raise NotImplementedError()
+
+def write_config(janis: Workflow) -> None:
     raise NotImplementedError()
 
 

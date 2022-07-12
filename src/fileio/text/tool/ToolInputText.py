@@ -3,13 +3,13 @@
 
 from typing import Optional, Tuple
 from dataclasses import dataclass
-from fileio.text.TextRender import TextRender
 
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.InputComponent import InputComponent
 from shellparser.components.inputs.Positional import Positional
 from shellparser.components.inputs.Option import Option
 
+from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 

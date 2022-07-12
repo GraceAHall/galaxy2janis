@@ -71,8 +71,10 @@ class WorkflowModePathManager(PathManager):
 
     _subfolders: list[str] = [
         'logs',
-        'tools',
         'wrappers',
+        'tools',
+        'subworkflows',
+        'scripts',
     ]
     
     def workflow(self) -> str:
@@ -81,8 +83,17 @@ class WorkflowModePathManager(PathManager):
     def inputs(self, format: str='yaml') -> str:
         return f'{self._project_dir}/inputs.{format}'
     
+    def config(self, format: str='yaml') -> str:
+        return f'{self._project_dir}/config.{format}'
+    
     def tool(self, tool_id: str) -> str:
         return f'{self._project_dir}/tools/{tool_id}.py'
+    
+    def subworkflow(self, tool_id: str) -> str:
+        return f'{self._project_dir}/subworkflows/{tool_id}.py'
+    
+    def script(self, tool_id: str) -> str: # TODO script name?
+        return f'{self._project_dir}/scripts/{tool_id}.py'
 
     def wrapper(self, tool_id: str, revision: str) -> str:
         return f'{self._project_dir}/wrappers/{tool_id}-{revision}'

@@ -4,12 +4,14 @@
 from typing import Tuple
 
 from entities.workflow import WorkflowInput
-from fileio.text.TextRender import TextRender
+
+from ..TextRender import TextRender
+from .. import formatting
+from .. import ordering
 
 import tags
-import formatting
 import datatypes
-import ordering
+
 
 class WorkflowInputText(TextRender):
     def __init__(self, entity: WorkflowInput):
@@ -31,10 +33,10 @@ class WorkflowInputText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        tag = tags.tool.get(self.entity.uuid)
+        tag = tags.workflow.get(self.entity.uuid)
         datatype = formatting.format_datatype_string(self.entity)
         out_str: str = ''
-        out_str += f'w.input("{tag}", {datatype})\n'
+        out_str += f'w.input("{tag}", {datatype})'
         #out_str += f'\t"{tag}",\n'
         #out_str += f'\t{datatype}'
         #out_str += f',\n\tdefault={default}' if default else ''  # TODO HERE

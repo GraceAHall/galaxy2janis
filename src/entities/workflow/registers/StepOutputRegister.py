@@ -1,8 +1,7 @@
 
 
 
-
-from entities.workflow import StepOutput
+from ..step.outputs import StepOutput
 
 
 class StepOutputRegister:

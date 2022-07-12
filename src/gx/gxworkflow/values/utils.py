@@ -2,24 +2,24 @@
 
 
 from typing import Any, Optional
-from entities.workflow import WorkflowInput
+#from entities.workflow import WorkflowInput
 
 from shellparser.components.CommandComponent import CommandComponent
 from shellparser.components.inputs.InputComponent import InputComponent
 
 import utils.general as utils
 import datatypes
-import tags
+#import tags
 
 
-def create_workflow_input(component: InputComponent) -> WorkflowInput:
-    """creates a workflow input from a tool component"""
-    return WorkflowInput(
-        name=tags.tool.get(component.uuid),
-        array=component.array,
-        is_galaxy_input_step=False,
-        janis_datatypes=datatypes.get(component),
-    )
+# def create_workflow_input(component: InputComponent) -> WorkflowInput:
+#     """creates a workflow input from a tool component"""
+#     return WorkflowInput(
+#         name=tags.tool.get(component.uuid),
+#         array=component.array,
+#         is_galaxy_input_step=False,
+#         janis_datatypes=datatypes.get(component),
+#     )
 
 def get_comptype(component: CommandComponent) -> str:
     return type(component).__name__.lower() 

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from shellparser.components.inputs import Positional, Flag, Option
     from entities.workflow import WorkflowInput
     from entities.workflow import WorkflowOutput
-    from entities.workflow import StepInput
+    from entities.workflow import InputValue
     from entities.workflow import StepOutput
 
 
@@ -57,10 +57,6 @@ class OutputStrategy(DatatypeGetStrategy):
             gxtypes = entity.gxparam.datatypes
         return galaxy_to_janis(gxtypes)
 
-class StepInputStrategy(DatatypeGetStrategy):
-    def get(self, entity: StepInput) -> list[JanisDatatype]:
-        return galaxy_to_janis(entity.gxparam.datatypes)
-
 class StepOutputStrategy(DatatypeGetStrategy):
     def get(self, entity: StepOutput) -> list[JanisDatatype]:
         return entity.janis_datatypes
@@ -77,7 +73,7 @@ class WorkflowInputStrategy(DatatypeGetStrategy):
         elif entity.gx_datatypes:
             return galaxy_to_janis(entity.gx_datatypes)
         else:
-            raise RuntimeError
+            return [core.file_t]
 
 class WorkflowOutputStrategy(DatatypeGetStrategy):
     def get(self, entity: WorkflowOutput) -> list[JanisDatatype]:
@@ -92,7 +88,6 @@ strategy_map = {
     'InputOutput': OutputStrategy,
     'WildcardOutput': OutputStrategy,
     'UncertainOutput': OutputStrategy,
-    'StepInput':StepInputStrategy,
     'StepOutput': StepOutputStrategy,
     'GalaxyStepOutput': GalaxyStepOutputStrategy,
     'WorkflowInput': WorkflowInputStrategy,

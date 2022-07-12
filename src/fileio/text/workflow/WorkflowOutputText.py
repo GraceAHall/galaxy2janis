@@ -4,12 +4,14 @@
 from typing import Tuple
 
 from entities.workflow import WorkflowOutput
-from fileio.text.TextRender import TextRender
+
+from ..TextRender import TextRender
+from .. import formatting
+from .. import ordering
 
 import tags
-import formatting
 import datatypes
-import ordering
+
 
 class WorkflowOutputText(TextRender):
     def __init__(self, entity: WorkflowOutput):

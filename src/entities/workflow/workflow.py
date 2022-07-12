@@ -7,6 +7,7 @@ from .step.step import WorkflowStep
 from .metadata import WorkflowMetadata
 from .output import WorkflowOutput
 from .input import WorkflowInput
+
 import tags
 
 
@@ -54,23 +55,9 @@ class Workflow:
         tags.workflow.register(w_out)
         self.outputs.append(w_out)
 
-    def get_input(self, step_id: Optional[int]=None, input_uuid: Optional[str]=None) -> Optional[WorkflowInput]:
-        if step_id is not None:
-            relevant_inputs = [x for x in self.inputs if x.step_id == step_id]
-            if relevant_inputs:
-                return relevant_inputs[0]
-        elif input_uuid is not None:
-            relevant_inputs = [x for x in self.inputs if x.uuid == input_uuid]
-            if relevant_inputs:
-                return relevant_inputs[0]
-        else:
-            raise RuntimeError('get_input needs to be supplied either step_id or input_uuid')
-
-    # def get_step(self, step_uuid: Optional[str]) -> WorkflowStep:
-    #     if not step_uuid:
-    #         raise RuntimeError('please provide step_uuid')
-    #     for step in self._steps:
-    #         if step.uuid == step_uuid:
-    #             return step
-    #     raise RuntimeError('cannot find workflow step')
+    def get_input(self, query_uuid: str) -> WorkflowInput:
+        for winp in self.inputs:
+            if winp.uuid == query_uuid:
+                return winp
+        raise RuntimeError('could not find input with uuid')
 

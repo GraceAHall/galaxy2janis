@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from uuid import uuid4
+
 from datatypes.JanisDatatype import JanisDatatype
 from shellparser.components.CommandComponent import CommandComponent
 

@@ -1,22 +1,23 @@
 
 
-from typing import Tuple
-from entities.tool.Tool import Tool
-
-from fileio.text.tool.ToolInputSectionText import ToolInputSectionText
-from fileio.text.tool.ToolOutputSectionText import ToolOutputSectionText
-
-from runtime.dates import JANIS_DATE_FMT
-from fileio.text.TextRender import TextRender
-from datetime import datetime
-
 import tags
 import textwrap
 
-from fileio.text.TextRender import TextRender
+from typing import Tuple
+from datetime import datetime
+
+from entities.tool.Tool import Tool
+from runtime.dates import JANIS_DATE_FMT
+
+from ..tool.ToolInputSectionText import ToolInputSectionText
+from ..tool.ToolOutputSectionText import ToolOutputSectionText
+from ..TextRender import TextRender
 
 from .. import ordering
 from .. import formatting
+
+
+
 
 def note_snippet(tool: Tool) -> str:
     tool_name = tool.metadata.id

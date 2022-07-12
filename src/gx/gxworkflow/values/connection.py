@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from entities.workflow import Workflow
-    from entities.workflow import WorkflowInput
-    
-from .values import ConnectionInputValue, WorkflowInputInputValue
+
+from entities.workflow import WorkflowInput
+from entities.workflow import ConnectionInputValue
+from entities.workflow import WorkflowInputInputValue
 
 import mapping
 
@@ -58,4 +59,4 @@ class ConnectionInputIngestor:
                     output_uuid=j_emitter.uuid
                 )
 
-            jstep.inputs.add(j_target, value)
+            jstep.inputs.add(value)

@@ -19,7 +19,8 @@ from gx.gxworkflow.values import handle_tool_connection_inputs
 from gx.gxworkflow.values import handle_tool_runtime_inputs
 from gx.gxworkflow.values import handle_tool_static_inputs
 from gx.gxworkflow.values import handle_tool_default_inputs
-from gx.gxworkflow.values import handle_tool_unlinked_inputs
+
+from gx.gxworkflow.updates import update_component_knowledge
 
 from fileio import write_workflow
 
@@ -45,7 +46,7 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     ingest_metadata(janis, galaxy)
     ingest_workflow_inputs(janis, galaxy)
     ingest_workflow_steps(janis, galaxy)
-    ingest_workflow_tools(janis)
+    ingest_workflow_tools(janis, galaxy)
     ingest_workflow_steps_outputs(janis, galaxy) 
 
     # assigning tool input values
@@ -55,7 +56,7 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     handle_tool_default_inputs(janis, galaxy)
 
     update_component_knowledge(janis)
-    write_workflow(janis, path)
+    write_workflow(janis)
 
 def load_tree() -> dict[str, Any]:
     # TODO should probably check the workflow type (.ga, .ga2)

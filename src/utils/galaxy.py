@@ -20,6 +20,13 @@ def is_tool_xml(path: str) -> bool:
         return True
     return False
 
+def is_macro_xml(path: str) -> bool:
+    """checks that the provided path is tool xml"""
+    root = et.parse(path).getroot()
+    if root.tag == 'macros':
+        return True
+    return False
+
 def get_xml_id(filepath: str) -> Optional[str]:
     tree = et.parse(filepath)
     root = tree.getroot()
@@ -33,3 +40,12 @@ def get_xml_by_id(xmldir: str, query_id: str) -> Optional[str]:
         if query_id == tool_id:
             return xml
     return None 
+
+def get_macros(xmldir: str) -> list[str]:
+    out: list[str] = []    
+    xmls = [x for x in os.listdir(xmldir) if x.endswith('.xml')]
+    for xml in xmls:
+        path = f'{xmldir}/{xml}'
+        if is_macro_xml(path):
+            out.append(path)
+    return out

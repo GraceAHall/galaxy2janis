@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from typing import Optional, Tuple
-from fileio.text.TextRender import TextRender
 
 from shellparser.components.outputs.OutputComponent import OutputComponent
 from shellparser.components.outputs.InputOutput import InputOutput
@@ -10,6 +9,7 @@ from shellparser.components.outputs.RedirectOutput import RedirectOutput
 from shellparser.components.outputs.UncertainOutput import UncertainOutput
 from shellparser.components.outputs.WildcardOutput import WildcardOutput
 
+from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 
@@ -34,8 +34,8 @@ def format_selector_str(output: OutputComponent) -> Optional[str]:
 
 @dataclass
 class ToolOutputText(TextRender):
-    def __init__(self, entity: OutputComponent, render_imports: bool=False):
-        super().__init__(render_imports)
+    def __init__(self, entity: OutputComponent):
+        super().__init__()
         self.entity = entity
 
     @property

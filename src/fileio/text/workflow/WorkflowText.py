@@ -2,19 +2,21 @@
 from typing import Tuple
 
 from entities.workflow import Workflow
-from fileio.text.TextRender import TextRender
 
 from datetime import datetime
-from fileio.text.tool.ToolText import ToolText
 from runtime.dates import JANIS_DATE_FMT
 
-from workflow.WorkflowInputText import WorkflowInputText
-from workflow.WorkflowOutputText import WorkflowOutputText
-from workflow.StepText import StepText
-
 import tags
-import formatting
-import ordering
+import paths
+
+from .. import formatting
+from .. import ordering
+
+from ..TextRender import TextRender
+from ..tool.ToolText import ToolText
+from .WorkflowInputText import WorkflowInputText
+from .WorkflowOutputText import WorkflowOutputText
+from .StepText import StepText
 
 
 ### HELPER METHODS ### 
@@ -86,7 +88,10 @@ class WorkflowText(TextRender):
         for winp in self.entity.inputs:
             imports += WorkflowInputText(winp).imports
         for step in self.entity.steps:
-            imports += ToolText(step.tool).imports
+            tool_id = step.metadata.wrapper.tool_id
+            relative_path = f'tools.{tool_id}'
+            tool_tag = tags.tool.get(step.tool.uuid)
+            imports.append((relative_path, tool_tag))
         for wout in self.entity.outputs:
             imports += WorkflowOutputText(wout).imports
         imports = list(set(imports))
@@ -109,8 +114,10 @@ class WorkflowText(TextRender):
                 out_str += f'{WorkflowInputText(winp).render()}\n'
         
         # steps (includes tool steps and subworkflow steps)
+        step_count: int = 0
         for step in self.entity.steps:
-            out_str += f'{StepText(step).render()}\n'
+            step_count += 1
+            out_str += f'\n{StepText(step_count, step, self.entity).render()}\n'
         
         # outputs
         for wout in self.entity.outputs:

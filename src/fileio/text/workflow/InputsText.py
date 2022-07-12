@@ -2,14 +2,14 @@
 from typing import Tuple
 
 from entities.workflow import Workflow
-from fileio.text.TextRender import TextRender
+from ..TextRender import TextRender
 
 
 class InputsText(TextRender):
-    def __init__(self, entity: Workflow, render_imports: bool=False, format: str='yaml'):
-        super().__init__(render_imports)
+    def __init__(self, entity: Workflow, file_format: str='yaml'):
+        super().__init__()
         self.entity = entity
-        self.format = format
+        self.file_format = file_format
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
@@ -17,9 +17,9 @@ class InputsText(TextRender):
 
     def render(self) -> str:
         input_list = RuntimeInputList(workflow)
-        if self.format == 'yaml':
+        if self.file_format == 'yaml':
             return to_yaml(input_list)
-        elif self.format == 'dict':
+        elif self.file_format == 'dict':
             return to_dict(input_list)
         else:
             raise RuntimeError('wrong format')

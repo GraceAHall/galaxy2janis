@@ -43,7 +43,7 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 
 def run_tool_mode(args: dict[str, Optional[str]]):
     tool = tool_mode(args)
-    path = paths.manager.tool()
+    path = paths.manager.tool(tool.metadata.id)
     fileio.write_tool(tool, path=path)  # I dont like this design, but it may be necessary
 
 def run_workflow_mode(args: dict[str, Optional[str]]):
@@ -55,6 +55,7 @@ def run_workflow_mode(args: dict[str, Optional[str]]):
 def try_run_tool_mode(args: dict[str, Optional[str]]):
     try: 
         tool = tool_mode(args)
+        path = paths.manager.tool(tool.metadata.id)
         fileio.write_tool(tool)
     except Exception as e:
         print(e)

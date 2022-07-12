@@ -1,13 +1,16 @@
 
 
 
-from typing import Any, Optional
+from __future__ import annotations
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from entities.workflow import WorkflowStep
+    from entities.workflow import Workflow
 
 from entities.workflow import WorkflowInput
-from entities.workflow import WorkflowStep
-from entities.workflow import Workflow
-
-from .values import InputValue, WorkflowInputInputValue
+from entities.workflow import InputValue
+from entities.workflow import WorkflowInputInputValue
 
 from shellparser.components.inputs.InputComponent import InputComponent
 
@@ -34,8 +37,9 @@ class RuntimeInputIngestor:
 
     def ingest_runtime(self, g_step: dict[str, Any]) -> None:
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
+        g_targets = [inp['name'] for inp in g_step['inputs']]
         
-        for g_target in g_step['inputs']:
+        for g_target in g_targets:
             g_target = g_target.replace('|', '.')
             j_target = mapping.tool_input(g_target, j_step.tool)
 
@@ -47,7 +51,7 @@ class RuntimeInputIngestor:
                         self.janis.add_input(winp)
                         # create step value & add to step 
                         value = self.create_workflow_value(j_target, winp)
-                        j_step.inputs.add(j_target, value)
+                        j_step.inputs.add(value)
 
     def create_workflow_input(self, j_step: WorkflowStep, j_target: InputComponent) -> WorkflowInput:
         step_tag = tags.workflow.get(j_step.uuid)

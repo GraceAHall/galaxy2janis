@@ -1,11 +1,12 @@
 
-
-from entities.workflow import WorkflowStep
+from __future__ import annotations
 import logs.logging as logging
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
-from entities.workflow import Workflow
-from entities.workflow import WorkflowInput
+if TYPE_CHECKING:
+    from entities.workflow import WorkflowStep
+    from entities.workflow import Workflow
+    from entities.workflow import WorkflowInput
 
 from shellparser.components.inputs.Flag import Flag
 from shellparser.components.inputs.InputComponent import InputComponent
@@ -20,7 +21,7 @@ from gx.gxtool.load import load_xmltool
 
 from . import factory
 from . import utils as value_utils
-from .values import InputValue
+from entities.workflow import InputValue
 
 import tags
 import mapping
@@ -34,7 +35,6 @@ def handle_tool_static_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
             j_step = mapping.step(g_step['id'], janis, galaxy)
             ingest_values_cheetah(g_step, j_step, janis)
             ingest_values_inputs(g_step, j_step, janis)
-            print()
 
 def ingest_values_cheetah(g_step: dict[str, Any], j_step: WorkflowStep, janis: Workflow) -> None:
     ingestor = CheetahInputIngestor(g_step, j_step, janis)
@@ -129,7 +129,7 @@ class CheetahInputIngestor:
         # create & add value 
         is_default = True if component.default_value == value else False
         inputval = factory.static(component, value, default=is_default)
-        self.j_step.inputs.add(component, inputval)
+        self.j_step.inputs.add(inputval)
     
     def update_tool_values_runtime(self, component: Flag | Option) -> None:
         # create & add new workflow input
@@ -137,7 +137,7 @@ class CheetahInputIngestor:
         self.janis.add_input(winp)
         # create & add value 
         inputval = factory.workflow_input(component, winp.uuid, is_runtime=True)
-        self.j_step.inputs.add(component, inputval)
+        self.j_step.inputs.add(inputval)
 
     def create_workflow_input(self, component: Flag | Option) -> WorkflowInput:
         """creates a workflow input for the tool input component"""
@@ -170,7 +170,7 @@ class StaticInputIngestor:
         for component in self.get_linkable_components():
             if self.is_directly_linkable(component):
                 value = self.create_value(component)
-                self.j_step.inputs.add(component, value)
+                self.j_step.inputs.add(value)
     
     def get_linkable_components(self) -> list[InputComponent]:
         out: list[InputComponent] = []

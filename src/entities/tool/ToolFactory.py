@@ -2,9 +2,12 @@
 
 import logs.logging as logging
 from typing import Optional
-from entities.tool import Tool
+
 from gx.gxtool.load import XMLToolDefinition
 from shellparser.command import Command
+
+# this module imports
+from .Tool import Tool
 from .outputs import extract_outputs
 
 
