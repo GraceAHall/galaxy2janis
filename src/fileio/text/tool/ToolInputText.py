@@ -4,10 +4,10 @@
 from typing import Optional, Tuple
 from dataclasses import dataclass
 
-from shellparser.components.inputs.Flag import Flag
-from shellparser.components.inputs.InputComponent import InputComponent
-from shellparser.components.inputs.Positional import Positional
-from shellparser.components.inputs.Option import Option
+from command import Flag
+from command import InputComponent
+from command import Positional
+from command import Option
 
 from ..TextRender import TextRender
 from .. import formatting

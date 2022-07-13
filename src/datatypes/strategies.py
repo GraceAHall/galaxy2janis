@@ -9,10 +9,8 @@ from .conversion import galaxy_to_janis
 from . import core
 
 if TYPE_CHECKING:
-    from shellparser.components.inputs import Positional, Flag, Option
+    from command import Positional, Flag, Option
     from entities.workflow import WorkflowInput
-    from entities.workflow import WorkflowOutput
-    from entities.workflow import InputValue
     from entities.workflow import StepOutput
 
 
@@ -75,10 +73,6 @@ class WorkflowInputStrategy(DatatypeGetStrategy):
         else:
             return [core.file_t]
 
-class WorkflowOutputStrategy(DatatypeGetStrategy):
-    def get(self, entity: WorkflowOutput) -> list[JanisDatatype]:
-        return entity.janis_datatypes
-
 
 strategy_map = {
     'Positional': PositionalStrategy,
@@ -91,7 +85,6 @@ strategy_map = {
     'StepOutput': StepOutputStrategy,
     'GalaxyStepOutput': GalaxyStepOutputStrategy,
     'WorkflowInput': WorkflowInputStrategy,
-    'WorkflowOutput': WorkflowOutputStrategy,
 }
 
 

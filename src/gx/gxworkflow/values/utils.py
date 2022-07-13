@@ -4,8 +4,8 @@
 from typing import Any, Optional
 #from entities.workflow import WorkflowInput
 
-from shellparser.components.CommandComponent import CommandComponent
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import CommandComponent
+from command import InputComponent
 
 import utils.general as utils
 import datatypes

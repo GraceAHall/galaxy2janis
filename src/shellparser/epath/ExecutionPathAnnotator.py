@@ -1,10 +1,11 @@
 
 
 from typing import Type
+from command import Command
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
-from shellparser.Command import Command
+
 from shellparser.epath.ExecutionPath import ExecutionPath
-from shellparser.text.tokens.Tokens import TokenType
+from shellparser.tokens.Tokens import TokenType
 
 from shellparser.epath.Annotator import (
     Annotator, 

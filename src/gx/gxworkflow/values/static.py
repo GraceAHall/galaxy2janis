@@ -8,16 +8,15 @@ if TYPE_CHECKING:
     from entities.workflow import Workflow
     from entities.workflow import WorkflowInput
 
-from shellparser.components.inputs.Flag import Flag
-from shellparser.components.inputs.InputComponent import InputComponent
-from shellparser.components.inputs.Option import Option
-from shellparser.cheetah.evaluation import sectional_evaluate
-from shellparser.text.simplification.aliases import resolve_aliases
-from shellparser.cmdstr.cmdstr import gen_command_string
-from shellparser.text.load import load_xml_command_cheetah_eval
-from shellparser.text.regex import utils as regex_utils
+from command import Flag
+from command import InputComponent
+from command import Option
+from command import gen_command_string
+
+from shellparser.regex import utils as regex_utils
 
 from gx.gxtool.load import load_xmltool
+from gx.text import load_partial_cheetah_command
 
 from . import factory
 from . import utils as value_utils
@@ -63,17 +62,12 @@ class CheetahInputIngestor:
                     pass
 
     def prepare_command(self) -> str:
-        text = load_xml_command_cheetah_eval()
-        text = sectional_evaluate(text, inputs=self.g_step['tool_state'])
-        text = resolve_aliases(text)
-
         xmltool = load_xmltool()
-        cmdstr = gen_command_string(source='xml', the_string=text, xmltool=xmltool)
+        command = load_partial_cheetah_command(inputs_dict=self.g_step['tool_state'])
+        cmdstr = gen_command_string(source='xml', the_string=command, xmltool=xmltool)
         stmtstr = cmdstr.main.cmdline
-        
-        logging.runtime_data(text)
+        logging.runtime_data(command)
         logging.runtime_data(stmtstr)
-        
         return stmtstr
     
     def link_flag(self, flag: Flag, cmdstr: str) -> None:

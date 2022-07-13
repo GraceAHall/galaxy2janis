@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import InputComponent
 
 import tags
 
@@ -41,7 +41,7 @@ class InputValue(ABC):
         return type(self.component).__name__.lower() 
     
     @property
-    def input_tag(self) -> Optional[str]:
+    def tool_input_tag(self) -> Optional[str]:
         if self.component:
             return tags.tool.get(self.component.uuid)
         else:
@@ -66,9 +66,9 @@ class StaticInputValue(InputValue):
     @property
     def tag_and_value(self) -> str:
         if self._should_wrap_value():
-            return f'{self.input_tag}="{self.value}"'
+            return f'{self.tool_input_tag}="{self.value}"'
         else:
-            return f'{self.input_tag}={self.value}'
+            return f'{self.tool_input_tag}={self.value}'
 
     def _should_wrap_value(self) -> bool:
         if self.valtype == InputValueType.STRING:
@@ -80,14 +80,12 @@ class StaticInputValue(InputValue):
 
 @dataclass
 class ConnectionInputValue(InputValue):
-    step_uuid: str
     output_uuid: str
     
     @property
     def tag_and_value(self) -> str:
-        step_tag = tags.workflow.get(self.step_uuid)
-        output_tag = tags.workflow.get(self.output_uuid)
-        return f'{self.input_tag}=w.{step_tag}.{output_tag}'
+        step_out_tag = tags.workflow.get(self.output_uuid)
+        return f'{self.tool_input_tag}=w.{step_out_tag}'
     
 
 @dataclass
@@ -97,6 +95,6 @@ class WorkflowInputInputValue(InputValue):
 
     @property
     def tag_and_value(self) -> str:
-        winp_tag = tags.workflow.get(self.input_uuid)
-        return f'{self.input_tag}=w.{winp_tag}'
+        wflow_inp_tag = tags.workflow.get(self.input_uuid)
+        return f'{self.tool_input_tag}=w.{wflow_inp_tag}'
 

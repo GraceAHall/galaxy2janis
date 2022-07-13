@@ -3,12 +3,13 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from shellparser.components.CommandComponent import CommandComponent
-from shellparser.components.linux.StreamMerge import StreamMerge
-from shellparser.components.linux.Tee import Tee
+from command import CommandComponent
+from command import StreamMerge
+from command import Tee
+
 from shellparser.epath.ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
-from shellparser.text.tokens.Tokens import Token
-import shellparser.text.tokens.utils as utils
+from shellparser.tokens.Tokens import Token
+import shellparser.tokens.utils as utils
 
 
 

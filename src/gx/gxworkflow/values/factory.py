@@ -1,7 +1,7 @@
 
 from typing import Any, Optional
 
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import InputComponent
 from . import utils
 
 from entities.workflow import (

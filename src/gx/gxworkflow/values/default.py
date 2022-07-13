@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from entities.workflow import WorkflowStep
     from entities.workflow import Workflow
 
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import InputComponent
 
 from . import factory
 import mapping

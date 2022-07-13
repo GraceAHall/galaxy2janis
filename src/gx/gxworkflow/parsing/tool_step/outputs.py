@@ -29,7 +29,7 @@ class OutputIngestor:
         janis_step = mapping.step(galaxy_step['id'], self.janis, self.galaxy)
         for galaxy_out in galaxy_step['outputs']:
             janis_out = init_tool_step_output(janis_step, galaxy_step, galaxy_out)
-            galaxy_out['janis_uuid'] = janis_step.uuid # entity linking
+            galaxy_out['janis_uuid'] = janis_out.uuid # entity linking
             janis_step.outputs.add(janis_out)
 
 
@@ -38,6 +38,7 @@ def init_tool_step_output(janis_step: WorkflowStep, step: dict[str, Any], output
     tool_output = mapping.tool_output(output['name'], janis_step.tool)
     assert(tool_output)
     return StepOutput(
+        step_uuid=janis_step.uuid,
         janis_datatypes=jtypes,
         is_wflow_out=is_workflow_output(step, output),
         tool_output=tool_output

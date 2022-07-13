@@ -4,7 +4,10 @@ import logs.logging as logging
 from typing import Optional
 
 from gx.gxtool.load import XMLToolDefinition
-from shellparser.command import Command
+from gx.text import load_command
+from gx.text import load_partial_cheetah_command
+
+from command import Command
 
 # this module imports
 from .Tool import Tool
@@ -18,15 +21,30 @@ class ToolFactory:
         self.container = container
 
     def create(self) -> Tool:
+        command_text = self.get_command()
+        
         tool = Tool(
             metadata=self.xmltool.metadata,
             container=self.container,
             base_command=self.get_base_command(),
-            gxparam_register=self.xmltool.inputs
+            gxparam_register=self.xmltool.inputs,
+            command=self.get_command(),
+            preprocessing=self.get_preprocessing(),
+            postprocessing=self.get_postprocessing(),
         )
         self.supply_inputs(tool)
         self.supply_outputs(tool)
         return tool
+
+    def get_preprocessing(self) -> Optional[str]:
+        self.command.xmlcmdstr.preprocessing
+
+        raise NotImplementedError()
+    
+    def get_postprocessing(self) -> Optional[str]:
+        self.command.xmlcmdstr.postprocessing
+        
+        raise NotImplementedError()
 
     def supply_inputs(self, tool: Tool) -> None:
         self.command.set_cmd_positions()

@@ -3,10 +3,10 @@
 import logs.logging as logging
 
 from shellparser.Command import Command
-from shellparser.components.inputs.Flag import Flag
+from command import Flag
 from shellparser.components.outputs.RedirectOutput import RedirectOutput
 from shellparser.components.outputs.create import create_output
-from shellparser.components.CommandComponent import CommandComponent
+from command import CommandComponent
 
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from gx.gxtool.param.Param import Param

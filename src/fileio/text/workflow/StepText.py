@@ -6,10 +6,10 @@ from typing import Tuple
 
 from entities.workflow import WorkflowStep
 from entities.workflow import InputValue
-from entities.workflow.step.inputs import StaticInputValue, WorkflowInputInputValue
+from entities.workflow.step.inputs import ConnectionInputValue, StaticInputValue, WorkflowInputInputValue
 from entities.workflow.workflow import Workflow
 from fileio.text.workflow.WorkflowInputText import WorkflowInputText
-from shellparser.components.inputs.Positional import Positional
+from command import Positional
 
 from ..TextRender import TextRender
 from .. import formatting
@@ -41,6 +41,8 @@ Please see [WEBLINK] for information on the PRE TASK, TOOL STEP, POST TASK struc
 
 def pre_task(step: WorkflowStep) -> str:
     # TODO DUMP TEXT
+    if step.tool:
+        pass
     return '# __PRE_TASK__\n'
 
 def post_task(step: WorkflowStep) -> str:
@@ -96,6 +98,8 @@ class ToolInputLineFactory:
                 return 'RUNTIME VALUE'
             else:
                 return 'WORKFLOW INPUT'
+        if isinstance(invalue, ConnectionInputValue):
+            return 'CONNECTION'
         return ''
     
     def get_prefix_label(self, invalue: InputValue) -> str:

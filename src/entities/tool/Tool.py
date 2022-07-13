@@ -8,8 +8,8 @@ from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
 from gx.gxtool.param.InputParamRegister import InputParamRegister
 from gx.gxtool.param.Param import Param
 
-from shellparser.components.CommandComponent import CommandComponent
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import CommandComponent
+from command import InputComponent
 from shellparser.components.outputs.OutputComponent import OutputComponent
 
 import tags
@@ -27,10 +27,13 @@ class Tool:
     gxparam_register: InputParamRegister
     container: Optional[str]
     base_command: list[str]
-    inputs: list[InputComponent] = field(default_factory=list)
-    outputs: list[OutputComponent] = field(default_factory=list)
+    command: str
+    preprocessing: Optional[str]
+    postprocessing: Optional[str]
 
     def __post_init__(self):
+        self.inputs: list[InputComponent] = []
+        self.outputs: list[OutputComponent] = []
         self.uuid: str = str(uuid4())
         tags.tool.new_tool()
         tags.tool.register(self)

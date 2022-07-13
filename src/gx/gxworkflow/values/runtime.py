@@ -12,7 +12,7 @@ from entities.workflow import WorkflowInput
 from entities.workflow import InputValue
 from entities.workflow import WorkflowInputInputValue
 
-from shellparser.components.inputs.InputComponent import InputComponent
+from command import InputComponent
 
 import tags
 import mapping

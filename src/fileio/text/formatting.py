@@ -2,9 +2,9 @@
 
 from typing import Any, Optional, Protocol, Tuple
 
-from shellparser.components.CommandComponent import CommandComponent
-from shellparser.components.inputs.InputComponent import InputComponent
-from shellparser.components.inputs.Option import Option
+from command import CommandComponent
+from command import InputComponent
+from command import Option
 
 import datatypes
 

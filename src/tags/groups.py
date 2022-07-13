@@ -1,20 +1,13 @@
 
 
 
-
-
 from typing import Any, Optional
 from .strategies import format_tag
 
 
-tool_permitted:     set[str] = set(['Tool', 'Positional', 'Flag', 'Option', 'RedirectOutput', 'WildcardOutput', 'InputOutput'])
-workflow_permitted: set[str] = set(['Workflow', 'WorkflowInput', 'WorkflowStep', 'WorkflowOutput'])
-
-
 class TagGroup:
 
-    def __init__(self, subtype: str='tool'):
-        self.permitted_entities = workflow_permitted if subtype == 'workflow' else tool_permitted
+    def __init__(self):
         self.uuids_basetags: dict[str, str] = {}
         self.basetags_uuids: dict[str, list[str]] = {}
 
@@ -31,13 +24,8 @@ class TagGroup:
     def get_base_tag(self, uuid: str) -> str:
         return self.uuids_basetags[uuid]
 
-    def register(self, entity: Any) -> None:
-        entity_type = entity.__class__.__name__
-        if entity_type not in self.permitted_entities:
-            raise RuntimeError(f'cannot register a {entity_type}')
-
-        #starting_text = self._get_starting_text(entity_type, entity)
-        basetag = format_tag(entity_type, entity)
+    def register(self, starting_text: str, entity: Any) -> None:
+        basetag = format_tag(starting_text, entity)
         uuid = entity.uuid
 
         self.uuids_basetags[uuid] = basetag

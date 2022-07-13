@@ -5,18 +5,18 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from shellparser.components.inputs.Flag import Flag
-from shellparser.components.inputs.Option import Option
-from shellparser.components.inputs.Positional import Positional
+from command import Flag
+from command import Option
+from command import Positional
+from command import Tee, StreamMerge
 
 from shellparser.epath.ExecutionPath import EPathPosition
-from shellparser.text.tokens.Tokens import Token, TokenType
+from shellparser.tokens.Tokens import Token, TokenType
 
-from shellparser.components.outputs.create import create_output
-from shellparser.components.linux import Tee, StreamMerge
+from command import create_output
 
 import shellparser.epath.utils as component_utils
-import shellparser.text.regex.scanners as scanners
+import shellparser.regex.scanners as scanners
 
 
 class Annotator(ABC):

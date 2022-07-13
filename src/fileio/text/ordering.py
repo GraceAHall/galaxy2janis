@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 from typing import Tuple
 from entities.workflow.step.inputs import ConnectionInputValue, InputValue, WorkflowInputInputValue
 
-from shellparser.components.inputs.Flag import Flag
-from shellparser.components.inputs.Option import Option
-from shellparser.components.inputs.Positional import Positional
+from command import Flag
+from command import Option
+from command import Positional
 
 import tags
 
@@ -77,7 +77,7 @@ class ConnectionPriorityStrategy(InputOrderingStrategy):
 
 class UnlinkedPriorityStrategy(InputOrderingStrategy):
     def order(self, invalues: list[InputValue]) -> list[InputValue]:
-        invalues.sort(key=lambda x: x.component is not None, reverse=True)
+        invalues.sort(key=lambda x: x.component is not None)
         return invalues
 
 

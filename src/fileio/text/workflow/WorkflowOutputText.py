@@ -3,7 +3,7 @@
 
 from typing import Tuple
 
-from entities.workflow import WorkflowOutput
+from entities.workflow.step.outputs import StepOutput
 
 from ..TextRender import TextRender
 from .. import formatting
@@ -14,7 +14,7 @@ import datatypes
 
 
 class WorkflowOutputText(TextRender):
-    def __init__(self, entity: WorkflowOutput):
+    def __init__(self, entity: StepOutput):
         super().__init__()
         self.entity = entity
 
@@ -25,7 +25,7 @@ class WorkflowOutputText(TextRender):
         imports = [(j.import_path, j.classname) for j in jtypes]
 
         # TODO opportunity for decorator
-        if self.entity.array:
+        if self.entity.tool_output.array:
             imports.append(('janis_core', 'Array'))
 
         # TODO opportunity for decorator
@@ -34,9 +34,9 @@ class WorkflowOutputText(TextRender):
 
     def render(self) -> str:
         tag = tags.workflow.get(self.entity.uuid)
-        datatype = formatting.format_datatype_string(self.entity)
-        step_tag = self.entity.step_tag # TODO this is inconsistent with tag system
-        output_tag = self.entity.toolout_tag # TODO this is inconsistent with tag system
+        step_tag = tag.rsplit('.', 1)[0]
+        output_tag = tag.rsplit('.', 1)[1]
+        datatype = formatting.format_datatype_string(self.entity.tool_output)
         out_str: str = ''
         out_str += 'w.output(\n'
         out_str += f'\t"{tag}",\n'

@@ -64,7 +64,7 @@ def capitalisation(tag: str, entity: Any) -> str:
     else:
         return tag[0]
 
-def non_alphanumeric(tag: str, entity: Any) -> str:
+def non_alphanumeric(tag: str, entity: Any, allow_dot: bool=False) -> str:
     """
     to satisfy janis tag requirements
     to avoid janis reserved keywords
@@ -76,7 +76,8 @@ def non_alphanumeric(tag: str, entity: Any) -> str:
     tag = tag.replace(')', '')
     tag = tag.replace(']', '')
     tag = tag.replace('[', '')
-    tag = tag.replace('.', '_')
+    if not allow_dot:
+        tag = tag.replace('.', '_')
     tag = tag.replace(' ', '_')
     tag = tag.replace('|', '_')
     tag = tag.replace('/', '_')

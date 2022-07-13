@@ -7,13 +7,11 @@ from datetime import datetime
 from runtime.dates import JANIS_DATE_FMT
 
 import tags
-import paths
 
 from .. import formatting
 from .. import ordering
 
 from ..TextRender import TextRender
-from ..tool.ToolText import ToolText
 from .WorkflowInputText import WorkflowInputText
 from .WorkflowOutputText import WorkflowOutputText
 from .StepText import StepText

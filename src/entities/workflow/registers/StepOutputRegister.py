@@ -2,6 +2,7 @@
 
 
 from ..step.outputs import StepOutput
+import tags
 
 
 class StepOutputRegister:
@@ -9,15 +10,10 @@ class StepOutputRegister:
         self.register: list[StepOutput] = []
 
     def add(self, step_output: StepOutput) -> None:
+        tags.workflow.register(step_output)
         self.register.append(step_output)
 
     def list(self) -> list[StepOutput]:
         return self.register
         
-    # def get(self, gxvarname: str) -> StepOutput:
-    #     raise RuntimeError(f'could not find output {gxvarname}')
-    #     for output in self.register:
-    #         if output.gx_varname == gxvarname:
-    #             return output
-    
 

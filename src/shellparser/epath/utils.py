@@ -1,10 +1,10 @@
 
 
 
-from shellparser.components.inputs import Flag, Option
-from shellparser.text.tokens.Tokens import Token, TokenType
+from command import Flag, Option
+from shellparser.tokens.Tokens import Token, TokenType
 from gx.gxtool.param.InputParam import BoolParam, SelectParam
-import shellparser.text.regex.scanners as scanners
+import shellparser.regex.scanners as scanners
 
 NON_VALUE_TOKENTYPES = set([
     TokenType.FUNCTION_CALL, 
@@ -140,8 +140,8 @@ def is_positional(token: Token) -> bool:
     return False
 
 def cast_opt_to_flag(option: Option) -> Flag:
-    return Flag(
+    flag = Flag(
         prefix=option.prefix,
-        gxparam=option.gxparam,
-        presence_array=option.presence_array
     )
+    flag.gxparam = option.gxparam
+    return flag

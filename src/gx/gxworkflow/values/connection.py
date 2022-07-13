@@ -30,7 +30,7 @@ class ConnectionInputIngestor:
             if step['type'] == 'tool':
                 self.ingest_connections(step)
 
-    def ingest_connections(self, gstep: dict[str, Any]) -> None:
+    def ingest_connections(self, g_step: dict[str, Any]) -> None:
         """
         ingest connections for this galaxy step.
         \n
@@ -38,11 +38,15 @@ class ConnectionInputIngestor:
         the emitting entity is a step output, and the target is a tool component.
         there isn't always a 1-to-1 mapping here. this is due to some galaxy params not being
         linked to a tool component. 
+        
+        j_emitter:  StepOutput or WorkflowInput (the source of the connection)
+        j_target: a Tool InputComponent (the destination of the connection)
+
         """
-        jstep = mapping.step(gstep['id'], self.janis, self.galaxy)
-        for g_target, g_emitter in gstep['input_connections'].items():
+        j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
+        for g_target, g_emitter in g_step['input_connections'].items():
             g_target = g_target.replace('|', '.')
-            j_target = mapping.tool_input(g_target, jstep.tool)
+            j_target = mapping.tool_input(g_target, j_step.tool)
             j_emitter = mapping.emitter(g_emitter['id'], g_emitter['output_name'], self.janis, self.galaxy)
 
             if isinstance(j_emitter, WorkflowInput):
@@ -52,11 +56,9 @@ class ConnectionInputIngestor:
                     is_runtime=False
                 )
             else:
-                j_emitter_step = mapping.step(g_emitter['id'], self.janis, self.galaxy)
                 value = ConnectionInputValue(
                     component=j_target,
-                    step_uuid=j_emitter_step.uuid,
                     output_uuid=j_emitter.uuid
                 )
 
-            jstep.inputs.add(value)
+            j_step.inputs.add(value)
