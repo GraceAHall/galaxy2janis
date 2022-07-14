@@ -5,7 +5,7 @@ from typing import Any
 from setup import tool_setup
 from gx.gxtool.load import load_xmltool
 
-from shellparser.command import gen_command
+from gx.command import gen_command
 from containers import fetch_container
 from entities.tool.generate import gen_tool
 from entities.tool import Tool
@@ -19,8 +19,8 @@ the steps involved are laid out in order
 each step involves a single module
 """
 
-def tool_mode(args: dict[str, Any]) -> Tool:
-    tool_setup(args)
+def tool_mode() -> Tool:
+    tool_setup()
     logging.msg_parsing_tool()
     xmltool = load_xmltool()
     command = gen_command(xmltool)

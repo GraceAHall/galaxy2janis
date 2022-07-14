@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 from typing import Tuple
 from entities.workflow.step.inputs import ConnectionInputValue, InputValue, WorkflowInputInputValue
 
-from command import Flag
-from command import Option
-from command import Positional
+from gx.command.components import Flag
+from gx.command.components import Option
+from gx.command.components import Positional
 
 import tags
 

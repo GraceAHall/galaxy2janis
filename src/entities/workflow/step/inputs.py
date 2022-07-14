@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 
-from command import InputComponent
+from gx.command.components import InputComponent
 
 import tags
 

@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from shellparser.regex import scanners
+from gx.command.parser import scanners
 from typing import Any, Optional
 
 @dataclass

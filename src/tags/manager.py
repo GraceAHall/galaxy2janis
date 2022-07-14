@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from command import InputComponent
+from gx.command.components import InputComponent
 from .groups import TagGroup
 
 

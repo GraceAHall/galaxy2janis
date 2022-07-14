@@ -1,10 +1,13 @@
 
 
-from typing import Optional
+from typing import Any, Optional
 
-tool_id: str
+from gx.wrappers import Wrapper
+from gx.wrappers import fetch_wrapper
+from utils.galaxy import get_xml_id
+
 tool_path: str
-
+tool_id: str
 owner: Optional[str] = None
 repo: Optional[str] = None
 revision: Optional[str] = None
@@ -22,25 +25,46 @@ def xml_dir() -> str:
 def logfile_path() -> str:
     return f'{xml_basename()}.log'
 
+def update(args: Optional[dict[str, Any]]=None, wrapper: Optional[Wrapper]=None) -> None:
+    if not args and not wrapper:
+        raise RuntimeError('supply either args or wrapper to update')
+    if args:
+        update_args(args)
+    elif wrapper:
+        update_wrapper(wrapper)
 
-def set_tool_id(value: str) -> None:
-    global tool_id
-    tool_id = value
-
-def set_tool_path(value: str) -> None:
+def update_args(args: dict[str, Any]) -> None:
     global tool_path
-    tool_path = value
-
-def set_owner(value: str) -> None:
+    global tool_id
     global owner
-    owner = value
-
-def set_repo(value: str) -> None:
     global repo
-    repo = value
-
-def set_revision(value: str) -> None:
     global revision
-    revision = value
 
+    if args['local']:
+        tool_path = args['local']
+        tool_id = get_xml_id(tool_path)
+        owner = None
+        repo = None
+        revision = None
+    
+    if args['remote']:
+        owner, repo, tool_id, revision_raw = args['remote'].split(',')
+        revision = revision_raw.rsplit(':', 1)[-1] # incase numeric:revision
+        assert(owner)
+        assert(repo)
+        assert(revision)
+        tool_path = fetch_wrapper(owner, repo, revision, tool_id)
+
+def update_wrapper(wrapper: Wrapper) -> None:
+    global tool_path
+    global tool_id
+    global owner
+    global repo
+    global revision
+
+    tool_id = wrapper.tool_id
+    owner = wrapper.owner
+    repo = wrapper.repo
+    revision = wrapper.revision
+    tool_path = fetch_wrapper(wrapper.owner, wrapper.repo, wrapper.revision, wrapper.tool_id)
 

@@ -3,11 +3,11 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from shellparser.components.outputs.OutputComponent import OutputComponent
-from shellparser.components.outputs.InputOutput import InputOutput
-from shellparser.components.outputs.RedirectOutput import RedirectOutput
-from shellparser.components.outputs.UncertainOutput import UncertainOutput
-from shellparser.components.outputs.WildcardOutput import WildcardOutput
+from gx.command.components import OutputComponent
+from gx.command.components import InputOutput
+from gx.command.components import RedirectOutput
+from gx.command.components import UncertainOutput
+from gx.command.components import WildcardOutput
 
 from ..TextRender import TextRender
 from .. import formatting

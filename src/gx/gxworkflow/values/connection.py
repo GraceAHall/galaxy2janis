@@ -12,6 +12,7 @@ from entities.workflow import ConnectionInputValue
 from entities.workflow import WorkflowInputInputValue
 
 import mapping
+import settings
 
 
 def handle_tool_connection_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
@@ -44,6 +45,7 @@ class ConnectionInputIngestor:
 
         """
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
+        settings.tool.update(wrapper=j_step.metadata.wrapper)
         for g_target, g_emitter in g_step['input_connections'].items():
             g_target = g_target.replace('|', '.')
             j_target = mapping.tool_input(g_target, j_step.tool)

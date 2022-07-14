@@ -12,6 +12,7 @@ CACHE: DownloadCache = DownloadCache(DOWNLOADED_WRAPPERS_DIR)
 
 
 def fetch_wrapper(owner: str, repo: str, revision: str, tool_id: str) -> str:
+    """gets the wrapper locally or from toolshed then returns path to xml"""
     path: Optional[str] = None
     if not path:
         path = _fetch_cache(repo, revision, tool_id)

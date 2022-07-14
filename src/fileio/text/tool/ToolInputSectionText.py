@@ -8,10 +8,10 @@ from ..TextRender import TextRender
 from ..tool.ToolInputText import ToolInputText
 from .. import ordering
 
-from command import InputComponent
-from command import Flag
-from command import Option
-from command import Positional
+from gx.command.components import InputComponent
+from gx.command.components import Flag
+from gx.command.components import Option
+from gx.command.components import Positional
 
 
 @dataclass

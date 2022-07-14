@@ -3,7 +3,7 @@
 
 from dataclasses import dataclass
 from typing import Tuple
-from shellparser.components.outputs.OutputComponent import OutputComponent
+from gx.command.components import OutputComponent
 
 from ..TextRender import TextRender
 from ..tool.ToolOutputText import ToolOutputText

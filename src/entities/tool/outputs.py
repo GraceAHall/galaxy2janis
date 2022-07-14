@@ -2,11 +2,11 @@
 
 import logs.logging as logging
 
-from shellparser.Command import Command
-from command import Flag
-from shellparser.components.outputs.RedirectOutput import RedirectOutput
-from shellparser.components.outputs.create import create_output
-from command import CommandComponent
+from gx.command import Command
+from gx.command.components import CommandComponent
+from gx.command.components import Flag
+from gx.command.components import RedirectOutput
+from gx.command.components import create_output
 
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from gx.gxtool.param.Param import Param

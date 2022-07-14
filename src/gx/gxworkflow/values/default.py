@@ -8,15 +8,18 @@ if TYPE_CHECKING:
     from entities.workflow import WorkflowStep
     from entities.workflow import Workflow
 
-from command import InputComponent
+from gx.command.components import InputComponent
 
 from . import factory
 import mapping
+import settings
+
 
 def handle_tool_default_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
     for g_step in galaxy['steps'].values():
         if g_step['type'] == 'tool':
             j_step = mapping.step(g_step['id'], janis, galaxy)
+            settings.tool.update(wrapper=j_step.metadata.wrapper)
             for component in get_linkable_components(j_step):
                 input_value = factory.static(component, component.default_value, default=True)
                 j_step.inputs.add(input_value)

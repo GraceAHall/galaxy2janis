@@ -4,10 +4,10 @@
 from typing import Optional, Tuple
 from dataclasses import dataclass
 
-from command import Flag
-from command import InputComponent
-from command import Positional
-from command import Option
+from gx.command.components import Flag
+from gx.command.components import InputComponent
+from gx.command.components import Positional
+from gx.command.components import Option
 
 from ..TextRender import TextRender
 from .. import formatting

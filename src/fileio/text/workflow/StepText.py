@@ -2,15 +2,14 @@
 
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Tuple
+from typing import Optional, Tuple
 
+from entities.workflow import Workflow
 from entities.workflow import WorkflowStep
-from entities.workflow import InputValue
-from entities.workflow.step.inputs import ConnectionInputValue, StaticInputValue, WorkflowInputInputValue
-from entities.workflow.workflow import Workflow
-from fileio.text.workflow.WorkflowInputText import WorkflowInputText
-from command import Positional
+from entities.workflow import InputValue, ConnectionInputValue, StaticInputValue, WorkflowInputInputValue
+from gx.command.components import Positional
 
+from .WorkflowInputText import WorkflowInputText
 from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
@@ -39,17 +38,23 @@ Please see [WEBLINK] for information on the PRE TASK, TOOL STEP, POST TASK struc
 \"\"\"
 """
 
-def pre_task(step: WorkflowStep) -> str:
-    # TODO DUMP TEXT
-    if step.tool:
-        pass
-    return '# __PRE_TASK__\n'
+def pre_task(step: WorkflowStep) -> Optional[str]:
+    if step.preprocessing:
+        out_str: str = ''
+        out_str += '# UNTRANSLATED PRE-PROCESSING LOGIC:\n'
+        out_str += step.preprocessing
+        return out_str
+    else:
+        return None
 
-def post_task(step: WorkflowStep) -> str:
-    # TODO DUMP TEXT
-    return '# __POST_TASK__\n'
-
-
+def post_task(step: WorkflowStep) -> Optional[str]:
+    if step.postprocessing:
+        out_str: str = ''
+        out_str += '# UNTRANSLATED POST-PROCESSING LOGIC:\n'
+        out_str += step.postprocessing
+        return out_str
+    else:
+        return None
 
 ### HELPER CLASSES ###
 
@@ -172,9 +177,16 @@ class StepText(TextRender):
             out_str += f'{title(self.step_num, self.entity)}\n'
 
         out_str += f'{self.format_runtime_inputs()}\n'
-        out_str += f'{pre_task(self.entity)}\n'
+
+        preprocessing = pre_task(self.entity)
+        if preprocessing:
+            out_str += f'"""\n{preprocessing}\n"""\n'
+
         out_str += f'{self.format_step()}\n'
-        out_str += f'{post_task(self.entity)}\n'
+
+        postprocessing = post_task(self.entity)
+        if postprocessing:
+            out_str += f'"""\n{postprocessing}\n"""\n'
 
         return out_str
 

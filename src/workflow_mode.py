@@ -13,6 +13,7 @@ from gx.gxworkflow.parsing.metadata import ingest_metadata
 from gx.gxworkflow.parsing.inputs import ingest_workflow_inputs
 from gx.gxworkflow.parsing.step import ingest_workflow_steps
 from gx.gxworkflow.parsing.tool_step.tool import ingest_workflow_tools
+from gx.gxworkflow.parsing.tool_step.prepost import ingest_workflow_steps_prepost
 from gx.gxworkflow.parsing.tool_step.outputs import ingest_workflow_steps_outputs
 
 from gx.gxworkflow.values import handle_tool_connection_inputs
@@ -47,6 +48,7 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     ingest_workflow_inputs(janis, galaxy)
     ingest_workflow_steps(janis, galaxy)
     ingest_workflow_tools(janis, galaxy)
+    ingest_workflow_steps_prepost(janis, galaxy)
     ingest_workflow_steps_outputs(janis, galaxy) 
 
     # assigning tool input values

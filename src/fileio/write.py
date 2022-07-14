@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from fileio.text.tool.ScriptText import ScriptText
+
+from fileio.text.tool.UnstranslatedText import UntranslatedText
 
 if TYPE_CHECKING:
     from entities.tool import Tool
@@ -29,6 +32,8 @@ def write_tool(tool: Tool, path: str) -> None:
 
 def write_workflow(janis: Workflow) -> None:
     write_tools(janis)
+    write_untranslated(janis)
+    write_scripts(janis)
     write_wrappers(janis)
     #write_sub_workflows(janis)
     write_main_workflow(janis)
@@ -39,6 +44,27 @@ def write_tools(janis: Workflow) -> None:
     for step in janis.steps:
         tool_id = step.metadata.wrapper.tool_id
         write_tool(step.tool, paths.manager.tool(tool_id))
+
+def write_untranslated(janis: Workflow) -> None:
+    for step in janis.steps:
+        if step.preprocessing or step.postprocessing:
+            tool_id = step.metadata.wrapper.tool_id
+            path = paths.manager.untranslated(tool_id)
+            text = UntranslatedText(step)
+            page = text.render()
+            with open(path, 'w') as fp:
+                fp.write(page)
+
+def write_scripts(janis: Workflow) -> None:
+    for step in janis.steps:
+        if step.tool.configfiles:
+            tool_id = step.metadata.wrapper.tool_id
+            for configfile in step.tool.configfiles:
+                path = paths.manager.script(tool_id, configfile.name)
+                text = ScriptText(configfile)
+                page = text.render()
+                with open(path, 'w') as fp:
+                    fp.write(page)
 
 def write_wrappers(janis: Workflow) -> None:
     for step in janis.steps:

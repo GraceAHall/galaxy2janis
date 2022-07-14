@@ -2,7 +2,7 @@
 
 from typing import Optional
 from gx.gxtool.load import XMLToolDefinition
-from shellparser.command import Command
+from gx.command import Command
 
 # this module imports
 from .Tool import Tool

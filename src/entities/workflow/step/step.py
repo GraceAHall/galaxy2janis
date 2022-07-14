@@ -18,6 +18,8 @@ class WorkflowStep:
         self.metadata = metadata
         self.inputs: StepInputRegister = StepInputRegister()
         self.outputs: StepOutputRegister = StepOutputRegister()
+        self.preprocessing: Optional[str] = None
+        self.postprocessing: Optional[str] = None
         self._tool: Optional[Tool] = None
 
     @property

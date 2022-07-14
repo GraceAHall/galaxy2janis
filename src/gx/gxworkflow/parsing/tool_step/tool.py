@@ -11,7 +11,7 @@ from gx.gxworkflow.parsing.tool_state import load_tool_state
 from gx.interaction import get_builtin_tool_path
 
 import mapping
-
+import settings
 
 def ingest_workflow_tools(janis: Workflow, galaxy: dict[str, Any]) -> None:
     for g_step in galaxy['steps'].values():
@@ -23,7 +23,8 @@ def ingest_workflow_tools(janis: Workflow, galaxy: dict[str, Any]) -> None:
 
 def parse_step_tool(metadata: StepMetadata) -> Tool:
     args = create_tool_settings_for_step(metadata)
-    return tool_mode(args)
+    settings.tool.update(args)
+    return tool_mode()
 
 def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
     tool_id = metadata.wrapper.tool_id

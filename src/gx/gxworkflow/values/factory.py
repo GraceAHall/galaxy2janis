@@ -1,7 +1,7 @@
 
 from typing import Any, Optional
 
-from command import InputComponent
+from gx.command.components import InputComponent
 from . import utils
 
 from entities.workflow import (

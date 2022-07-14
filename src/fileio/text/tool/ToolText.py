@@ -17,8 +17,6 @@ from .. import ordering
 from .. import formatting
 
 
-
-
 def note_snippet(tool: Tool) -> str:
     tool_name = tool.metadata.id
     tool_version = tool.metadata.version

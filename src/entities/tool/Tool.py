@@ -3,14 +3,15 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from uuid import uuid4
+from gx.configfiles.Configfile import Configfile
 
 from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
 from gx.gxtool.param.InputParamRegister import InputParamRegister
 from gx.gxtool.param.Param import Param
 
-from command import CommandComponent
-from command import InputComponent
-from shellparser.components.outputs.OutputComponent import OutputComponent
+from gx.command.components import CommandComponent
+from gx.command.components import InputComponent
+from gx.command.components import OutputComponent
 
 import tags
 
@@ -25,11 +26,9 @@ class Tool:
     uuid: str = field(init=False)
     metadata: ToolXMLMetadata
     gxparam_register: InputParamRegister
+    configfiles: list[Configfile]
     container: Optional[str]
     base_command: list[str]
-    command: str
-    preprocessing: Optional[str]
-    postprocessing: Optional[str]
 
     def __post_init__(self):
         self.inputs: list[InputComponent] = []

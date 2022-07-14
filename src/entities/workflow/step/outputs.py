@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from uuid import uuid4
 
 from datatypes.JanisDatatype import JanisDatatype
-from shellparser.components.outputs.OutputComponent import OutputComponent
+from gx.command.components import OutputComponent
 
 
 @dataclass

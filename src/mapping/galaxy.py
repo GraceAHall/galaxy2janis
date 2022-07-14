@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from entities.workflow import WorkflowStep
     from entities.workflow import StepOutput
 
-    from command import InputComponent
-    from shellparser.components.outputs.OutputComponent import OutputComponent
+    from gx.command.components import InputComponent
+    from gx.command.components import OutputComponent
 
 
 # split this file into mapping.workflow, mapping.tool?

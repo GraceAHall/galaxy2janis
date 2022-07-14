@@ -4,12 +4,12 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 from datatypes.JanisDatatype import JanisDatatype
 
-from shellparser.components.outputs.OutputComponent import OutputComponent
+from gx.command.components import OutputComponent
 from .conversion import galaxy_to_janis
 from . import core
 
 if TYPE_CHECKING:
-    from command import Positional, Flag, Option
+    from gx.command.components import Positional, Flag, Option
     from entities.workflow import WorkflowInput
     from entities.workflow import StepOutput
 

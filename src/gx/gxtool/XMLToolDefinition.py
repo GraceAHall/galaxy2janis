@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from typing import Optional
+from gx.configfiles.Configfile import Configfile
 
 from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
 from gx.gxtool.param.OutputParam import OutputParam
@@ -26,7 +27,7 @@ class XMLToolDefinition:
     """
     metadata: ToolXMLMetadata
     raw_command: str
-    configfiles: dict[str, str]
+    configfiles: list[Configfile]
     inputs: InputParamRegister
     outputs: OutputParamRegister
     tests: TestRegister

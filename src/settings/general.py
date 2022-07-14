@@ -3,6 +3,7 @@
 
 command: str
 
+
 # setting
 def set_command(value: str) -> None:
     global command

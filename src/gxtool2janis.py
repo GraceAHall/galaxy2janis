@@ -14,6 +14,7 @@ from tool_mode import tool_mode
 from workflow_mode import workflow_mode
 
 import paths
+import settings
 
 """
 gxtool2janis program entry point
@@ -42,7 +43,8 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
             pass
 
 def run_tool_mode(args: dict[str, Optional[str]]):
-    tool = tool_mode(args)
+    settings.tool.update(args)
+    tool = tool_mode()
     path = paths.manager.tool(tool.metadata.id)
     fileio.write_tool(tool, path=path)  # I dont like this design, but it may be necessary
 
@@ -54,16 +56,14 @@ def run_workflow_mode(args: dict[str, Optional[str]]):
 
 def try_run_tool_mode(args: dict[str, Optional[str]]):
     try: 
-        tool = tool_mode(args)
-        path = paths.manager.tool(tool.metadata.id)
-        fileio.write_tool(tool)
+        run_tool_mode(args)
     except Exception as e:
         print(e)
         logging.tool_exception()
 
 def try_run_workflow_mode(args: dict[str, Optional[str]]):
     try: 
-        workflow_mode(args)
+        run_workflow_mode(args)
     except Exception as e:
         print(e)
         logging.workflow_exception()

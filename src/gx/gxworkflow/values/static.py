@@ -8,15 +8,15 @@ if TYPE_CHECKING:
     from entities.workflow import Workflow
     from entities.workflow import WorkflowInput
 
-from command import Flag
-from command import InputComponent
-from command import Option
-from command import gen_command_string
+from gx.command.cmdstr import gen_command_string
+from gx.command.parser import utils as regex_utils
 
-from shellparser.regex import utils as regex_utils
+from gx.command.components import Flag
+from gx.command.components import InputComponent
+from gx.command.components import Option
 
 from gx.gxtool.load import load_xmltool
-from gx.text import load_partial_cheetah_command
+from gx.gxtool.text import load_partial_cheetah_command
 
 from . import factory
 from . import utils as value_utils
@@ -25,6 +25,7 @@ from entities.workflow import InputValue
 import tags
 import mapping
 import datatypes
+import settings
 
 
 def handle_tool_static_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
@@ -32,6 +33,7 @@ def handle_tool_static_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
     for g_step in galaxy['steps'].values():
         if g_step['type'] == 'tool':
             j_step = mapping.step(g_step['id'], janis, galaxy)
+            settings.tool.update(wrapper=j_step.metadata.wrapper)
             ingest_values_cheetah(g_step, j_step, janis)
             ingest_values_inputs(g_step, j_step, janis)
 

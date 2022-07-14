@@ -4,8 +4,8 @@
 from typing import Any, Optional
 #from entities.workflow import WorkflowInput
 
-from command import CommandComponent
-from command import InputComponent
+from gx.command.components import CommandComponent
+from gx.command.components import InputComponent
 
 import utils.general as utils
 import datatypes

@@ -2,9 +2,9 @@
 
 from typing import Any, Optional, Protocol, Tuple
 
-from command import CommandComponent
-from command import InputComponent
-from command import Option
+from gx.command.components import CommandComponent
+from gx.command.components import InputComponent
+from gx.command.components import Option
 
 import datatypes
 

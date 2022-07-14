@@ -27,7 +27,7 @@ def is_macro_xml(path: str) -> bool:
         return True
     return False
 
-def get_xml_id(filepath: str) -> Optional[str]:
+def get_xml_id(filepath: str) -> str:
     tree = et.parse(filepath)
     root = tree.getroot()
     return str(root.attrib['id']) # type: ignore

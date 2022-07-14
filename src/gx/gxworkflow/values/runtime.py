@@ -12,11 +12,12 @@ from entities.workflow import WorkflowInput
 from entities.workflow import InputValue
 from entities.workflow import WorkflowInputInputValue
 
-from command import InputComponent
+from gx.command.components import InputComponent
 
 import tags
 import mapping
 import datatypes
+import settings
 
 
 def handle_tool_runtime_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
@@ -37,6 +38,7 @@ class RuntimeInputIngestor:
 
     def ingest_runtime(self, g_step: dict[str, Any]) -> None:
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
+        settings.tool.update(wrapper=j_step.metadata.wrapper)
         g_targets = [inp['name'] for inp in g_step['inputs']]
         
         for g_target in g_targets:
