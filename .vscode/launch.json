@@ -42,6 +42,18 @@
             ]
         },
         {
+            "name": "cutadapt tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/cutadapt/cutadapt.xml", 
+            ]
+        },
+        {
             "name": "unicycler tool",
             "type": "python",
             "request": "launch",

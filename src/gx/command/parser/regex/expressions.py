@@ -45,3 +45,5 @@ SH_STREAM_MERGE = r'(?<=\s|^)\d?>&\d'
 OPERATOR = r'[-+\\/*=]?='
 VERSIONS = r'(\d+)(\.\d+)*'
 
+WILDCARD_GROUPS = r'\((\?P<.+?>)(.*?)\)'
+

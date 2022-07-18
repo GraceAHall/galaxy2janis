@@ -12,6 +12,7 @@ class InputComponent(ABC):
         self.gxparam: Optional[Param] = None
         self.cmd_pos: int = -1
         self.forced_optionality: Optional[bool] = None
+        self.forced_array: Optional[bool] = None
  
     @property
     @abstractmethod

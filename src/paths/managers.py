@@ -73,6 +73,13 @@ class ToolModePathManager(PathManager):
 
     def wrapper(self, tool_id: str, revision: str) -> str:
         raise NotImplementedError()
+    
+    def script(self, tool_id: str, script_name: str) -> str:
+        raise NotImplementedError()
+
+    def untranslated(self, tool_id: str) -> str:
+        raise NotImplementedError()
+
 
 
 # workflow mode 

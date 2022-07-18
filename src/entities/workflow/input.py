@@ -1,6 +1,6 @@
 
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 from uuid import uuid4
 
@@ -11,10 +11,9 @@ from datatypes.JanisDatatype import JanisDatatype
 class WorkflowInput:
     name: str
     array: bool
-    optional: bool = False
-    is_galaxy_input_step: bool = False
-    gx_datatypes: list[str] = field(default_factory=list)
-    janis_datatypes: list[JanisDatatype] = field(default_factory=list)
+    optional: bool
+    is_runtime: bool
+    datatype: JanisDatatype
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())

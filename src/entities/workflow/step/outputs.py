@@ -3,15 +3,14 @@
 
 from dataclasses import dataclass
 from uuid import uuid4
-
-from datatypes.JanisDatatype import JanisDatatype
 from gx.command.components import OutputComponent
 
+
+# TODO could probably go direct to janis
 
 @dataclass
 class StepOutput:
     step_uuid: str
-    janis_datatypes: list[JanisDatatype]
     is_wflow_out: bool
     tool_output: OutputComponent
 

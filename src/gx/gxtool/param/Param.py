@@ -8,7 +8,7 @@ from typing import Any
 
 class Param(ABC):
     name: str
-    datatypes: list[str] = []
+    formats: list[str] = []
 
     @property
     @abstractmethod

@@ -2,7 +2,7 @@
 
 from gx.interaction import get_tool
 
-from gx.gxtool.parsing.GalaxyToolIngestor import GalaxyToolIngestor
+from gx.gxtool.parsing.ingest import GalaxyToolIngestor
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 
 import settings

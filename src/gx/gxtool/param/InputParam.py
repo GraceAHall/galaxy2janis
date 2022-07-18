@@ -9,7 +9,7 @@ from gx.gxtool.param.Param import Param
 class InputParam(Param):
     def __init__(self, name: str):
         self.name: str = name
-        self.datatypes: list[str] = []
+        self.formats: list[str] = []
         self.label: str = ''
         self.argument: Optional[str] = None
         self.helptext: str = ''
@@ -49,7 +49,7 @@ class TextParam(InputParam):
     def __init__(self, name: str):
         super().__init__(name)
         self.value: Optional[str] = None
-        self.datatypes: list[str] = ['String']
+        self.formats: list[str] = ['string']
 
     @property
     def default(self) -> Any:
@@ -64,7 +64,7 @@ class IntegerParam(InputParam):
         self.value: Optional[str] = None
         self.min: Optional[str] = None
         self.max: Optional[str] = None
-        self.datatypes: list[str] = ['Int']
+        self.formats: list[str] = ['integer']
 
     @property
     def default(self) -> Any:
@@ -84,7 +84,7 @@ class FloatParam(InputParam):
         self.value: Optional[str] = None
         self.min: Optional[str] = None
         self.max: Optional[str] = None
-        self.datatypes: list[str] = ['Float']
+        self.formats: list[str] = ['float']
 
     @property
     def default(self) -> Any:
@@ -103,7 +103,7 @@ class BoolParam(InputParam):
         self.checked: bool = True
         self.truevalue: str = ''
         self.falsevalue: str = ''
-        self.datatypes: list[str] = ['Boolean']
+        self.formats: list[str] = ['boolean']
 
     @property
     def default(self) -> str:
@@ -143,7 +143,7 @@ class SelectParam(InputParam):
         super().__init__(name)
         self.options: list[SelectOption] = []
         self.multiple: bool = False
-        self.datatypes: list[str] = ['String']
+        self.formats: list[str] = []
 
     @property
     def default(self) -> Any:
@@ -185,7 +185,7 @@ class SelectParam(InputParam):
 class DataParam(InputParam):
     def __init__(self, name: str):
         super().__init__(name)
-        self.datatypes: list[str] = []
+        self.formats: list[str] = []
         self.multiple: bool = False
     
     @property
@@ -194,9 +194,10 @@ class DataParam(InputParam):
 
 
 class DataCollectionParam(InputParam):
-    def __init__(self, name: str):
+    def __init__(self, name: str, collection_type: str):
         super().__init__(name)
-        self.datatypes: list[str] = []
+        self.collection_type = collection_type
+        self.formats: list[str] = []
     
     @property
     def array(self) -> bool:

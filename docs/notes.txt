@@ -1,4 +1,22 @@
 
+
+------
+Arrays
+------
+
+- env_var_is_array
+    - for inputs / outputs
+    - used to identify arrays
+    - looks up an env_var
+    - decides if it is using a galaxy param to create an array 
+
+- workflow step arrays
+    - correct tool inputs / outputs
+    - if is directly linkable 
+    - if tool_state value is a list & the tool input is single, correct to array
+
+
+
 -------------------------
 New approach to ingestion
 -------------------------
@@ -8,7 +26,7 @@ New approach to ingestion
     - entities first in logical order (ie steps before step outputs)
     - connections last after all entities exist
 
-- Liason class 
+- mapping class 
     - holds the galaxy workflow (json) and the janis Workflow
     - entities are linked between these using the Liason class 
     - think like 2 storey shopping mall building layout: 2 layers

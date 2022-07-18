@@ -7,7 +7,7 @@ class OutputParam(Param):
     def __init__(self, name: str):
         self.name: str = name
         self.label: str = ''
-        self.datatypes: list[str] = []
+        self.formats: list[str] = []
         self.wildcard_pattern: Optional[str] = None
 
     @property

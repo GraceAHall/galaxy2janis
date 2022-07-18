@@ -6,14 +6,13 @@ from typing import Optional, Tuple
 from gx.command.components import OutputComponent
 from gx.command.components import InputOutput
 from gx.command.components import RedirectOutput
-from gx.command.components import UncertainOutput
 from gx.command.components import WildcardOutput
 
 from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 
-from datatypes import get
+import datatypes
 import tags
 
 
@@ -25,9 +24,9 @@ def format_selector_str(output: OutputComponent) -> Optional[str]:
             input_comp_uuid = output.input_component.uuid
             input_comp_tag = tags.tool.get(input_comp_uuid)
             return f'InputSelector("{input_comp_tag}")'
-        case WildcardOutput() | UncertainOutput():
-            pattern = output.gxparam.wildcard_pattern # what
-            return f'WildcardSelector("{pattern}")'
+        case WildcardOutput():
+            pattern = output.gxparam.wildcard_pattern
+            return f'WildcardSelector(r"{pattern}")'
         case _:
             pass
 
@@ -40,18 +39,20 @@ class ToolOutputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = get(self.entity)
+        jtype = datatypes.get(self.entity)
         imports: list[Tuple[str, str]] = []
-        imports = [(j.import_path, j.classname) for j in jtypes]
+        imports.append((jtype.import_path, jtype.classname))
 
         # TODO opportunity for decorator # Stdout class import
         if isinstance(self.entity, RedirectOutput):
             imports.append(('janis_core', 'Stdout'))
+
         # TODO opportunity for decorator # Selector class import
         selector_str = format_selector_str(self.entity)
         if selector_str:
             selector = selector_str.split('(', 1)[0]
             imports.append(('janis_core', selector))
+        
         # TODO opportunity for decorator # Array class import
         if self.entity.array:
             imports.append(('janis_core', 'Array'))
@@ -67,7 +68,7 @@ class ToolOutputText(TextRender):
         out_str: str = ''
         out_str += '\tToolOutput(\n'
         out_str += f"\t\t'{tags.tool.get(e.uuid)}',\n"
-        out_str += f"\t\t{formatting.format_datatype_string(e)},\n"
+        out_str += f"\t\t{datatypes.get_str(e)},\n"
         if selector_str:
             out_str += f"\t\tselector={selector_str},\n" 
         out_str += f'\t\tdoc="{doc}",\n' if doc else ''

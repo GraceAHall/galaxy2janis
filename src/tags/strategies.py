@@ -18,9 +18,9 @@ class GenericFormattingStrategy(FormattingStrategy):
         tag = rules.numeric_start(tag, entity)
         tag = rules.non_alphanumeric(tag, entity)
         tag = rules.short_tag(tag, entity)
-        tag = rules.capitalisation(tag, entity)
         tag = rules.replace_keywords(tag, entity)
-        tag = rules.encode(tag)
+        #tag = rules.encode(tag)
+        tag = rules.camelify(tag)
         return tag
 
 class StepOutputFormattingStrategy(FormattingStrategy):
@@ -30,9 +30,9 @@ class StepOutputFormattingStrategy(FormattingStrategy):
         tag = rules.numeric_start(tag, entity)
         tag = rules.non_alphanumeric(tag, entity, allow_dot=True)
         tag = rules.short_tag(tag, entity)
-        tag = rules.capitalisation(tag, entity)
         tag = rules.replace_keywords(tag, entity)
-        tag = rules.encode(tag)
+        #tag = rules.encode(tag)
+        tag = rules.camelify(tag)
         return tag
 
 # capitalisation is allowed
@@ -43,9 +43,9 @@ class ToolNameStrategy(FormattingStrategy):
         tag = rules.numeric(tag, entity)
         tag = rules.numeric_start(tag, entity)
         tag = rules.short_tag(tag, entity)
-        #tag = rules.capitalisation(tag, entity)
         tag = rules.replace_keywords(tag, entity)
-        tag = rules.encode(tag)
+        #tag = rules.encode(tag)
+        tag = rules.camelify(tag)
         return tag
         
 

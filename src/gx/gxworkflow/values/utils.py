@@ -9,17 +9,8 @@ from gx.command.components import InputComponent
 
 import utils.general as utils
 import datatypes
-#import tags
 
 
-# def create_workflow_input(component: InputComponent) -> WorkflowInput:
-#     """creates a workflow input from a tool component"""
-#     return WorkflowInput(
-#         name=tags.tool.get(component.uuid),
-#         array=component.array,
-#         is_galaxy_input_step=False,
-#         janis_datatypes=datatypes.get(component),
-#     )
 
 def get_comptype(component: CommandComponent) -> str:
     return type(component).__name__.lower() 
@@ -67,10 +58,9 @@ def is_numeric(component: CommandComponent, value: Any) -> bool:
     return False
 
 def _has_numeric_datatype(component: CommandComponent) -> bool:
-    jtypes = datatypes.get(component)
-    jclasses = [x.classname for x in jtypes]
+    jtype = datatypes.get(component)
     numeric_classes = ['Int', 'Float']
-    if any([x in jclasses for x in numeric_classes]): 
+    if jtype.classname in numeric_classes:
         return True
     return False
     

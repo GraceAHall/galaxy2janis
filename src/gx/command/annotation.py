@@ -5,7 +5,6 @@ import logs.logging as logging
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 from gx.gxtool.param.Param import Param
 from gx.gxtool.param.InputParam import BoolParam, SelectParam
-from gx.gxtool.param import utils
 
 from .parser.epath.ExecutionPath import ExecutionPath
 from .parser.epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
@@ -124,7 +123,7 @@ class ArgumentCommandAnnotator:
 
     def handle_select_param(self, gxparam: SelectParam) -> None:
         assert(gxparam.argument)
-        if utils.select_is_bool(gxparam):
+        if self.select_is_bool(gxparam):
             component = spawn_component('flag', ctext=gxparam.argument, ntexts=[])
             self.command.update(component)
         else:
@@ -133,10 +132,18 @@ class ArgumentCommandAnnotator:
                 component.gxparam = gxparam
                 self.command.update(component)
 
+    def select_is_bool(self, gxparam: SelectParam) -> bool:
+        values = gxparam.get_all_values(nonempty=True)
+        if len(values) == 1:
+            if values[0].startswith('-'):
+                return True
+        return False  
+
     def handle_generic_param(self, gxparam: Param) -> None:
         component = spawn_component('option', ctext=gxparam.argument, ntexts=[])
         component.gxparam = gxparam
-        self.command.update(component)    
+        self.command.update(component)  
+
 
 
 

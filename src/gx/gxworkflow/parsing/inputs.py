@@ -1,10 +1,12 @@
 
 
-from typing import Any
 import json
+from typing import Any
 
 from entities.workflow import WorkflowInput
 from entities.workflow import Workflow
+
+import datatypes
 
 
 def ingest_workflow_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
@@ -18,8 +20,9 @@ def parse_input_step(step: dict[str, Any]) -> WorkflowInput:
     return WorkflowInput(
         name=format_input_step_name(step),
         array=format_input_step_array(step),
-        is_galaxy_input_step=True,
-        gx_datatypes=format_input_step_datatypes(step),
+        is_runtime=False,
+        datatype=datatypes.get(step, 'GalaxyInputStep'),
+        optional=format_input_step_optionality(step)
     )
 
 def format_input_step_name(step: dict[str, Any]) -> str:
@@ -35,10 +38,8 @@ def format_input_step_array(step: dict[str, Any]) -> bool:
         return True
     return False
 
-def format_input_step_datatypes(step: dict[str, Any]) -> list[str]:
+def format_input_step_optionality(step: dict[str, Any]) -> bool:
     tool_state = json.loads(step['tool_state'])
-    if 'format' in tool_state:
-        return tool_state['format']
-    return []
-    # TODO no idea if this needs recursive tool_state expansion
-
+    if 'optional' in tool_state:
+        return bool(tool_state['optional'])
+    return False

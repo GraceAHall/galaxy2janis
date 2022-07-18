@@ -8,7 +8,6 @@ from gx.gxtool.param.Param import Param
 from .RedirectOutput import RedirectOutput
 from .InputOutput import InputOutput
 from .WildcardOutput import WildcardOutput
-from .UncertainOutput import UncertainOutput
 from ..CommandComponent import CommandComponent
 
 
@@ -25,16 +24,17 @@ def create_wildcard_output(gxparam: Param) -> WildcardOutput:
     output.gxparam = gxparam
     return output
 
-def create_uncertain_output(gxparam: Param) -> UncertainOutput:
-    output = UncertainOutput()
+def create_uncertain_output(gxparam: Param) -> WildcardOutput:
+    output = WildcardOutput()
     output.gxparam = gxparam
+    output.verified = False
     return output
 
 output_map = {
     'redirect': create_redirect_output,
     'input': create_input_output,
     'wildcard': create_wildcard_output,
-    'uncertain': create_uncertain_output
+    'uncertain_wildcard': create_uncertain_output
 }
 
 def create_output(ctype: str, incoming: Any) -> CommandComponent:

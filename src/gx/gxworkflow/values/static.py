@@ -140,8 +140,9 @@ class CheetahInputIngestor:
         return WorkflowInput(
             name=tags.tool.get(component.uuid),
             array=component.array,
-            is_galaxy_input_step=False,
-            janis_datatypes=datatypes.get(component),
+            is_runtime=True,
+            datatype=datatypes.get(component),
+            optional=component.optional
         )
 
     def get_linkable_components(self) -> list[InputComponent]:

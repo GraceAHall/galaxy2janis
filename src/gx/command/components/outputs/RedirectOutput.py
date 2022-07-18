@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import Optional, Tuple
 
 from ...parser.tokens.Token import Token
-from gx.gxtool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 from .OutputComponent import OutputComponent
 from ..linux.streams import Stream
@@ -40,15 +39,6 @@ class RedirectOutput(OutputComponent):
     @property
     def optional(self) -> bool:
         # NOTE - janis does not allow optional outputs
-        return False
-
-    @property
-    def array(self) -> bool:
-        match self.gxparam:
-            case CollectionOutputParam() | DataOutputParam():
-                return self.gxparam.array
-            case _:
-                pass
         return False
 
     @property

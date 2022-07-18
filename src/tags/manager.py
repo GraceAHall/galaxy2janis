@@ -9,6 +9,7 @@ from .groups import TagGroup
 
 
 
+
 class TagManager(ABC):
     permitted: set[str]
 
@@ -23,6 +24,8 @@ class TagManager(ABC):
     @abstractmethod
     def _get_starting_text(self, entity: Any) -> str:
         ...
+
+
 
 
 class ToolTagManager(TagManager):
@@ -93,7 +96,7 @@ class WorkflowTagManager(TagManager):
             case 'Workflow':
                 return entity.metadata.name
             case 'WorkflowInput':
-                if entity.is_galaxy_input_step:
+                if not entity.is_runtime:
                     return f'in_{entity.name}'
                 else:
                     return entity.name
@@ -105,3 +108,5 @@ class WorkflowTagManager(TagManager):
                 return f'{step_tag}.{out_name}'
             case _:
                 raise RuntimeError(f'cannot register a {entity.__class__.__name__}')
+    
+

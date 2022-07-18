@@ -2,9 +2,9 @@
 
 
 from galaxy.tools.parameters.basic import ToolParameter as GalaxyParam
+from gx.gxtool.param.Param import Param
 
 from runtime.exceptions import ParamNotSupportedError
-from gx.gxtool.param.Param import Param
 from gx.gxtool.param.InputParam import (
     InputParam,
     SelectOption,
@@ -18,25 +18,29 @@ from gx.gxtool.param.InputParam import (
 )
 
 
+def parse_input_param(gxparam: GalaxyParam) -> Param:
+    factory = InputParamFactory()
+    return factory.produce(gxparam)
+
 class InputParamFactory:
     def produce(self, gxparam: GalaxyParam) -> Param:
         match gxparam.type: # type: ignore
             case 'text':
-                param = self.init_text_param(gxparam)
+                param = self.parse_text_param(gxparam)
             case 'integer':
-                param = self.init_int_param(gxparam)
+                param = self.parse_int_param(gxparam)
             case 'float':
-                param = self.init_float_param(gxparam)
+                param = self.parse_float_param(gxparam)
             case 'boolean':
-                param = self.init_bool_param(gxparam)
+                param = self.parse_bool_param(gxparam)
             case 'select':
-                param = self.init_select_param(gxparam)
+                param = self.parse_select_param(gxparam)
             case 'data':
-                param = self.init_data_param(gxparam)
+                param = self.parse_data_param(gxparam)
             case 'data_collection':
-                param = self.init_data_collection_param(gxparam)
+                param = self.parse_data_collection_param(gxparam)
             case 'data_column':
-                param = self.init_int_param(gxparam)
+                param = self.parse_int_param(gxparam)
             case _:
                 raise ParamNotSupportedError(f'unknown param type: {str(gxparam.type)}')
         
@@ -50,12 +54,12 @@ class InputParamFactory:
         param.set_optionality(bool(gxparam.optional))
         return param
 
-    def init_text_param(self, gxparam: GalaxyParam) -> TextParam:
+    def parse_text_param(self, gxparam: GalaxyParam) -> TextParam:
         param = TextParam(str(gxparam.flat_name))
         param.value = gxparam.value
         return param
 
-    def init_int_param(self, gxparam: GalaxyParam) -> IntegerParam:
+    def parse_int_param(self, gxparam: GalaxyParam) -> IntegerParam:
         param = IntegerParam(str(gxparam.flat_name))
         if hasattr(gxparam, 'value'):
             param.value = gxparam.value
@@ -65,21 +69,21 @@ class InputParamFactory:
             param.max = gxparam.max
         return param
 
-    def init_float_param(self, gxparam: GalaxyParam) -> FloatParam:
+    def parse_float_param(self, gxparam: GalaxyParam) -> FloatParam:
         param = FloatParam(str(gxparam.flat_name))
         param.value = gxparam.value
         param.min = gxparam.min
         param.max = gxparam.max
         return param
 
-    def init_bool_param(self, gxparam: GalaxyParam) -> BoolParam:
+    def parse_bool_param(self, gxparam: GalaxyParam) -> BoolParam:
         param = BoolParam(str(gxparam.flat_name))
         param.checked = bool(gxparam.checked)
         param.truevalue = str(gxparam.truevalue)
         param.falsevalue = str(gxparam.falsevalue)
         return param
 
-    def init_select_param(self, gxparam: GalaxyParam) -> SelectParam:
+    def parse_select_param(self, gxparam: GalaxyParam) -> SelectParam:
         # TODO this could be dynamic options!
         param = SelectParam(str(gxparam.flat_name))
         param.multiple = bool(gxparam.multiple)
@@ -89,14 +93,16 @@ class InputParamFactory:
                 param.options.append(option)
         return param
 
-    def init_data_param(self, gxparam: GalaxyParam) -> DataParam:
+    def parse_data_param(self, gxparam: GalaxyParam) -> DataParam:
         param = DataParam(str(gxparam.flat_name))
-        param.datatypes = gxparam.extensions
+        param.formats = gxparam.extensions
         param.multiple = bool(gxparam.multiple)
         return param
 
-    def init_data_collection_param(self, gxparam: GalaxyParam) -> DataCollectionParam:
-        param = DataCollectionParam(str(gxparam.flat_name))
-        param.datatypes = gxparam.extensions
+    def parse_data_collection_param(self, gxparam: GalaxyParam) -> DataCollectionParam:
+        name = str(gxparam.flat_name)
+        collection_type = gxparam.collection_types[0]
+        param = DataCollectionParam(name, collection_type)
+        param.formats = gxparam.extensions
         return param
 

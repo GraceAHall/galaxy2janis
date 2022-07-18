@@ -6,7 +6,6 @@ from typing import Tuple
 from entities.workflow import WorkflowInput
 
 from ..TextRender import TextRender
-from .. import formatting
 from .. import ordering
 
 import tags
@@ -20,9 +19,9 @@ class WorkflowInputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = datatypes.get(self.entity)
+        jtype = datatypes.get(self.entity)
         imports: list[Tuple[str, str]] = []
-        imports = [(j.import_path, j.classname) for j in jtypes]
+        imports.append((jtype.import_path, jtype.classname))
 
         # TODO opportunity for decorator
         if self.entity.array:
@@ -34,9 +33,9 @@ class WorkflowInputText(TextRender):
 
     def render(self) -> str:
         tag = tags.workflow.get(self.entity.uuid)
-        datatype = formatting.format_datatype_string(self.entity)
+        type_str = datatypes.get_str(entity=self.entity)
         out_str: str = ''
-        out_str += f'w.input("{tag}", {datatype})'
+        out_str += f'w.input("{tag}", {type_str})'
         #out_str += f'\t"{tag}",\n'
         #out_str += f'\t{datatype}'
         #out_str += f',\n\tdefault={default}' if default else ''  # TODO HERE

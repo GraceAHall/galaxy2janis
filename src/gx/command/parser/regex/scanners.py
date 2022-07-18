@@ -34,9 +34,14 @@ from .expressions import (
     NEXT_WORD_RIGHT,
     EMPTY_STRINGS,
     EDGE_CASE_CH_INPUT,
+    WILDCARD_GROUPS,
     ALL
 )
 
+
+def get_wildcard_groups(the_string: str) -> list[re.Match[str]]:
+    matches = re.finditer(WILDCARD_GROUPS, the_string)
+    return [m for m in matches]
 
 def get_edge_case_ch_input(the_string: str) -> list[re.Match[str]]:
     matches = re.finditer(EDGE_CASE_CH_INPUT, the_string)

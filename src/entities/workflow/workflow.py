@@ -64,4 +64,18 @@ class Workflow:
             if winp.uuid == query_uuid:
                 return winp
         raise RuntimeError('could not find input with uuid')
+    
+    def get_step(self, query_uuid: str) -> WorkflowStep:
+        for step in self.steps:
+            if step.uuid == query_uuid:
+                return step
+        raise RuntimeError('could not find step with uuid')
+    
+    def get_step_output(self, query_uuid: str) -> StepOutput:
+        for step in self.steps:
+            for s_out in step.outputs.list():
+                if s_out.uuid == query_uuid:
+                    return s_out
+        raise RuntimeError('could not find step output with uuid')
+    
 

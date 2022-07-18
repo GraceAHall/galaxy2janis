@@ -4,6 +4,7 @@ from typing import Any
 import keyword
 import builtins
 
+import regex as re
 import logs.logging as logging
 import datatypes
 
@@ -55,14 +56,22 @@ def short_tag(tag: str, entity: Any) -> str:
         tag = _prepend_component_type(tag, entity)
     return tag
 
-def capitalisation(tag: str, entity: Any) -> str:
-    # if single letter allow any capitalisation, otherwise lower
-    # this doesn't really work at the moment as will always lower, due
-    # to the short_tag() rule
-    if len(tag) > 1:
-        return tag.lower()
-    else:
-        return tag[0]
+
+def camelify(text: str) -> str:
+    text = re.sub(r"(_|-|\.)+", " ", text)
+    words = text.split()
+    words = [w.title() for w in words]
+    words = [words[0].lower()] + words[1:]
+    return ''.join(words)
+
+# def capitalisation(tag: str, entity: Any) -> str:
+#     # if single letter allow any capitalisation, otherwise lower
+#     # this doesn't really work at the moment as will always lower, due
+#     # to the short_tag() rule
+#     if len(tag) > 1:
+#         return tag.lower()
+#     else:
+#         return tag[0]
 
 def non_alphanumeric(tag: str, entity: Any, allow_dot: bool=False) -> str:
     """
@@ -93,8 +102,8 @@ def _prepend_component_type(tag: str, entity: Any) -> str:
     return f'{entity_type}_{tag}'
 
 def _append_datatype(tag: str, entity: Any) -> str:
-    jtypes = datatypes.get(entity)
-    jclass = jtypes[0].classname.lower()
+    jtype = datatypes.get(entity)
+    jclass = jtype.classname.lower()
     if not tag.endswith(jclass): # don't add the dtype if its already been added
         tag = f"{tag}_{jclass}"
     return tag

@@ -4,7 +4,6 @@ from __future__ import annotations
 from .OutputComponent import OutputComponent
 
 from typing import Any, Optional
-from gx.gxtool.param.OutputParam import DataOutputParam, CollectionOutputParam
 
 from ..CommandComponent import CommandComponent
 
@@ -31,15 +30,6 @@ class InputOutput(OutputComponent):
         # NOTE - janis does not allow optional outputs
         return False
 
-    @property
-    def array(self) -> bool:
-        match self.gxparam:
-            case CollectionOutputParam() | DataOutputParam():
-                return self.gxparam.array
-            case _:
-                pass
-        return False
-   
     @property
     def docstring(self) -> Optional[str]:
         if self.gxparam:

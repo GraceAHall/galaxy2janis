@@ -48,7 +48,7 @@ class Positional(InputComponent):
             return self.forced_optionality
         elif self.gxparam: 
             return self.gxparam.optional
-        return True
+        return False
 
     @property
     def array(self) -> bool:

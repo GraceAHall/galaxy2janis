@@ -61,8 +61,9 @@ class RuntimeInputIngestor:
         return WorkflowInput(
             name=f'{step_tag}_{input_tag}',
             array=j_target.array,
-            is_galaxy_input_step=False,
-            janis_datatypes=datatypes.get(j_target),
+            is_runtime=True,
+            datatype=datatypes.get(j_target),
+            optional=j_target.optional
         )
 
     def create_workflow_value(self, j_target: InputComponent, winp: WorkflowInput) -> InputValue:

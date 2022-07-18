@@ -25,14 +25,14 @@ class ToolInputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = datatypes.get(self.entity)
+        jtype = datatypes.get(self.entity)
         imports: list[Tuple[str, str]] = []
-        imports = [(j.import_path, j.classname) for j in jtypes]
+        imports.append((jtype.import_path, jtype.classname))
 
         # TODO opportunity for decorator
         if self.entity.array:
             imports.append(('janis_core', 'Array'))
-
+        
         # TODO opportunity for decorator
         imports = list(set(imports))
         return ordering.order_imports(imports)
@@ -45,7 +45,7 @@ class ToolInputText(TextRender):
         out_str: str = ''
         out_str += '\tToolInput(\n'
         out_str += f"\t\t'{tags.tool.get(e.uuid)}',\n"
-        out_str += f"\t\t{formatting.format_datatype_string(e)},\n"  # TODO decouple!
+        out_str += f"\t\t{datatypes.get_str(e)},\n" 
         out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
         out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''
         out_str += f"\t\tposition={e.cmd_pos},\n"

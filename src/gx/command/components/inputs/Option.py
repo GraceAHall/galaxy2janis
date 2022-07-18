@@ -37,13 +37,15 @@ class Option(InputComponent):
     def optional(self) -> bool:
         if self.forced_optionality is not None:
             return self.forced_optionality
-        elif self.gxparam and self.gxparam.optional:
-            return True
-        return True
+        elif self.gxparam:
+            return self.gxparam.optional
+        return False
 
     @property
     def array(self) -> bool:
-        if self.gxparam:
+        if self.forced_array:
+            return self.forced_array
+        elif self.gxparam:
             if isinstance(self.gxparam, SelectParam):
                 if self.gxparam.multiple:
                     return True

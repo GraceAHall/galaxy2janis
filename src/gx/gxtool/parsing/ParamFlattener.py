@@ -10,6 +10,7 @@ from galaxy.tools.parameters.grouping import Conditional, ConditionalWhen, Secti
 
 XmlNode = ToolParameter | Conditional | ConditionalWhen | Section | Repeat
 
+
 class ParamFlattener:
     def __init__(self, inputs: dict[str, Any]):
         self.inputs = inputs
@@ -25,29 +26,22 @@ class ParamFlattener:
         match node:
             case HiddenToolParameter():
                 pass
-
-            case ToolParameter():
+            case ToolParameter(): # leaf node
                 self.flatten_param(node, heirarchy)
-
-            case Conditional():
+            case Conditional(): 
                 heirarchy.append(node.name)
                 self.flatten_param(node.test_param, heirarchy)
                 for child in node.cases:
                     self.explore_node(child, heirarchy)
-
             case ConditionalWhen():
                 for child in node.inputs.values():
                     self.explore_node(child, heirarchy)
-
             case Section():
-                #self.flatten_param(node, heirarchy)
                 heirarchy.append(node.name)
                 for child in node.inputs.values():
                     self.explore_node(child, heirarchy)
-
             case Repeat():
                 logging.has_repeat()
-
             case _:
                 raise NotImplementedError()
     

@@ -108,7 +108,7 @@ class WorkflowText(TextRender):
         
         # inputs
         for winp in self.entity.inputs:
-            if winp.is_galaxy_input_step:
+            if not winp.is_runtime:
                 out_str += f'{WorkflowInputText(winp).render()}\n'
         
         # steps (includes tool steps and subworkflow steps)

@@ -38,24 +38,6 @@ Please see [WEBLINK] for information on the PRE TASK, TOOL STEP, POST TASK struc
 \"\"\"
 """
 
-def pre_task(step: WorkflowStep) -> Optional[str]:
-    if step.preprocessing:
-        out_str: str = ''
-        out_str += '# UNTRANSLATED PRE-PROCESSING LOGIC:\n'
-        out_str += step.preprocessing
-        return out_str
-    else:
-        return None
-
-def post_task(step: WorkflowStep) -> Optional[str]:
-    if step.postprocessing:
-        out_str: str = ''
-        out_str += '# UNTRANSLATED POST-PROCESSING LOGIC:\n'
-        out_str += step.postprocessing
-        return out_str
-    else:
-        return None
-
 ### HELPER CLASSES ###
 
 @dataclass
@@ -122,10 +104,8 @@ class ToolInputLineFactory:
         return ''
     
     def get_datatype_label(self, invalue: InputValue) -> str:
-        # TODO here - can maybe follow step connections? 
         if invalue.component:
-            jtypes = datatypes.get(invalue.component)
-            return jtypes[0].classname
+            return datatypes.get_str(entity=invalue.component)
         return ''
 
 
@@ -168,7 +148,6 @@ class StepText(TextRender):
 
     def render(self) -> str:
         out_str: str = ''
-
         if self.render_note:
             out_str += f'{note()}\n'
         if self.render_imports:
@@ -177,17 +156,7 @@ class StepText(TextRender):
             out_str += f'{title(self.step_num, self.entity)}\n'
 
         out_str += f'{self.format_runtime_inputs()}\n'
-
-        preprocessing = pre_task(self.entity)
-        if preprocessing:
-            out_str += f'"""\n{preprocessing}\n"""\n'
-
         out_str += f'{self.format_step()}\n'
-
-        postprocessing = post_task(self.entity)
-        if postprocessing:
-            out_str += f'"""\n{postprocessing}\n"""\n'
-
         return out_str
 
     def format_runtime_inputs(self) -> str:

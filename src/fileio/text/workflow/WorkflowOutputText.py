@@ -6,7 +6,6 @@ from typing import Tuple
 from entities.workflow.step.outputs import StepOutput
 
 from ..TextRender import TextRender
-from .. import formatting
 from .. import ordering
 
 import tags
@@ -20,9 +19,9 @@ class WorkflowOutputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtypes = datatypes.get(self.entity)
+        jtype = datatypes.get(self.entity.tool_output)
         imports: list[Tuple[str, str]] = []
-        imports = [(j.import_path, j.classname) for j in jtypes]
+        imports.append((jtype.import_path, jtype.classname))
 
         # TODO opportunity for decorator
         if self.entity.tool_output.array:
@@ -36,11 +35,11 @@ class WorkflowOutputText(TextRender):
         tag = tags.workflow.get(self.entity.uuid)
         step_tag = tag.rsplit('.', 1)[0]
         output_tag = tag.rsplit('.', 1)[1]
-        datatype = formatting.format_datatype_string(self.entity.tool_output)
+        type_str = datatypes.get_str(entity=self.entity.tool_output)
         out_str: str = ''
         out_str += 'w.output(\n'
         out_str += f'\t"{tag}",\n'
-        out_str += f'\t{datatype},\n'
+        out_str += f'\t{type_str},\n'
         out_str += f'\tsource=(w.{step_tag}, "{output_tag}")'
         # out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
         # out_str += f',\n\toutput_name="{output_name}"' if output_name else ''

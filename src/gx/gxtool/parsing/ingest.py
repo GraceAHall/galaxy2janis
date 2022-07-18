@@ -1,24 +1,25 @@
 
-import logs.logging as logging
-from gx.configfiles.Configfile import Configfile
-from galaxy.tools import Tool as GxTool
-from galaxy.tools.parameters.basic import ToolParameter as GxInput
-from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 
+from gx.gxtool.param.OutputParam import OutputParam
+import logs.logging as logging
+
+from galaxy.tools import Tool as GxTool
+from galaxy.tools.parameters.basic import ToolParameter
+from galaxy.tool_util.parser.output_objects import ToolOutput
+
+from gx.configfiles.Configfile import Configfile
 from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
 from gx.gxtool.citations import Citation
-
+from gx.gxtool.param.Param import Param
 from gx.gxtool.parsing.ParamFlattener import ParamFlattener
-from gx.gxtool.parsing.InputParamFactory import InputParamFactory
-from gx.gxtool.parsing.OutputParamFactory import OutputParamFactory
 from gx.gxtool.param.InputParamRegister import InputParamRegister
 from gx.gxtool.param.OutputParamRegister import OutputParamRegister
-
-#from gx.xmltool.parsing.tests.TestFactory import TestFactory
 from gx.gxtool.TestRegister import TestRegister
-
 from gx.gxtool.requirements import CondaRequirement, ContainerRequirement
 Requirement = ContainerRequirement | CondaRequirement
+
+from .outputs import parse_output_param
+from .inputs import parse_input_param
 
 
 class GalaxyToolIngestor:
@@ -125,19 +126,26 @@ class GalaxyToolIngestor:
     
     def get_inputs(self) -> InputParamRegister:
         """returns a an InputRegister by reformatting the galaxy tool representation's params."""
+        g_in_params = self.flatten_params()
+        inputs: list[Param] = []
+        for g_param in g_in_params:
+            t_param = parse_input_param(g_param)
+            inputs.append(t_param)
+        register = InputParamRegister(inputs)
+        self.inputs = register
+        return register
+
+    def flatten_params(self) -> list[ToolParameter]:
         pf = ParamFlattener(self.gxtool.inputs)
-        gx_inputs: list[GxInput] = pf.flatten()
-        fac = InputParamFactory()
-        inputs = [fac.produce(gxp) for gxp in gx_inputs]
-        # caching the input register for use in getting outputs
-        self.inputs = InputParamRegister(inputs)
-        return self.inputs
+        return pf.flatten()
 
     def get_outputs(self) -> OutputParamRegister:
         """returns a formatted list of outputs using the representation"""
-        fac = OutputParamFactory()
-        gx_outputs: list[GxOutput] = list(self.gxtool.outputs.values())
-        outputs = [fac.produce(gxp, self.inputs) for gxp in gx_outputs]
+        g_out_params: list[ToolOutput] = list(self.gxtool.outputs.values())
+        outputs: list[OutputParam] = []
+        for g_param in g_out_params:
+            t_param = parse_output_param(g_param, self.inputs)
+            outputs.append(t_param)
         return OutputParamRegister(outputs)
     
     def get_tests(self) -> TestRegister:
@@ -146,6 +154,3 @@ class GalaxyToolIngestor:
         needs to be properly fleshed out later!
         """
         return TestRegister([])
-        #fac = TestFactory()
-        #ttestcases = [fac.produce(t) for t in self.gxtool.tests]
-        #return TestRegister(ttestcases)

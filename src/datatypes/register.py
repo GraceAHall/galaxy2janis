@@ -27,8 +27,12 @@ class DatatypeRegister:
             datatypes = yaml.safe_load(fp)
         for type_data in datatypes['types']:
             janistype = self._init_type(type_data)
+            # multiple keys per datatype
             out[type_data['format']] = janistype
-            out[type_data['classname']] = janistype # two keys per datatype
+            out[type_data['classname']] = janistype 
+            if type_data['extensions']:
+                for ext in type_data['extensions']:
+                    out[ext] = janistype 
         return out
 
     def _init_type(self, dtype: dict[str, str]) -> JanisDatatype:

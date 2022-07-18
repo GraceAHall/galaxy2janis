@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from uuid import uuid4
+from gx.gxtool.param.OutputParam import CollectionOutputParam, DataOutputParam
 from gx.gxtool.param.Param import Param
 
 
@@ -15,6 +16,7 @@ class OutputComponent(ABC):
         self.uuid: str = str(uuid4())
         self.gxparam: Optional[Param] = None
         self.forced_optionality: Optional[bool] = None
+        self.forced_array: Optional[bool] = None
  
     @property
     @abstractmethod
@@ -35,14 +37,14 @@ class OutputComponent(ABC):
         ...
 
     @property
-    @abstractmethod
     def array(self) -> bool:
-        """
-        returns whether the component is an array or not
-        uses galaxy param information if available.
-        flags components are never arrays.
-        """
-        ...
+        if self.forced_array:
+            return self.forced_array
+        elif isinstance(self.gxparam, CollectionOutputParam):
+            return self.gxparam.array
+        elif isinstance(self.gxparam, DataOutputParam):
+            return self.gxparam.array
+        return False
 
     @property
     @abstractmethod

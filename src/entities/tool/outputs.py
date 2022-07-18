@@ -81,7 +81,7 @@ class OutputExtractor:
         for gxparam in self.xmltool.list_outputs():
             if self.should_create_uncertain_output(gxparam, existing_outputs):
                 logging.uncertain_output()
-                out.append(create_output('uncertain', gxparam))
+                out.append(create_output('uncertain_wildcard', gxparam))
         return out
 
     # CHECKS
@@ -102,8 +102,8 @@ class OutputExtractor:
 
     def should_create_uncertain_output(self, gxparam: Param, existing_outputs: list[CommandComponent]) -> bool:
         """
-        test to see if this *galaxy output param* should spawn UncertainOutput
-        all galaxy outputs which are not yet accounted for must become UncertainOutputs
+        test to see if this *galaxy output param* should spawn uncertain WildcardOutput
+        all galaxy outputs which are not yet accounted for must become uncertain WildcardOutputs
         """
         has_output_component = False
         for output in existing_outputs:

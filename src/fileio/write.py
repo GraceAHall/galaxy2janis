@@ -21,7 +21,7 @@ from .initialisation import init_folder
 
 from .text.workflow.WorkflowText import WorkflowText
 
-download_cache: DownloadCache = DownloadCache(paths.DOWNLOADED_WRAPPERS_DIR)
+download_cache: DownloadCache = DownloadCache(paths.DOWNLOADED_WRAPPERS_DIR)  # shouldn't do this. should use fetch_wrapper ideally. 
 
 
 def write_tool(tool: Tool, path: str) -> None:
