@@ -19,11 +19,11 @@ def static(component: Optional[InputComponent], value: Any, default: bool=False)
         default=default
     )
 
-def connection(component: Optional[InputComponent], step_uuid: str, output_uuid: str) -> ConnectionInputValue:
+def connection(component: Optional[InputComponent], step_uuid: str, out_uuid: str) -> ConnectionInputValue:
     return ConnectionInputValue(
         component=component,
         step_uuid=step_uuid,
-        output_uuid=output_uuid
+        out_uuid=out_uuid
     )
 
 def workflow_input(component: Optional[InputComponent], input_uuid: str, is_runtime: bool=False) -> WorkflowInputInputValue:

@@ -6,6 +6,7 @@ from typing import Optional
 
 import utils.galaxy as utils
 from gx.wrappers.downloads.cache import DownloadCache
+from gx.interaction import get_builtin_tool_path
 
 from paths import DOWNLOADED_WRAPPERS_DIR
 CACHE: DownloadCache = DownloadCache(DOWNLOADED_WRAPPERS_DIR)
@@ -17,11 +18,16 @@ def fetch_wrapper(owner: str, repo: str, revision: str, tool_id: str) -> str:
     if not path:
         path = _fetch_cache(repo, revision, tool_id)
     if not path:
+        path = _fetch_builtin(tool_id)
+    if not path:
         path = _fetch_toolshed(owner, repo, revision, tool_id)
     if not path:
         raise RuntimeError(f'could not find wrapper for {tool_id}:{revision}')
     else:
         return path
+
+def _fetch_builtin(tool_id: str) -> Optional[str]:
+    return get_builtin_tool_path(tool_id)
 
 def _fetch_cache(repo: str, revision: str, tool_id: str) -> Optional[str]:
     wrapper = CACHE.get(repo, revision)

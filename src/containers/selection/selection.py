@@ -5,14 +5,17 @@ from gx.gxtool.requirements import Requirement
 from ..Container import Container
 
 
-
 def select_best_container_match(containers: list[Container], requirement: Requirement) -> Container:
     containers = select_version_matches(containers, requirement)
     containers = sort_by_create_date(containers)
     return containers[0]
 
 def select_version_matches(containers: list[Container], requirement: Requirement) -> list[Container]:
-    return [c for c in containers if c.tool_version == requirement.version]
+    matches = [c for c in containers if c.tool_version == requirement.version]
+    if matches:
+        return matches
+    # TODO logging.version_mismatch
+    return containers
 
 def sort_by_create_date(containers: list[Container]) -> list[Container]: 
     return sorted(containers, key=lambda x: x.timestamp, reverse=True)

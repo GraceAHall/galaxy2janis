@@ -14,6 +14,7 @@ from gx.command.components import Option
 from gx.command.components import Positional
 
 
+
 @dataclass
 class ToolInputSectionText(TextRender):
     def __init__(self, entity: list[InputComponent]):

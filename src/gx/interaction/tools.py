@@ -20,6 +20,7 @@ def get_tool(xml_path: str) -> GxTool:
     return tool
 
 def get_builtin_tool_path(tool_id: str) -> str:
+    """returns path to xml file with id='tool_id'"""
     tool_directories = _get_builtin_tool_directories()
     for directory in tool_directories:
         xmlfile = utils.get_xml_by_id(directory, tool_id)

@@ -32,7 +32,7 @@ class WorkflowInputText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        tag = tags.workflow.get(self.entity.uuid)
+        tag = tags.get(self.entity.uuid)
         type_str = datatypes.get_str(entity=self.entity)
         out_str: str = ''
         out_str += f'w.input("{tag}", {type_str})'

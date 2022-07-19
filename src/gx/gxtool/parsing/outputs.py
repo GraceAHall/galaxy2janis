@@ -26,7 +26,8 @@ class DataOutputFactory(Factory):
         param = DataOutputParam(gxout.name)
         param.label = str(gxout.label).rsplit('}', 1)[-1].strip(': ')
         param.formats = fetch_format(gxout, inputs)
-        param.wildcard_pattern = get_wildcard_pattern(gxout)
+        param.from_work_dir = get_from_workdir_pattern(gxout)
+        param.discover_pattern = get_discover_pattern(gxout)
         return param
 
 class CollectionOutputFactory(Factory):
@@ -36,15 +37,17 @@ class CollectionOutputFactory(Factory):
         if gxout.structure.collection_type != '':
             param.collection_type = str(gxout.structure.collection_type) 
         param.formats = fetch_format(gxout, inputs)
-        param.wildcard_pattern = get_wildcard_pattern(gxout)
+        param.discover_pattern = get_discover_pattern(gxout)
         return param
 
 
-def get_wildcard_pattern(gxout: GxOutput) -> Optional[str]:
+def get_from_workdir_pattern(gxout: GxOutput) -> Optional[str]:
     if has_from_workdir(gxout):
-        pattern = gxout.from_work_dir
-        return remove_pattern_capture_groups(pattern)
-    elif has_dataset_collector(gxout):
+        return gxout.from_work_dir
+    return None
+
+def get_discover_pattern(gxout: GxOutput) -> Optional[str]:
+    if has_dataset_collector(gxout):
         collector = gxout.dataset_collector_descriptions[0]
         pattern = f'{collector.directory}/{collector.pattern}' # type: ignore
         return remove_pattern_capture_groups(pattern)

@@ -31,22 +31,26 @@ enum_map = {
 class InputValue(ABC):
     component: Optional[InputComponent]
 
-    @property
-    @abstractmethod
-    def tag_and_value(self) -> str:
-        ...
-    
+    def __post_init__(self):
+        self.scatter: bool = False
+
     @property
     def comptype(self) -> Optional[str]:
         return type(self.component).__name__.lower() 
+
+    @property
+    def input_tag(self) -> str:
+        """get the str tag for this tool input"""
+        if self.component:
+            return tags.get(self.component.uuid)
+        else:
+            return 'UNKNOWN'
     
     @property
-    def tool_input_tag(self) -> Optional[str]:
-        if self.component:
-            return tags.tool.get(self.component.uuid)
-        else:
-            return '#UNKNOWN'
-    
+    def input_value(self) -> str:
+        """get the str value for this tool input"""
+        ...
+
 
 @dataclass
 class StaticInputValue(InputValue):
@@ -55,6 +59,7 @@ class StaticInputValue(InputValue):
     default: bool
 
     def __post_init__(self):
+        self.scatter: bool = False
         self.valtype = enum_map[self._valtypestr]
     
     @property
@@ -64,11 +69,11 @@ class StaticInputValue(InputValue):
         return False
     
     @property
-    def tag_and_value(self) -> str:
+    def input_value(self) -> str:
         if self._should_wrap_value():
-            return f'{self.tool_input_tag}="{self.value}"'
+            return f'"{self.value}"'
         else:
-            return f'{self.tool_input_tag}={self.value}'
+            return f'{self.value}'
 
     def _should_wrap_value(self) -> bool:
         if self.valtype == InputValueType.STRING:
@@ -80,12 +85,14 @@ class StaticInputValue(InputValue):
 
 @dataclass
 class ConnectionInputValue(InputValue):
-    output_uuid: str
+    step_uuid: str
+    out_uuid: str
     
     @property
-    def tag_and_value(self) -> str:
-        step_out_tag = tags.workflow.get(self.output_uuid)
-        return f'{self.tool_input_tag}=w.{step_out_tag}'
+    def input_value(self) -> str:
+        step_tag = tags.get(self.step_uuid)
+        out_tag = tags.get(self.out_uuid)
+        return f'w.{step_tag}.{out_tag}'
     
 
 @dataclass
@@ -94,7 +101,7 @@ class WorkflowInputInputValue(InputValue):
     is_runtime: bool
 
     @property
-    def tag_and_value(self) -> str:
-        wflow_inp_tag = tags.workflow.get(self.input_uuid)
-        return f'{self.tool_input_tag}=w.{wflow_inp_tag}'
+    def input_value(self) -> str:
+        wflow_inp_tag = tags.get(self.input_uuid)
+        return f'w.{wflow_inp_tag}'
 

@@ -17,11 +17,11 @@ def order_positionals(positionals: list[Positional]) -> list[Positional]:
     return positionals
 
 def order_flags(flags: list[Flag]) -> list[Flag]:
-    flags.sort(key=lambda x: tags.tool.get(x.uuid))
+    flags.sort(key=lambda x: tags.get(x.uuid))
     return flags
 
 def order_options(options: list[Option]) -> list[Option]:
-    options.sort(key=lambda x: tags.tool.get(x.uuid))
+    options.sort(key=lambda x: tags.get(x.uuid))
     return options
 
 def order_imports(imports: list[Tuple[str, str]]) -> list[Tuple[str, str]]:
@@ -50,7 +50,7 @@ class InputOrderingStrategy(ABC):
 
 class AlphabeticalStrategy(InputOrderingStrategy):
     def order(self, invalues: list[InputValue]) -> list[InputValue]:
-        invalues.sort(key=lambda x: x.tag_and_value)
+        invalues.sort(key=lambda x: x.input_tag)
         return invalues
 
 class CmdPosStrategy(InputOrderingStrategy):

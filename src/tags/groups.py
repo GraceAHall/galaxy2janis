@@ -7,9 +7,11 @@ from .strategies import format_tag
 
 class TagGroup:
 
-    def __init__(self):
+    def __init__(self, section: str):
+        self.section = section
         self.uuids_basetags: dict[str, str] = {}
         self.basetags_uuids: dict[str, list[str]] = {}
+        self.active: bool = False
 
     def exists(self, uuid: str) -> bool:
         if uuid in self.uuids_basetags:

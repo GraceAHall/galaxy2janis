@@ -1,5 +1,4 @@
 
-
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional, Tuple
@@ -21,7 +20,7 @@ import datatypes
 ### HELPER METHODS ### 
 
 def title(step_num: int, step: WorkflowStep) -> str: 
-    tool_tag = tags.tool.get(step.tool.uuid).upper()
+    tool_tag = tags.get(step.tool.uuid).upper()
     title = f'# STEP{step_num}: {tool_tag}'
     border = f'# {"=" * (len(title) - 2)}'
     return f"""\
@@ -69,10 +68,16 @@ class ToolInputLine:
 
 
 class ToolInputLineFactory:
+    unknown_count = 0
 
     def create(self, invalue: InputValue) -> ToolInputLine:
+        if not invalue.component:
+            self.unknown_count += 1
+            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.input_value}'
+        else:
+            tag_and_value = f'{invalue.input_tag}={invalue.input_value}'
         return ToolInputLine(
-            tag_and_value=invalue.tag_and_value,
+            tag_and_value=tag_and_value,
             special_label=self.get_special_label(invalue),
             prefix_label=self.get_prefix_label(invalue),
             default_label=self.get_default_label(invalue),
@@ -105,7 +110,7 @@ class ToolInputLineFactory:
     
     def get_datatype_label(self, invalue: InputValue) -> str:
         if invalue.component:
-            return datatypes.get_str(entity=invalue.component)
+            return datatypes.get_str(entity=invalue.component, fmt='value')
         return ''
 
 
@@ -136,7 +141,7 @@ class StepText(TextRender):
         invalues = self.entity.inputs.all
         invalues = ordering.order_step_inputs(invalues)
         factory = ToolInputLineFactory()
-        return [factory.create(x) for x in invalues]
+        return [factory.create(val) for val in invalues]
     
     @cached_property
     def line_len(self) -> int:
@@ -144,7 +149,11 @@ class StepText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        raise NotImplementedError()
+        imports: list[Tuple[str, str]] = []
+        if len(self.get_scatter_input_names()) > 1:
+            imports.append(('janis_core', 'ScatterDescription'))
+            imports.append(('janis_core', 'ScatterMethods'))
+        return imports
 
     def render(self) -> str:
         out_str: str = ''
@@ -156,7 +165,7 @@ class StepText(TextRender):
             out_str += f'{title(self.step_num, self.entity)}\n'
 
         out_str += f'{self.format_runtime_inputs()}\n'
-        out_str += f'{self.format_step()}\n'
+        out_str += f'{self.format_tool()}\n'
         return out_str
 
     def format_runtime_inputs(self) -> str:
@@ -169,20 +178,52 @@ class StepText(TextRender):
             out_str += f'{WorkflowInputText(winp).render()}\n'
         return out_str
 
-    def format_step(self) -> str:
+    def format_tool(self) -> str:
+        step_tag = tags.get(self.entity.uuid)
+        tool_tag = tags.get(self.entity.tool.uuid)
+        scatter_stmt = self.format_scatter()
+        
         out_str: str = ''
-        step_tag = tags.workflow.get(self.entity.uuid)
-        tool_tag = tags.tool.get(self.entity.tool.uuid)
         out_str += 'w.step(\n'
         out_str += f'\t"{step_tag}",\n'
         out_str += f'\t{tool_tag}(\n'
-        #out_str += f'\tscatter="{scatter}",\n' if scatter else ''
-        # input values
         for line in self.lines:
             out_str += f'{line.render(self.line_len)}\n'
-        out_str += '\t)\n'
-        out_str += ')\n\n'
+        out_str += '\t)'
+        if scatter_stmt:
+            out_str += f',\n{scatter_stmt}'
+        out_str += '\n)'
+
         return out_str
+
+    def format_scatter(self) -> Optional[str]:
+        names = self.get_scatter_input_names()
+        return self.format_scatter_statement(names)
+
+    def get_scatter_input_names(self) -> list[str]:
+        # get scatter inputs names
+        unknown_count: int = 0
+        targets: list[str] = []
+        invalues = self.entity.inputs.all
+        invalues = ordering.order_step_inputs(invalues)
+        for val in invalues:
+            if val.scatter:
+                if not val.component:
+                    unknown_count += 1
+                    targets.append(f'{val.input_tag}{unknown_count}')
+                else:
+                    targets.append(val.input_tag)
+        return targets
+
+    def format_scatter_statement(self, names: list[str]) -> Optional[str]:
+        # format text
+        if len(names) == 0:
+            return None
+        elif len(names) == 1:
+            return f'\tscatter="{names[0]}"'
+        else:
+            return f'\tscatter=ScatterDescription(fields={repr(names)}, method=ScatterMethods.dot)'
+
 
         
 

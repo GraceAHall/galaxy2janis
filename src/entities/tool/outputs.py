@@ -46,8 +46,8 @@ class OutputExtractor:
     def attempt_redirect_gxparam_link(self, r: RedirectOutput) -> None:
         if not r.gxparam:
             for query_param in self.xmltool.list_outputs():
-                if query_param.wildcard_pattern is not None:
-                    if query_param.wildcard_pattern == r.file_token.text:
+                if query_param.discover_pattern is not None:
+                    if query_param.discover_pattern == r.file_token.text:
                         r.gxparam = query_param
 
     def get_input_outputs(self) -> list[CommandComponent]:
@@ -93,10 +93,10 @@ class OutputExtractor:
 
     def should_create_wildcard_output(self, gxparam: Param) -> bool:
         """test to see if this *galaxy output param* should spawn WildcardOutput"""
-        # UNCOMMENT THIS TO MAKE STRICT
-        # if len(self.command.xmlcmdstr.postprocessing) == 0:
-        if hasattr(gxparam, 'wildcard_pattern') and gxparam.wildcard_pattern is not None: # type: ignore
-            if not self.command.gxparam_is_attached(gxparam): 
+        if not self.command.gxparam_is_attached(gxparam):
+            if hasattr(gxparam, 'from_work_dir') and gxparam.from_work_dir is not None: # type: ignore
+                return True
+            elif hasattr(gxparam, 'discover_pattern') and gxparam.discover_pattern is not None: # type: ignore
                 return True
         return False
 

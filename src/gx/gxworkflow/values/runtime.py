@@ -56,8 +56,8 @@ class RuntimeInputIngestor:
                         j_step.inputs.add(value)
 
     def create_workflow_input(self, j_step: WorkflowStep, j_target: InputComponent) -> WorkflowInput:
-        step_tag = tags.workflow.get(j_step.uuid)
-        input_tag = tags.tool.get(j_target.uuid)
+        step_tag = tags.get(j_step.uuid)
+        input_tag = tags.get(j_target.uuid)
         return WorkflowInput(
             name=f'{step_tag}_{input_tag}',
             array=j_target.array,

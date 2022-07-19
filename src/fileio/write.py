@@ -15,13 +15,13 @@ import shutil
 import paths
 
 from utils import galaxy as galaxy_utils
-from gx.wrappers.downloads.cache import DownloadCache
+from gx.wrappers import fetch_wrapper
+
 from fileio.text.tool.ToolText import ToolText
 from .initialisation import init_folder
 
 from .text.workflow.WorkflowText import WorkflowText
 
-download_cache: DownloadCache = DownloadCache(paths.DOWNLOADED_WRAPPERS_DIR)  # shouldn't do this. should use fetch_wrapper ideally. 
 
 
 def write_tool(tool: Tool, path: str) -> None:
@@ -75,17 +75,16 @@ def write_wrappers(janis: Workflow) -> None:
             shutil.copy2(src, dest)
 
 def get_wrapper_files_src(step: WorkflowStep) -> list[str]:
-    repo = step.metadata.wrapper.repo
-    tool_id = step.metadata.wrapper.tool_id
-    revision = step.metadata.wrapper.revision
-    source_dir = download_cache.get(repo, revision)
-    assert(source_dir)
-    main_xml = galaxy_utils.get_xml_by_id(source_dir, tool_id)
-    assert(main_xml)
-    macro_xmls = galaxy_utils.get_macros(source_dir)
-    xmls = [main_xml] + macro_xmls
-    xmls = [f'{source_dir}/{xml}' for xml in xmls]
-    return xmls
+    wrapper = step.metadata.wrapper
+    wrapper_path = fetch_wrapper(
+        owner= wrapper.owner,
+        repo= wrapper.repo,
+        revision= wrapper.revision,
+        tool_id= wrapper.tool_id
+    )
+    wrapper_dir = wrapper_path.rsplit('/', 1)[0]
+    macro_xmls = galaxy_utils.get_macros(wrapper_dir)
+    return [wrapper_path] + macro_xmls
 
 def get_wrapper_files_dest(step: WorkflowStep) -> str:
     tool_id = step.metadata.wrapper.tool_id

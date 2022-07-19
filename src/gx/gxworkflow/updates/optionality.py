@@ -18,7 +18,7 @@ def update_components_optionality(value: InputValue, janis: Workflow) -> None:
                 if w_inp.optional and not value.component.optional:
                     value.component.forced_optionality = True
         elif isinstance(value, ConnectionInputValue):
-            s_out = janis.get_step_output(query_uuid=value.output_uuid) 
+            s_out = janis.get_step_output(query_uuid=value.out_uuid) 
             if s_out.tool_output.optional and not value.component.optional:
                 value.component.forced_optionality = True
         elif isinstance(value, StaticInputValue):

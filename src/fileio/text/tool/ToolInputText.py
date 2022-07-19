@@ -44,7 +44,7 @@ class ToolInputText(TextRender):
         doc = formatting.format_docstring(e)
         out_str: str = ''
         out_str += '\tToolInput(\n'
-        out_str += f"\t\t'{tags.tool.get(e.uuid)}',\n"
+        out_str += f"\t\t'{tags.get(e.uuid)}',\n"
         out_str += f"\t\t{datatypes.get_str(e)},\n" 
         out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
         out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''

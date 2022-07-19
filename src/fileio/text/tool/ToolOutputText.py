@@ -22,10 +22,14 @@ def format_selector_str(output: OutputComponent) -> Optional[str]:
             return None
         case InputOutput():
             input_comp_uuid = output.input_component.uuid
-            input_comp_tag = tags.tool.get(input_comp_uuid)
+            input_comp_tag = tags.get(input_comp_uuid)
             return f'InputSelector("{input_comp_tag}")'
         case WildcardOutput():
-            pattern = output.gxparam.wildcard_pattern
+            pattern = 'UNKNOWN'
+            if hasattr(output.gxparam, 'from_work_dir') and output.gxparam.from_work_dir:
+                pattern = output.gxparam.from_work_dir
+            elif output.gxparam.discover_pattern:
+                pattern = output.gxparam.discover_pattern
             return f'WildcardSelector(r"{pattern}")'
         case _:
             pass
@@ -67,7 +71,7 @@ class ToolOutputText(TextRender):
         doc = formatting.format_docstring(e)
         out_str: str = ''
         out_str += '\tToolOutput(\n'
-        out_str += f"\t\t'{tags.tool.get(e.uuid)}',\n"
+        out_str += f"\t\t'{tags.get(e.uuid)}',\n"
         out_str += f"\t\t{datatypes.get_str(e)},\n"
         if selector_str:
             out_str += f"\t\tselector={selector_str},\n" 

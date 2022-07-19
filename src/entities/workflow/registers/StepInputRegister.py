@@ -2,7 +2,8 @@
 
 from typing import Optional
 
-from ..step.inputs import InputValue
+from ..step.inputs import InputValue, WorkflowInputInputValue
+from ..step.inputs import ConnectionInputValue
 
 import tags
 
@@ -14,6 +15,14 @@ class StepInputRegister:
     @property
     def all(self) -> list[InputValue]:
         return self.inputs
+    
+    @property
+    def connections(self) -> list[ConnectionInputValue]:
+        return [x for x in self.inputs if isinstance(x, ConnectionInputValue)]
+    
+    @property
+    def workflow_inputs(self) -> list[WorkflowInputInputValue]:
+        return [x for x in self.inputs if isinstance(x, WorkflowInputInputValue)]
     
     @property
     def linked(self) -> list[InputValue]:
@@ -30,16 +39,3 @@ class StepInputRegister:
         for invalue in self.inputs:
             if invalue.component and invalue.component.uuid == query_uuid:
                 return invalue
-
-    def __str__(self) -> str:
-        out: str = '\nInputValueRegister -----\n'
-        out += f"{'[gxparam]':30}{'[input type]':30}{'[value]':30}\n"
-        for inval in self.inputs:
-            if inval.component:
-                label = tags.tool.get(inval.component.uuid)
-            else:
-                label = 'unlinked'
-            out += f'{label:30}{str(type(inval).__name__):30}{inval.tag_and_value:30}\n'
-        return out
-
-

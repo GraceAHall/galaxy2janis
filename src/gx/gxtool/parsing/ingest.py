@@ -118,8 +118,9 @@ class GalaxyToolIngestor:
         """returns the tool configfiles"""
         out: list[Configfile] = []
         for name, _, contents in self.gxtool.config_files:  # type: ignore
-            new_config = Configfile(name, contents)  # type: ignore
-            out.append(new_config)
+            if isinstance(contents, str):
+                new_config = Configfile(name, contents)  # type: ignore
+                out.append(new_config)
         if out:
             logging.has_configfile()
         return out

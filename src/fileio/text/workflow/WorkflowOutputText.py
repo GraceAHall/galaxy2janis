@@ -32,15 +32,14 @@ class WorkflowOutputText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        tag = tags.workflow.get(self.entity.uuid)
-        step_tag = tag.rsplit('.', 1)[0]
-        output_tag = tag.rsplit('.', 1)[1]
+        step_tag = tags.get(self.entity.step_uuid)
+        out_tag = tags.get(self.entity.tool_output.uuid)
         type_str = datatypes.get_str(entity=self.entity.tool_output)
         out_str: str = ''
         out_str += 'w.output(\n'
-        out_str += f'\t"{tag}",\n'
+        out_str += f'\t"{step_tag}_{out_tag}",\n'
         out_str += f'\t{type_str},\n'
-        out_str += f'\tsource=(w.{step_tag}, "{output_tag}")'
+        out_str += f'\tsource=(w.{step_tag}, "{out_tag}")'
         # out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
         # out_str += f',\n\toutput_name="{output_name}"' if output_name else ''
         # out_str += f',\n\textension="{extension}"' if extension else ''

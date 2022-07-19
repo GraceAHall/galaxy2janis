@@ -52,6 +52,10 @@ class Positional(InputComponent):
 
     @property
     def array(self) -> bool:
+        if self.forced_array is not None:
+            return self.forced_array
+        elif self.gxparam: 
+            return self.gxparam.array
         return False
     
     @property

@@ -23,16 +23,17 @@ class GenericFormattingStrategy(FormattingStrategy):
         tag = rules.camelify(tag)
         return tag
 
-class StepOutputFormattingStrategy(FormattingStrategy):
+class WorkflowInputFormattingStrategy(FormattingStrategy):
     def format(self, starting_text: str, entity: Any) -> str:
         tag = starting_text
-        tag = rules.numeric(tag, entity)
-        tag = rules.numeric_start(tag, entity)
-        tag = rules.non_alphanumeric(tag, entity, allow_dot=True)
-        tag = rules.short_tag(tag, entity)
-        tag = rules.replace_keywords(tag, entity)
-        #tag = rules.encode(tag)
-        tag = rules.camelify(tag)
+        if not entity.is_runtime:
+            tag = rules.numeric(tag, entity)
+            tag = rules.numeric_start(tag, entity)
+            tag = rules.non_alphanumeric(tag, entity)
+            tag = rules.short_tag(tag, entity)
+            tag = rules.replace_keywords(tag, entity)
+            #tag = rules.encode(tag)
+            tag = rules.camelify(tag)
         return tag
 
 # capitalisation is allowed
@@ -51,9 +52,8 @@ class ToolNameStrategy(FormattingStrategy):
 
 STRATEGIES = {
     'Workflow': GenericFormattingStrategy(),
-    'WorkflowInput': GenericFormattingStrategy(),
+    'WorkflowInput': WorkflowInputFormattingStrategy(),
     'WorkflowStep': GenericFormattingStrategy(),
-    'StepOutput': StepOutputFormattingStrategy(),
     'Tool': ToolNameStrategy(),
     'Positional': GenericFormattingStrategy(),
     'Flag': GenericFormattingStrategy(),

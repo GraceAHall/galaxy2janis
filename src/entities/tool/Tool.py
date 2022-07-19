@@ -34,16 +34,18 @@ class Tool:
         self.inputs: list[InputComponent] = []
         self.outputs: list[OutputComponent] = []
         self.uuid: str = str(uuid4())
-        tags.tool.new_tool()
-        tags.tool.register(self)
+        tags.new_group('tool', self.uuid)
+        tags.register(self)
 
     def add_input(self, inp: InputComponent) -> None:
+        tags.switch_group(self.uuid)
+        tags.register(inp)
         self.inputs.append(inp)
-        tags.tool.register(inp)
     
     def add_output(self, out: OutputComponent) -> None:
+        tags.switch_group(self.uuid)
+        tags.register(out)
         self.outputs.append(out)
-        tags.tool.register(out)
 
     def get_gxparam(self, query: str) -> Optional[Param]:
         param = self.gxparam_register.get(query, strategy='lca')

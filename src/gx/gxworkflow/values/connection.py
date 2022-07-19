@@ -58,9 +58,11 @@ class ConnectionInputIngestor:
                     is_runtime=False
                 )
             else:
+                j_emitter_step = mapping.step(g_emitter['id'], self.janis, self.galaxy)
                 value = ConnectionInputValue(
                     component=j_target,
-                    output_uuid=j_emitter.uuid
+                    step_uuid=j_emitter_step.uuid,
+                    out_uuid=j_emitter.tool_output.uuid
                 )
 
             j_step.inputs.add(value)

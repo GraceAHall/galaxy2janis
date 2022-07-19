@@ -4,16 +4,70 @@
 Arrays
 ------
 
-- env_var_is_array
-    - for inputs / outputs
-    - used to identify arrays
-    - looks up an env_var
-    - decides if it is using a galaxy param to create an array 
+- array tool input is from single source (workflowinput or step output)
+- array tool input is from multiple sources (multiple workflowinputs and/or step outputs supply the array elems)
+
+'results' is a repeat tag
+'results.software_cond.output' is a repeat tag
+
+
+results = [
+    [
+        
+    ]
+]
+
+"input_connections": {
+    "results_0|software_cond|output_0|input": { -> results.software_cond.output.input
+        "id": 4,
+        "output_name": "text_file"
+    },
+    "results_1|software_cond|input": {
+        "id": 3,
+        "output_name": "report"
+    },
+    "results_2|software_cond|output_0|type|input": {
+        "id": 10,
+        "output_name": "output"
+    },
+    "results_3|software_cond|output_0|input": {
+        "id": 7,
+        "output_name": "metrics_file"
+    },
+    "results_4|software_cond|output_0|type|input": {
+        "id": 8,
+        "output_name": "output"
+    },
+    "results_5|software_cond|output_0|type|input": {
+        "id": 9,
+        "output_name": "outputtxt"
+    },
+    "results_6|software_cond|output_0|type|input": {
+        "id": 11,
+        "output_name": "output"
+    },
+    "results_7|software_cond|input": {
+        "id": 6,
+        "output_name": "output_summary"
+    },
+    "results_8|software_cond|input": {
+        "id": 5,
+        "output_name": "summary_file"
+    }
+}
+
 
 - workflow step arrays
     - correct tool inputs / outputs
     - if is directly linkable 
     - if tool_state value is a list & the tool input is single, correct to array
+
+- env_var_is_array (future)
+    - for inputs / outputs
+    - used to identify arrays
+    - looks up an env_var
+    - decides if it is using a galaxy param to create an array 
+
 
 
 

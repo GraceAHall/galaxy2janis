@@ -54,7 +54,18 @@ def get_wrapper(gxstep: dict[str, Any]) -> Wrapper:
         return get_wrapper_toolshed(gxstep)
 
 def get_wrapper_builtin(gxstep: dict[str, Any]) -> Wrapper:
-    raise NotImplementedError()
+    details: dict[str, Any] = {
+        'owner': 'Galaxy',
+        'repo': 'None',
+        'revision': 'None',
+        'tool_id': gxstep['tool_id'],
+        'tool_build': gxstep['tool_version'],
+        'date_created': '1960-01-01 00:00:00',
+        'requirements': [],
+    }
+    wrapper = Wrapper(details)
+    wrapper.inbuilt = True
+    return wrapper
 
 def get_wrapper_toolshed(gxstep: dict[str, Any]) -> Wrapper:
     wrappers = get_local(gxstep)

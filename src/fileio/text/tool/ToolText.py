@@ -59,8 +59,8 @@ def get_contributors(tool: Tool) -> list[str]:
 def builder_snippet(tool: Tool) -> str:
     container = f'"{tool.container}"' if tool.container else None
     return f"""\
-{tags.tool.get(tool.uuid)} = CommandToolBuilder(
-    tool="{tags.tool.get(tool.uuid)}",
+{tags.get(tool.uuid)} = CommandToolBuilder(
+    tool="{tags.get(tool.uuid)}",
     version="{tool.metadata.version}",
     metadata=metadata,
     container={container},

@@ -138,7 +138,7 @@ class CheetahInputIngestor:
     def create_workflow_input(self, component: Flag | Option) -> WorkflowInput:
         """creates a workflow input for the tool input component"""
         return WorkflowInput(
-            name=tags.tool.get(component.uuid),
+            name=tags.get(component.uuid),
             array=component.array,
             is_runtime=True,
             datatype=datatypes.get(component),

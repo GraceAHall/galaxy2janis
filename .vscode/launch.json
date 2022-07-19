@@ -101,5 +101,29 @@
                 "test/data/workflows/mine/simple_workflow.ga", 
             ]
         },
+        {
+            "name": "medium workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/medium_workflow.ga", 
+            ]
+        },
+        {
+            "name": "hard workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/mine/hard_workflow.ga", 
+            ]
+        },
     ]
 }

@@ -58,7 +58,7 @@ def short_tag(tag: str, entity: Any) -> str:
 
 
 def camelify(text: str) -> str:
-    text = re.sub(r"(_|-|\.)+", " ", text)
+    text = re.sub(r"(_|-)+", " ", text)
     words = text.split()
     words = [w.title() for w in words]
     words = [words[0].lower()] + words[1:]
@@ -73,7 +73,7 @@ def camelify(text: str) -> str:
 #     else:
 #         return tag[0]
 
-def non_alphanumeric(tag: str, entity: Any, allow_dot: bool=False) -> str:
+def non_alphanumeric(tag: str, entity: Any) -> str:
     """
     to satisfy janis tag requirements
     to avoid janis reserved keywords
@@ -85,8 +85,7 @@ def non_alphanumeric(tag: str, entity: Any, allow_dot: bool=False) -> str:
     tag = tag.replace(')', '')
     tag = tag.replace(']', '')
     tag = tag.replace('[', '')
-    if not allow_dot:
-        tag = tag.replace('.', '_')
+    tag = tag.replace('.', '_')
     tag = tag.replace(' ', '_')
     tag = tag.replace('|', '_')
     tag = tag.replace('/', '_')

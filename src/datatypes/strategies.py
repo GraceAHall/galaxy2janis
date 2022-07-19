@@ -57,7 +57,7 @@ class OutputStrategy(DatatypeGetStrategy):
         if entity.gxparam and entity.gxparam.formats:
             gxtypes = entity.gxparam.formats
         elif entity.gxparam and isinstance(entity.gxparam, CollectionOutputParam):
-            ext = self.extract_extension(entity.gxparam.wildcard_pattern)
+            ext = self.extract_extension(entity.gxparam.discover_pattern)
             gxtypes = [ext]
         return galaxy_to_janis(gxtypes)
 

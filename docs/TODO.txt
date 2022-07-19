@@ -1,22 +1,31 @@
 
 TODO
-- array inputs (runtime)
-- array connections (steps or wflow input step galaxy)
 - bug fixes
-- better optionality detection
 - parsing stats: tools-iuc
+- better optionality detection
 
 BUGS
-- pre/postprocessing: cheetah templating doesn't seem to be happening
-- cutadapt: duplicate params
-- abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
-- cutadapt wrapper translation is bad
+- env_vars are appearing as values - what should file type be? 
 - #if #else causing multiple instances of variable
+    - cutadapt: duplicate params
     - trimmomatic.xml mrsa_illumina 
     - r1_ext, r2_ext
     - fastq_in_extension1, fastq_in_extension2
     - don't even know why these are being interpreted as a variable
+- pre/postprocessing: cheetah templating doesn't seem to be happening
+- pre/postprocessing: dont dedent? 
+- abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
+- step tool value order
 - emboss suite has CRITICAL errors
+- detect string type
+
+WRAPPERS
+- currently seperated over 2 locations: wrapper definitions & downloads
+- ideally have in same parent module
+- wrappers.path()
+- wrappers.download()
+- wrappers.details()
+- caches etc are confusing
 
 DOCUMENTATION
 - parsing order
@@ -30,9 +39,8 @@ Production-level code
     - Top 10 / top 20 most common tools parsed correctly galaxy (cameron hyde list)
     - 3 Workflows parsed correctly
 
-
-
 FUTURE
+- cheetah partial evaluation then identify tool components
 - tool command string
     - string that cwl etc will execute
     - first place i look to fix translation

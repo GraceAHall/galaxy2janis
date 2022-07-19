@@ -25,21 +25,55 @@ class FormattableEntity(Protocol):
     def array(self) -> bool:
         ...
 
-def get_str(entity: FormattableEntity) -> str:
+def get_str(entity: FormattableEntity, fmt: str='definition') -> str:
     jtype = get(entity=entity)
-    
-    if not entity.optional and not entity.array: # not array not optional
+    if fmt == 'definition':
+        return fmt_typestr_definition(entity, jtype)
+    elif fmt == 'value':
+        return fmt_typestr_value(entity, jtype)
+    else:
+        raise RuntimeError()
+
+def fmt_typestr_definition(entity: FormattableEntity, jtype: JanisDatatype) -> str:
+    # not array not optional
+    if not entity.optional and not entity.array: 
         out_str = f'{jtype.classname}'
     
-    elif not entity.optional and entity.array: # array and not optional
+    # array and not optional
+    elif not entity.optional and entity.array: 
         out_str = f'Array({jtype.classname})'
     
-    elif entity.optional and not entity.array: # not array and optional
+    # not array and optional
+    elif entity.optional and not entity.array: 
         out_str = f'{jtype.classname}(optional=True)'
     
-    elif entity.optional and entity.array: # array and optional
+    # array and optional
+    elif entity.optional and entity.array: 
         out_str = f'Array({jtype.classname}(), optional=True)'
+    return out_str
+
+    # if len(types) > 1:
+    #     dtype = ', '.join([x.classname for x in types])
+    #     dtype = "UnionType(" + dtype + ")"
+    # else:
+    #     dtype = types[0].classname
+
+def fmt_typestr_value(entity: FormattableEntity, jtype: JanisDatatype) -> str:
+    # not array not optional
+    if not entity.optional and not entity.array: 
+        out_str = f'{jtype.classname}'
     
+    # array and not optional
+    elif not entity.optional and entity.array: 
+        out_str = f'{jtype.classname} ARRAY'
+    
+    # not array and optional
+    elif entity.optional and not entity.array: 
+        out_str = f'{jtype.classname} OPTIONAL'
+    
+    # array and optional
+    elif entity.optional and entity.array: 
+        out_str = f'{jtype.classname} ARRAY OPTIONAL'
     return out_str
 
     # if len(types) > 1:

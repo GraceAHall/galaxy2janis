@@ -49,14 +49,17 @@ class Workflow:
 
     def set_metadata(self, metadata: WorkflowMetadata) -> None:
         self._metadata = metadata
-        tags.workflow.register(self)
+        tags.new_group('workflow', self.uuid)
+        tags.register(self)
     
     def add_input(self, w_inp: WorkflowInput) -> None:
-        tags.workflow.register(w_inp)
+        tags.switch_group(self.uuid)
+        tags.register(w_inp)
         self.inputs.append(w_inp)
 
     def add_step(self, step: WorkflowStep) -> None:
-        tags.workflow.register(step)
+        tags.switch_group(self.uuid)
+        tags.register(step)
         self.steps.append(step)
 
     def get_input(self, query_uuid: str) -> WorkflowInput:
@@ -65,16 +68,32 @@ class Workflow:
                 return winp
         raise RuntimeError('could not find input with uuid')
     
+    def get_input_children(self, query_uuid: str) -> list[WorkflowStep]:
+        out: list[WorkflowStep] = []
+        for step in self.steps:
+            for winp_connection in step.inputs.workflow_inputs:
+                if winp_connection.input_uuid == query_uuid:
+                    out.append(step)
+        return out
+    
     def get_step(self, query_uuid: str) -> WorkflowStep:
         for step in self.steps:
             if step.uuid == query_uuid:
                 return step
         raise RuntimeError('could not find step with uuid')
     
+    def get_step_children(self, query_uuid: str) -> list[WorkflowStep]:
+        out: list[WorkflowStep] = []
+        for step in self.steps:
+            for connection in step.inputs.connections:
+                if connection.step_uuid == query_uuid:
+                    out.append(step)
+        return out
+    
     def get_step_output(self, query_uuid: str) -> StepOutput:
         for step in self.steps:
             for s_out in step.outputs.list():
-                if s_out.uuid == query_uuid:
+                if s_out.tool_output.uuid == query_uuid:
                     return s_out
         raise RuntimeError('could not find step output with uuid')
     

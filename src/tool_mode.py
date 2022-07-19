@@ -1,6 +1,5 @@
 
 import logs.logging as logging
-from typing import Any
 
 from setup import tool_setup
 from gx.gxtool.load import load_xmltool

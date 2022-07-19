@@ -43,12 +43,10 @@ class Option(InputComponent):
 
     @property
     def array(self) -> bool:
-        if self.forced_array:
+        if self.forced_array is not None:
             return self.forced_array
         elif self.gxparam:
-            if isinstance(self.gxparam, SelectParam):
-                if self.gxparam.multiple:
-                    return True
+            return self.gxparam.array
         return False
 
     @property

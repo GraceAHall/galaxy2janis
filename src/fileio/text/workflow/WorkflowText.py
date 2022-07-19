@@ -45,7 +45,7 @@ def metadata_snippet(workflow: Workflow) -> str:
 def builder_snippet(workflow: Workflow) -> str:
     out_str: str = ''
     out_str += 'w = WorkflowBuilder(\n'
-    out_str += f'\t"{tags.workflow.get(workflow.uuid)}",\n'
+    out_str += f'\t"{tags.get(workflow.uuid)}",\n'
     out_str += f'\tversion="{workflow.metadata.version}",\n'
     out_str += f'\tdoc="{workflow.metadata.annotation}"\n'
     out_str += ')\n'
@@ -88,8 +88,10 @@ class WorkflowText(TextRender):
         for step in self.entity.steps:
             tool_id = step.metadata.wrapper.tool_id
             relative_path = f'tools.{tool_id}'
-            tool_tag = tags.tool.get(step.tool.uuid)
+            tool_tag = tags.get(step.tool.uuid)
             imports.append((relative_path, tool_tag))
+        for step in self.entity.steps:
+            imports += StepText(-1, step, self.entity).imports
         for wout in self.entity.outputs:
             imports += WorkflowOutputText(wout).imports
         imports = list(set(imports))
