@@ -2,15 +2,18 @@
 
 
 from dataclasses import dataclass
-from gx.command.parser import scanners
 from typing import Any, Optional
+
+import expressions
+from expressions.patterns import VERSIONS
+
 
 @dataclass
 class Version:
     text: str
 
     def get_numeric(self) -> str:
-        matches = scanners.get_versions(self.text)
+        matches = expressions.get_matches(self.text, VERSIONS)
         if matches:
             match = matches[0]
             return match[0] # type: ignore

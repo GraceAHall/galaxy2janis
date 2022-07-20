@@ -12,12 +12,15 @@ from ...components import Tee
 from ...components import StreamMerge
 from ...components import create_output
 
-from ...parser import scanners
 from ...parser import Token
 from ...parser import TokenType
 
 from .ExecutionPath import EPathPosition
 from . import utils as component_utils
+
+
+import expressions
+from expressions.patterns import COMPOUND_OPT
 
 
 class Annotator(ABC):
@@ -160,7 +163,7 @@ class CompoundOptionAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        match = scanners.get_compound_opt(self.ctoken.text)[0]
+        match = expressions.get_matches(self.ctoken.text, COMPOUND_OPT)[0]
         component = Option(
             prefix=match.group(1),
             delim='',

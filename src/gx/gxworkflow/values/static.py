@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from entities.workflow import WorkflowInput
 
 from gx.command.cmdstr import gen_command_string
-from gx.command.parser import utils as regex_utils
 
 from gx.command.components import Flag
 from gx.command.components import InputComponent
@@ -19,13 +18,13 @@ from gx.gxtool.load import load_xmltool
 from gx.gxtool.text import load_partial_cheetah_command
 
 from . import factory
-from . import utils as value_utils
 from entities.workflow import InputValue
 
 import tags
 import mapping
 import datatypes
 import settings
+import expressions
 
 
 def handle_tool_static_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
@@ -77,18 +76,18 @@ class CheetahInputIngestor:
         links a flag component value as None if not in cmdstr
         should only detect the flag's absense, nothing else
         """
-        if not regex_utils.word_exists(flag.prefix, cmdstr):
+        if not expressions.is_present(flag.prefix, cmdstr):
             self.handle_not_present_flag(flag)
 
     def link_option(self, option: Option, cmdstr: str) -> None:
         """gets the value for a specific tool argument"""
-        value = regex_utils.get_next_word(option.prefix, option.delim, cmdstr)
+        value = expressions.get_next_word(option.prefix, option.delim, cmdstr)
         value = None if value == '' else value
         if value is None:
             self.handle_not_present_opt(option)
         elif self.is_param(value):
             self.handle_gxvar_opt(option, value)
-        elif value_utils.is_env_var(value) or value_utils.has_env_var(value):
+        elif expressions.is_var(value) or expressions.has_var(value):
             self.handle_envvar_opt(option, value)
         else:
             self.handle_value_opt(option, value)

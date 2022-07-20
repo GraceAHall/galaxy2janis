@@ -2,18 +2,27 @@
 
 
 import logs.logging as logging
-import re
+import regex as re
 
-from gx.command.parser import utils as regex_utils
-from gx.command.parser import scanners
 from .. import utils
+
+import expressions
+from expressions.patterns import (
+    FUNCTION_CALL_FMT1,
+    FUNCTION_CALL_FMT2,
+    BACKTICK_SECTIONS,
+    QUOTED_SECTIONS,
+    GX_DYNAMIC_KEYWORDS,
+    # GX_STATIC_KEYWORDS,
+)
 
 
 def replace_function_calls(cmdstr: str) -> str:
     cmdlines = utils.split_lines(cmdstr)
     out: list[str] = []
     for line in cmdlines:
-        matches = scanners.get_function_calls(line)
+        matches = expressions.get_matches(line, FUNCTION_CALL_FMT1)
+        matches += expressions.get_matches(line, FUNCTION_CALL_FMT2)
         for match in matches:
             logging.has_cheetah_function()
             old_section = match[0]
@@ -23,7 +32,7 @@ def replace_function_calls(cmdstr: str) -> str:
     return utils.join_lines(out)
 
 def replace_backticks(cmdstr: str) -> str:
-    matches = scanners.get_backtick_sections(cmdstr)
+    matches = expressions.get_matches(cmdstr, BACKTICK_SECTIONS)
     for match in matches:
         logging.has_backtick_statement()
         old_section = match[0]
@@ -35,7 +44,7 @@ def interpret_raw(cmdstr: str) -> str:
     return cmdstr.replace('\\', '')
 
 def flatten_multiline_strings(cmdstr: str) -> str:
-    matches = scanners.get_quoted_sections(cmdstr)
+    matches = expressions.get_matches(cmdstr, QUOTED_SECTIONS)
     for match in matches:
         if '\n' in match[0]:
             logging.has_multiline_str()
@@ -100,7 +109,7 @@ def simplify_galaxy_static_vars(cmdstr: str) -> str:
 
 def simplify_galaxy_dynamic_vars(cmdstr: str) -> str:
     """  ${GALAXY_SLOTS:-2} -> 2   etc """
-    matches = scanners.get_dynamic_keywords(cmdstr)
+    matches = expressions.get_matches(cmdstr, GX_DYNAMIC_KEYWORDS)
     for match in matches:
         cmdstr = cmdstr.replace(match[0], match.group(1)) 
     return cmdstr
@@ -114,7 +123,7 @@ def remove_cheetah_comments(cmdstr: str) -> str:
     outlines: list[str] = []
 
     for line in cmdlines:
-        comment_start, _ = regex_utils.find_unquoted(line, '##')
+        comment_start, _ = expressions.find_unquoted(line, '##')
         if comment_start != -1:
             # override line with comment removed
             line = line[:comment_start].strip()

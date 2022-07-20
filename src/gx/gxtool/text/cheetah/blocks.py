@@ -10,8 +10,10 @@ from Cheetah.Template import Template
 from galaxy.util import unicodify
 
 from .. import utils
-from gx.command.parser import scanners 
 from gx.command.cmdstr import constructs
+
+import expressions
+from expressions.patterns import EDGE_CASE_CH_INPUT
 
 
 def get_blocks(ptr: int, lines: list[str], indent_level: int) -> list[CheetahBlock]:
@@ -290,7 +292,7 @@ class CheetahBlock:
 
     def edge_case_input(self, input_dict: dict[str, Any]) -> bool:
         for line in self.lines:
-            matches = scanners.get_edge_case_ch_input(line)
+            matches = expressions.get_matches(line, EDGE_CASE_CH_INPUT)
             if matches:
                 if 'input' not in input_dict:
                     return True

@@ -2,22 +2,24 @@
 
 
 from .Token import Token, TokenType
-from ..regex import scanners as scanners
+
+import expressions
+from expressions.patterns import ALL
 
 
 def spawn_end_sentinel() -> Token:
-    matches = scanners.get_all('end')
+    matches = expressions.get_matches('end', ALL)
     return Token(matches[0], TokenType.END_STATEMENT)
 
 def spawn_kv_linker(delim: str) -> Token:
-    matches = scanners.get_all(delim)
+    matches = expressions.get_matches(delim, ALL)
     return Token(matches[0], TokenType.KV_LINKER)
 
 def spawn_function_call() -> Token:
-    matches = scanners.get_all('__FUNCTION_CALL__')
+    matches = expressions.get_matches('__FUNCTION_CALL__', ALL)
     return Token(matches[0], TokenType.FUNCTION_CALL)
     
 def spawn_backtick_section() -> Token:
-    matches = scanners.get_all('__BACKTICK_SHELL_STATEMENT__')
+    matches = expressions.get_matches('__BACKTICK_SHELL_STATEMENT__', ALL)
     return Token(matches[0], TokenType.BACKTICK_SHELL_STATEMENT)
 

@@ -57,12 +57,12 @@ class ToolInputLine:
         right = f'#'
         if self.prefix_label != '':
             right += f' {self.prefix_label}'
+        if self.datatype_label != '':
+            right += f' [{self.datatype_label}]'
         if self.special_label != '':
             right += f' ({self.special_label})'
         if self.default_label != '':
             right += f' ({self.default_label})'
-        if self.datatype_label != '':
-            right += f' [{self.datatype_label}]'
         justified = f'\t\t{left:<{info_indent+2}}{right}'
         return justified
 

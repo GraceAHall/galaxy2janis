@@ -6,8 +6,6 @@ EDGE_CASE_CH_INPUT = r'\${?input([ =.}\'")]|$)'
 WITHIN_BRACKETS = r''
 
 EMPTY_STRINGS = r'\'\'|""'
-NEXT_WORD_LEFT = r'(?<=(?:\s|^))'
-NEXT_WORD_RIGHT = r'+?([\w\d\'"${}\\_.\-\:/]+)(?=\s|$)'
 
 QUOTES = r'[\'"]'
 QUOTED_SECTIONS = r'"([^\"]*?)"|\'([^\']*?)\''
@@ -15,6 +13,9 @@ QUOTED_STRINGS = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")'
 QUOTED_NUMBERS = r'[\'"](?<!\w)(-?\d+(\.\d+)?)(?!\d)[\'"]'
 QUOTED_SECTION_W_NEWLINE = r'\'[^\']*?\n[^\']*?\'|"[^"]*?\n[^"]*?"'
 BACKTICK_SECTIONS = r'`.+?`'
+
+INTEGER = r'^\d+$'
+FLOAT = r'^[\d.]+$'
 
 RAW_NUMBERS = r'(?<=\s|^)-?\.?\d+(\.\d*)?(?=\s|$)'
 RAW_STRINGS = r'(?<=\s|^)([\/\\\w\d-.*`@])[-\w\d\{\}\$.\/\\_:*`@]*(?=\s|$)'

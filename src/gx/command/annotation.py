@@ -8,7 +8,6 @@ from gx.gxtool.param.InputParam import BoolParam, SelectParam
 
 from .parser.epath.ExecutionPath import ExecutionPath
 from .parser.epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
-from .parser.regex import scanners
 
 from .Command import Command 
 from .cmdstr.CommandString import CommandString
@@ -16,6 +15,7 @@ from .components.inputs.Flag import Flag
 from .components.inputs.Option import Option
 from .components.inputs.factory import spawn_component 
 
+import expressions
 
 
 # Utility functions to check aspects of a gxparam argument attribute
@@ -91,7 +91,7 @@ class ArgumentCommandAnnotator:
         argument
         """
         old_argument: str = gxparam.argument # type: ignore
-        matches = scanners.get_preceeding_dashes(
+        matches = expressions.get_preceeding_dashes(
             search_term=old_argument,
             text=self.xmltool.raw_command
         )

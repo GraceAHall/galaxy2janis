@@ -1,8 +1,6 @@
 
 
-from .regex import scanners
-from .regex import expressions
-from .regex import utils
+
 
 from .tokens.TokenFactory import TokenFactory
 from .tokens.Token import Token

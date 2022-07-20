@@ -15,6 +15,7 @@ from .components.inputs.factory import spawn_component
 
 from gx.gxtool.param.Param import Param 
 
+import expressions
 
 
 class Updater(ABC):
@@ -221,8 +222,10 @@ class Command:
         positionals = self.get_positionals()
         out: list[CommandComponent] = []
         for p in positionals:
-            if p.before_opts and not p.gxparam and p.has_single_value() and not p.values_are_variables():
-                out.append(p)
+            if p.before_opts and not p.gxparam:
+                if p.has_single_value():
+                    if not expressions.items_are_vars(p.value_record.unique_values):
+                        out.append(p)
             else:
                 break
         return out

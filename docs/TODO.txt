@@ -2,10 +2,24 @@
 TODO
 - bug fixes
 - parsing stats: tools-iuc
-- better optionality detection
+- subworkflows
+- $__tool_directory__
+    - 15% of tools 
+    - Tools which execute python file or other
+    - often preprocessing: building indexes etc
 
 BUGS
-- env_vars are appearing as values - what should file type be? 
+- step tool value order: 
+    - runtime
+    - wflow input 
+    - connection 
+    - positionals (before opts) 
+    - flags 
+    - options 
+    - positionals (after opts)
+    - each category above should appear alphabetically
+- egsea threads=$SLOTS [FILE] default val why?
+- tags: cut tool -> cut1, join tool -> join1
 - #if #else causing multiple instances of variable
     - cutadapt: duplicate params
     - trimmomatic.xml mrsa_illumina 
@@ -15,17 +29,8 @@ BUGS
 - pre/postprocessing: cheetah templating doesn't seem to be happening
 - pre/postprocessing: dont dedent? 
 - abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
-- step tool value order
 - emboss suite has CRITICAL errors
 - detect string type
-
-WRAPPERS
-- currently seperated over 2 locations: wrapper definitions & downloads
-- ideally have in same parent module
-- wrappers.path()
-- wrappers.download()
-- wrappers.details()
-- caches etc are confusing
 
 DOCUMENTATION
 - parsing order
@@ -40,32 +45,38 @@ Production-level code
     - 3 Workflows parsed correctly
 
 FUTURE
-- cheetah partial evaluation then identify tool components
+- minimal tool translation
+    - cheetah partial evaluation then re-identify tool components
+- html files
+    - quast / rgFastQC $report_html.files_path
+    - probably about 6% of tools
 - tool command string
     - string that cwl etc will execute
     - first place i look to fix translation
     - refresh command which updates the command string
-- $__tool_directory__
-    - 15% of tools 
-    - Tools which execute python file or other
-    - often preprocessing: building indexes etc
 - confidence
     - some params we are confident they're right, others are guesses
     - [HIGH] [MEDIUM] [LOW] confidence
+- TTestCases (tool)
+    - janis tool test parsing and evaluation functions (from xml to janis definition)
 - syntax highlighting
     - we already have parsing ability (can identify constructs of text)
     - can use this to provide syntax highlighting to provide tutorials
     - eg nextflow steps, inputs, outputs, GO statement, etc
     - similar to regexr
-- html files
-    - quast / rgFastQC $report_html.files_path
-- TTestCases
-    - janis tool test parsing and evaluation functions (from xml to janis definition)
 
 
 -----
 NOTES
 -----
+
+WRAPPERS
+- currently seperated over 2 locations: wrapper definitions & downloads
+- ideally have in same parent module
+- wrappers.path()
+- wrappers.download()
+- wrappers.details()
+- caches etc are confusing
 
 DOCS
 - properly define current capabilities

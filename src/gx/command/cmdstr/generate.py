@@ -4,16 +4,16 @@
 import logs.logging as logging
 from typing import Optional
 
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+
 from .CommandString import CommandString
 from .DynamicCommandStatement import DynamicCommandStatement
 from .MainStatementInferrer import MainStatementInferrer
-
-from ..parser.regex.scanners import get_statement_delims
-from ..parser.regex.utils import get_quoted_sections
 from ..parser.tokens.RealisedTokenValues import RealisedTokenFactory
 from ..parser.tokens.TokenFactory import TokenFactory
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+import expressions
+from expressions.patterns import SH_STATEMENT_DELIMS
 
 
 def gen_command_string(
@@ -44,8 +44,9 @@ def _gen_command_statements(the_string: str, xmltool: Optional[XMLToolDefinition
 
 def _split_text_statements(the_string: str) -> list[str]:
     statements: list[str] = []
-    quoted_sections = get_quoted_sections(the_string)
-    delim_matches = get_statement_delims(the_string)
+    
+    delim_matches = expressions.get_matches(the_string, SH_STATEMENT_DELIMS)
+    quoted_sections = expressions.get_quoted_sections(the_string)
 
     # has to be reverse order otherwise m.start() and m.end() are out of place
     for m in sorted(delim_matches, key=lambda x: x.start(), reverse=True): 

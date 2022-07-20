@@ -4,8 +4,15 @@ from typing import Optional, Tuple
 
 import re
 
-from gx.command.parser import scanners
 from .. import utils
+
+import expressions
+from expressions.patterns import (
+    CH_SET,
+    LN,
+    MV,
+    CP
+)
 
 
 def resolve_aliases(cmdstr: str) -> str:
@@ -32,28 +39,28 @@ def is_alias_line(line: str) -> bool:
     return False
 
 def get_set(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = scanners.get_set(line)
+    matches = expressions.get_matches(line, CH_SET)
     if matches:
         m = matches[0]
         return m.group(1), m.group(2)
     return None, None
 
 def get_symlink(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = scanners.get_ln(line)
+    matches = expressions.get_matches(line, LN)
     if matches:
         m = matches[0]
         return m.group(2), m.group(1)
     return None, None
 
 def get_copy(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = scanners.get_cp(line)
+    matches = expressions.get_matches(line, CP)
     if matches:
         m = matches[0]
         return m.group(2), m.group(1)
     return None, None
 
 def get_move(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = scanners.get_mv(line)
+    matches = expressions.get_matches(line, MV)
     if matches:
         m = matches[0]
         return m.group(1), m.group(2)

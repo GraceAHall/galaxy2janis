@@ -8,7 +8,10 @@ from ..ValueRecord import PositionalValueRecord
 from .InputComponent import InputComponent
 
 from gx.gxtool.param.Param import Param
-from ...parser.regex import scanners
+from . import utils
+
+# import expressions
+# from expressions.patterns import VARIABLES_FMT1, VARIABLES_FMT2
 
 
 class Positional(InputComponent):
@@ -32,15 +35,13 @@ class Positional(InputComponent):
     @property
     def default_value(self) -> Any:
         """gets the default value for this component"""
-        #if utils.datatypes_permit_default(self.janis_datatypes):
         if self.gxparam:
             default = self.gxparam.default
         elif self.value_record.get_observed_env_var():
             default = self.value_record.get_observed_env_var()
         else:
             default = self.value_record.get_most_common_value()
-        return default
-        #return utils.sanitise_default_value(default)
+        return utils.sanitise_default_value(default)
 
     @property
     def optional(self) -> bool:
@@ -79,14 +80,13 @@ class Positional(InputComponent):
             return True
         return False
     
-    def values_are_variables(self) -> bool:
-        str_values = self.value_record.unique_values
-        for val in str_values:
-            if not scanners.get_variables_fmt1(val) and not scanners.get_variables_fmt2(val):
-                return False
-        return True
-
     def __str__(self) -> str:
         return f'{str(self.default_value):20}{str(self.optional):>10}'
 
+    # def values_are_variables(self) -> bool:
+    #     str_values = self.value_record.unique_values
+    #     for val in str_values:
+    #         if not expressions.get_matches(val, VARIABLES_FMT1) and not expressions.get_matches(val, VARIABLES_FMT2):
+    #             return False
+    #     return True
 

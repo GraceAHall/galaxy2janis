@@ -1,14 +1,96 @@
 
 
+import regex as re
+
 from abc import ABC, abstractmethod
 from typing import Optional
 
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
-
-from ..regex import scanners as scanners
-from ..regex.utils import get_base_variable
 from .Token import Token, TokenType
 from . import utils as token_utils
+
+import expressions
+from expressions.patterns import (
+    QUOTED_NUMBERS,
+    QUOTED_STRINGS,
+    RAW_NUMBERS,
+    RAW_STRINGS,
+    SH_REDIRECT,
+    SH_TEE,
+    SH_STREAM_MERGE,
+    GX_DYNAMIC_KEYWORDS,
+    GX_STATIC_KEYWORDS,
+    EMPTY_STRINGS,
+    VARIABLES_FMT1,
+    VARIABLES_FMT2,
+    ALL,
+)
+
+
+def strip_to_base_variable(match: re.Match[str]) -> Optional[str]:
+    """trims function calls, attributes from variable matches"""
+    text: str = match[0]
+    text = _strip_quotes(text)
+    text = _strip_braces(text)
+    text = _strip_method_calls(text, match)
+    text = _strip_common_attributes(text)
+    if text != '':
+        return text
+    return None
+
+def _strip_quotes(text: str) -> str:
+    text = text.replace('"', '')
+    text = text.replace("'", '')
+    return text
+
+def _strip_braces(text: str) -> str:
+    if text[1] == '{':
+        text = text[0] + text[2:]
+    if text[-1] == '}':
+        text = text[:-1]
+    # text = text.replace('{', '')
+    # text = text.replace('}', '')
+    return text
+
+def _strip_method_calls(text: str, match: re.Match[str]) -> str:
+    """
+    only want cheetah variable references.  
+    sometimes we see python string methods attached to a galaxy param var or cheetah functions (which have similar syntax to other vars of course). Want to remove these.
+    """
+    if match.end() < len(match.string) and match.string[match.end()] == '(':
+        # object method?
+        if '.' in text:
+            # strip back method call
+            text = text.rsplit('.', 1)[0]
+        else:
+            # is cheetah func call.  
+            text = ''
+    return text
+
+def _strip_common_attributes(text: str) -> str:
+    return text
+    gx_attributes = set([
+        '.forward',
+        '.reverse',
+        '.ext',
+        '.value',
+        '.name',
+        '.files_path',
+        '.element_identifier'
+    ])
+    # needs to be recursive so we can iterately peel back 
+    # eg  in1.forward.ext
+    # need to peel .ext then peel .forward.
+    for att in gx_attributes:
+        if text.endswith(att):
+            # strip from the right - num of chars in the att
+            text = text[:-len(att)]
+            # recurse
+            text = _strip_common_attributes(text)
+    return text
+
+
+
 
 
 class TokenOrderingStrategy(ABC):
@@ -62,18 +144,17 @@ class TokenFactory:
     def __init__(self, xmltool: Optional[XMLToolDefinition]=None):
         self.xmltool = xmltool
         self.generic_scanners = [
-            #(scanners.get_keyval_pairs, TokenType.KV_PAIR),
-            (scanners.get_quoted_numbers, TokenType.QUOTED_NUM),
-            (scanners.get_quoted_strings, TokenType.QUOTED_STRING),
-            (scanners.get_raw_numbers, TokenType.RAW_NUM),
-            (scanners.get_raw_strings, TokenType.RAW_STRING),
-            (scanners.get_redirects, TokenType.LINUX_REDIRECT),
-            (scanners.get_tees, TokenType.LINUX_TEE),
-            (scanners.get_stream_merges, TokenType.LINUX_STREAM_MERGE),
-            (scanners.get_dynamic_keywords, TokenType.GX_KW_DYNAMIC),
-            (scanners.get_static_keywords, TokenType.GX_KW_STATIC),
-            (scanners.get_empty_strings, TokenType.EMPTY_STRING),
-            (scanners.get_all, TokenType.UNKNOWN)
+            (QUOTED_NUMBERS, TokenType.QUOTED_NUM),
+            (QUOTED_STRINGS, TokenType.QUOTED_STRING),
+            (RAW_NUMBERS, TokenType.RAW_NUM),
+            (RAW_STRINGS, TokenType.RAW_STRING),
+            (SH_REDIRECT, TokenType.LINUX_REDIRECT),
+            (SH_TEE, TokenType.LINUX_TEE),
+            (SH_STREAM_MERGE, TokenType.LINUX_STREAM_MERGE),
+            (GX_DYNAMIC_KEYWORDS, TokenType.GX_KW_DYNAMIC),
+            (GX_STATIC_KEYWORDS, TokenType.GX_KW_STATIC),
+            (EMPTY_STRINGS, TokenType.EMPTY_STRING),
+            (ALL, TokenType.UNKNOWN)
         ]
         self.ordering_strategies: dict[str, TokenOrderingStrategy] = {
             'first':  FirstTokenOrderingStrategy(),
@@ -166,17 +247,17 @@ class TokenFactory:
     def get_generic_tokens(self, the_string: str) -> list[Token]:
         """gets all tokens except galaxy/env variables"""
         tokens: list[Token] = []
-        for scanner_func, ttype in self.generic_scanners:
-            matches = scanner_func(the_string)
+        for pattern, ttype in self.generic_scanners:
+            matches = expressions.get_matches(the_string, pattern)
             tokens += [Token(m, ttype) for m in matches]
         return tokens
 
     def get_variable_tokens(self, the_string: str) -> list[Token]:
         """gets tokens for galaxy/env variables"""
         tokens: list[Token] = []
-        matches = scanners.get_variables_fmt1(the_string)
-        matches += scanners.get_variables_fmt2(the_string)
-        base_vars = [get_base_variable(m) for m in matches]
+        matches = expressions.get_matches(the_string, VARIABLES_FMT1)
+        matches += expressions.get_matches(the_string, VARIABLES_FMT2)
+        base_vars = [strip_to_base_variable(m) for m in matches]
         
         for m, varname in zip(matches, base_vars):
             if varname and self.xmltool:

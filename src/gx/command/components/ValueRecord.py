@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Any, Optional
 
-import utils.general as utils 
-
 
 
 class ValueRecord(ABC):
@@ -20,16 +18,6 @@ class ValueRecord(ABC):
     @abstractmethod
     def get_counts(self) -> defaultdict[str, int]:
         """returns how often a value was witnessed"""
-        ...
-
-    @abstractmethod
-    def values_are_ints(self) -> bool:
-        """returns true if all observed values are castable to int"""
-        ...
-    
-    @abstractmethod
-    def values_are_floats(self) -> bool:
-        """returns true if all observed values are castable to float"""
         ...
 
     @property
@@ -66,22 +54,11 @@ class PositionalValueRecord(ValueRecord):
                 counts[obsval] += 1
         return counts
 
-    def values_are_ints(self) -> bool:
-        if all([utils.is_int(obsval) for obsval in self.record]):
-            return True
-        return False
-    
-    def values_are_floats(self) -> bool:
-        if all([utils.is_float(obsval) for obsval in self.record]):
-            return True
-        return False
-
     @property
     def unique_values(self) -> list[str]:
         values = list(set([obsval for obsval in self.record]))
         values.sort()
         return values
-
 
 
 
@@ -98,18 +75,6 @@ class OptionValueRecord(ValueRecord):
                 label = ' '.join(obsval)
                 counts[label] += 1
         return counts
-
-    def values_are_ints(self) -> bool:
-        for obsval in self.record:
-            if not all([utils.is_int(x) for x in obsval]):
-                return False
-        return True
-    
-    def values_are_floats(self) -> bool:
-        for obsval in self.record:
-            if not all([utils.is_float(x) for x in obsval]):
-                return False
-        return True
 
     @property
     def unique_values(self) -> list[str]:

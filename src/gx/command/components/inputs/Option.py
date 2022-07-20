@@ -2,11 +2,11 @@
 from __future__ import annotations
 from typing import Any, Optional
 
-from gx.gxtool.param.InputParam import SelectParam
 from gx.gxtool.param.Param import Param
 
 from ..ValueRecord import OptionValueRecord
 from .InputComponent import InputComponent
+from . import utils
 
 
 class Option(InputComponent):
@@ -25,13 +25,11 @@ class Option(InputComponent):
     @property
     def default_value(self) -> Any:
         """gets the default value for this component"""
-        #if utils.datatypes_permit_default(self.janis_datatypes):
-        default = None
         if self.gxparam:
             default = self.gxparam.default
-        if default is None:
+        else:
             default = self.value_record.get_most_common_value()
-        return default
+        return utils.sanitise_default_value(default)
     
     @property
     def optional(self) -> bool:

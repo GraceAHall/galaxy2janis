@@ -5,8 +5,9 @@ from gx.gxtool.param.InputParam import BoolParam, SelectParam
 from ...components import Flag
 from ...components import Option
 from ..tokens.Token import Token, TokenType
-from ..regex import scanners
 
+import expressions
+from expressions.patterns import COMPOUND_OPT
 
 NON_VALUE_TOKENTYPES = set([
     TokenType.FUNCTION_CALL, 
@@ -88,7 +89,7 @@ def compound_option(ctoken: Token, ntoken: Token) -> bool:
     return False
 
 def has_compound_structure(token: Token) -> bool:
-    compound_opts = scanners.get_compound_opt(token.text)
+    compound_opts = expressions.get_matches(token.text, COMPOUND_OPT)
     if compound_opts:
         match = compound_opts[0]
         value = match.group(2)

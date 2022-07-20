@@ -12,7 +12,8 @@ from gx.gxtool.param.OutputParam import (
     CollectionOutputParam,
 )
 
-from gx.command.parser import scanners
+import expressions
+from expressions.patterns import WILDCARD_GROUPS
 
 
 class Factory(ABC):
@@ -54,7 +55,7 @@ def get_discover_pattern(gxout: GxOutput) -> Optional[str]:
     return None
 
 def remove_pattern_capture_groups(pattern: str) -> str:
-    matches = scanners.get_wildcard_groups(pattern)
+    matches = expressions.get_matches(pattern, WILDCARD_GROUPS)
     for m in matches:
         pattern = pattern.replace(m.group(0), m.group(2))
     return pattern
