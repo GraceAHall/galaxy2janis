@@ -6,7 +6,7 @@ from gx.configfiles.Configfile import Configfile
 from ..TextRender import TextRender
 
 
-class ScriptText(TextRender):
+class ConfigfileText(TextRender):
     def __init__(self, entity: Configfile):
         super().__init__()
         self.entity = entity

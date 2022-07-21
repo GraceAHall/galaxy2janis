@@ -1,7 +1,6 @@
 
 
-from ...parser.tokens.Token import Token
-
+from tokens import Token
 from enum import Enum, auto
 
 class Stream(Enum):

@@ -4,19 +4,18 @@ from typing import Any, Optional
 
 from gx.gxtool.param.Param import Param
 
-from ..ValueRecord import OptionValueRecord
+from ..ValueRecord import ValueRecord
 from .InputComponent import InputComponent
 from . import utils
 
 
 class Option(InputComponent):
-    def __init__(self, prefix: str, values: list[str], delim: str) -> None:
+    def __init__(self, prefix: str) -> None:
         super().__init__()
         self.prefix = prefix
-        self.delim = delim
+        self.delim: str = ' '
         self.gxparam_attachment: int = 1
-        self.value_record: OptionValueRecord = OptionValueRecord()
-        self.value_record.add(values)
+        self.values: ValueRecord = ValueRecord()
 
     @property
     def name(self) -> str:
@@ -27,8 +26,10 @@ class Option(InputComponent):
         """gets the default value for this component"""
         if self.gxparam:
             default = self.gxparam.default
+        elif self.values.env_var:
+            default = self.values.env_var
         else:
-            default = self.value_record.get_most_common_value()
+            default = self.values.most_common_value
         return utils.sanitise_default_value(default)
     
     @property
@@ -52,12 +53,12 @@ class Option(InputComponent):
         if self.gxparam:
             return self.gxparam.docstring
         return ''
-        #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
+        #return f'examples: {", ".join(self.values.unique[:3])}'
 
     def update(self, incoming: Any):
         assert(isinstance(incoming, Option))
         # transfer values
-        self.value_record.record += incoming.value_record.record
+        self.values.record += incoming.values.record
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam

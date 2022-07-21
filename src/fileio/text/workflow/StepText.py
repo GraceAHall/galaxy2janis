@@ -19,16 +19,6 @@ import datatypes
 
 ### HELPER METHODS ### 
 
-def title(step_num: int, step: WorkflowStep) -> str: 
-    tool_tag = tags.get(step.tool.uuid).upper()
-    title = f'# STEP{step_num}: {tool_tag}'
-    border = f'# {"=" * (len(title) - 2)}'
-    return f"""\
-{border}
-{title}
-{border}
-"""
-
 def note() -> str:
     return"""\"\"\"
 FOREWORD ----------
@@ -119,20 +109,16 @@ class ToolInputLineFactory:
 class StepText(TextRender):
     def __init__(
         self, 
-        step_num: int,
         entity: WorkflowStep, 
         janis: Workflow,
         render_note: bool=False,
         render_imports: bool=False,
-        render_title: bool=True,
         render_wflow_inputs: bool=True
     ):
         super().__init__()
-        self.step_num = step_num
         self.entity = entity
         self.janis = janis
         self.render_note = render_note
-        self.render_title = render_title
         self.render_imports = render_imports
         self.render_wflow_inputs = render_wflow_inputs
     
@@ -161,8 +147,6 @@ class StepText(TextRender):
             out_str += f'{note()}\n'
         if self.render_imports:
             out_str += f'{formatting.format_imports(self.imports)}\n'
-        if self.render_title:
-            out_str += f'{title(self.step_num, self.entity)}\n'
 
         out_str += f'{self.format_runtime_inputs()}\n'
         out_str += f'{self.format_tool()}\n'

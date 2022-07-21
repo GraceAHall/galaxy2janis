@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from fileio.text.tool.ScriptText import ScriptText
+from fileio.text.tool.ConfigfileText import ConfigfileText
 
 from fileio.text.tool.UnstranslatedText import UntranslatedText
 
@@ -61,7 +61,7 @@ def write_scripts(janis: Workflow) -> None:
             tool_id = step.metadata.wrapper.tool_id
             for configfile in step.tool.configfiles:
                 path = paths.manager.script(tool_id, configfile.name)
-                text = ScriptText(configfile)
+                text = ConfigfileText(configfile)
                 page = text.render()
                 with open(path, 'w') as fp:
                     fp.write(page)

@@ -39,8 +39,8 @@ class ToolInputText(TextRender):
 
     def render(self) -> str:
         e = self.entity
-        prefix = self.get_component_prefix()
-        kv_space = self.get_separation()
+        prefix = self.format_component_prefix()
+        kv_space = self.format_separation()
         doc = formatting.format_docstring(e)
         out_str: str = ''
         out_str += '\tToolInput(\n'
@@ -54,7 +54,7 @@ class ToolInputText(TextRender):
         out_str += '\t)'
         return out_str
 
-    def get_component_prefix(self) -> Optional[str]:
+    def format_component_prefix(self) -> Optional[str]:
         e = self.entity
         match e:
             case Positional():
@@ -66,7 +66,7 @@ class ToolInputText(TextRender):
             case _:
                 raise RuntimeError
     
-    def get_separation(self) -> bool:
+    def format_separation(self) -> bool:
         if isinstance(self.entity, Option) and self.entity.delim == ' ':
             return True
         return False

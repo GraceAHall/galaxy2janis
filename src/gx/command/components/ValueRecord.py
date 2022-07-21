@@ -1,39 +1,48 @@
 
 
-from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Optional
+
+from tokens import Token
 
 
-
-class ValueRecord(ABC):
+class ValueRecord:
     def __init__(self):
-        self.record: list[Any] = []
+        self.record: list[Token] = []
 
-    @abstractmethod
-    def add(self, value: Any) -> None:
-        """adds an observed value to the record"""
-        ...
-
-    @abstractmethod
-    def get_counts(self) -> defaultdict[str, int]:
-        """returns how often a value was witnessed"""
-        ...
+    def add(self, value: Token) -> None:
+        self.record.append(value)
 
     @property
-    @abstractmethod
-    def unique_values(self) -> list[str]:
-        """returns all unique witnessed values"""
-        ...
+    def tokens(self) -> list[Token]:
+        values = self.record
+        values.sort(key=lambda x: x.text)
+        return values
+    
+    @property
+    def unique(self) -> list[str]:
+        values = list(set([token.text for token in self.record]))
+        values.sort()
+        return values
 
-    def get_observed_env_var(self) -> Optional[str]:
-        for obsval in self.record:
-            if str(obsval).startswith('$'):
-                return str(obsval)
+    @property
+    def env_var(self) -> Optional[str]:
+        for token in self.record:
+            if token.text.startswith('$'):
+                return token.text
         return None
 
-    def get_most_common_value(self) -> Optional[Any]:
-        counts_dict = self.get_counts()
+    @property
+    def counts(self) -> defaultdict[str, int]:
+        counts: defaultdict[str, int] = defaultdict(int) 
+        for token in self.record:
+            if token.text != '': # TODO how???
+                counts[token.text] += 1
+        return counts
+
+    @property
+    def most_common_value(self) -> Optional[str]:
+        counts_dict = self.counts
         counts_list = list(counts_dict.items())
         counts_list.sort(key=lambda x: x[1], reverse=True)
         if len(counts_list) > 0:
@@ -42,45 +51,5 @@ class ValueRecord(ABC):
             return None
 
 
-class PositionalValueRecord(ValueRecord):
-
-    def add(self, value: Any) -> None:
-        self.record.append(value)
-
-    def get_counts(self) -> defaultdict[str, int]:
-        counts: defaultdict[str, int] = defaultdict(int) 
-        for obsval in self.record:
-            if obsval != '':
-                counts[obsval] += 1
-        return counts
-
-    @property
-    def unique_values(self) -> list[str]:
-        values = list(set([obsval for obsval in self.record]))
-        values.sort()
-        return values
-
-
-
-# should be cmdstr_count, value
-class OptionValueRecord(ValueRecord):
-
-    def add(self, value: list[str]) -> None:
-        self.record.append(value)
-
-    def get_counts(self) -> defaultdict[str, int]:
-        counts: defaultdict[str, int] = defaultdict(int) 
-        for obsval in self.record:
-            if len(obsval) > 0:
-                label = ' '.join(obsval)
-                counts[label] += 1
-        return counts
-
-    @property
-    def unique_values(self) -> list[str]:
-        str_vals = [' '.join(obsval) for obsval in self.record]
-        str_vals = list(set(str_vals))
-        str_vals.sort()
-        return str_vals
 
 

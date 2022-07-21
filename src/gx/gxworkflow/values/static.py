@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-import logs.logging as logging
 from typing import TYPE_CHECKING, Any, Optional
 
 if TYPE_CHECKING:
@@ -8,8 +7,9 @@ if TYPE_CHECKING:
     from entities.workflow import Workflow
     from entities.workflow import WorkflowInput
 
-from gx.command.cmdstr import gen_command_string
+import logs.logging as logging
 
+from gx.command.cmdstr import gen_command_string
 from gx.command.components import Flag
 from gx.command.components import InputComponent
 from gx.command.components import Option

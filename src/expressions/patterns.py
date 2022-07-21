@@ -1,50 +1,43 @@
 
 ALL = r'.*'
 
-EDGE_CASE_CH_INPUT = r'\${?input([ =.}\'")]|$)'
+WORD = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
+STRING  = r'^([\/\\\w\d-.*`@])[-\w\d\{\}\$.\/\\_:*`@]*$'
+SIMPLE_STRING = r'[\w$_-]+'
+EMPTY_STRING = r'\'\'|""'
 
-WITHIN_BRACKETS = r''
-
-EMPTY_STRINGS = r'\'\'|""'
-
-QUOTES = r'[\'"]'
-QUOTED_SECTIONS = r'"([^\"]*?)"|\'([^\']*?)\''
-QUOTED_STRINGS = r'(\'.*?(?<!\\)\')|(".*?(?<!\\)")'
-QUOTED_NUMBERS = r'[\'"](?<!\w)(-?\d+(\.\d+)?)(?!\d)[\'"]'
+BACKTICK_SECTION = r'`.+?`'
+QUOTED_SECTION = r'"([^\"]*?)"|\'([^\']*?)\''
 QUOTED_SECTION_W_NEWLINE = r'\'[^\']*?\n[^\']*?\'|"[^"]*?\n[^"]*?"'
-BACKTICK_SECTIONS = r'`.+?`'
 
-INTEGER = r'^\d+$'
-FLOAT = r'^[\d.]+$'
+INTEGER = r'^-?\d+$'
+FLOAT   = r'^-?(\.\d+)|-?(\d+\.\d+)$'
+NUMBER  = r'^-?\.?\d+(\.\d+)?$'
+OPERATOR = r'^[-+\\/*=]?=$'
+VERSION = r'^(\d+)(\.\d+)*$'
 
-RAW_NUMBERS = r'(?<=\s|^)-?\.?\d+(\.\d*)?(?=\s|$)'
-RAW_STRINGS = r'(?<=\s|^)([\/\\\w\d-.*`@])[-\w\d\{\}\$.\/\\_:*`@]*(?=\s|$)'
-SIMPLE_STRINGS = r'[\w$_-]+'
+LINUX_LN = r'(?:\s|^)ln(?:\s-[sf]+)* [\'"]?([-\{}$./\\*\w\d]+)[\'"]? [\'"]?([-\{}$./\\*\w\d]+)[\'"]?(?=\s|$)'
+LINUX_MV = r'(?:\s|^)mv(?:\s-f+)* ([-\'"{}$./\\*\w\d]+) ([-\'"{}$./\\*\w\d]+)(?=\s|$)'
+LINUX_CP = r'(?:\s|^)cp(?:\s-[rpfR]+)* ([-_\'"{}$.*/\\\w\d]+) ([-_\'"{}$.*/\\\w\d]+)(?=\s|$)'
+LINUX_STATEMENT_DELIMS = r'(?<!\\)(&&|\|?\|(?! tee |tee ))(?=\s|$)' 
+LINUX_REDIRECT = r'((?<=\s)\d|&)?>[>&]?(?![>&]?\d)'
+LINUX_TEE = r'(?<![\d&])\| ?tee( -a)?'
+LINUX_STREAM_MERGE = r'(?<=\s|^)\d?>&\d'
 
-WORDS = r'(\'.*?(?<!\\)\'[^\s]*)|(".*?(?<!\\)"[^\s]*)|([^\s]+)'
-KEYVAL_PAIRS = r'(?<=\s|^)(\S+?)([=:])(\S+?)(?=\s|$)'
+KEYVAL_PAIR = r'(?<=\s|^)(\S+?)([=:])(\S+?)(?=\s|$)'
 COMPOUND_OPT = r'^(-\w)(\d+?)$'
 
-CH_SET = r'(?:^|\s)#set ([$\w\d]+) = [\'"]?([$\w\d.]+)[\'"]?(?=\s|$)'
-LN = r'(?:\s|^)ln(?:\s-[sf]+)* [\'"]?([-\{}$./\\*\w\d]+)[\'"]? [\'"]?([-\{}$./\\*\w\d]+)[\'"]?(?=\s|$)'
-MV = r'(?:\s|^)mv(?:\s-f+)* ([-\'"{}$./\\*\w\d]+) ([-\'"{}$./\\*\w\d]+)(?=\s|$)'
-CP = r'(?:\s|^)cp(?:\s-[rpfR]+)* ([-_\'"{}$.*/\\\w\d]+) ([-_\'"{}$.*/\\\w\d]+)(?=\s|$)'
+CHEETAH_SET = r'(?:^|\s)#set ([$\w\d]+) = [\'"]?([$\w\d.]+)[\'"]?(?=\s|$)'
+CHEETAH_EDGE_CASE_INPUT = r'\${?input([ =.}\'")]|$)'
 
 VARIABLES_FMT1 = r'\$\w[\w._]+'
 VARIABLES_FMT2 = r'\$\{\w[\w._]+\}'
 FUNCTION_CALL_FMT1 = r'\$\{[^(].+?(\(.*\))[^(]*\}'
 FUNCTION_CALL_FMT2 = r'\$[^(){} \n\'"]+(\(.*\))[^(){} \n\'"]*'
 
+SCRIPT = r'(\$__tool_directory__\/)([^\s\$]+)'
 GX_DYNAMIC_KEYWORDS = r'\\?\${[\w\d]+\:\-(\d+)}'
-GX_STATIC_KEYWORDS = r'\$__tool_directory__|\$__new_file_path__|\$__tool_data_path__|\$__root_dir__|\$__datatypes_config__|\$__user_id__|\$__user_email__|\$__app__|\$__target_datatype__'
+GX_STATIC_KEYWORDS = r'\$__new_file_path__|\$__tool_data_path__|\$__root_dir__|\$__datatypes_config__|\$__user_id__|\$__user_email__|\$__app__|\$__target_datatype__'
 
-SH_STATEMENT_DELIMS = r'(?<!\\)(&&|\|?\|(?! tee |tee ))(?=\s|$)' 
-SH_REDIRECT = r'((?<=\s)\d|&)?>[>&]?(?![>&]?\d)'
-SH_TEE = r'(?<![\d&])\| ?tee( -a)?'
-SH_STREAM_MERGE = r'(?<=\s|^)\d?>&\d'
-
-OPERATOR = r'[-+\\/*=]?='
-VERSIONS = r'(\d+)(\.\d+)*'
-
-WILDCARD_GROUPS = r'\((\?P<.+?>)(.*?)\)'
+WILDCARD_GROUP = r'\((\?P<.+?>)(.*?)\)'
 

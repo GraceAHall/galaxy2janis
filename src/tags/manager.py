@@ -77,7 +77,12 @@ def _get_starting_text_wflow(entity: Any) -> str:
             else:
                 return entity.name
         case 'WorkflowStep':
-            return entity.metadata.wrapper.tool_id
+            if entity.metadata.label:
+                return entity.metadata.label
+            elif entity.metadata.step_name:
+                return entity.metadata.step_name
+            else:
+                return entity.metadata.wrapper.tool_name
         case _:
             raise RuntimeError(f'cannot register a {entity.__class__.__name__}')
 

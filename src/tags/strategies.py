@@ -48,7 +48,7 @@ class ToolNameStrategy(FormattingStrategy):
         #tag = rules.encode(tag)
         tag = rules.camelify(tag)
         return tag
-        
+
 
 STRATEGIES = {
     'Workflow': GenericFormattingStrategy(),

@@ -2,15 +2,14 @@
 
 from dataclasses import dataclass
 from typing import Optional
+from tokens import Token
+from tokens import spawn_end_sentinel
 
-from ...components import CommandComponent
-from ...components import StreamMerge
-from ...components import Tee
+from ..components import CommandComponent
+from ..components import StreamMerge
+from ..components import Tee
 
 from .ComponentOrderingStrategy import SimplifiedComponentOrderingStrategy
-from ..tokens.Token import Token
-from ..tokens import utils
-
 
 
 @dataclass
@@ -47,14 +46,14 @@ class ExecutionPath:
     
     def _init_positions(self, tokens: list[Token]) -> list[EPathPosition]:
         positions = [EPathPosition(i, token) for i, token in enumerate(tokens)]
-        end_sentinel = utils.spawn_end_sentinel()
+        end_sentinel = spawn_end_sentinel()
         positions.append(EPathPosition(len(positions), end_sentinel))
         return positions
 
     def __str__(self) -> str:
         out: str = '\n'
         for position in self.positions:
-            out += f'{str(position.ptr):<3}{position.token.text[:39]:<40}{position.token.type:<35}\n'
+            out += f'{str(position.ptr):<3}{position.token.text[:39]:<40}{position.token.ttype:<35}\n'
         return out
 
 

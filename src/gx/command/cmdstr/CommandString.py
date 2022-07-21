@@ -3,8 +3,9 @@
 
 from dataclasses import dataclass
 
+from tokens import Token
+
 from .DynamicCommandStatement import DynamicCommandStatement
-from ..parser.tokens.Token import Token
 
 
 @dataclass

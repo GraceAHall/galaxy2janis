@@ -1,15 +1,11 @@
 
 
-
 from typing import Any, Optional
-#from entities.workflow import WorkflowInput
-
-from gx.command.components import CommandComponent
-from gx.command.components import InputComponent
-
 import datatypes
 import expressions
 
+from ...command.components import CommandComponent
+from ...command.components import InputComponent
 
 
 def get_comptype(component: CommandComponent) -> str:
@@ -18,7 +14,7 @@ def get_comptype(component: CommandComponent) -> str:
 def select_input_value_type(component: Optional[InputComponent], value: Any) -> str:
     """
     only StaticValueLinkingStrategy and DefaultValueLinkingStrategy 
-    call this function. don't need to worry about CONNECTION and RUNTIME_VALUE
+    call select_input_value_type(). don't need to worry about CONNECTION and RUNTIME_VALUE
     """
     if is_bool(value):
         return 'boolean'

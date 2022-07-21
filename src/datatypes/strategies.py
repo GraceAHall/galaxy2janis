@@ -2,23 +2,28 @@
 
 
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
-
 if TYPE_CHECKING:
     from entities.workflow.input import WorkflowInput
     from gx.command.components import Positional, Flag, Option
     from gx.command.components import OutputComponent
     from gx.gxtool.param.OutputParam import CollectionOutputParam
 
-from abc import ABC, abstractmethod
 import json
-
+import expressions
+from tokens.token import Token
+from tokens.token import TokenType
 from datatypes.JanisDatatype import JanisDatatype
+
 from .conversion import galaxy_to_janis
 from . import core
 
-import expressions
-
+INTEGERS = [TokenType.INTEGER]
+FLOATS = [TokenType.FLOAT]
+SCRIPTS = [TokenType.SCRIPT]
+ENV_VARS = [TokenType.ENV_VAR, TokenType.GX_KW_DYNAMIC, TokenType.GX_KW_STATIC]
+GX_VARS = [TokenType.GX_INPUT, TokenType.GX_OUTPUT]
 
 ### SHARED FUNCTIONS ###
 
@@ -28,24 +33,25 @@ def types_from_param(entity: Positional | Option | OutputComponent) -> list[str]
     return []
 
 def types_from_values(entity: Positional | Option) -> list[str]:
-    values = entity.value_record.unique_values
-    if values:
-        if expressions.items_are_ints(values):
-            return ['integer']
-        elif expressions.items_are_floats(values):
-            return ['float']
-        elif not expressions.items_are_vars(values):
-            return ['string']
+    tokens = entity.values.tokens
+    if _items_are_of_type(tokens, SCRIPTS):
+        return ['file']
+    elif _items_are_of_type(tokens, INTEGERS):
+        return ['integer']
+    elif _items_are_of_type(tokens, FLOATS):
+        return ['float']
+    elif _items_are_of_type(tokens, ENV_VARS):
+        return ['string']
     return []
 
 def types_from_default(entity: Positional | Option) -> list[str]:
-    if entity.default_value:
-        if expressions.is_int(entity.default_value):
-            return ['integer']
-        elif expressions.is_float(entity.default_value):
-            return ['float']
-        elif not expressions.is_var(entity.default_value):
-            return ['string']
+    default = entity.default_value
+    if expressions.is_int(default):
+        return ['integer']
+    if expressions.is_float(default):
+        return ['float']
+    if expressions.is_var(default) or expressions.has_var(default):
+        return ['string']
     return []
 
 def types_from_extension(output: OutputComponent) -> list[str]:
@@ -59,6 +65,14 @@ def types_from_extension(output: OutputComponent) -> list[str]:
             ext = p_split[-1]
             return [f'.{ext}']
     return []
+
+def _items_are_of_type(tokens: list[Token], permitted_types: list[TokenType]) -> bool:
+    if not tokens:
+        return False
+    for t in tokens:
+        if t.ttype not in permitted_types:
+            return False
+    return True
 
 
 ### STRATEGIES ###

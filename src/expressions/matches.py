@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 import regex as re
 import numpy as np
 
-from .patterns import QUOTED_SECTIONS 
+from .patterns import QUOTED_SECTION 
 
 
 def get_matches(the_string: str, expression: str) -> list[re.Match[str]]:
@@ -28,7 +28,7 @@ def get_preceeding_dashes(search_term: str, text: str) -> list[str]:
 
 def get_quoted_sections(the_string: str):
     # find the areas of the string which are quoted
-    matches = re.finditer(QUOTED_SECTIONS, the_string)
+    matches = re.finditer(QUOTED_SECTION, the_string)
     quoted_sections = [(m.start(), m.end()) for m in matches]
 
     # transform to mask

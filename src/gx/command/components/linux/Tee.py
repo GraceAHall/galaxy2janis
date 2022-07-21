@@ -1,6 +1,6 @@
 
 
-from ...parser.tokens.Token import Token
+from tokens import Token
 
 
 class Tee:

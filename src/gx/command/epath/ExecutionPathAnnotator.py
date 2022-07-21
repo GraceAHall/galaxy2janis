@@ -1,10 +1,10 @@
 
 
 from typing import Type
-from ...Command import Command
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from tokens import TokenType
 
-from ..tokens.Token import TokenType
+from ...gxtool.XMLToolDefinition import XMLToolDefinition
+from ..Command import Command
 from .ExecutionPath import ExecutionPath
 from .Annotator import (
     Annotator, 
@@ -76,16 +76,16 @@ class GreedyExecutionPathAnnotator:
             TokenType.BACKTICK_SHELL_STATEMENT,
         ]
         for position in self.epath.positions:
-            if position.token.type in ignore_tokens:
+            if position.token.ttype in ignore_tokens:
                 position.ignore = True
         
     def annotate_via_param_args(self) -> None:
-        arguments: set[str] = set([param.argument for param in self.xmltool.list_inputs() if param.argument]) # type: ignore
+        arguments: set[str] = set([param.argument for param in self.xmltool.inputs.list() if param.argument]) # type: ignore
         ptr = 0
         while ptr < len(self.epath.positions) - 1:
             token = self.epath.positions[ptr].token
             if token.text in arguments:
-                token.type = TokenType.FORCED_PREFIX
+                token.ttype = TokenType.FORCED_PREFIX
                 ptr = self.annotate_position(ptr, annotators=tool_arguments)
             else:
                 ptr += 1

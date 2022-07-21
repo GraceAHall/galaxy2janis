@@ -1,21 +1,22 @@
 
 
 import logs.logging as logging
+import expressions
+from tokens import tokenize_single
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
-from gx.gxtool.param.Param import Param
-from gx.gxtool.param.InputParam import BoolParam, SelectParam
+from ..gxtool.XMLToolDefinition import XMLToolDefinition
+from ..gxtool.param.Param import Param
+from ..gxtool.param.InputParam import BoolParam, SelectParam
 
-from .parser.epath.ExecutionPath import ExecutionPath
-from .parser.epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
+from .epath.ExecutionPath import ExecutionPath
+from .epath.ExecutionPathAnnotator import GreedyExecutionPathAnnotator
 
 from .Command import Command 
 from .cmdstr.CommandString import CommandString
 from .components.inputs.Flag import Flag
 from .components.inputs.Option import Option
-from .components.inputs.factory import spawn_component 
+from .components import factory
 
-import expressions
 
 
 # Utility functions to check aspects of a gxparam argument attribute
@@ -66,7 +67,7 @@ class ArgumentCommandAnnotator:
 
     def annotate(self) -> None:
         # add any gxparams which hint they are components (or update the component)
-        for gxparam in self.xmltool.list_inputs():
+        for gxparam in self.xmltool.inputs.list():
             if self.should_update_command_components(gxparam):
                 gxparam = self.refine_argument(gxparam)
                 self.update_command_components(gxparam)
@@ -117,33 +118,29 @@ class ArgumentCommandAnnotator:
 
     def handle_bool_param(self, gxparam: BoolParam) -> None:
         assert(gxparam.argument)
-        component = spawn_component('flag', ctext=gxparam.argument, ntexts=[])
-        component.gxparam = gxparam
-        self.command.update(component)
+        flag = factory.flag(prefix=gxparam.argument, gxparam=gxparam)
+        self.command.update(flag)
 
     def handle_select_param(self, gxparam: SelectParam) -> None:
         assert(gxparam.argument)
         if self.select_is_bool(gxparam):
-            component = spawn_component('flag', ctext=gxparam.argument, ntexts=[])
-            self.command.update(component)
+            flag = factory.flag(prefix=gxparam.argument, gxparam=gxparam)
+            self.command.update(flag)
         else:
-            for opt in gxparam.options:
-                component = spawn_component('option', ctext=gxparam.argument, ntexts=[opt.value])
-                component.gxparam = gxparam
-                self.command.update(component)
-
+            values = [tokenize_single(word=opt.value, xmltool=self.xmltool) for opt in gxparam.options]
+            option = factory.option(prefix=gxparam.argument, gxparam=gxparam, values=values)
+            self.command.update(option)
+        
+    def handle_generic_param(self, gxparam: Param) -> None:
+        option = factory.option(prefix=gxparam.argument, gxparam=gxparam)
+        self.command.update(option) 
+    
     def select_is_bool(self, gxparam: SelectParam) -> bool:
         values = gxparam.get_all_values(nonempty=True)
         if len(values) == 1:
             if values[0].startswith('-'):
                 return True
         return False  
-
-    def handle_generic_param(self, gxparam: Param) -> None:
-        component = spawn_component('option', ctext=gxparam.argument, ntexts=[])
-        component.gxparam = gxparam
-        self.command.update(component)  
-
 
 
 

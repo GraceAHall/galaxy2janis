@@ -8,7 +8,6 @@ from .DynamicCommandStatement import DynamicCommandStatement
 from utils.general import global_align
 
 
-
 # functions to identify best statement
 def undefined_future_function(metric_records: list[StatementMetricRecord]) -> Optional[int]:
     # TODO statment with most flags? statement with redirect? statement firstword is not in list of known linux commands (except in cases like where the tool is actually 'awk')?

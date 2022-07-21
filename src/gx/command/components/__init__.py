@@ -15,5 +15,4 @@ from .outputs.InputOutput import InputOutput
 from .outputs.RedirectOutput import RedirectOutput
 from .outputs.WildcardOutput import WildcardOutput
 
-from .outputs.factory import create_output
-from .inputs.factory import spawn_component
+from . import factory

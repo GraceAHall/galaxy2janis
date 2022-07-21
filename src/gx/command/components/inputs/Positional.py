@@ -4,22 +4,18 @@
 from __future__ import annotations
 from typing import Any, Optional
 
-from ..ValueRecord import PositionalValueRecord
+from ..ValueRecord import ValueRecord
 from .InputComponent import InputComponent
-
-from gx.gxtool.param.Param import Param
 from . import utils
 
-# import expressions
-# from expressions.patterns import VARIABLES_FMT1, VARIABLES_FMT2
+from gx.gxtool.param.Param import Param
 
 
 class Positional(InputComponent):
-    def __init__(self, value: str) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.before_opts: bool = False
-        self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(value)
+        self.values: ValueRecord = ValueRecord()
 
     @property
     def name(self) -> str:
@@ -27,7 +23,7 @@ class Positional(InputComponent):
         if self.gxparam:
             return self.gxparam.name
         # otherwise, most commonly witnessed option value as name
-        pseudo_name = self.value_record.get_most_common_value()
+        pseudo_name = self.values.most_common_value
         if not pseudo_name:
             pseudo_name = 'positional'
         return pseudo_name.strip('$')
@@ -37,10 +33,10 @@ class Positional(InputComponent):
         """gets the default value for this component"""
         if self.gxparam:
             default = self.gxparam.default
-        elif self.value_record.get_observed_env_var():
-            default = self.value_record.get_observed_env_var()
+        elif self.values.env_var:
+            default = self.values.env_var
         else:
-            default = self.value_record.get_most_common_value()
+            default = self.values.most_common_value
         return utils.sanitise_default_value(default)
 
     @property
@@ -64,29 +60,20 @@ class Positional(InputComponent):
         if self.gxparam:
             return self.gxparam.docstring
         return ''
-        #return f'examples: {", ".join(self.value_record.get_unique_values()[:3])}'
+        #return f'examples: {", ".join(self.values.unique[:3])}'
 
     def update(self, incoming: Any) -> None:
         # transfer values
         assert(isinstance(incoming, Positional))
-        self.value_record.record += incoming.value_record.record
+        self.values.record += incoming.values.record
         # transfer galaxy param reference
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam
 
     def has_single_value(self) -> bool:
-        counts = self.value_record.get_counts()
-        if len(counts) == 1:
+        if len(self.values.counts) == 1:
             return True
         return False
     
     def __str__(self) -> str:
         return f'{str(self.default_value):20}{str(self.optional):>10}'
-
-    # def values_are_variables(self) -> bool:
-    #     str_values = self.value_record.unique_values
-    #     for val in str_values:
-    #         if not expressions.get_matches(val, VARIABLES_FMT1) and not expressions.get_matches(val, VARIABLES_FMT2):
-    #             return False
-    #     return True
-

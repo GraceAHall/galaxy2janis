@@ -1,7 +1,7 @@
 
 
 
-from .Token import Token, TokenType
+from .token import Token, TokenType
 
 import expressions
 from expressions.patterns import ALL

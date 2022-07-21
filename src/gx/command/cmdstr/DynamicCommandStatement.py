@@ -2,10 +2,10 @@
 
 from copy import deepcopy
 from typing import Iterable
+from tokens import Token
 
-from ..parser.tokens.Token import Token
-from ..parser.tokens.RealisedTokenValues import RealisedTokens
-from ..parser.epath.ExecutionPath import ExecutionPath
+from .RealisedTokenValues import RealisedTokens
+from ..epath.ExecutionPath import ExecutionPath
 
 
 class DynamicCommandStatement:

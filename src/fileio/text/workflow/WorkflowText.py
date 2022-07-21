@@ -62,6 +62,13 @@ core_imports = [
     ("janis_core", "WorkflowBuilder"),
 ]
 
+def label(text: str) -> str: 
+    title = f'# {text}'
+    border = f'# {"-" * (len(title) - 2)}'
+    return f"""\
+{border}
+{title}
+{border}"""
 
 ### MAIN CLASS ### 
 
@@ -91,7 +98,7 @@ class WorkflowText(TextRender):
             tool_tag = tags.get(step.tool.uuid)
             imports.append((relative_path, tool_tag))
         for step in self.entity.steps:
-            imports += StepText(-1, step, self.entity).imports
+            imports += StepText(step, self.entity).imports
         for wout in self.entity.outputs:
             imports += WorkflowOutputText(wout).imports
         imports = list(set(imports))
@@ -109,17 +116,19 @@ class WorkflowText(TextRender):
         out_str += f'{builder_snippet(self.entity)}\n'
         
         # inputs
+        out_str += f"{label('INPUTS')}\n\n"
         for winp in self.entity.inputs:
             if not winp.is_runtime:
                 out_str += f'{WorkflowInputText(winp).render()}\n'
         
         # steps (includes tool steps and subworkflow steps)
-        step_count: int = 0
-        for step in self.entity.steps:
-            step_count += 1
-            out_str += f'\n{StepText(step_count, step, self.entity).render()}\n'
+        for i, step in enumerate(self.entity.steps):
+            tool_tag = tags.get(step.tool.uuid)
+            out_str += f"{label(f'STEP{i}: {tool_tag}')}\n"
+            out_str += f'{StepText(step, self.entity).render()}\n'
         
         # outputs
+        out_str += f"{label('OUTPUTS')}\n\n"
         for wout in self.entity.outputs:
             out_str += f'{WorkflowOutputText(wout).render()}\n'
 

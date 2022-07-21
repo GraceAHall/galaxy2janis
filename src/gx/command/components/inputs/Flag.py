@@ -8,7 +8,7 @@ from gx.gxtool.param.Param import Param
 
 
 class Flag(InputComponent):
-    def __init__(self, prefix: str, name: Optional[str]=None) -> None:
+    def __init__(self, prefix: str) -> None:
         super().__init__()
         self.prefix = prefix
 

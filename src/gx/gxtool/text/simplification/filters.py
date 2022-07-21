@@ -10,8 +10,8 @@ import expressions
 from expressions.patterns import (
     FUNCTION_CALL_FMT1,
     FUNCTION_CALL_FMT2,
-    BACKTICK_SECTIONS,
-    QUOTED_SECTIONS,
+    BACKTICK_SECTION,
+    QUOTED_SECTION,
     GX_DYNAMIC_KEYWORDS,
     # GX_STATIC_KEYWORDS,
 )
@@ -32,7 +32,7 @@ def replace_function_calls(cmdstr: str) -> str:
     return utils.join_lines(out)
 
 def replace_backticks(cmdstr: str) -> str:
-    matches = expressions.get_matches(cmdstr, BACKTICK_SECTIONS)
+    matches = expressions.get_matches(cmdstr, BACKTICK_SECTION)
     for match in matches:
         logging.has_backtick_statement()
         old_section = match[0]
@@ -44,7 +44,7 @@ def interpret_raw(cmdstr: str) -> str:
     return cmdstr.replace('\\', '')
 
 def flatten_multiline_strings(cmdstr: str) -> str:
-    matches = expressions.get_matches(cmdstr, QUOTED_SECTIONS)
+    matches = expressions.get_matches(cmdstr, QUOTED_SECTION)
     for match in matches:
         if '\n' in match[0]:
             logging.has_multiline_str()
@@ -98,14 +98,6 @@ def simplify_sh_constructs(cmdstr: str) -> str:
     cmdstr = cmdstr.replace("| tee", "|tee")
     cmdstr = cmdstr.replace("1>", ">")
     return cmdstr 
-
-def simplify_galaxy_static_vars(cmdstr: str) -> str:
-    """
-    modifies galaxy reserved words to relevant format. only $__tool_directory__ for now. 
-    There is a scanner for this, but the actual substitutions might be different. 
-    """
-    cmdstr = re.sub(r"\$__tool_directory__/", "", cmdstr)
-    return cmdstr
 
 def simplify_galaxy_dynamic_vars(cmdstr: str) -> str:
     """  ${GALAXY_SLOTS:-2} -> 2   etc """

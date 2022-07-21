@@ -3,19 +3,17 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+import expressions
+
+from ..gxtool.param.Param import Param 
 
 from .cmdstr.CommandString import CommandString
-
 from .components.CommandComponent import CommandComponent
 from .components.inputs.Positional import Positional
 from .components.inputs.Flag import Flag
 from .components.inputs.Option import Option
 from .components.outputs.RedirectOutput import RedirectOutput
-from .components.inputs.factory import spawn_component
-
-from gx.gxtool.param.Param import Param 
-
-import expressions
+from .components import factory
 
 
 class Updater(ABC):
@@ -224,7 +222,7 @@ class Command:
         for p in positionals:
             if p.before_opts and not p.gxparam:
                 if p.has_single_value():
-                    if not expressions.items_are_vars(p.value_record.unique_values):
+                    if not expressions.items_are_vars(p.values.unique):
                         out.append(p)
             else:
                 break
@@ -244,11 +242,11 @@ class Command:
         # migrate incorrect option to flag
         if isinstance(incoming, Option):
             if incoming.prefix in self.flags:
-                return spawn_component('flag', ctext=incoming.prefix, ntexts=[])
+                return factory.flag(prefix=incoming.prefix, gxparam=incoming.gxparam)
         # migrate incorrect flag to option
-        if isinstance(incoming, Flag):
-            if incoming.prefix in self.options:
-                return spawn_component('option', ctext=incoming.prefix, ntexts=[])
+        # if isinstance(incoming, Flag):
+        #     if incoming.prefix in self.options:
+        #         return factory.option(prefix=incoming.prefix, gxparam=incoming.gxparam)
         return incoming
 
     def select_updater(self, incoming: CommandComponent) -> Updater:

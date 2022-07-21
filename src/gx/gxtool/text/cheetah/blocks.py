@@ -13,7 +13,7 @@ from .. import utils
 from gx.command.cmdstr import constructs
 
 import expressions
-from expressions.patterns import EDGE_CASE_CH_INPUT
+from expressions.patterns import CHEETAH_EDGE_CASE_INPUT
 
 
 def get_blocks(ptr: int, lines: list[str], indent_level: int) -> list[CheetahBlock]:
@@ -292,7 +292,7 @@ class CheetahBlock:
 
     def edge_case_input(self, input_dict: dict[str, Any]) -> bool:
         for line in self.lines:
-            matches = expressions.get_matches(line, EDGE_CASE_CH_INPUT)
+            matches = expressions.get_matches(line, CHEETAH_EDGE_CASE_INPUT)
             if matches:
                 if 'input' not in input_dict:
                     return True

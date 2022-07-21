@@ -1,13 +1,12 @@
 
 
-from gx.gxtool.param.InputParam import BoolParam, SelectParam
-
-from ...components import Flag
-from ...components import Option
-from ..tokens.Token import Token, TokenType
-
 import expressions
 from expressions.patterns import COMPOUND_OPT
+from tokens import Token
+from tokens import TokenType
+
+from ...gxtool.param.InputParam import BoolParam, SelectParam
+
 
 NON_VALUE_TOKENTYPES = set([
     TokenType.FUNCTION_CALL, 
@@ -20,7 +19,7 @@ NON_VALUE_TOKENTYPES = set([
 ])
 
 def is_bool_select(token: Token) -> bool:
-    if token.type == TokenType.GX_INPUT:
+    if token.ttype == TokenType.GX_INPUT:
         match token.gxparam:
             case BoolParam():
                 return True
@@ -49,15 +48,15 @@ def flag_then_flag(ctoken: Token, ntoken: Token) -> bool:
     return False
 
 def flag_then_null(ctoken: Token, ntoken: Token) -> bool:
-    if looks_like_a_flag(ctoken) and ntoken.type in NON_VALUE_TOKENTYPES:
+    if looks_like_a_flag(ctoken) and ntoken.ttype in NON_VALUE_TOKENTYPES:
         return True
     return False
 
 def looks_like_a_flag(token: Token) -> bool:
-    allowed_prefix_types = [TokenType.RAW_STRING, TokenType.RAW_NUM]
-    if token.type == TokenType.FORCED_PREFIX:
+    allowed_prefix_types = [TokenType.STRING, TokenType.INTEGER]
+    if token.ttype == TokenType.FORCED_PREFIX:
         return True
-    if token.type in allowed_prefix_types and token.text.startswith('-'):
+    if token.ttype in allowed_prefix_types and token.text.startswith('-'):
         return True
     return False
 
@@ -78,7 +77,7 @@ def is_flag(ctoken: Token, ntoken: Token) -> bool:
 
 
 def kvlinker(ctoken: Token, ntoken: Token) -> bool:
-    if ntoken.type == TokenType.KV_LINKER:
+    if ntoken.ttype == TokenType.KV_LINKER:
         return True 
     return False
 
@@ -138,13 +137,7 @@ def within_different_constructs(ctoken: Token, ntoken: Token) -> bool:
 
 def is_positional(token: Token) -> bool:
     if not looks_like_a_flag(token):
-        if token.type not in NON_VALUE_TOKENTYPES:
+        if token.ttype not in NON_VALUE_TOKENTYPES:
             return True
     return False
 
-def cast_opt_to_flag(option: Option) -> Flag:
-    flag = Flag(
-        prefix=option.prefix,
-    )
-    flag.gxparam = option.gxparam
-    return flag

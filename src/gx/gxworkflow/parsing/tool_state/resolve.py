@@ -27,7 +27,7 @@ class StepValueResolver:
         return self.tool_state
     
     def resolve_value(self, gxvarname: str, val: Any) -> Any:
-        param = self.xmltool.get_input(gxvarname)
+        param = self.xmltool.inputs.get(gxvarname)
         match param:
             case BoolParam():
                 if val == 'false':

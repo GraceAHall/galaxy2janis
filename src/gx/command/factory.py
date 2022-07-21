@@ -1,8 +1,8 @@
 
 
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
-from gx.gxtool.text import load_command
+from ..gxtool.XMLToolDefinition import XMLToolDefinition
+from ..gxtool.text import load_command
 
 from .cmdstr.CommandString import CommandString
 from .cmdstr.generate import gen_command_string

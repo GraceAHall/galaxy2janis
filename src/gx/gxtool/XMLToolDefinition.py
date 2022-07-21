@@ -1,21 +1,14 @@
 
 
-
 from dataclasses import dataclass
-from typing import Optional
-from gx.configfiles.Configfile import Configfile
 
-from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
-from gx.gxtool.param.OutputParam import OutputParam
-from gx.gxtool.param.Param import Param
-from gx.gxtool.param.InputParamRegister import InputParamRegister
-from gx.gxtool.param.OutputParamRegister import OutputParamRegister
-from gx.gxtool.TestRegister import TestRegister
-from janis_core.tool.test_classes import TTestCase
-from gx.gxtool.requirements import ContainerRequirement, CondaRequirement
+from ..configfiles.Configfile import Configfile
+from .ToolXMLMetadata import ToolXMLMetadata
+from .param.ParamRegister import ParamRegister
+from .TestRegister import TestRegister
+from .requirements import ContainerRequirement, CondaRequirement
 
 Requirement = ContainerRequirement | CondaRequirement
-
 
 
 @dataclass
@@ -28,30 +21,30 @@ class XMLToolDefinition:
     metadata: ToolXMLMetadata
     raw_command: str
     configfiles: list[Configfile]
-    inputs: InputParamRegister
-    outputs: OutputParamRegister
+    inputs: ParamRegister
+    outputs: ParamRegister
     tests: TestRegister
 
-    def get_input(self, query: str, strategy: str='exact') -> Optional[Param]:
-        return self.inputs.get(query.lstrip('$'), strategy=strategy)
+    # def get_input(self, query: str, strategy: str='exact') -> Optional[Param]:
+    #     return self.inputs.get(query.lstrip('$'), strategy=strategy)
     
-    def list_inputs(self) -> list[Param]:
-        return self.inputs.list()
+    # def list_inputs(self) -> list[Param]:
+    #     return self.inputs.list()
 
-    def get_output(self, query: str, strategy: str='exact') -> Optional[Param]:
-        return self.outputs.get(query.lstrip('$'), strategy=strategy)
+    # def get_output(self, query: str, strategy: str='exact') -> Optional[Param]:
+    #     return self.outputs.get(query.lstrip('$'), strategy=strategy)
     
-    def list_outputs(self) -> list[OutputParam]:
-        return self.outputs.list()
+    # def list_outputs(self) -> list[OutputParam]:
+    #     return self.outputs.list()
 
-    def list_tests(self) -> list[TTestCase]:
-        return self.tests.list()
+    # def list_tests(self) -> list[TTestCase]:
+    #     return self.tests.list()
 
-    def get_requirements(self) -> list[Requirement]:
-        return self.metadata.requirements
+    # def get_requirements(self) -> list[Requirement]:
+    #     return self.metadata.requirements
     
-    def get_main_requirement(self) -> Requirement:
-        return self.metadata.get_main_requirement()
+    # def get_main_requirement(self) -> Requirement:
+    #     return self.metadata.get_main_requirement()
 
 
 

@@ -17,9 +17,6 @@ def format_docstring(component: CommandComponent) -> Optional[str]:
 
 def get_wrapped_default(component: InputComponent) -> Optional[str]:
     default = component.default_value
-    # override env var default values to None 
-    # TODO move this. should NOT happen here. 
-    # THIS IS SO BAD I CANT EVEN. Should happen when getting default value
     if isinstance(component, Option) and default is not None:
         if '$' in default:
             default = None

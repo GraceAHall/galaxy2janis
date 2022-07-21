@@ -6,7 +6,6 @@ from .filters import (
     translate_variable_markers,
     standardise_variable_format,
     simplify_sh_constructs,
-    simplify_galaxy_static_vars,
     simplify_galaxy_dynamic_vars,
     remove_cheetah_comments,
     replace_function_calls,
@@ -45,7 +44,6 @@ class CommandSimplifier:
 class PartialCheetahEvalSimplifier(CommandSimplifier):
     filters: list[Callable[[str], str]] = [
         remove_cheetah_comments,
-        simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
     ]
 
@@ -69,7 +67,6 @@ class XMLSimplifier(CommandSimplifier):
         replace_backticks,
         standardise_variable_format,
         simplify_sh_constructs,
-        simplify_galaxy_static_vars,
         simplify_galaxy_dynamic_vars,
         remove_empty_quotes,
         interpret_raw

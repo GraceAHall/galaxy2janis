@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 import expressions
-from expressions.patterns import VERSIONS
+from expressions.patterns import VERSION
 
 
 @dataclass
@@ -13,7 +13,7 @@ class Version:
     text: str
 
     def get_numeric(self) -> str:
-        matches = expressions.get_matches(self.text, VERSIONS)
+        matches = expressions.get_matches(self.text, VERSION)
         if matches:
             match = matches[0]
             return match[0] # type: ignore

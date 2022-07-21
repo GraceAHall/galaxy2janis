@@ -2,18 +2,17 @@
 
 
 import logs.logging as logging
+import expressions
+
 from typing import Optional
 
 from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from expressions.patterns import LINUX_STATEMENT_DELIMS
 
 from .CommandString import CommandString
 from .DynamicCommandStatement import DynamicCommandStatement
 from .MainStatementInferrer import MainStatementInferrer
-from ..parser.tokens.RealisedTokenValues import RealisedTokenFactory
-from ..parser.tokens.TokenFactory import TokenFactory
-
-import expressions
-from expressions.patterns import SH_STATEMENT_DELIMS
+from .RealisedTokenValues import RealisedTokenFactory
 
 
 def gen_command_string(
@@ -24,7 +23,7 @@ def gen_command_string(
     ) -> CommandString:
 
     if xmltool and not requirement:
-        requirement = xmltool.get_main_requirement().name
+        requirement = xmltool.metadata.get_main_requirement().name
     assert(requirement)
 
     statements = _gen_command_statements(the_string, xmltool)
@@ -32,8 +31,8 @@ def gen_command_string(
     return _init_command_string(statement_dict)
 
 def gen_command_statement(statement: str, xmltool: Optional[XMLToolDefinition]=None) -> DynamicCommandStatement:
-    token_factory = TokenFactory(xmltool)
-    realised_tokens = RealisedTokenFactory(token_factory).try_tokenify(statement)
+    factory = RealisedTokenFactory(xmltool)
+    realised_tokens = factory.try_tokenify(statement)
     return DynamicCommandStatement(statement, realised_tokens)
 
 def _gen_command_statements(the_string: str, xmltool: Optional[XMLToolDefinition]=None) -> list[DynamicCommandStatement]:
@@ -45,7 +44,7 @@ def _gen_command_statements(the_string: str, xmltool: Optional[XMLToolDefinition
 def _split_text_statements(the_string: str) -> list[str]:
     statements: list[str] = []
     
-    delim_matches = expressions.get_matches(the_string, SH_STATEMENT_DELIMS)
+    delim_matches = expressions.get_matches(the_string, LINUX_STATEMENT_DELIMS)
     quoted_sections = expressions.get_quoted_sections(the_string)
 
     # has to be reverse order otherwise m.start() and m.end() are out of place

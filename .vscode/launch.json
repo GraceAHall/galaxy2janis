@@ -66,6 +66,30 @@
             ]
         },
         {
+            "name": "egsea tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/egsea/egsea.xml", 
+            ]
+        },
+        {
+            "name": "bowtie2_index_builder tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/bowtie2_index_builder/bowtie2_index_builder.xml", 
+            ]
+        },
+        {
             "name": "fastqc tool",
             "type": "python",
             "request": "launch",

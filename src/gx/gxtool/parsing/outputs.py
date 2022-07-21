@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
 
-from gx.gxtool.param.InputParamRegister import InputParamRegister
+from gx.gxtool.param.InputParamRegister import ParamRegister
 
 from gx.gxtool.param.OutputParam import (
     OutputParam,
@@ -13,17 +13,17 @@ from gx.gxtool.param.OutputParam import (
 )
 
 import expressions
-from expressions.patterns import WILDCARD_GROUPS
+from expressions.patterns import WILDCARD_GROUP
 
 
 class Factory(ABC):
     @abstractmethod
-    def create(self, gxout: GxOutput, inputs: InputParamRegister)  -> OutputParam:
+    def create(self, gxout: GxOutput, inputs: ParamRegister)  -> OutputParam:
         """parses galaxy output to return an OutputParam"""
         ...
 
 class DataOutputFactory(Factory):
-    def create(self, gxout: GxOutput, inputs: InputParamRegister)  -> OutputParam:
+    def create(self, gxout: GxOutput, inputs: ParamRegister)  -> OutputParam:
         param = DataOutputParam(gxout.name)
         param.label = str(gxout.label).rsplit('}', 1)[-1].strip(': ')
         param.formats = fetch_format(gxout, inputs)
@@ -32,7 +32,7 @@ class DataOutputFactory(Factory):
         return param
 
 class CollectionOutputFactory(Factory):
-    def create(self, gxout: GxOutput, inputs: InputParamRegister)  -> OutputParam:
+    def create(self, gxout: GxOutput, inputs: ParamRegister)  -> OutputParam:
         param = CollectionOutputParam(gxout.name)
         param.label = str(gxout.label).rsplit('}', 1)[-1].strip(': ')
         if gxout.structure.collection_type != '':
@@ -55,7 +55,7 @@ def get_discover_pattern(gxout: GxOutput) -> Optional[str]:
     return None
 
 def remove_pattern_capture_groups(pattern: str) -> str:
-    matches = expressions.get_matches(pattern, WILDCARD_GROUPS)
+    matches = expressions.get_matches(pattern, WILDCARD_GROUP)
     for m in matches:
         pattern = pattern.replace(m.group(0), m.group(2))
     return pattern
@@ -67,14 +67,14 @@ factory_map = {
     'collection': CollectionOutputFactory
 }
 
-def parse_output_param(gxout: GxOutput, inputs: InputParamRegister) -> OutputParam:
+def parse_output_param(gxout: GxOutput, inputs: ParamRegister) -> OutputParam:
     f_class = factory_map[gxout.output_type]
     factory = f_class()
     return factory.create(gxout, inputs)
 
 
 
-def fetch_format(gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+def fetch_format(gxout: GxOutput, inputs: ParamRegister) -> list[str]:
     strategy: FetchStrategy = select_fetcher(gxout)
     return strategy.fetch(gxout, inputs)
 
@@ -117,34 +117,34 @@ def has_dataset_collector2(gxout: GxOutput) -> bool:
 # helper classes 
 class FetchStrategy(ABC):
     @abstractmethod
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         """gets the galaxy datatype formats for this galaxy output"""
         ...
 
 class FormatFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         return str(gxout.format).split(',')
 
 class DefaultFormatFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         return str(gxout.default_format).split(',')
 
 class FormatSourceFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         param = inputs.get(gxout.format_source, strategy='lca')
         if param:
             return param.formats
         return []
 
 class CollectorFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         coll = gxout.dataset_collector_descriptions[0]
         if coll.default_ext:
             return str(coll.default_ext).split(',')
         return []
 
 class FallbackFetchStrategy(FetchStrategy):
-    def fetch(self, gxout: GxOutput, inputs: InputParamRegister) -> list[str]:
+    def fetch(self, gxout: GxOutput, inputs: ParamRegister) -> list[str]:
         return []
 
 def select_fetcher(gxout: GxOutput) -> FetchStrategy:

@@ -47,6 +47,7 @@ class InputValue(ABC):
             return 'UNKNOWN'
     
     @property
+    @abstractmethod
     def input_value(self) -> str:
         """get the str value for this tool input"""
         ...

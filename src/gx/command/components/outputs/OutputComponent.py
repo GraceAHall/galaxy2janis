@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from uuid import uuid4
-from gx.gxtool.param.OutputParam import CollectionOutputParam, DataOutputParam
 from gx.gxtool.param.Param import Param
 
 

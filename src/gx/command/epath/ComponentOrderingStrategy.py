@@ -3,10 +3,10 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from ...components import InputComponent
-from ...components import Positional
-from ...components import Flag
-from ...components import Option
+from ..components import InputComponent
+from ..components import Positional
+from ..components import Flag
+from ..components import Option
 
 
 class ComponentOrderingStrategy(ABC):

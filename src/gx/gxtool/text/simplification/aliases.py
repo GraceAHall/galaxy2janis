@@ -8,10 +8,10 @@ from .. import utils
 
 import expressions
 from expressions.patterns import (
-    CH_SET,
-    LN,
-    MV,
-    CP
+    CHEETAH_SET,
+    LINUX_LN,
+    LINUX_MV,
+    LINUX_CP
 )
 
 
@@ -39,28 +39,28 @@ def is_alias_line(line: str) -> bool:
     return False
 
 def get_set(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = expressions.get_matches(line, CH_SET)
+    matches = expressions.get_matches(line, CHEETAH_SET)
     if matches:
         m = matches[0]
         return m.group(1), m.group(2)
     return None, None
 
 def get_symlink(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = expressions.get_matches(line, LN)
+    matches = expressions.get_matches(line, LINUX_LN)
     if matches:
         m = matches[0]
         return m.group(2), m.group(1)
     return None, None
 
 def get_copy(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = expressions.get_matches(line, CP)
+    matches = expressions.get_matches(line, LINUX_CP)
     if matches:
         m = matches[0]
         return m.group(2), m.group(1)
     return None, None
 
 def get_move(line: str) -> Tuple[Optional[str], Optional[str]]:
-    matches = expressions.get_matches(line, MV)
+    matches = expressions.get_matches(line, LINUX_MV)
     if matches:
         m = matches[0]
         return m.group(1), m.group(2)

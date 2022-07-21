@@ -1,24 +1,34 @@
 
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
 from dataclasses import dataclass
+from typing import Optional
 
-from gx.gxtool.param.Param import Param 
+from .Param import Param
 
 
-class ParamRegister(ABC):
-    @abstractmethod
-    def list(self) -> list[Any]:
-        ...
+class ParamRegister:
+    def __init__(self):
+        self.params: list[Param] = []
+
+    def list(self) -> list[Param]:
+        return self.params
     
-    @abstractmethod
-    def add(self, param: Any) -> None:
-        ...
-    
-    @abstractmethod
-    def get(self, query: str, strategy: str='default') -> Optional[Any]:
-        ...
+    def add(self, param: Param) -> None:
+        """adds a param to register. enforces unique param var names"""
+        self.params.append(param)
+
+    def get(self, query: str, strategy: str='exact') -> Optional[Param]:
+        """performs search using the specified search strategy"""
+        strategy_map = {
+            'exact': ExactSearchStrategy(),
+            'lca': LCASearchStrategy(),
+            'filepath': FilepathSearchStrategy(),
+        }
+
+        search_strategy = strategy_map[strategy]
+        return search_strategy.search(query, self.params)
+
 
 
 class SearchStrategy(ABC):    
@@ -69,7 +79,3 @@ class FilepathSearchStrategy(SearchStrategy):
         # for param in params.values():
         #     if hasattr(param, 'from_work_dir') and param.from_work_dir == query:
         #         return param
-
-
-    
-

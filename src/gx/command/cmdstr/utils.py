@@ -17,5 +17,5 @@ def join_lines(lines: list[str]) -> str:
     return '\n'.join(lines)
 
 def split_to_words(line: str) -> list[str]:
-    return shlex.split(line)
+    return shlex.split(line, posix=False)
 

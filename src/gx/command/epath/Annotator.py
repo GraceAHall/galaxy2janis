@@ -4,23 +4,19 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
-
-from ...components import Flag
-from ...components import Option
-from ...components import Positional
-from ...components import Tee
-from ...components import StreamMerge
-from ...components import create_output
-
-from ...parser import Token
-from ...parser import TokenType
-
-from .ExecutionPath import EPathPosition
-from . import utils as component_utils
-
+from tokens import Token
+from tokens import TokenType
 
 import expressions
 from expressions.patterns import COMPOUND_OPT
+from expressions.patterns import INTEGER
+
+from ..components import Tee
+from ..components import StreamMerge
+from ..components import factory
+
+from .ExecutionPath import EPathPosition
+from . import utils as component_utils
 
 
 class Annotator(ABC):
@@ -77,48 +73,49 @@ class OptionAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        component = Option(
+        option = factory.option(
             prefix=self.ctoken.text,
+            gxparam=self.ctoken.gxparam,
             delim=self.get_delim(),
             values=self.get_option_values()
         )
         for pos in range(self.ptr, self.stop_ptr + 1):
-            self.update_epath_components(pos, component)
+            self.update_epath_components(pos, option)
 
     def get_delim(self) -> str:
-        if self.ntoken.type == TokenType.KV_LINKER:
+        if self.ntoken.ttype == TokenType.KV_LINKER:
             return self.ntoken.text
         return ' ' # fallback default
 
-    def get_option_values(self) -> list[str]:
+    def get_option_values(self) -> list[Token]:
         if self.is_kv_pair():
             return self.get_single_value()
         else:
             return self.get_multiple_values()
 
     def is_kv_pair(self) -> bool:
-        if self.positions[self.ptr + 1].token.type == TokenType.KV_LINKER:
+        if self.positions[self.ptr + 1].token.ttype == TokenType.KV_LINKER:
             return True
         return False
      
-    def get_single_value(self) -> list[str]:
+    def get_single_value(self) -> list[Token]:
         # if is_kv_pair() -- self.ptr + 1 will always be KV_LINKER
         self.stop_ptr = self.ptr + 2
         value = self.positions[self.ptr + 2]
-        return [value.token.text]
+        return [value.token]
 
-    def get_multiple_values(self) -> list[str]:
-        out: list[str] = []
+    def get_multiple_values(self) -> list[Token]:
+        out: list[Token] = []
 
         # define a max possible end point to consume upto (handles edge cases)
         final_pos = self.get_greedy_consumption_end()  
-        values_type = self.positions[self.ptr + 1].token.type
+        values_type = self.positions[self.ptr + 1].token.ttype
 
         # look at next ntoken to see its probably a value for the option
         curr_pos = self.ptr + 1
         while curr_pos <= final_pos:
             if self.should_eat_value(curr_pos, values_type):
-                out.append(self.positions[curr_pos].token.text)
+                out.append(self.positions[curr_pos].token)
                 curr_pos += 1 
             else:
                 break
@@ -128,7 +125,7 @@ class OptionAnnotator(Annotator):
     def should_eat_value(self, curr_pos: int, values_type: TokenType) -> bool:
         ctoken = self.positions[curr_pos].token
         ntoken = self.positions[curr_pos + 1].token
-        if component_utils.is_positional(ctoken) and ctoken.type == values_type and ntoken.type != TokenType.KV_LINKER:
+        if component_utils.is_positional(ctoken) and ctoken.ttype == values_type and ntoken.ttype != TokenType.KV_LINKER:
             return True
         return False
 
@@ -146,7 +143,7 @@ class OptionAnnotator(Annotator):
     def get_end_token_position(self) -> int:
         end_tokens = [TokenType.END_STATEMENT, TokenType.LINUX_TEE, TokenType.LINUX_REDIRECT]
         for position in self.positions:
-            if position.token.type in end_tokens:
+            if position.token.ttype in end_tokens:
                 return position.ptr - 1
         return len(self.positions) - 2  # this will never happen
     
@@ -164,12 +161,15 @@ class CompoundOptionAnnotator(Annotator):
     
     def handle(self) -> None:
         match = expressions.get_matches(self.ctoken.text, COMPOUND_OPT)[0]
-        component = Option(
-            prefix=match.group(1),
-            delim='',
-            values=[match.group(2)]
-        )
-        self.update_epath_components(self.ptr, component)
+        
+        prefix = match.group(1)
+        gxparam = self.ctoken.gxparam
+        delim = ''
+        value_match = expressions.get_matches(match.group(2), INTEGER)[0]
+        value_token = Token(value_match, TokenType.INTEGER)
+
+        option = factory.option(prefix, gxparam, delim, values=[value_token])
+        self.update_epath_components(self.ptr, option)
     
     def calculate_next_ptr_pos(self) -> int:
         return self.ptr + 1
@@ -183,8 +183,10 @@ class FlagAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        component = Flag(prefix=self.ctoken.text)
-        self.update_epath_components(self.ptr, component)
+        prefix = self.ctoken.text
+        gxparam = self.ctoken.gxparam
+        flag = factory.flag(prefix, gxparam)
+        self.update_epath_components(self.ptr, flag)
 
     def calculate_next_ptr_pos(self) -> int:
         return self.ptr + 1
@@ -198,8 +200,8 @@ class PositionalAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        component = Positional(value=self.ctoken.text)
-        self.update_epath_components(self.ptr, component)
+        positional = factory.positional(value=self.ctoken)
+        self.update_epath_components(self.ptr, positional)
     
     def calculate_next_ptr_pos(self) -> int:
         return self.ptr + 1
@@ -212,7 +214,7 @@ class PositionalAnnotator(Annotator):
 class StreamMergeAnnotator(Annotator):
 
     def passes_check(self) -> bool:
-        if self.ctoken.type == TokenType.LINUX_STREAM_MERGE:
+        if self.ctoken.ttype == TokenType.LINUX_STREAM_MERGE:
             return True
         return False
     
@@ -227,14 +229,13 @@ class StreamMergeAnnotator(Annotator):
 class RedirectAnnotator(Annotator):
 
     def passes_check(self) -> bool:
-        if self.ctoken.type == TokenType.LINUX_REDIRECT:
+        if self.ctoken.ttype == TokenType.LINUX_REDIRECT:
             return True
         return False
     
     def handle(self) -> None:
-        if self.ctoken and self.ntoken:  # ???
-            tokens = (self.ctoken, self.ntoken)
-            component = create_output('redirect', tokens)
+        if self.ctoken and self.ntoken:
+            component = factory.redirect_output(self.ctoken, self.ntoken)
             self.update_epath_components(self.ptr, component)
             self.update_epath_components(self.ptr + 1, component)
    
@@ -245,7 +246,7 @@ class RedirectAnnotator(Annotator):
 class TeeAnnotator(Annotator):
 
     def passes_check(self) -> bool:
-        if self.ctoken.type == TokenType.LINUX_TEE:
+        if self.ctoken.ttype == TokenType.LINUX_TEE:
             return True
         return False
 

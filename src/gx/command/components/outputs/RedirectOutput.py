@@ -1,25 +1,24 @@
 
 
 from __future__ import annotations
-from typing import Optional, Tuple
-
-from ...parser.tokens.Token import Token
+from typing import Optional
 
 from .OutputComponent import OutputComponent
 from ..linux.streams import Stream
-from ...components.ValueRecord import PositionalValueRecord
+from ...components.ValueRecord import ValueRecord
+from tokens import Token
 
 
 class RedirectOutput(OutputComponent):
-    def __init__(self, tokens: Tuple[Token, Token]):
+    def __init__(self, redirect_token: Token, file_token: Token):
         super().__init__()
-        self.redirect_token = tokens[0]
-        self.file_token = tokens[1]
+        self.redirect_token = redirect_token
+        self.file_token = file_token
         self.stream: Stream = self.extract_stream()
 
         self.gxparam = self.file_token.gxparam
-        self.value_record: PositionalValueRecord = PositionalValueRecord()
-        self.value_record.add(self.file_token.text)
+        self.values: ValueRecord = ValueRecord()
+        self.values.add(self.file_token)
 
     @property
     def name(self) -> str:
@@ -27,7 +26,7 @@ class RedirectOutput(OutputComponent):
         if self.gxparam:
             return self.gxparam.name
         # otherwise, most commonly witnessed option value as name
-        pseudo_name = self.value_record.get_most_common_value()
+        pseudo_name = self.values.most_common_value
         if pseudo_name:
             return pseudo_name.split('.', 1)[0].split(' ', 1)[0]
         return self.file_token.text.split('.', 1)[0]
@@ -46,7 +45,7 @@ class RedirectOutput(OutputComponent):
         if self.gxparam:
             return self.gxparam.docstring
         return ''
-        #return f'examples: {", ".join(self.value_record.get_unique_values()[:5])}'
+        #return f'examples: {", ".join(self.values.unique[:5])}'
     
     def is_append(self) -> bool:
         if self.redirect_token.text == '>>':

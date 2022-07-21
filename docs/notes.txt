@@ -1,117 +1,28 @@
 
+CURRENT WORK
+I can mark strings which reference scripts as a new type of Token class ScriptToken(Token)
+2:55
+that way they'll appear as a ToolInput (positional in this case)
+2:56
+so the base command will be base_command='python'
+2:58
+and the first input is ToolInput('script', File)
+2:58
+then in the workflow, its value would be the path to the script
 
-------
-Arrays
-------
+- move all w.input() to the top of workflow.py
+  (don't have step runtime inputs directly above each step)
+- tell user to set their values in inputs.yaml
+- inputs.yaml starts with all value: null
+  (except scripts which will have the path already resolved)
+- users will supply values
 
-- array tool input is from single source (workflowinput or step output)
-- array tool input is from multiple sources (multiple workflowinputs and/or step outputs supply the array elems)
-
-'results' is a repeat tag
-'results.software_cond.output' is a repeat tag
-
-
-results = [
-    [
-        
-    ]
-]
-
-"input_connections": {
-    "results_0|software_cond|output_0|input": { -> results.software_cond.output.input
-        "id": 4,
-        "output_name": "text_file"
-    },
-    "results_1|software_cond|input": {
-        "id": 3,
-        "output_name": "report"
-    },
-    "results_2|software_cond|output_0|type|input": {
-        "id": 10,
-        "output_name": "output"
-    },
-    "results_3|software_cond|output_0|input": {
-        "id": 7,
-        "output_name": "metrics_file"
-    },
-    "results_4|software_cond|output_0|type|input": {
-        "id": 8,
-        "output_name": "output"
-    },
-    "results_5|software_cond|output_0|type|input": {
-        "id": 9,
-        "output_name": "outputtxt"
-    },
-    "results_6|software_cond|output_0|type|input": {
-        "id": 11,
-        "output_name": "output"
-    },
-    "results_7|software_cond|input": {
-        "id": 6,
-        "output_name": "output_summary"
-    },
-    "results_8|software_cond|input": {
-        "id": 5,
-        "output_name": "summary_file"
-    }
-}
-
-
-- workflow step arrays
-    - correct tool inputs / outputs
-    - if is directly linkable 
-    - if tool_state value is a list & the tool input is single, correct to array
 
 - env_var_is_array (future)
     - for inputs / outputs
     - used to identify arrays
     - looks up an env_var
     - decides if it is using a galaxy param to create an array 
-
-
-
-
--------------------------
-New approach to ingestion
--------------------------
-
-- relational database like
-    - think like relational database 
-    - entities first in logical order (ie steps before step outputs)
-    - connections last after all entities exist
-
-- mapping class 
-    - holds the galaxy workflow (json) and the janis Workflow
-    - entities are linked between these using the Liason class 
-    - think like 2 storey shopping mall building layout: 2 layers
-    - ie if i am looking at a galaxy step and i want to get the equivalent janis step, the liason will be able to do that.
-    - clearly defines how entities are linked between the two workflows. 
-
-    - fromcwl and fromwdl use odd methods to find the entity they want
-    - ie when making a connection:
-        - they know the emitting entity and receiving entity in the cwl workflow
-        - because janis is like a reskin of cwl, the same entities exist in the janis workflow being built
-        - they then can assume 'there will be an emitting entity and receiving entity in the janis workflow with the same names as the cwl versions'
-        - ie if a step name is 'fastqc' in the cwl workflow, a 'fastqc' step will already be available in the janis workflow. names match. 
-        - this relies on the fact that janis & cwl are the same. DOES NOT WORK for other languages. 
-        - additionally, this is way too coupled. if any changes are made to the linking process, everything will break and have to be changed in a million locations
-
--------------------------
--------------------------
-
-
-FILEIO TextRender
-- code duplication: @property imports has same logic for anything that just collects datatypes (workflowinput, workflowoutput, toolinput, tooloutput)
-
-uuids
-- anytime we need to refer to registered external entity
-- ConnectionInputValue ->    step_uuid = WorkflowStep.uuid
-- ConnectionInputValue ->    output_uuid = StepOutput.uuid
-- WorkflowInputInputValue -> input_uuid = WorkflowInput.uuid
-
-InputValue
-- add UnknownInputValue
-
 
 
 REMEMBER: Think about whether code would work on webapp

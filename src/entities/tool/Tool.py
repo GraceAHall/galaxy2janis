@@ -6,7 +6,7 @@ from uuid import uuid4
 from gx.configfiles.Configfile import Configfile
 
 from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
-from gx.gxtool.param.InputParamRegister import InputParamRegister
+from gx.gxtool.param.InputParamRegister import ParamRegister
 from gx.gxtool.param.Param import Param
 
 from gx.command.components import CommandComponent
@@ -25,7 +25,7 @@ class Tool:
     """
     uuid: str = field(init=False)
     metadata: ToolXMLMetadata
-    gxparam_register: InputParamRegister
+    gxparam_register: ParamRegister
     configfiles: list[Configfile]
     container: Optional[str]
     base_command: list[str]

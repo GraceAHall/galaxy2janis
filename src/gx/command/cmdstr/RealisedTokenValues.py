@@ -1,17 +1,17 @@
 
 
 
+from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 import logs.logging as logging
-
 from typing import Optional
 
 from gx.gxtool.param.Param import Param
 
-from ...cmdstr import constructs
-from ...cmdstr import utils
+from tokens import Token
+from tokens import tokenize
 
-from .Token import Token
-from .TokenFactory import TokenFactory
+from . import constructs
+from . import utils
 from ..epath.utils import is_bool_select
 
 
@@ -48,10 +48,9 @@ class RealisedTokens:
         return f'RealisedTokenValues: {", ".join(strvalues)}'
 
 
-
 class RealisedTokenFactory:
-    def __init__(self, token_factory: TokenFactory):
-        self.factory = token_factory
+    def __init__(self, xmltool: Optional[XMLToolDefinition]):
+        self.xmltool = xmltool
         self.tracker = constructs.ConstructTracker()  # this is all a bit ugly
 
     def try_tokenify(self, the_string: str) -> list[RealisedTokens]:
@@ -78,7 +77,7 @@ class RealisedTokenFactory:
     def create_line_tokens(self, line: str) -> list[Token]:
         line_tokens: list[Token] = []
         for word in utils.split_to_words(line):
-            line_tokens += self.factory.create(word)
+            line_tokens += tokenize(word, xmltool=self.xmltool)
         return line_tokens
 
     def set_token_context(self, line_tokens: list[Token]) -> list[Token]:
@@ -100,28 +99,4 @@ class RealisedTokenFactory:
         return out
 
 
-
-
-
-
-        # def expand_kvpairs(self, tokens: list[Token]) -> list[Token]:
-    #     out: list[Token] = []
-    #     for token in tokens:
-    #         if token.type == TokenType.KV_PAIR:
-    #             out += self.split_kv_token(token)
-    #         else:
-    #             out.append(token)
-    #     return out
-
-    # def split_kv_token(self, token: Token) -> list[Token]:
-    #     left_text = str(token.match.group(1))
-    #     delim = str(token.match.group(2))
-    #     right_text = str(token.match.group(3))
-    #     return [
-    #         self.factory.create(left_text),
-    #         utils.spawn_kv_linker(delim),
-    #         self.factory.create(right_text)
-    #     ]
-
-        
 

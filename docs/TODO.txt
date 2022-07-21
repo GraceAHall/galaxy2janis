@@ -1,15 +1,23 @@
 
 TODO
+- check how seurat.xml is parsed into a tool
+- output of scattered step isn't always scattered - collection join tool
 - bug fixes
 - parsing stats: tools-iuc
-- subworkflows
-- $__tool_directory__
+- $__tool_directory__ files - script 
     - 15% of tools 
     - Tools which execute python file or other
     - often preprocessing: building indexes etc
 
 BUGS
-- step tool value order: 
+- tags: cut tool -> cut1, join tool -> join1
+- #if #else causing multiple instances of variable
+    - cutadapt: duplicate params
+    - trimmomatic.xml mrsa_illumina 
+    - r1_ext, r2_ext
+    - fastq_in_extension1, fastq_in_extension2
+    - don't even know why these are being interpreted as a variable
+- step tool value order:
     - runtime
     - wflow input 
     - connection 
@@ -18,33 +26,31 @@ BUGS
     - options 
     - positionals (after opts)
     - each category above should appear alphabetically
-- egsea threads=$SLOTS [FILE] default val why?
-- tags: cut tool -> cut1, join tool -> join1
-- #if #else causing multiple instances of variable
-    - cutadapt: duplicate params
-    - trimmomatic.xml mrsa_illumina 
-    - r1_ext, r2_ext
-    - fastq_in_extension1, fastq_in_extension2
-    - don't even know why these are being interpreted as a variable
-- pre/postprocessing: cheetah templating doesn't seem to be happening
-- pre/postprocessing: dont dedent? 
+- pre/postprocessing: 
+    - cheetah templating doesn't seem to be happening
+    - dont dedent? 
 - abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
 - emboss suite has CRITICAL errors
-- detect string type
 
 DOCUMENTATION
+- future features (subworkflows)
+- supported / unsupported constructs
+- key concepts
 - parsing order
 - key modules & their function
 - how to edit translated workflow
 
 PyPI
-learn to package code and install into environment
 Production-level code
-    - Error handling
     - Top 10 / top 20 most common tools parsed correctly galaxy (cameron hyde list)
     - 3 Workflows parsed correctly
+    - Error handling
 
 FUTURE
+- learn to package code and install into environment
+- cheetah lexer 
+- antler 
+- look into pretty printing library
 - minimal tool translation
     - cheetah partial evaluation then re-identify tool components
 - html files
