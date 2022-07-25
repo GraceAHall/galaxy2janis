@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 
-from gx.gxtool.param.Param import Param
+from gx.gxtool.param import Param
 from gx.command.cmdstr import constructs
 
 class TokenType(Enum):

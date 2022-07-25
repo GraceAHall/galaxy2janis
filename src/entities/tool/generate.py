@@ -1,7 +1,7 @@
 
 
 from typing import Optional
-from gx.gxtool.load import XMLToolDefinition
+from gx.gxtool import XMLToolDefinition
 from gx.command import Command
 
 # this module imports

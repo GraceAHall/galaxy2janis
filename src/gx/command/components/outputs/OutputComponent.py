@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from uuid import uuid4
-from gx.gxtool.param.Param import Param
+from gx.gxtool.param import Param
 
 
 class OutputComponent(ABC):

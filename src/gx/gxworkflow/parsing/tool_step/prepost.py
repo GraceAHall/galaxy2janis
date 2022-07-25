@@ -5,7 +5,7 @@ from typing import Any, Optional
 from gx.command.cmdstr.DynamicCommandStatement import DynamicCommandStatement
 from gx.command.cmdstr.generate import gen_command_string
 from entities.workflow.workflow import Workflow
-from gx.gxtool.load import load_xmltool
+from gx.gxtool import load_xmltool
 from gx.gxtool.text import load_partial_cheetah_command
 
 import mapping

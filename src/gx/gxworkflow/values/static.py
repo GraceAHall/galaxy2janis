@@ -14,7 +14,7 @@ from gx.command.components import Flag
 from gx.command.components import InputComponent
 from gx.command.components import Option
 
-from gx.gxtool.load import load_xmltool
+from gx.gxtool import load_xmltool
 from gx.gxtool.text import load_partial_cheetah_command
 
 from . import factory

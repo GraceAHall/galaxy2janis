@@ -1,6 +1,6 @@
 
 from typing import Any, Optional
-from gx.gxtool.param.Param import Param
+from .Param import Param
 
 
 class OutputParam(Param):

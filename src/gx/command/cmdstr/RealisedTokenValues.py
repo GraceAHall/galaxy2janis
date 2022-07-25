@@ -1,11 +1,11 @@
 
 
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
 import logs.logging as logging
 from typing import Optional
 
-from gx.gxtool.param.Param import Param
+from gx.gxtool import XMLToolDefinition
+from gx.gxtool.param import Param
 
 from . import constructs
 from . import utils

@@ -6,8 +6,8 @@ from typing import Any, Optional
 
 from runtime.exceptions import AttributeNotSupportedError
 from galaxy.tool_util.verify.interactor import ToolTestDescription
-from gx.gxtool.parsing.tests.checks import ValidCheck
-from gx.gxtool.parsing.tests.mapper import map_ttestout
+from .checks import ValidCheck
+from .mapper import map_ttestout
 
 from janis_core.tool.test_classes import (
     TTestCase,

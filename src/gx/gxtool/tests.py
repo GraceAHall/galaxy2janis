@@ -1,7 +1,8 @@
 
 
 import settings
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+
+from .XMLToolDefinition import XMLToolDefinition
 
 
 

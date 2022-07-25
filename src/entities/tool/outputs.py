@@ -8,8 +8,8 @@ from gx.command.components import Flag
 from gx.command.components import RedirectOutput
 from gx.command.components import factory
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
-from gx.gxtool.param.Param import Param
+from gx.gxtool import XMLToolDefinition
+from gx.gxtool.param import Param
 
 def extract_outputs(xmltool: XMLToolDefinition, command: Command) -> list[CommandComponent]:
     extractor = OutputExtractor(xmltool, command)

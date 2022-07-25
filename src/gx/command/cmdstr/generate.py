@@ -6,7 +6,7 @@ import expressions
 
 from typing import Optional
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool import XMLToolDefinition
 from expressions.patterns import LINUX_STATEMENT_DELIMS
 
 from .CommandString import CommandString

@@ -8,13 +8,13 @@ import containers
 from gx.gxtool.requirements import CondaRequirement
 
 QUERY1 = CondaRequirement(_name='abricate', _version='1.0.1')
-QUERY1_EXPECTED_RESULT = 'quay.io/biocontainers/abricate:1.0.1--h1341992_0'
+QUERY1_EXPECTED_RESULT = 'quay.io/biocontainers/abricate:1.0.1--ha8f3691_1'
 
-QUERY2 = CondaRequirement(_name='samtools', _version='1.13')
-QUERY2_EXPECTED_RESULT = 'quay.io/biocontainers/samtools:1.13--h8c37831_0'
+QUERY2 = CondaRequirement(_name='samtools', _version='1.15')
+QUERY2_EXPECTED_RESULT = 'quay.io/biocontainers/samtools:1.15--h1170115_1'
 
-QUERY3 = CondaRequirement(_name='cutadapt', _version='1.13')
-QUERY3_EXPECTED_RESULT = 'quay.io/biocontainers/samtools:1.13--h8c37831_0'
+QUERY3 = CondaRequirement(_name='cutadapt', _version='3.5')
+QUERY3_EXPECTED_RESULT = 'quay.io/biocontainers/cutadapt:3.5--py36h91eb985_1'
 
 
 class TestContainerFetching(unittest.TestCase):

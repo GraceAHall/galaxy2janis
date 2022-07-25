@@ -2,7 +2,7 @@
 import logs.logging as logging
 
 from setup import tool_setup
-from gx.gxtool.load import load_xmltool
+from gx.gxtool import load_xmltool
 
 from gx.command import gen_command
 from containers import fetch_container

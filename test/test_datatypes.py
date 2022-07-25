@@ -5,11 +5,11 @@ import datatypes
 from datatypes.core import file_t, float_t, bool_t
 
 # mock objects
-from .mock.mock_components import MOCK_POSIT1
-from .mock.mock_components import MOCK_FLAG1
-from .mock.mock_components import MOCK_OPTION1
-from .mock.mock_components import MOCK_REDIRECT1
-from .mock.mock_entities import MOCK_WORKFLOW_INPUT1
+from mock.mock_components import MOCK_POSIT1
+from mock.mock_components import MOCK_FLAG1
+from mock.mock_components import MOCK_OPTION1
+from mock.mock_components import MOCK_REDIRECT1
+from mock.mock_entities import MOCK_WORKFLOW_INPUT1
 
 
 class TestDatatypeInference(unittest.TestCase):

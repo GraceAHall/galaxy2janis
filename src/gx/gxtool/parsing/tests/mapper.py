@@ -5,12 +5,13 @@ import operator
 from typing import Callable
 
 from runtime.exceptions import AttributeNotSupportedError
-from gx.gxtool.parsing.tests.checks import ValidCheck
 from janis_core.tool.test_classes import (
     TTestExpectedOutput,
     TTestPreprocessor
 )
-import gx.gxtool.parsing.tests.custom_ops as custom_ops
+
+from .checks import ValidCheck
+from . import custom_ops
 
 
 def unsupported_strategy(vcheck: ValidCheck) -> TTestExpectedOutput:

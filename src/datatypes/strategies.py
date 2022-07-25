@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from gx.command.components import Positional, Flag, Option
     from gx.command.components import OutputComponent
 
-from gx.gxtool.param.OutputParam import CollectionOutputParam
+from gx.gxtool.param import CollectionOutputParam
 
 import json
 import expressions

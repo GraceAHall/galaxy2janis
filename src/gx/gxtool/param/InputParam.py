@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from gx.gxtool.param.Param import Param
+from .Param import Param
 
 
 class InputParam(Param):

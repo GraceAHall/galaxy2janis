@@ -1,8 +1,8 @@
 
 
+from gx.gxtool.requirements import ContainerRequirement
 
 from ..Container import Container
-from gx.gxtool.requirements import ContainerRequirement
 from .Fetcher import Fetcher
 
 

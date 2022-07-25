@@ -2,7 +2,8 @@
 
 
 from typing import Any
-from gx.gxtool.load import load_xmltool
+
+from ..load import load_xmltool
 from .simplification.aliases import resolve_aliases
 from .cheetah.evaluation import sectional_evaluate
 from .simplification.simplify import simplify_cmd

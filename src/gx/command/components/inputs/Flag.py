@@ -1,10 +1,11 @@
 
 from __future__ import annotations
 from typing import Any, Optional
-from gx.gxtool.param.InputParam import BoolParam
+
+from gx.gxtool.param import BoolParam
+from gx.gxtool.param import Param
 
 from .InputComponent import InputComponent
-from gx.gxtool.param.Param import Param
 
 
 class Flag(InputComponent):

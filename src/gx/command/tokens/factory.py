@@ -5,7 +5,7 @@ import expressions
 
 from typing import Optional, Tuple
 
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool import XMLToolDefinition
 from expressions.patterns import (
     INTEGER,
     FLOAT,

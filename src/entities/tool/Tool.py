@@ -5,9 +5,9 @@ from typing import Optional
 from uuid import uuid4
 from gx.configfiles.Configfile import Configfile
 
-from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
-from gx.gxtool.param.ParamRegister import ParamRegister
-from gx.gxtool.param.Param import Param
+from gx.gxtool import ToolXMLMetadata
+from gx.gxtool.param import ParamRegister
+from gx.gxtool.param import Param
 
 from gx.command.components import CommandComponent
 from gx.command.components import InputComponent

@@ -1,11 +1,10 @@
 
 
-from logs import logging
 from galaxy.tools.parameters.basic import ToolParameter as GalaxyParam
-from gx.gxtool.param.Param import Param
-
 from runtime.exceptions import ParamNotSupportedError
-from gx.gxtool.param.InputParam import (
+
+from ..param.Param import Param
+from ..param.InputParam import (
     InputParam,
     SelectOption,
     TextParam,

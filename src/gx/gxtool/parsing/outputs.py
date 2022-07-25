@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 from galaxy.tool_util.parser.output_objects import ToolOutput as GxOutput
-from gx.gxtool.param.ParamRegister import ParamRegister
 
-from gx.gxtool.param.OutputParam import (
+from ..param.ParamRegister import ParamRegister
+from ..param.OutputParam import (
     OutputParam,
     DataOutputParam,
     CollectionOutputParam,

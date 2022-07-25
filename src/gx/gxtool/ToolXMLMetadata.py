@@ -4,10 +4,10 @@
 
 from dataclasses import dataclass
 from typing import Optional, Tuple
-
-from gx.gxtool.citations import Citation
-from gx.gxtool.requirements import ContainerRequirement, CondaRequirement
 from utils.general import global_align
+
+from .requirements import ContainerRequirement, CondaRequirement
+from .citations import Citation
 
 
 Requirement = ContainerRequirement | CondaRequirement

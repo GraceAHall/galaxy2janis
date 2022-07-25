@@ -3,9 +3,9 @@
 
 from typing import Any
 
-from gx.gxtool.load import load_xmltool
-from gx.gxtool.param.InputParam import BoolParam
-from gx.gxtool.XMLToolDefinition import XMLToolDefinition
+from gx.gxtool import load_xmltool
+from gx.gxtool.param import BoolParam
+from gx.gxtool import XMLToolDefinition
 
 
 def resolve_values(gxstep: dict[str, Any]) -> dict[str, Any]:
