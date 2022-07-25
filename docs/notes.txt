@@ -1,21 +1,5 @@
 
 CURRENT WORK
-I can mark strings which reference scripts as a new type of Token class ScriptToken(Token)
-2:55
-that way they'll appear as a ToolInput (positional in this case)
-2:56
-so the base command will be base_command='python'
-2:58
-and the first input is ToolInput('script', File)
-2:58
-then in the workflow, its value would be the path to the script
-
-- move all w.input() to the top of workflow.py
-  (don't have step runtime inputs directly above each step)
-- tell user to set their values in inputs.yaml
-- inputs.yaml starts with all value: null
-  (except scripts which will have the path already resolved)
-- users will supply values
 
 
 - env_var_is_array (future)
@@ -23,9 +7,6 @@ then in the workflow, its value would be the path to the script
     - used to identify arrays
     - looks up an env_var
     - decides if it is using a galaxy param to create an array 
-
-
-REMEMBER: Think about whether code would work on webapp
 
 - paths module
     - refactor into module 

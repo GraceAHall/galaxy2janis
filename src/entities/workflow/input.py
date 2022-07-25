@@ -1,7 +1,7 @@
 
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 from uuid import uuid4
 
 from datatypes.JanisDatatype import JanisDatatype
@@ -14,6 +14,7 @@ class WorkflowInput:
     optional: bool
     is_runtime: bool
     datatype: JanisDatatype
+    value: Any = None
 
     def __post_init__(self):
         self.uuid: str = str(uuid4())

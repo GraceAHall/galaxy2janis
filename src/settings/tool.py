@@ -25,7 +25,7 @@ def xml_dir() -> str:
 def logfile_path() -> str:
     return f'{xml_basename()}.log'
 
-def update(args: Optional[dict[str, Any]]=None, wrapper: Optional[Wrapper]=None) -> None:
+def set(args: Optional[dict[str, Any]]=None, wrapper: Optional[Wrapper]=None) -> None:
     if not args and not wrapper:
         raise RuntimeError('supply either args or wrapper to update')
     if args:

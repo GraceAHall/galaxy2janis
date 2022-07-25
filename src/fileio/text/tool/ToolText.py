@@ -96,8 +96,8 @@ class ToolText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        inputs = self.entity.list_inputs()
-        outputs = self.entity.list_outputs()
+        inputs = self.entity.inputs
+        outputs = self.entity.outputs
         imports: list[Tuple[str, str]] = []
         imports += core_imports
         imports += ToolInputSectionText(inputs).imports
@@ -106,8 +106,8 @@ class ToolText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        inputs = self.entity.list_inputs()
-        outputs = self.entity.list_outputs()
+        inputs = self.entity.inputs
+        outputs = self.entity.outputs
         out_str: str = ''
         out_str += f'{note_snippet(self.entity)}\n'
         # messages here?

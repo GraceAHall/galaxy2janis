@@ -65,7 +65,7 @@ class XMLSimplifier(CommandSimplifier):
         flatten_multiline_strings,
         replace_function_calls,
         replace_backticks,
-        standardise_variable_format,
+        standardise_variable_format,  # ?
         simplify_sh_constructs,
         simplify_galaxy_dynamic_vars,
         remove_empty_quotes,

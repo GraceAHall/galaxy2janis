@@ -6,7 +6,7 @@ from uuid import uuid4
 from gx.configfiles.Configfile import Configfile
 
 from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
-from gx.gxtool.param.InputParamRegister import ParamRegister
+from gx.gxtool.param.ParamRegister import ParamRegister
 from gx.gxtool.param.Param import Param
 
 from gx.command.components import CommandComponent
@@ -65,12 +65,6 @@ class Tool:
             if query_uuid == inp.uuid:
                 return inp
         raise RuntimeError(f'could not find {query_uuid} in tool inputs')
-
-    def list_inputs(self) -> list[InputComponent]:
-        return self.inputs
-
-    def list_outputs(self) -> list[OutputComponent]:
-        return self.outputs
 
     def get_preprocessing(self) -> Optional[str]:
         raise NotImplementedError

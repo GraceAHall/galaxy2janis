@@ -16,7 +16,6 @@ from .. import ordering
 import tags
 import datatypes
 
-
 ### HELPER METHODS ### 
 
 def note() -> str:
@@ -113,14 +112,14 @@ class StepText(TextRender):
         janis: Workflow,
         render_note: bool=False,
         render_imports: bool=False,
-        render_wflow_inputs: bool=True
+        render_runtime_inputs: bool=False
     ):
         super().__init__()
         self.entity = entity
         self.janis = janis
         self.render_note = render_note
         self.render_imports = render_imports
-        self.render_wflow_inputs = render_wflow_inputs
+        self.render_runtime_inputs = render_runtime_inputs
     
     @cached_property
     def lines(self) -> list[ToolInputLine]:
@@ -147,8 +146,9 @@ class StepText(TextRender):
             out_str += f'{note()}\n'
         if self.render_imports:
             out_str += f'{formatting.format_imports(self.imports)}\n'
-
-        out_str += f'{self.format_runtime_inputs()}\n'
+        if self.render_runtime_inputs:
+            out_str += f'{self.format_runtime_inputs()}\n'
+        
         out_str += f'{self.format_tool()}\n'
         return out_str
 

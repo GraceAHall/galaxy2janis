@@ -2,9 +2,9 @@
 
 import expressions
 from expressions.patterns import COMPOUND_OPT
-from tokens import Token
-from tokens import TokenType
 
+from ..tokens import Token
+from ..tokens import TokenType
 from ...gxtool.param.InputParam import BoolParam, SelectParam
 
 

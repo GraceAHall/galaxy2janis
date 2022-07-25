@@ -1,7 +1,12 @@
 
-from typing import Tuple
 
-from entities.workflow import Workflow
+
+
+from __future__ import annotations
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    from entities.workflow import Workflow
 
 from datetime import datetime
 from runtime.dates import JANIS_DATE_FMT
@@ -23,6 +28,15 @@ def note_snippet(workflow: Workflow) -> str:
     return f"""# NOTE
 # This is an automated translation of the '{workflow.metadata.name}' version '{workflow.metadata.version}' workflow. 
 # Translation was performed by the gxtool2janis program (in-development)
+"""
+
+def inputs_yaml_snippet() -> str:
+    return f"""
+\"\"\"
+NOTE
+Please provide values for these workflow inputs 
+in inputs.yaml
+\"\"\"
 """
 
 def syspath_snippet() -> str: # ???
@@ -54,7 +68,6 @@ def builder_snippet(workflow: Workflow) -> str:
 def translate_snippet() -> str:
     return f"""if __name__ == "__main__":
     w.translate("cwl", **args)
-    w.translate("wdl", **args)
 """
 
 core_imports = [
@@ -90,15 +103,19 @@ class WorkflowText(TextRender):
     def imports(self) -> list[Tuple[str, str]]:
         imports: list[Tuple[str, str]] = []
         imports += core_imports
+        # imports for each workflow input (eg datatypes)
         for winp in self.entity.inputs:
             imports += WorkflowInputText(winp).imports
+        # imports for each translated tool
         for step in self.entity.steps:
             tool_id = step.metadata.wrapper.tool_id
             relative_path = f'tools.{tool_id}'
             tool_tag = tags.get(step.tool.uuid)
             imports.append((relative_path, tool_tag))
+        # imports used in steps
         for step in self.entity.steps:
             imports += StepText(step, self.entity).imports
+        # imports for each output (mostly datatypes)
         for wout in self.entity.outputs:
             imports += WorkflowOutputText(wout).imports
         imports = list(set(imports))
@@ -116,15 +133,17 @@ class WorkflowText(TextRender):
         out_str += f'{builder_snippet(self.entity)}\n'
         
         # inputs
-        out_str += f"{label('INPUTS')}\n\n"
+        out_str += f"{label('INPUTS')}\n"
+        out_str += f"{inputs_yaml_snippet()}\n"
         for winp in self.entity.inputs:
-            if not winp.is_runtime:
-                out_str += f'{WorkflowInputText(winp).render()}\n'
+            #if not winp.is_runtime:
+            out_str += f'{WorkflowInputText(winp).render()}\n'
+        out_str += '\n'
         
         # steps (includes tool steps and subworkflow steps)
         for i, step in enumerate(self.entity.steps):
-            tool_tag = tags.get(step.tool.uuid)
-            out_str += f"{label(f'STEP{i}: {tool_tag}')}\n"
+            out_str += f"{label(f'STEP{i+1}: {step.metadata.label}')}\n"
+            out_str += '\n'
             out_str += f'{StepText(step, self.entity).render()}\n'
         
         # outputs

@@ -7,12 +7,11 @@ from typing import Optional
 
 from gx.gxtool.param.Param import Param
 
-from tokens import Token
-from tokens import tokenize
-
 from . import constructs
 from . import utils
 from ..epath.utils import is_bool_select
+from ..tokens import Token
+from ..tokens import tokenize
 
 
 class RealisedTokens:

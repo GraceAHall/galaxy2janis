@@ -1,8 +1,7 @@
 
 
-from tokens import Token
 
 
 class Tee:
-    options: list[Token] = []
-    files: list[Token] = []
+    options: list[str] = []
+    files: list[str] = []

@@ -4,11 +4,11 @@
 from __future__ import annotations
 from typing import Any, Optional
 
+from ....gxtool.param.Param import Param
 from ..ValueRecord import ValueRecord
 from .InputComponent import InputComponent
 from . import utils
 
-from gx.gxtool.param.Param import Param
 
 
 class Positional(InputComponent):
@@ -19,6 +19,9 @@ class Positional(InputComponent):
 
     @property
     def name(self) -> str:
+        # just return script if its a script
+        if self.values.script:
+            return 'script'
         # get name from galaxy param if available
         if self.gxparam:
             return self.gxparam.name
@@ -33,10 +36,17 @@ class Positional(InputComponent):
         """gets the default value for this component"""
         if self.gxparam:
             default = self.gxparam.default
-        elif self.values.env_var:
-            default = self.values.env_var
+        elif len(self.values.unique) == 1:
+            default = self.values.unique[0]
+        elif len(self.values.unique) > 1:
+            if self.values.script:
+                default = self.values.script
+            elif self.values.env_var:
+                default = self.values.env_var
+            else:
+                default = self.values.most_common_value
         else:
-            default = self.values.most_common_value
+            default = None
         return utils.sanitise_default_value(default)
 
     @property
@@ -70,10 +80,5 @@ class Positional(InputComponent):
         if not self.gxparam and incoming.gxparam:
             self.gxparam: Optional[Param] = incoming.gxparam
 
-    def has_single_value(self) -> bool:
-        if len(self.values.counts) == 1:
-            return True
-        return False
-    
     def __str__(self) -> str:
         return f'{str(self.default_value):20}{str(self.optional):>10}'

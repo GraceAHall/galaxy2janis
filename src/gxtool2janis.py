@@ -34,16 +34,16 @@ def load_args() -> dict[str, Optional[str]]:
 def run_sub_program(args: dict[str, Optional[str]]) -> None:
     match args['command']:
         case 'tool':
-            run_tool_mode(args)
-            #try_run_tool_mode(args)
+            #run_tool_mode(args)
+            try_run_tool_mode(args)
         case 'workflow':
-            run_workflow_mode(args)
-            #try_run_workflow_mode(args)
+            #run_workflow_mode(args)
+            try_run_workflow_mode(args)
         case _:
             pass
 
 def run_tool_mode(args: dict[str, Optional[str]]):
-    settings.tool.update(args)
+    settings.tool.set(args)
     tool = tool_mode()
     path = paths.manager.tool(tool.metadata.id)
     fileio.write_tool(tool, path=path)  # I dont like this design, but it may be necessary

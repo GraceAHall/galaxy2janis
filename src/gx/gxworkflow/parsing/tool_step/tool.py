@@ -23,7 +23,7 @@ def ingest_workflow_tools(janis: Workflow, galaxy: dict[str, Any]) -> None:
 
 def parse_step_tool(metadata: StepMetadata) -> Tool:
     args = create_tool_settings_for_step(metadata)
-    settings.tool.update(args)
+    settings.tool.set(args)
     return tool_mode()
 
 def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:

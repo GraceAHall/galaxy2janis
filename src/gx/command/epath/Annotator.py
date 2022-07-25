@@ -1,20 +1,17 @@
 
 
-
-
 from abc import ABC, abstractmethod
-from typing import Any
-from tokens import Token
-from tokens import TokenType
+from typing import Any, Optional
 
 import expressions
 from expressions.patterns import COMPOUND_OPT
-from expressions.patterns import INTEGER
 
+from ...gxtool.param.Param import Param
+from ..tokens import Token
+from ..tokens import TokenType
 from ..components import Tee
 from ..components import StreamMerge
 from ..components import factory
-
 from .ExecutionPath import EPathPosition
 from . import utils as component_utils
 
@@ -73,14 +70,25 @@ class OptionAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
+        value_tokens = self.get_option_values()
+        gxparam = self.get_param(value_tokens)
         option = factory.option(
             prefix=self.ctoken.text,
-            gxparam=self.ctoken.gxparam,
+            gxparam=gxparam,
             delim=self.get_delim(),
-            values=self.get_option_values()
+            values=[v.text for v in value_tokens]
         )
         for pos in range(self.ptr, self.stop_ptr + 1):
             self.update_epath_components(pos, option)
+
+    def get_param(self, value_tokens: list[Token]) -> Optional[Param]:
+        out: Optional[Param] = self.ctoken.gxparam
+        if not out:
+            for token in value_tokens:
+                if token.gxparam:
+                    out = token.gxparam
+                    break
+        return out
 
     def get_delim(self) -> str:
         if self.ntoken.ttype == TokenType.KV_LINKER:
@@ -161,14 +169,7 @@ class CompoundOptionAnnotator(Annotator):
     
     def handle(self) -> None:
         match = expressions.get_matches(self.ctoken.text, COMPOUND_OPT)[0]
-        
-        prefix = match.group(1)
-        gxparam = self.ctoken.gxparam
-        delim = ''
-        value_match = expressions.get_matches(match.group(2), INTEGER)[0]
-        value_token = Token(value_match, TokenType.INTEGER)
-
-        option = factory.option(prefix, gxparam, delim, values=[value_token])
+        option = factory.option(match.group(1), gxparam=self.ctoken.gxparam, delim='', values=[match.group(2)])
         self.update_epath_components(self.ptr, option)
     
     def calculate_next_ptr_pos(self) -> int:
@@ -200,7 +201,9 @@ class PositionalAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        positional = factory.positional(value=self.ctoken)
+        value = self.ctoken.text
+        gxparam = self.ctoken.gxparam
+        positional = factory.positional(value, gxparam)
         self.update_epath_components(self.ptr, positional)
     
     def calculate_next_ptr_pos(self) -> int:
@@ -219,7 +222,7 @@ class StreamMergeAnnotator(Annotator):
         return False
     
     def handle(self) -> None:
-        component = StreamMerge(self.ctoken)
+        component = StreamMerge(self.ctoken.text)
         self.update_epath_components(self.ptr, component)
    
     def calculate_next_ptr_pos(self) -> int:
@@ -235,7 +238,7 @@ class RedirectAnnotator(Annotator):
     
     def handle(self) -> None:
         if self.ctoken and self.ntoken:
-            component = factory.redirect_output(self.ctoken, self.ntoken)
+            component = factory.redirect_output(self.ctoken.text, self.ntoken.text, gxparam=self.ntoken.gxparam)
             self.update_epath_components(self.ptr, component)
             self.update_epath_components(self.ptr + 1, component)
    
@@ -257,7 +260,7 @@ class TeeAnnotator(Annotator):
         # tee arguments
         token = self.positions[ptr].token
         while token.text.startswith('-'):
-            tee.options.append(token)
+            tee.options.append(token.text)
             self.update_epath_components(ptr, tee)
             ptr += 1
             token = self.positions[ptr].token
@@ -265,7 +268,7 @@ class TeeAnnotator(Annotator):
         # tee files: consumes to end of statement
         while ptr < len(self.positions) - 1:
             token = self.positions[ptr].token
-            tee.files.append(token)
+            tee.files.append(token.text)
             self.update_epath_components(ptr, tee)
             ptr += 1
 

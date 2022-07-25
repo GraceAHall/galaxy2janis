@@ -2,7 +2,6 @@
 
 import logs.logging as logging
 import expressions
-from tokens import tokenize_single
 
 from ..gxtool.XMLToolDefinition import XMLToolDefinition
 from ..gxtool.param.Param import Param
@@ -43,19 +42,38 @@ def argument_component_not_exists(gxparam: Param, xmltool: XMLToolDefinition, co
     return True
 
 def argument_has_command_presence(gxparam: Param, xmltool: XMLToolDefinition, command: Command) -> bool:
-    # check the prefix appears in the cmd text
-    # TODO improve. this is very limited.
-    argument: str = gxparam.argument # type: ignore
-    variable_fmt1: str = f'${gxparam.name}'
-    variable_fmt2: str = f'${{{gxparam.name}}}'
-    if argument is not None:
-        # options
-        if argument in xmltool.raw_command:
-            return True
-        # flags
-        if variable_fmt1 in xmltool.raw_command or variable_fmt2 in xmltool.raw_command:
-            return True
+    # prefix appears in the cmd text
+    if gxparam.argument in xmltool.raw_command: # type: ignore
+        return True
     return False
+
+def select_is_flag(gxparam: SelectParam) -> bool:
+    """checks if a galaxy SelectParam is being used as a Flag() tool input"""
+    values = gxparam.get_all_values(nonempty=True)
+    if len(values) == 1:
+        if values[0].startswith('-'):
+            return True
+    return False  
+
+# def bool_is_option(gxparam: BoolParam, xmltool: XMLToolDefinition) -> bool:
+#     """
+#     checks if a galaxy BoolParam is being used as a Option() tool input.
+#     eg cutadapt: $info_file is a BoolParam, but in the command we see 
+#     '--info-file=$info_file'. '--info-file $info_file' would also count as an Option()
+#     """
+#     if isinstance(gxparam, BoolParam):
+#         variable_fmt1: str = f'${gxparam.name}'
+#         variable_fmt2: str = f'${{{gxparam.name}}}'
+#         if variable_fmt1 in text or variable_fmt2 in text:
+#             pass
+#         #return True
+#     text: str = xmltool.raw_command
+#     prefix: str = gxparam.argument
+
+#     pattern = r'(?<=\s|^)' + prefix + r'[:=][\'"]?\${?([\w_.])*?' + gxparam.name + r'}?[\'"]?(?=\s|$)'
+#     if expressions.get_matches(text, pattern):
+#         return True
+#     return False
 
 
 # Annotator classes
@@ -110,37 +128,35 @@ class ArgumentCommandAnnotator:
         assert(gxparam.argument) # type: ignore
         match gxparam:
             case BoolParam():
-                self.handle_bool_param(gxparam)
+                pass
+                #self.handle_bool_param(gxparam)
             case SelectParam():
                 self.handle_select_param(gxparam)
             case _:
                 self.handle_generic_param(gxparam)
 
-    def handle_bool_param(self, gxparam: BoolParam) -> None:
-        assert(gxparam.argument)
-        flag = factory.flag(prefix=gxparam.argument, gxparam=gxparam)
-        self.command.update(flag)
+    # def handle_bool_param(self, gxparam: BoolParam) -> None:
+    #     assert(gxparam.argument)
+    #     if bool_is_option(gxparam, self.xmltool):
+    #         option = factory.option(prefix=gxparam.argument, gxparam=gxparam)
+    #         self.command.update(option) 
+    #     else:
+    #         flag = factory.flag(prefix=gxparam.argument, gxparam=gxparam)
+    #         self.command.update(flag)
 
     def handle_select_param(self, gxparam: SelectParam) -> None:
         assert(gxparam.argument)
-        if self.select_is_bool(gxparam):
+        if select_is_flag(gxparam):
             flag = factory.flag(prefix=gxparam.argument, gxparam=gxparam)
             self.command.update(flag)
         else:
-            values = [tokenize_single(word=opt.value, xmltool=self.xmltool) for opt in gxparam.options]
+            values = [opt.value for opt in gxparam.options]
             option = factory.option(prefix=gxparam.argument, gxparam=gxparam, values=values)
             self.command.update(option)
         
     def handle_generic_param(self, gxparam: Param) -> None:
         option = factory.option(prefix=gxparam.argument, gxparam=gxparam)
         self.command.update(option) 
-    
-    def select_is_bool(self, gxparam: SelectParam) -> bool:
-        values = gxparam.get_all_values(nonempty=True)
-        if len(values) == 1:
-            if values[0].startswith('-'):
-                return True
-        return False  
 
 
 

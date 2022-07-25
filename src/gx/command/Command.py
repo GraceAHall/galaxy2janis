@@ -4,11 +4,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 import expressions
+from gx.command.components.inputs.InputComponent import InputComponent
 
 from ..gxtool.param.Param import Param 
 
 from .cmdstr.CommandString import CommandString
 from .components.CommandComponent import CommandComponent
+from .components.inputs.InputComponent import InputComponent
 from .components.inputs.Positional import Positional
 from .components.inputs.Flag import Flag
 from .components.inputs.Option import Option
@@ -216,17 +218,24 @@ class Command:
     def get_options(self) -> list[Option]:
         return list(self.options.values())
 
-    def get_base_positionals(self) -> list[CommandComponent]:
+    def get_base_positionals(self) -> list[InputComponent]:
         positionals = self.get_positionals()
-        out: list[CommandComponent] = []
+        out: list[InputComponent] = []
         for p in positionals:
-            if p.before_opts and not p.gxparam:
-                if p.has_single_value():
-                    if not expressions.items_are_vars(p.values.unique):
-                        out.append(p)
+            if self.positional_is_based(p):
+                out.append(p)
             else:
                 break
         return out
+
+    def positional_is_based(self, p: Positional) -> bool:
+        if p.before_opts:
+            if not p.gxparam:
+                if len(p.values.unique) == 1:
+                    if not expressions.is_var(p.values.unique[0]):
+                        if not expressions.is_script(p.values.unique[0]):
+                            return True
+        return False
 
     def get_non_base_positionals(self) -> list[Positional]:
         base_positionals = self.get_base_positionals()
@@ -242,7 +251,7 @@ class Command:
         # migrate incorrect option to flag
         if isinstance(incoming, Option):
             if incoming.prefix in self.flags:
-                return factory.flag(prefix=incoming.prefix, gxparam=incoming.gxparam)
+                return factory.flag(incoming.prefix, incoming.gxparam)
         # migrate incorrect flag to option
         # if isinstance(incoming, Flag):
         #     if incoming.prefix in self.options:

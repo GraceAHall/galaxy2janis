@@ -37,7 +37,6 @@ def switch_group(uuid: str):
     _set_active(uuid)
             
 
-
 def _get_active() -> TagGroup:
     global groups
     for group in groups.values():
@@ -77,12 +76,7 @@ def _get_starting_text_wflow(entity: Any) -> str:
             else:
                 return entity.name
         case 'WorkflowStep':
-            if entity.metadata.label:
-                return entity.metadata.label
-            elif entity.metadata.step_name:
-                return entity.metadata.step_name
-            else:
-                return entity.metadata.wrapper.tool_name
+            return entity.metadata.wrapper.tool_id
         case _:
             raise RuntimeError(f'cannot register a {entity.__class__.__name__}')
 

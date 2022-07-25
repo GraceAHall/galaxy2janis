@@ -1,8 +1,11 @@
 
 
-from typing import Tuple
+from __future__ import annotations
+from typing import TYPE_CHECKING, Tuple
 
-from entities.workflow.step.step import WorkflowStep
+if TYPE_CHECKING:
+    from entities.workflow import WorkflowStep
+
 from ..TextRender import TextRender
 
 

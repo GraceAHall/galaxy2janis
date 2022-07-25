@@ -32,7 +32,7 @@ def handle_tool_static_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
     for g_step in galaxy['steps'].values():
         if g_step['type'] == 'tool':
             j_step = mapping.step(g_step['id'], janis, galaxy)
-            settings.tool.update(wrapper=j_step.metadata.wrapper)
+            settings.tool.set(wrapper=j_step.metadata.wrapper)
             ingest_values_cheetah(g_step, j_step, janis)
             ingest_values_inputs(g_step, j_step, janis)
 
@@ -146,11 +146,8 @@ class CheetahInputIngestor:
 
     def get_linkable_components(self) -> list[InputComponent]:
         out: list[InputComponent] = []
-        # tool components which don't yet appear in register
-        tool_inputs = self.j_step.tool.list_inputs()
-        tool_values = self.j_step.inputs
-        for component in tool_inputs:
-            if not tool_values.get(component.uuid):
+        for component in self.j_step.tool.inputs:
+            if not self.j_step.inputs.get(component.uuid):
                 out.append(component)
         return out
 
@@ -171,7 +168,7 @@ class StaticInputIngestor:
     def get_linkable_components(self) -> list[InputComponent]:
         out: list[InputComponent] = []
         # tool components which don't yet appear in register
-        tool_inputs = self.j_step.tool.list_inputs()
+        tool_inputs = self.j_step.tool.inputs
         tool_values = self.j_step.inputs
         for component in tool_inputs:
             if component.gxparam and not tool_values.get(component.uuid):

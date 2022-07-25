@@ -23,6 +23,7 @@ from gx.gxworkflow.values import handle_tool_default_inputs
 
 from gx.gxworkflow.updates import update_component_knowledge
 from gx.gxworkflow.connections import handle_scattering
+from gx.gxworkflow.values.scripts import handle_tool_script_inputs
 
 from fileio import write_workflow
 
@@ -55,8 +56,9 @@ def workflow_mode(args: dict[str, Optional[str]]) -> None:
     # assigning tool input values
     handle_tool_connection_inputs(janis, galaxy)
     handle_tool_runtime_inputs(janis, galaxy)
+    handle_tool_script_inputs(janis)
     handle_tool_static_inputs(janis, galaxy)
-    handle_tool_default_inputs(janis, galaxy)
+    handle_tool_default_inputs(janis)
 
     update_component_knowledge(janis)
     handle_scattering(janis)

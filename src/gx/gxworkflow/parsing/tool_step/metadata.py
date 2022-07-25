@@ -37,7 +37,7 @@ def parse_step_metadata(gxstep: dict[str, Any]) -> StepMetadata:
         step_name=gxstep['name'],
         tool_state=gxstep['tool_state'], 
         workflow_outputs=gxstep['workflow_outputs'],
-        label=gxstep['label']
+        _label=gxstep['label']
     )
 
 def get_wrapper(gxstep: dict[str, Any]) -> Wrapper:

@@ -38,7 +38,7 @@ class RuntimeInputIngestor:
 
     def ingest_runtime(self, g_step: dict[str, Any]) -> None:
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
-        settings.tool.update(wrapper=j_step.metadata.wrapper)
+        settings.tool.set(wrapper=j_step.metadata.wrapper)
         g_targets = [inp['name'] for inp in g_step['inputs']]
         
         for g_target in g_targets:
@@ -47,7 +47,7 @@ class RuntimeInputIngestor:
 
             if not self.already_ingested(g_target, g_step):
                 if not self.already_assigned(j_target, j_step):
-                    if j_target: # TODO only care if can link
+                    if j_target: # only care if can link. is this a TODO?
                         # create workflow input & add to workflow
                         winp = self.create_workflow_input(j_step, j_target)
                         self.janis.add_input(winp)

@@ -115,8 +115,7 @@ def _spawn_single(word: str, prioritisation: str='priority', xmltool: Optional[X
     token_list = _get_all_tokens(word, xmltool)
     token_list = _perform_default_ordering(token_list)
     final_ordering = _perform_final_ordering(token_list, prioritisation)
-    final_token = _select_final_token(final_ordering)
-    return final_token
+    return final_ordering[0]
 
 def _get_all_tokens(the_string: str, xmltool: Optional[XMLToolDefinition]=None) -> list[Token]:
     """gets all the possible token interpretations of the_string"""  
@@ -147,15 +146,18 @@ def _get_variable_tokens(the_string: str, xmltool: Optional[XMLToolDefinition]=N
     matches = expressions.get_matches(the_string, VARIABLES_FMT1)
     matches += expressions.get_matches(the_string, VARIABLES_FMT2)
     base_vars = [strip_to_base_variable(m) for m in matches]
+    base_vars = [v for v in base_vars if v is not None]
     
     for m, varname in zip(matches, base_vars):
-        if varname and xmltool:
+        if xmltool:
             if xmltool.inputs.get(varname):
                 tokens.append(Token(m, TokenType.GX_INPUT, gxparam=xmltool.inputs.get(varname)))
             elif xmltool.outputs.get(varname):
                 tokens.append(Token(m, TokenType.GX_OUTPUT, gxparam=xmltool.outputs.get(varname)))
             else:
                 tokens.append(Token(m, TokenType.ENV_VAR))
+        else:
+            tokens.append(Token(m, TokenType.ENV_VAR))
     return tokens
 
 def strip_to_base_variable(match: re.Match[str]) -> Optional[str]:
@@ -164,7 +166,8 @@ def strip_to_base_variable(match: re.Match[str]) -> Optional[str]:
     text = _strip_quotes(text)
     text = _strip_braces(text)
     text = _strip_method_calls(text, match)
-    #text = _strip_common_attributes(text)
+    text = _strip_common_attributes(text)
+    text = text.replace('$', '')
     if text != '':
         return text
     return None
@@ -208,35 +211,24 @@ def _perform_final_ordering(token_list: list[Token],  prioritisation: str) -> li
     # overriding final prioritisation
     return ordering_strategies[prioritisation].order(token_list)
 
-def _select_final_token(ordered_token_list: list[Token]) -> Token:
-    # normal approach (priority based)
-    final_token = ordered_token_list[0]
-    return final_token
-
-
-
-
-
-
-
-# def _strip_common_attributes(text: str) -> str:
-#     return text
-#     gx_attributes = set([
-#         '.forward',
-#         '.reverse',
-#         '.ext',
-#         '.value',
-#         '.name',
-#         '.files_path',
-#         '.element_identifier'
-#     ])
-#     # needs to be recursive so we can iterately peel back 
-#     # eg  in1.forward.ext
-#     # need to peel .ext then peel .forward.
-#     for att in gx_attributes:
-#         if text.endswith(att):
-#             # strip from the right - num of chars in the att
-#             text = text[:-len(att)]
-#             # recurse
-#             text = _strip_common_attributes(text)
-#     return text
+def _strip_common_attributes(text: str) -> str:
+    #return text
+    gx_attributes = set([
+        '.forward',
+        '.reverse',
+        '.ext',
+        '.value',
+        '.name',
+        #'.files_path',
+        '.element_identifier'
+    ])
+    # needs to be recursive so we can iterately peel back 
+    # eg  in1.forward.ext
+    # need to peel .ext then peel .forward.
+    for att in gx_attributes:
+        if text.endswith(att):
+            # strip from the right - num of chars in the att
+            text = text[:-len(att)]
+            # recurse
+            text = _strip_common_attributes(text)
+    return text

@@ -2,8 +2,7 @@
 from __future__ import annotations
 from typing import Any, Optional
 
-from gx.gxtool.param.Param import Param
-
+from ....gxtool.param.Param import Param
 from ..ValueRecord import ValueRecord
 from .InputComponent import InputComponent
 from . import utils
@@ -26,10 +25,17 @@ class Option(InputComponent):
         """gets the default value for this component"""
         if self.gxparam:
             default = self.gxparam.default
-        elif self.values.env_var:
-            default = self.values.env_var
+        elif len(self.values.unique) == 1:
+            default = self.values.unique[0]
+        elif len(self.values.unique) > 1:
+            if self.values.script:
+                default = self.values.script
+            elif self.values.env_var:
+                default = self.values.env_var
+            else:
+                default = self.values.most_common_value
         else:
-            default = self.values.most_common_value
+            default = None
         return utils.sanitise_default_value(default)
     
     @property

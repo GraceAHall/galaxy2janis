@@ -1,22 +1,5 @@
 
 TODO
-- check how seurat.xml is parsed into a tool
-- output of scattered step isn't always scattered - collection join tool
-- bug fixes
-- parsing stats: tools-iuc
-- $__tool_directory__ files - script 
-    - 15% of tools 
-    - Tools which execute python file or other
-    - often preprocessing: building indexes etc
-
-BUGS
-- tags: cut tool -> cut1, join tool -> join1
-- #if #else causing multiple instances of variable
-    - cutadapt: duplicate params
-    - trimmomatic.xml mrsa_illumina 
-    - r1_ext, r2_ext
-    - fastq_in_extension1, fastq_in_extension2
-    - don't even know why these are being interpreted as a variable
 - step tool value order:
     - runtime
     - wflow input 
@@ -26,11 +9,26 @@ BUGS
     - options 
     - positionals (after opts)
     - each category above should appear alphabetically
-- pre/postprocessing: 
+- check how seurat.xml is parsed into a tool
+- bug fixes
+- parsing stats: tools-iuc
+- pre/postprocessing: ?
     - cheetah templating doesn't seem to be happening
     - dont dedent? 
+
+BUGS
+- tags: cut tool -> cut1, join tool -> join1
+- #if #else causing multiple instances of variable
+    - trimmomatic.xml mrsa_illumina
+    - r1_ext, r2_ext
+    - fastq_in_extension1, fastq_in_extension2
+    - don't even know why these are being interpreted as a variable
 - abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
 - emboss suite has CRITICAL errors
+
+FUTURE
+- move connections to seperate list under workflow
+- output of scattered step isn't always scattered - collection join tool
 
 DOCUMENTATION
 - future features (subworkflows)

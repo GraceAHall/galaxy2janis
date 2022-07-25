@@ -13,5 +13,11 @@ class StepMetadata:
     step_name: str
     tool_state: dict[str, Any]
     workflow_outputs: list[dict[str, Any]]
-    label: Optional[str] = None
+    _label: Optional[str] = None
+
+    @property
+    def label(self) -> str:
+        if self._label:
+            return self._label
+        return self.step_name
 

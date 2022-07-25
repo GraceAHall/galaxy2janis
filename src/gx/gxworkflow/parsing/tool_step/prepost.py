@@ -20,7 +20,7 @@ def ingest_workflow_steps_prepost(janis: Workflow, galaxy: dict[str, Any]) -> No
 def ingest_prepost(g_step: dict[str, Any], janis: Workflow, galaxy: dict[str, Any]):
     # get janis step & update settings
     j_step = mapping.step(g_step['id'], janis, galaxy)
-    settings.tool.update(wrapper=j_step.metadata.wrapper)
+    settings.tool.set(wrapper=j_step.metadata.wrapper)
 
     xmltool = load_xmltool()
     command = load_partial_cheetah_command(inputs_dict=g_step['tool_state'])

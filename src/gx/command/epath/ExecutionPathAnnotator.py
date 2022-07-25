@@ -1,9 +1,9 @@
 
 
 from typing import Type
-from tokens import TokenType
 
 from ...gxtool.XMLToolDefinition import XMLToolDefinition
+from ..tokens import TokenType
 from ..Command import Command
 from .ExecutionPath import ExecutionPath
 from .Annotator import (

@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from fileio.text.tool.ConfigfileText import ConfigfileText
 
-from fileio.text.tool.UnstranslatedText import UntranslatedText
+from fileio.text.workflow.InputsText import InputsText
 
 if TYPE_CHECKING:
     from entities.tool import Tool
@@ -17,10 +16,13 @@ import paths
 from utils import galaxy as galaxy_utils
 from gx.wrappers import fetch_wrapper
 
-from fileio.text.tool.ToolText import ToolText
+from .text.workflow.WorkflowText import WorkflowText
+from .text.tool.ConfigfileText import ConfigfileText
+from .text.tool.UnstranslatedText import UntranslatedText
+from .text.tool.ToolText import ToolText
+
 from .initialisation import init_folder
 
-from .text.workflow.WorkflowText import WorkflowText
 
 
 
@@ -35,9 +37,9 @@ def write_workflow(janis: Workflow) -> None:
     write_untranslated(janis)
     write_scripts(janis)
     write_wrappers(janis)
-    #write_sub_workflows(janis)
     write_main_workflow(janis)
-    #write_inputs(janis)
+    write_inputs(janis)
+    #write_sub_workflows(janis)
     #write_config(janis)
 
 def write_tools(janis: Workflow) -> None:
@@ -60,7 +62,7 @@ def write_scripts(janis: Workflow) -> None:
         if step.tool.configfiles:
             tool_id = step.metadata.wrapper.tool_id
             for configfile in step.tool.configfiles:
-                path = paths.manager.script(tool_id, configfile.name)
+                path = paths.manager.configfile(tool_id, configfile.name)
                 text = ConfigfileText(configfile)
                 page = text.render()
                 with open(path, 'w') as fp:
@@ -99,7 +101,11 @@ def write_main_workflow(janis: Workflow) -> None:
         fp.write(page)
 
 def write_inputs(janis: Workflow) -> None:
-    raise NotImplementedError()
+    path = paths.manager.inputs(file_format='yaml')
+    text = InputsText(janis, file_format='yaml')
+    page = text.render()
+    with open(path, 'w') as fp:
+        fp.write(page)
 
 def write_sub_workflows(janis: Workflow) -> None:
     raise NotImplementedError()
@@ -109,50 +115,4 @@ def write_config(janis: Workflow) -> None:
 
 
 
-
-
-
-
-# def write_workflow_tools(workflow: Workflow) -> None:
-#     for step in workflow.list_steps():
-#         formatter = JanisToolFormatter(step.tool)
-#         tool_definition = formatter.to_janis_definition()
-#         path = f'{esettings.outdir}/{step.metadata.tool_definition_path}'
-#         with open(path, 'w') as fp:
-#             fp.write(tool_definition)
-
-# def write_workflow(workflow: Workflow) -> None: 
-#     write_workflow_tools(esettings, workflow)
-#     write_workflow_definitions(esettings, workflow)
-
-
-# def write_workflow_definitions(workflow: Workflow) -> None:
-#     # inputs dict
-#     write_inputs_dict(workflow)
-
-#     # main workflow page
-#     text_def = BulkWorkflowTextDefinition(workflow)
-#     #text_def = StepwiseWorkflowTextDefinition(esettings, workflow)
-#     write_main_page(text_def)
-    
-#     # individual step pages if necessary
-#     if isinstance(text_def, StepwiseWorkflowTextDefinition):
-#         write_step_pages(text_def)
-
-# def write_inputs_dict(workflow: Workflow) -> None:
-#     FMT = 'yaml'
-#     path = esettings.outpaths.inputs(format=FMT)
-#     text = format_input_dict(workflow, format=FMT)
-#     with open(path, 'w') as fp:
-#         fp.write(text)
-
-# def write_main_page(text_def: WorkflowTextDefinition) -> None:
-#     path = esettings.outpaths.workflow()
-#     with open(path, 'w') as fp:
-#         fp.write(text_def.format())
-        
-# def write_step_pages(text_def: StepwiseWorkflowTextDefinition) -> None:
-#     for page in text_def.step_pages:
-#         with open(page.path, 'w') as fp:
-#             fp.write(page.text)
 

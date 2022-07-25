@@ -11,4 +11,5 @@ from .checks import is_int
 from .checks import is_float
 from .checks import is_present
 from .checks import is_var
+from .checks import is_script
 from .checks import has_var

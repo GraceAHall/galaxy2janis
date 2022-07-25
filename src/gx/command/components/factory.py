@@ -2,7 +2,6 @@
 
 
 from typing import Optional
-from tokens import Token
 
 from ...gxtool.param.Param import Param
 
@@ -16,13 +15,11 @@ from .outputs.WildcardOutput import WildcardOutput
 from .CommandComponent import CommandComponent
 
 
-def positional(gxparam: Optional[Param]=None, value: Optional[Token]=None) -> Positional:
+def positional(value: Optional[str]=None, gxparam: Optional[Param]=None) -> Positional:
     component = Positional()
     component.gxparam = gxparam
     if value:
         component.values.add(value)
-        if not component.gxparam and value.gxparam:
-            component.gxparam = value.gxparam
     return component
 
 def flag(prefix: str, gxparam: Optional[Param]=None) -> Flag:
@@ -34,7 +31,7 @@ def option(
     prefix: str,
     gxparam: Optional[Param]=None,
     delim: Optional[str]=None,
-    values: Optional[list[Token]]=None
+    values: Optional[list[str]]=None
 ) -> Option:
     component = Option(prefix=prefix)
     component.gxparam = gxparam
@@ -43,12 +40,12 @@ def option(
     if values:
         for val in values:
             component.values.add(val)
-            if not component.gxparam and val.gxparam:
-                component.gxparam = val.gxparam
     return component
 
-def redirect_output(redirect_token: Token, file_token: Token) -> RedirectOutput:
-    return RedirectOutput(redirect_token, file_token)
+def redirect_output(redirect: str, filepath: str, gxparam: Optional[Param]=None) -> RedirectOutput:
+    output = RedirectOutput(redirect, filepath)
+    output.gxparam = gxparam
+    return output
 
 def input_output(input_component: CommandComponent) -> InputOutput:
     return InputOutput(input_component)

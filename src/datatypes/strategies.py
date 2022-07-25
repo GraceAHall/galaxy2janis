@@ -12,18 +12,12 @@ if TYPE_CHECKING:
 
 import json
 import expressions
-from tokens.token import Token
-from tokens.token import TokenType
-from datatypes.JanisDatatype import JanisDatatype
 
+from .JanisDatatype import JanisDatatype
 from .conversion import galaxy_to_janis
 from . import core
 
-INTEGERS = [TokenType.INTEGER]
-FLOATS = [TokenType.FLOAT]
-SCRIPTS = [TokenType.SCRIPT]
-ENV_VARS = [TokenType.ENV_VAR, TokenType.GX_KW_DYNAMIC, TokenType.GX_KW_STATIC]
-GX_VARS = [TokenType.GX_INPUT, TokenType.GX_OUTPUT]
+
 
 ### SHARED FUNCTIONS ###
 
@@ -33,25 +27,26 @@ def types_from_param(entity: Positional | Option | OutputComponent) -> list[str]
     return []
 
 def types_from_values(entity: Positional | Option) -> list[str]:
-    tokens = entity.values.tokens
-    if _items_are_of_type(tokens, SCRIPTS):
+    values = entity.values.unique
+    if all([expressions.is_script(v) for v in values]):
         return ['file']
-    elif _items_are_of_type(tokens, INTEGERS):
+    elif all([expressions.is_int(v) for v in values]):
         return ['integer']
-    elif _items_are_of_type(tokens, FLOATS):
+    elif all([expressions.is_float(v) for v in values]):
         return ['float']
-    elif _items_are_of_type(tokens, ENV_VARS):
+    elif all([expressions.is_var(v) for v in values]):
         return ['string']
     return []
 
 def types_from_default(entity: Positional | Option) -> list[str]:
     default = entity.default_value
-    if expressions.is_int(default):
-        return ['integer']
-    if expressions.is_float(default):
-        return ['float']
-    if expressions.is_var(default) or expressions.has_var(default):
-        return ['string']
+    if default:
+        if expressions.is_int(default):
+            return ['integer']
+        if expressions.is_float(default):
+            return ['float']
+        if expressions.is_var(default) or expressions.has_var(default):
+            return ['string']
     return []
 
 def types_from_extension(output: OutputComponent) -> list[str]:
@@ -65,14 +60,6 @@ def types_from_extension(output: OutputComponent) -> list[str]:
             ext = p_split[-1]
             return [f'.{ext}']
     return []
-
-def _items_are_of_type(tokens: list[Token], permitted_types: list[TokenType]) -> bool:
-    if not tokens:
-        return False
-    for t in tokens:
-        if t.ttype not in permitted_types:
-            return False
-    return True
 
 
 ### STRATEGIES ###
@@ -91,7 +78,7 @@ class PositionalStrategy(DatatypeGetStrategy):
         if not gxtypes:
             gxtypes = types_from_default(entity)
         if not gxtypes:
-            gxtypes = []
+            gxtypes = ['string']
         return galaxy_to_janis(gxtypes)
 
 class FlagStrategy(DatatypeGetStrategy):
@@ -106,7 +93,7 @@ class OptionStrategy(DatatypeGetStrategy):
         if not gxtypes:
             gxtypes = types_from_default(entity)
         if not gxtypes:
-            gxtypes = []
+            gxtypes = ['string']
         return galaxy_to_janis(gxtypes)
 
 class OutputStrategy(DatatypeGetStrategy):
@@ -115,7 +102,7 @@ class OutputStrategy(DatatypeGetStrategy):
         if not gxtypes:
             gxtypes = types_from_extension(entity)
         if not gxtypes:
-            gxtypes = []
+            gxtypes = ['file']
         return galaxy_to_janis(gxtypes)
 
 class WorkflowInputStrategy(DatatypeGetStrategy):

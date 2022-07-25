@@ -6,6 +6,8 @@ import expressions
 
 from ...command.components import CommandComponent
 from ...command.components import InputComponent
+from ...command.components import Positional
+from ...command.components import Option
 
 
 def get_comptype(component: CommandComponent) -> str:

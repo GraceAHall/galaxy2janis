@@ -18,13 +18,13 @@ if TYPE_CHECKING:
 
 def tool_input(galaxy_param_name: str, tool: Tool) -> Optional[InputComponent]:
     """given a galaxy param name, get the corresponding Tool InputComponent if exists"""
-    for inp in tool.list_inputs():
+    for inp in tool.inputs:
         if inp.gxparam and inp.gxparam.name == galaxy_param_name:
             return inp
 
 def tool_output(galaxy_param_name: str, tool: Tool) -> Optional[OutputComponent]:
     """given a galaxy param name, get the corresponding Tool OutputComponent if exists"""
-    for out in tool.list_outputs():
+    for out in tool.outputs:
         if out.gxparam and out.gxparam.name == galaxy_param_name:
             return out
 

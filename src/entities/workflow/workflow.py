@@ -3,8 +3,7 @@
 from typing import Optional
 from uuid import uuid4
 
-from entities.workflow.step.outputs import StepOutput
-
+from .step.outputs import StepOutput
 from .step.step import WorkflowStep
 from .metadata import WorkflowMetadata
 from .input import WorkflowInput

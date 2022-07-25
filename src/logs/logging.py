@@ -77,7 +77,7 @@ def has_repeat():
 
 def has_cheetah_loop(text: Optional[str]=None):
     logger = getLogger('tool')
-    logger.info(f'cheetah loop:\t{text}')
+    logger.info(f'cheetah loop')
 
 def has_cheetah_function():
     logger = getLogger('tool')

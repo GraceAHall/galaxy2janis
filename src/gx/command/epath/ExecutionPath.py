@@ -2,9 +2,9 @@
 
 from dataclasses import dataclass
 from typing import Optional
-from tokens import Token
-from tokens import spawn_end_sentinel
 
+from ..tokens import Token
+from ..tokens import spawn_end_sentinel
 from ..components import CommandComponent
 from ..components import StreamMerge
 from ..components import Tee

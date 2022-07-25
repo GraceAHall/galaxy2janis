@@ -3,41 +3,28 @@
 from collections import defaultdict
 from typing import Optional
 
-from tokens import Token
+import expressions
 
 
 class ValueRecord:
     def __init__(self):
-        self.record: list[Token] = []
+        self.record: list[str] = []
 
-    def add(self, value: Token) -> None:
+    def add(self, value: str) -> None:
         self.record.append(value)
-
-    @property
-    def tokens(self) -> list[Token]:
-        values = self.record
-        values.sort(key=lambda x: x.text)
-        return values
     
     @property
     def unique(self) -> list[str]:
-        values = list(set([token.text for token in self.record]))
+        values = list(set([text for text in self.record]))
         values.sort()
         return values
-
-    @property
-    def env_var(self) -> Optional[str]:
-        for token in self.record:
-            if token.text.startswith('$'):
-                return token.text
-        return None
-
+    
     @property
     def counts(self) -> defaultdict[str, int]:
         counts: defaultdict[str, int] = defaultdict(int) 
-        for token in self.record:
-            if token.text != '': # TODO how???
-                counts[token.text] += 1
+        for text in self.record:
+            if text != '': # TODO how would this happen ??
+                counts[text] += 1
         return counts
 
     @property
@@ -49,6 +36,23 @@ class ValueRecord:
             return counts_list[0][0]
         else:
             return None
+
+    @property
+    def env_var(self) -> Optional[str]:
+        for text in self.record:
+            if text.startswith('$'):
+                return text
+        return None
+    
+    @property
+    def script(self) -> Optional[str]:
+        for text in self.record:
+            if expressions.is_script(text):
+                return text
+        return None
+
+    
+
 
 
 

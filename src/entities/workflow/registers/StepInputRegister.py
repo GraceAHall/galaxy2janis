@@ -5,7 +5,6 @@ from typing import Optional
 from ..step.inputs import InputValue, WorkflowInputInputValue
 from ..step.inputs import ConnectionInputValue
 
-import tags
 
 
 class StepInputRegister:
