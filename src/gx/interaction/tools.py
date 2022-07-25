@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+from typing import Optional
 
 from galaxy.tools import Tool as GxTool
 from galaxy.tool_util.parser import get_tool_source
@@ -19,15 +20,14 @@ def get_tool(xml_path: str) -> GxTool:
     tool.assert_finalized()
     return tool
 
-def get_builtin_tool_path(tool_id: str) -> str:
+def get_builtin_tool_path(tool_id: str) -> Optional[str]:
     """returns path to xml file with id='tool_id'"""
     tool_directories = _get_builtin_tool_directories()
     for directory in tool_directories:
         xmlfile = utils.get_xml_by_id(directory, tool_id)
         if xmlfile:
             return f'{directory}/{xmlfile}'
-    raise RuntimeError(f'cannot locate builtin tool {tool_id}') 
-
+    return None
 
 def _get_builtin_tool_directories() -> list[str]:
     out: list[str] = []

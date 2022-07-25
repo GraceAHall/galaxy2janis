@@ -90,6 +90,18 @@
             ]
         },
         {
+            "name": "picard_FilterSamReads tool",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "tool",
+                "--local", "test/data/tools/picard/picard_FilterSamReads.xml", 
+            ]
+        },
+        {
             "name": "fastqc tool",
             "type": "python",
             "request": "launch",
@@ -147,6 +159,18 @@
             "args": [
                 "workflow",
                 "test/data/workflows/mine/hard_workflow.ga", 
+            ]
+        },
+        {
+            "name": "mrsa-illumina workflow",
+            "type": "python",
+            "request": "launch",
+            "program": "src/gxtool2janis.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "workflow",
+                "test/data/workflows/assembly/mrsa-illumina.ga", 
             ]
         },
     ]

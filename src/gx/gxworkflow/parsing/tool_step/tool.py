@@ -30,6 +30,7 @@ def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
     tool_id = metadata.wrapper.tool_id
     if metadata.wrapper.inbuilt:
         xml_path = get_builtin_tool_path(tool_id)
+        assert(xml_path)
         return {
             'local': xml_path,
             'remote': None,

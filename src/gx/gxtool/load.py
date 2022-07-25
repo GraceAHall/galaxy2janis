@@ -64,8 +64,9 @@ class GalaxyToolFactory:
         register = ParamRegister()
         g_out_params: list[ToolOutput] = list(self.gxtool.outputs.values())
         for g_param in g_out_params:
-            t_param = parse_output_param(g_param, self.inputs)
-            register.add(t_param)
+            t_params = parse_output_param(g_param, self.inputs)
+            for param in t_params:
+                register.add(param)
         return register
 
     def parse_metadata(self, ) -> ToolXMLMetadata:

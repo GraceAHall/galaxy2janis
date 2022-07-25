@@ -63,14 +63,33 @@ def remove_pattern_capture_groups(pattern: str) -> str:
 
 factory_map = {
     'data': DataOutputFactory,
+    'float': DataOutputFactory,
     'collection': CollectionOutputFactory
 }
 
-def parse_output_param(gxout: GxOutput, inputs: ParamRegister) -> OutputParam:
-    f_class = factory_map[gxout.output_type]
-    factory = f_class()
-    return factory.create(gxout, inputs)
+def parse_output_param(gxout: GxOutput, inputs: ParamRegister) -> list[OutputParam]:
+    galaxy_params: list[GxOutput] = []
+    internal_params: list[OutputParam] = []
 
+    # split collection of defined outputs to list 
+    if is_defined_collection(gxout):
+        for g_param in gxout.outputs.values(): # type: ignore
+            galaxy_params.append(g_param)
+    # parse the output as usual
+    else:
+        galaxy_params.append(gxout)
+    
+    for g_param in galaxy_params:
+        f_class = factory_map[g_param.output_type]
+        factory = f_class()
+        i_param = factory.create(g_param, inputs)
+        internal_params.append(i_param)
+    return internal_params
+
+def is_defined_collection(gxout: GxOutput) -> bool:
+    if hasattr(gxout, 'outputs') and len(gxout.outputs) > 0:  # type: ignore
+        return True
+    return False
 
 
 def fetch_format(gxout: GxOutput, inputs: ParamRegister) -> list[str]:
@@ -104,12 +123,6 @@ def has_from_workdir(gxout: GxOutput) -> bool:
 def has_dataset_collector(gxout: GxOutput) -> bool:
     if hasattr(gxout, 'dynamic_structure') and gxout.dynamic_structure: # type: ignore
         if hasattr(gxout, 'dataset_collector_descriptions'):
-            return True
-    return False
-
-def has_dataset_collector2(gxout: GxOutput) -> bool:
-    if gxout.dynamic_structure:
-        if len(gxout.dataset_collector_descriptions) > 0:
             return True
     return False
 

@@ -69,10 +69,13 @@ class ToolOutputText(TextRender):
         e = self.entity
         selector_str = format_selector_str(e)
         doc = formatting.format_docstring(e)
+        datatype_str = datatypes.get_str(e)
+        if isinstance(e, RedirectOutput):
+            datatype_str = f'Stdout'
         out_str: str = ''
         out_str += '\tToolOutput(\n'
         out_str += f"\t\t'{tags.get(e.uuid)}',\n"
-        out_str += f"\t\t{datatypes.get_str(e)},\n"
+        out_str += f"\t\t{datatype_str},\n"
         if selector_str:
             out_str += f"\t\tselector={selector_str},\n" 
         out_str += f'\t\tdoc="{doc}",\n' if doc else ''

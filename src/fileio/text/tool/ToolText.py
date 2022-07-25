@@ -71,10 +71,10 @@ def builder_snippet(tool: Tool) -> str:
 """
     
 def translate_snippet(tool: Tool) -> str:
-    tool_name = tool.metadata.id
+    tool_tag = tags.get(tool.uuid)
     return textwrap.dedent(f"""\
     if __name__ == "__main__":
-        {tool_name}().translate(
+        {tool_tag}().translate(
             "wdl", to_console=True
         )\n
     """

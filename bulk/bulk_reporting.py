@@ -128,7 +128,7 @@ class ToolParsingReport:
         if report.status == 'CRITICAL':
             return 'FAIL'
         elif report.translatable:
-            return 'TRANSLATABLE'
+           return 'TRANSLATABLE'
         else:
             return 'PARSED'
 
@@ -261,12 +261,12 @@ def create_tool_parsing_report(parsed_tools_folder: str) -> ToolParsingReport:
     return ToolParsingReport(reports)
 
 def make_tool_report(folder: str) -> ToolReport:
-    logfiles = [x for x in os.listdir(folder) if x.endswith('.log')]
-    pyfiles = [x for x in os.listdir(folder) if x.endswith('.py')]
+    pyfiles = [f'{folder}/{x}' for x in os.listdir(folder) if x.endswith('.py')]
+    logfile = f'{folder}/logs/janis.log'
     return ToolReport(
         toolname=folder.rsplit('/', 1)[-1],
-        toolpath=f'{folder}/{pyfiles[0]}' if pyfiles else None,
-        logpath=f'{folder}/{logfiles[0]}'
+        toolpath=pyfiles[0] if pyfiles else None,
+        logpath=logfile
     )
 
 def create_workflow_parsing_report(parsed_workflows_folder: str) -> WorkflowParsingReport:
@@ -326,8 +326,8 @@ def load_log(path: str) -> LogFile:
 def print_tool_parsing_report(report: ToolParsingReport) -> None:
     out: str = ''
     out += str_tool_count(report)
-    out += str_tool_log_statuses(report)
     out += str_tool_parsing_statuses(report)
+    out += str_tool_log_statuses(report)
     out += str_tool_messages(report)
     out += str_critical_tools(report)
     print(out)

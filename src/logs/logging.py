@@ -87,20 +87,37 @@ def no_base_cmd():
     logger = getLogger('tool')
     logger.info('no base cmd')
 
-# warning
-# (things that WILL cause issues and require human editing in the workflow)
+def has_configfile():
+    logger = getLogger('tool')
+    logger.info('configfile')
+
+def no_container():
+    logger = getLogger('tool')
+    logger.info('no container')
+
+def no_ga4gh_data():
+    logger = getLogger('tool')
+    logger.info('no ga4gh data')
+
+def container_version_mismatch():
+    logger = getLogger('tool')
+    logger.info('container version mismatch')
+
+def color_param_ignored():
+    logger = getLogger('tool')
+    logger.info('ignored unsupported param type: color')
 
 def uncertain_output():
     logger = getLogger('tool')
-    logger.warning('uncertain outputs')
+    logger.info('uncertain outputs')
 
 def unlinked_input_connection():
     logger = getLogger('workflow')
-    logger.warning('unknown input')
+    logger.info('unknown input')
 
-def zero_length_tag():
-    logger = getLogger('tool')
-    logger.warning('zero length tag')
+
+# warning
+# (things that will probably cause issues and require human editing in the workflow)
 
 def no_inputs():
     logger = getLogger('tool')
@@ -110,29 +127,13 @@ def no_outputs():
     logger = getLogger('tool')
     logger.warning('no outputs')
 
-def no_container():
+def zero_length_tag():
     logger = getLogger('tool')
-    logger.warning('no container')
-
-def no_ga4gh_data():
-    logger = getLogger('tool')
-    logger.warning('no ga4gh data')
-
-def container_version_mismatch():
-    logger = getLogger('tool')
-    logger.warning('container version mismatch')
+    logger.warning('zero length tag')
 
 # error
 # (unsupported features)
 
-def has_configfile():
-    logger = getLogger('tool')
-    logger.error('configfile')
-
-def workflow_step_array_connections():
-    logger = getLogger('workflow')
-    logger.error('workflow step array connections')
- 
 # critical
 # (program failed - uncaught exceptions)
 

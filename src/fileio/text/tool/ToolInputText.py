@@ -67,8 +67,12 @@ class ToolInputText(TextRender):
                 raise RuntimeError
     
     def format_separation(self) -> bool:
-        if isinstance(self.entity, Option) and self.entity.delim == ' ':
+        if isinstance(self.entity, Option):
+            if self.entity.delim == ' ':
+                return True
+            else:
+                return False
+        else:
             return True
-        return False
 
 

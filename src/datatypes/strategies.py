@@ -8,7 +8,8 @@ if TYPE_CHECKING:
     from entities.workflow.input import WorkflowInput
     from gx.command.components import Positional, Flag, Option
     from gx.command.components import OutputComponent
-    from gx.gxtool.param.OutputParam import CollectionOutputParam
+
+from gx.gxtool.param.OutputParam import CollectionOutputParam
 
 import json
 import expressions
@@ -53,12 +54,13 @@ def types_from_extension(output: OutputComponent) -> list[str]:
     if output.gxparam:
         if isinstance(output.gxparam, CollectionOutputParam):
             pattern: str = output.gxparam.discover_pattern # type: ignore
-            compressed_types = ['gz', 'bz2']
-            p_split = pattern.split('.')
-            while p_split[-1] in compressed_types:
-                p_split = p_split[:-1]
-            ext = p_split[-1]
-            return [f'.{ext}']
+            if pattern and '.' in pattern:
+                compressed_types = ['gz', 'bz2']
+                p_split = pattern.split('.')
+                while p_split[-1] in compressed_types:
+                    p_split = p_split[:-1]
+                ext = p_split[-1]
+                return [f'.{ext}']
     return []
 
 

@@ -46,7 +46,7 @@ class OutputExtractor:
         if not r.gxparam:
             for query_param in self.xmltool.outputs.list():
                 if query_param.discover_pattern is not None:
-                    if query_param.discover_pattern == r.file_token.text:
+                    if query_param.discover_pattern == r.values.most_common_value:
                         r.gxparam = query_param
 
     def get_input_outputs(self) -> list[CommandComponent]:

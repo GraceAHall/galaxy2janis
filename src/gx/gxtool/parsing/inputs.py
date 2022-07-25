@@ -1,6 +1,6 @@
 
 
-
+from logs import logging
 from galaxy.tools.parameters.basic import ToolParameter as GalaxyParam
 from gx.gxtool.param.Param import Param
 
@@ -41,6 +41,9 @@ class InputParamFactory:
                 param = self.parse_data_collection_param(gxparam)
             case 'data_column':
                 param = self.parse_int_param(gxparam)
+            case 'color':
+                param = self.parse_text_param(gxparam)
+                #logging.color_param_ignored()
             case _:
                 raise ParamNotSupportedError(f'unknown param type: {str(gxparam.type)}')
         

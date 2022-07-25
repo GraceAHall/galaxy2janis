@@ -18,7 +18,7 @@ def format_docstring(component: CommandComponent) -> Optional[str]:
 def get_wrapped_default(component: InputComponent) -> Optional[str]:
     default = component.default_value
     if isinstance(component, Option) and default is not None:
-        if '$' in default:
+        if isinstance(default, str) and '$' in default:
             default = None
     if should_quote(default, component):
         return f'"{default}"'

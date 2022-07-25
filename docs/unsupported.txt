@@ -1,0 +1,21 @@
+
+-------
+COMMAND
+-------
+- Rscript -e
+- translating cheetah into javascript / groovy 
+
+------
+PARAMS
+------
+- param: color_param
+
+
+
+-----
+TOOLS
+-----
+- emboss suite: galaxy unable to load legacy features with current setup. 
+- some tools broken:
+  'An error occured while parsing the tool wrapper xml, the tool is not functional'
+  

@@ -12,6 +12,7 @@ from gx.command.components import Positional
 import tags
 
 
+
 def order_positionals(positionals: list[Positional]) -> list[Positional]:
     positionals.sort(key=lambda x: x.cmd_pos)
     return positionals
@@ -53,12 +54,32 @@ class AlphabeticalStrategy(InputOrderingStrategy):
         invalues.sort(key=lambda x: x.input_tag)
         return invalues
 
-class CmdPosStrategy(InputOrderingStrategy):
+class NotNullPriority(InputOrderingStrategy):
     def order(self, invalues: list[InputValue]) -> list[InputValue]:
-        top = [x for x in invalues if x.component]
-        bottom = [x for x in invalues if not x.component]
-        top.sort(key=lambda x: x.component.cmd_pos) # type: ignore
-        return top + bottom
+        invalues.sort(key=lambda x: x.input_value != 'None', reverse=True)
+        return invalues
+
+class PositionalsOptsPositionals(InputOrderingStrategy):
+    def order(self, invalues: list[InputValue]) -> list[InputValue]:
+        opts_pos = self.get_opts_position(invalues)
+        top: list[InputValue] = []
+        middle: list[InputValue] = []
+        bottom: list[InputValue] = []
+        for inval in invalues:
+            if inval.component and inval.comptype == 'positional':
+                if inval.component.cmd_pos < opts_pos:
+                    top.append(inval)
+                else:
+                    bottom.append(inval)
+            else:
+                middle.append(inval)
+        return top + middle + bottom
+
+    def get_opts_position(self, invalues: list[InputValue]) -> int:
+        for inval in invalues:
+            if inval.component and inval.comptype != 'positional':
+                return inval.component.cmd_pos
+        return 1
 
 class RuntimeInputPriorityStrategy(InputOrderingStrategy):
     def order(self, invalues: list[InputValue]) -> list[InputValue]:
@@ -83,12 +104,30 @@ class UnlinkedPriorityStrategy(InputOrderingStrategy):
 
 # changing the order of the objects below changes the 
 # ordering priority, as the last ordering method has the highest impact etc
+
+"""
+- step tool value order:
+    - connection 
+    - wflow input 
+    - runtime
+    - positionals (before opts) 
+    - things with values
+        - flags 
+        - options 
+    - things without values
+        - flags 
+        - options 
+    - positionals (after opts)
+    - each category above should appear alphabetically
+"""
+
 STRATEGIES = [
     AlphabeticalStrategy(),
-    CmdPosStrategy(),
+    NotNullPriority(),
+    PositionalsOptsPositionals(),
     RuntimeInputPriorityStrategy(),
-    WorkflowInputPriorityStrategy(),
     ConnectionPriorityStrategy(),
+    WorkflowInputPriorityStrategy(),
     UnlinkedPriorityStrategy()
 ]
 

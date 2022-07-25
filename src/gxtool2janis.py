@@ -34,11 +34,11 @@ def load_args() -> dict[str, Optional[str]]:
 def run_sub_program(args: dict[str, Optional[str]]) -> None:
     match args['command']:
         case 'tool':
-            #run_tool_mode(args)
-            try_run_tool_mode(args)
+            run_tool_mode(args)
+            #try_run_tool_mode(args)
         case 'workflow':
-            #run_workflow_mode(args)
-            try_run_workflow_mode(args)
+            run_workflow_mode(args)
+            #try_run_workflow_mode(args)
         case _:
             pass
 
@@ -58,6 +58,10 @@ def try_run_tool_mode(args: dict[str, Optional[str]]):
     try: 
         run_tool_mode(args)
     except Exception as e:
+        # print('\n####################')
+        # print(settings.tool.tool_id.upper())
+        # print('####################\n')
+        # print()
         print(e)
         logging.tool_exception()
 

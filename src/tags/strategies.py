@@ -18,9 +18,9 @@ class GenericFormattingStrategy(FormattingStrategy):
         tag = rules.numeric_start(tag, entity)
         tag = rules.non_alphanumeric(tag, entity)
         tag = rules.short_tag(tag, entity)
-        tag = rules.replace_keywords(tag, entity)
-        #tag = rules.encode(tag)
         tag = rules.camelify(tag)
+        #tag = rules.encode(tag)
+        tag = rules.replace_keywords(tag, entity)
         return tag
 
 class WorkflowInputFormattingStrategy(FormattingStrategy):
@@ -31,9 +31,9 @@ class WorkflowInputFormattingStrategy(FormattingStrategy):
             tag = rules.numeric_start(tag, entity)
             tag = rules.non_alphanumeric(tag, entity)
             tag = rules.short_tag(tag, entity)
-            tag = rules.replace_keywords(tag, entity)
             #tag = rules.encode(tag)
             tag = rules.camelify(tag)
+            tag = rules.replace_keywords(tag, entity)
         return tag
 
 # capitalisation is allowed
@@ -44,9 +44,9 @@ class ToolNameStrategy(FormattingStrategy):
         tag = rules.numeric(tag, entity)
         tag = rules.numeric_start(tag, entity)
         tag = rules.short_tag(tag, entity)
-        tag = rules.replace_keywords(tag, entity)
         #tag = rules.encode(tag)
         tag = rules.camelify(tag)
+        tag = rules.replace_keywords(tag, entity)
         return tag
 
 

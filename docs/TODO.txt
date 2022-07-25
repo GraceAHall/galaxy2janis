@@ -1,34 +1,21 @@
 
+
 TODO
-- step tool value order:
-    - runtime
-    - wflow input 
-    - connection 
-    - positionals (before opts) 
-    - flags 
-    - options 
-    - positionals (after opts)
-    - each category above should appear alphabetically
-- check how seurat.xml is parsed into a tool
-- bug fixes
-- parsing stats: tools-iuc
-- pre/postprocessing: ?
-    - cheetah templating doesn't seem to be happening
-    - dont dedent? 
+- Bugs
+- Test suite
+
+PyPI
+Production-level code
+    - Top 10 / top 20 most common tools parsed correctly galaxy (cameron hyde list)
+    - 3 Workflows parsed correctly
+    - Error handling ?
 
 BUGS
-- tags: cut tool -> cut1, join tool -> join1
 - #if #else causing multiple instances of variable
     - trimmomatic.xml mrsa_illumina
     - r1_ext, r2_ext
     - fastq_in_extension1, fastq_in_extension2
     - don't even know why these are being interpreted as a variable
-- abricate.xml 'from janis_core import Stdout': is the output InputOutput or RedirectOutput
-- emboss suite has CRITICAL errors
-
-FUTURE
-- move connections to seperate list under workflow
-- output of scattered step isn't always scattered - collection join tool
 
 DOCUMENTATION
 - future features (subworkflows)
@@ -38,17 +25,16 @@ DOCUMENTATION
 - key modules & their function
 - how to edit translated workflow
 
-PyPI
-Production-level code
-    - Top 10 / top 20 most common tools parsed correctly galaxy (cameron hyde list)
-    - 3 Workflows parsed correctly
-    - Error handling
-
 FUTURE
 - learn to package code and install into environment
+- move connections to seperate list under workflow
+- output of scattered step isn't always scattered - collection join tool
 - cheetah lexer 
 - antler 
 - look into pretty printing library
+- pre/postprocessing:
+    - cheetah templating doesn't seem to be happening
+    - dont dedent? 
 - minimal tool translation
     - cheetah partial evaluation then re-identify tool components
 - html files
