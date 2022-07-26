@@ -13,9 +13,6 @@ from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 
-import datatypes
-import tags
-
 
 @dataclass
 class ToolInputText(TextRender):
@@ -25,7 +22,7 @@ class ToolInputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtype = datatypes.get(self.entity)
+        jtype = self.entity.datatype
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
@@ -42,10 +39,11 @@ class ToolInputText(TextRender):
         prefix = self.format_component_prefix()
         kv_space = self.format_separation()
         doc = formatting.format_docstring(e)
+        datatype_str = formatting.format_typestr(e)
         out_str: str = ''
         out_str += '\tToolInput(\n'
-        out_str += f"\t\t'{tags.get(e.uuid)}',\n"
-        out_str += f"\t\t{datatypes.get_str(e)},\n" 
+        out_str += f"\t\t'{e.tag}',\n"
+        out_str += f"\t\t{datatype_str},\n" 
         out_str += f"\t\tprefix='{prefix}',\n" if prefix else ''
         out_str += f"\t\tseparate_value_from_prefix={kv_space},\n" if kv_space == False else ''
         out_str += f"\t\tposition={e.cmd_pos},\n"

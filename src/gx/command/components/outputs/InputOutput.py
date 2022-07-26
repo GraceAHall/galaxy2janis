@@ -17,9 +17,12 @@ class InputOutput(OutputComponent):
 
     @property
     def name(self) -> str:
+        name = ''
         if self.gxparam:
-            return self.gxparam.name
-        raise RuntimeError('an InputOutput must have an input_component with an attached gxparam')
+            name = self.gxparam.name
+        if not name.startswith('out'):
+            name = f'out_{name}'
+        return name
 
     @property
     def default_value(self) -> Any:

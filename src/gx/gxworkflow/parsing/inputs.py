@@ -18,7 +18,7 @@ def ingest_workflow_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
 
 def parse_input_step(step: dict[str, Any]) -> WorkflowInput:
     return WorkflowInput(
-        name=format_input_step_name(step),
+        _name=format_input_step_name(step),
         array=format_input_step_array(step),
         is_runtime=False,
         datatype=datatypes.get(step, 'GalaxyInputStep'),

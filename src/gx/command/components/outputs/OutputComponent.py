@@ -6,6 +6,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
+import tags
+import datatypes
+
 from uuid import uuid4
 from gx.gxtool.param import Param
 
@@ -25,6 +28,14 @@ class OutputComponent(ABC):
         information is available to the component
         """
         ...
+    
+    @property
+    def tag(self) -> str:
+        return tags.get(self.uuid)
+    
+    @property
+    def datatype(self) -> datatypes.JanisDatatype:
+        return datatypes.get(self)
 
     @property
     @abstractmethod

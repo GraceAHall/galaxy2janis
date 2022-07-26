@@ -1,16 +1,13 @@
 
 
 from typing import Any, Optional
-import datatypes
 import expressions
 
-from ...command.components import CommandComponent
+from ...command.components.outputs.OutputComponent import OutputComponent
 from ...command.components import InputComponent
-from ...command.components import Positional
-from ...command.components import Option
 
 
-def get_comptype(component: CommandComponent) -> str:
+def get_comptype(component: InputComponent | OutputComponent) -> str:
     return type(component).__name__.lower() 
 
 def select_input_value_type(component: Optional[InputComponent], value: Any) -> str:
@@ -39,14 +36,14 @@ def is_none(value: Any) -> bool:
         return True
     return False
 
-def is_numeric(component: CommandComponent, value: Any) -> bool:
+def is_numeric(component: InputComponent | OutputComponent, value: Any) -> bool:
     if _has_numeric_datatype(component):
         if expressions.is_int(str(value)) or expressions.is_float(str(value)):
             return True
     return False
 
-def _has_numeric_datatype(component: CommandComponent) -> bool:
-    jtype = datatypes.get(component)
+def _has_numeric_datatype(component: InputComponent | OutputComponent) -> bool:
+    jtype = component.datatype
     numeric_classes = ['Int', 'Float']
     if jtype.classname in numeric_classes:
         return True

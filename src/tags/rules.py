@@ -1,12 +1,11 @@
 
 
 from typing import Any
+import regex as re
 import keyword
 import builtins
 
-import regex as re
-import logs.logging as logging
-import datatypes
+#import logs.logging as logging
 
 python_keys = set(keyword.kwlist)
 builtin_keys = set(dir(builtins))
@@ -49,7 +48,7 @@ def numeric_start(tag: str, entity: Any) -> str:
 
 def short_tag(tag: str, entity: Any) -> str:
     if len(tag) == 0:
-        logging.zero_length_tag()
+        #logging.zero_length_tag()
         tag = _prepend_component_type(tag, entity)
         tag = f'{tag}ERROR'
     elif len(tag) == 1:
@@ -91,12 +90,12 @@ def _prepend_component_type(tag: str, entity: Any) -> str:
     return f'{entity_type}_{tag}'
 
 def _append_datatype(tag: str, entity: Any) -> str:
-    jtype = datatypes.get(entity)
+    jtype = entity.datatype
     jclass = jtype.classname.title()
     if not tag.endswith(jclass): # don't add the dtype if its already been added
         tag = f"{tag}{jclass}"
     return tag
 
-def _strip_numerals(tag: str) -> str:  # ??? y
-    return tag.lstrip('0123456789')
+# def _strip_numerals(tag: str) -> str:  # ??? y
+#     return tag.lstrip('0123456789')
 

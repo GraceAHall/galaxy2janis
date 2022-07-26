@@ -25,6 +25,8 @@ class RedirectOutput(OutputComponent):
         # otherwise, most commonly witnessed option value as name
         elif self.values.most_common_value:
             name = self.values.most_common_value
+        if not name.startswith('out'):
+            name = f'out_{name}'
         return name
     
     @property

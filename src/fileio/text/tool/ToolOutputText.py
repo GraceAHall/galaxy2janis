@@ -12,8 +12,7 @@ from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 
-import datatypes
-import tags
+import tags  # remove if possible
 
 
 def format_selector_str(output: OutputComponent) -> Optional[str]:
@@ -43,7 +42,7 @@ class ToolOutputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtype = datatypes.get(self.entity)
+        jtype = self.entity.datatype
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
@@ -69,7 +68,7 @@ class ToolOutputText(TextRender):
         e = self.entity
         selector_str = format_selector_str(e)
         doc = formatting.format_docstring(e)
-        datatype_str = datatypes.get_str(e)
+        datatype_str = formatting.format_typestr(e)
         if isinstance(e, RedirectOutput):
             datatype_str = f'Stdout'
         out_str: str = ''

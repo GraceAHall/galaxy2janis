@@ -7,9 +7,9 @@ from entities.workflow.step.outputs import StepOutput
 
 from ..TextRender import TextRender
 from .. import ordering
+from .. import formatting
 
-import tags
-import datatypes
+import tags  # remove if possible
 
 
 class WorkflowOutputText(TextRender):
@@ -19,7 +19,7 @@ class WorkflowOutputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtype = datatypes.get(self.entity.tool_output)
+        jtype = self.entity.tool_output.datatype
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
@@ -33,12 +33,12 @@ class WorkflowOutputText(TextRender):
 
     def render(self) -> str:
         step_tag = tags.get(self.entity.step_uuid)
-        out_tag = tags.get(self.entity.tool_output.uuid)
-        type_str = datatypes.get_str(entity=self.entity.tool_output)
+        out_tag = self.entity.tool_output.tag
+        datatype_str = formatting.format_typestr(self.entity.tool_output)
         out_str: str = ''
         out_str += 'w.output(\n'
         out_str += f'\t"{step_tag}_{out_tag}",\n'
-        out_str += f'\t{type_str},\n'
+        out_str += f'\t{datatype_str},\n'
         out_str += f'\tsource=(w.{step_tag}, "{out_tag}")'
         # out_str += f',\n\toutput_folder="{output_folder}"' if output_folder else ''
         # out_str += f',\n\toutput_name="{output_name}"' if output_name else ''

@@ -20,7 +20,6 @@ from gx.gxtool.text import load_partial_cheetah_command
 from . import factory
 from entities.workflow import InputValue
 
-import tags
 import mapping
 import datatypes
 import settings
@@ -137,7 +136,7 @@ class CheetahInputIngestor:
     def create_workflow_input(self, component: Flag | Option) -> WorkflowInput:
         """creates a workflow input for the tool input component"""
         return WorkflowInput(
-            name=tags.get(component.uuid),
+            _name=component.tag,
             array=component.array,
             is_runtime=True,
             datatype=datatypes.get(component),

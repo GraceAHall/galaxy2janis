@@ -1,6 +1,9 @@
 
 CURRENT WORK
-
+- expressions module good
+- datatypes module good
+- tags module good
+- NOTE: review how step uuids are shared between galaxy and janis step
 
 - env_var_is_array (future)
     - for inputs / outputs

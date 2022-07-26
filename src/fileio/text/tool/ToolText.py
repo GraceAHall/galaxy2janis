@@ -1,6 +1,5 @@
 
 
-import tags
 import textwrap
 
 from typing import Tuple
@@ -59,8 +58,8 @@ def get_contributors(tool: Tool) -> list[str]:
 def builder_snippet(tool: Tool) -> str:
     container = f'"{tool.container}"' if tool.container else None
     return f"""\
-{tags.get(tool.uuid)} = CommandToolBuilder(
-    tool="{tags.get(tool.uuid)}",
+{tool.tag} = CommandToolBuilder(
+    tool="{tool.tag}",
     version="{tool.metadata.version}",
     metadata=metadata,
     container={container},
@@ -71,7 +70,7 @@ def builder_snippet(tool: Tool) -> str:
 """
     
 def translate_snippet(tool: Tool) -> str:
-    tool_tag = tags.get(tool.uuid)
+    tool_tag = tool.tag
     return textwrap.dedent(f"""\
     if __name__ == "__main__":
         {tool_tag}().translate(

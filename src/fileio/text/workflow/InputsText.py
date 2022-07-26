@@ -1,6 +1,5 @@
 
 from typing import Any, Tuple
-import tags
 
 from entities.workflow import Workflow
 from ..TextRender import TextRender
@@ -26,9 +25,8 @@ class InputsText(TextRender):
     def render(self) -> str:
         input_list: list[Tuple[str, Any]] = []
         for w_inp in self.entity.inputs:
-            tag = tags.get(w_inp.uuid)
             value = w_inp.value
-            input_list.append((tag, value))
+            input_list.append((w_inp.tag, value))
 
         if self.file_format == 'yaml':
             return to_yaml(input_list)

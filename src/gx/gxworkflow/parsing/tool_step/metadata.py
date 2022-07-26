@@ -32,7 +32,6 @@ wrappers during this phase.
 def parse_step_metadata(gxstep: dict[str, Any]) -> StepMetadata:
     return StepMetadata(
         wrapper=get_wrapper(gxstep),
-        uuid=str(gxstep['uuid']),
         step_id=int(gxstep['id']),
         step_name=gxstep['name'],
         tool_state=gxstep['tool_state'], 

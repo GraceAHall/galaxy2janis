@@ -4,8 +4,9 @@ from __future__ import annotations
 from typing import Optional
 
 from entities.tool import Tool
+from uuid import uuid4
+import tags
 
-# this module imports
 from ..registers.StepInputRegister import StepInputRegister
 from ..registers.StepOutputRegister import StepOutputRegister
 from .metadata import StepMetadata
@@ -16,11 +17,24 @@ class WorkflowStep:
 
     def __init__(self, metadata: StepMetadata):
         self.metadata = metadata
+        self.uuid: str = str(uuid4())
         self.inputs: StepInputRegister = StepInputRegister()
         self.outputs: StepOutputRegister = StepOutputRegister()
         self.preprocessing: Optional[str] = None
         self.postprocessing: Optional[str] = None
         self._tool: Optional[Tool] = None
+
+    @property
+    def name(self) -> str:
+        return self.metadata.wrapper.tool_id
+    
+    @property
+    def tag(self) -> str:
+        return tags.get(self.uuid)
+    
+    @property
+    def docstring(self) -> Optional[str]:
+        return self.metadata.label
 
     @property
     def tool(self) -> Tool:
@@ -31,17 +45,5 @@ class WorkflowStep:
     def set_tool(self, tool: Tool) -> None:
         self._tool = tool
 
-    @property
-    def tool_name(self) -> str:
-        return self.metadata.wrapper.tool_id
-
-    @property
-    def uuid(self) -> str:
-        return self.metadata.uuid  # why?
-    
-    @property
-    def docstring(self) -> Optional[str]:
-        return self.metadata.label
-
     def __repr__(self) -> str:
-        return f'(WorkflowStep) step{self.metadata.step_id} - {self.tool_name}'
+        return f'(WorkflowStep) step{self.metadata.step_id} - {self.name}'

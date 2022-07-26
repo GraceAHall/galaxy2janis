@@ -4,10 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
-
-from gx.command.components import InputComponent
-
 import tags
+from gx.command.components import InputComponent
 
 
 class InputValueType(Enum):
@@ -42,7 +40,7 @@ class InputValue(ABC):
     def input_tag(self) -> str:
         """get the str tag for this tool input"""
         if self.component:
-            return tags.get(self.component.uuid)
+            return self.component.tag
         else:
             return 'UNKNOWN'
     

@@ -2,11 +2,11 @@
 
 
 import yaml
-from paths import DATATYPES_YAML 
 from typing import Optional
+
 from .JanisDatatype import JanisDatatype
 
-
+DATATYPES_PATH = './src/datatypes/galaxy_janis_types.yaml'
 
 class DatatypeRegister:
     def __init__(self):
@@ -23,7 +23,7 @@ class DatatypeRegister:
         in galaxy 'format' attributes.
         """
         out: dict[str, JanisDatatype] = {}
-        with open(DATATYPES_YAML, 'r') as fp:
+        with open(DATATYPES_PATH, 'r') as fp:
             datatypes = yaml.safe_load(fp)
         for type_data in datatypes['types']:
             janistype = self._init_type(type_data)

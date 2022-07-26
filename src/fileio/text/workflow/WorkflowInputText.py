@@ -7,9 +7,7 @@ from entities.workflow import WorkflowInput
 
 from ..TextRender import TextRender
 from .. import ordering
-
-import tags
-import datatypes
+from .. import formatting
 
 
 class WorkflowInputText(TextRender):
@@ -19,7 +17,7 @@ class WorkflowInputText(TextRender):
 
     @property
     def imports(self) -> list[Tuple[str, str]]:
-        jtype = datatypes.get(self.entity)
+        jtype = self.entity.datatype
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
@@ -32,10 +30,9 @@ class WorkflowInputText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        tag = tags.get(self.entity.uuid)
-        type_str = datatypes.get_str(entity=self.entity)
+        datatype_str = formatting.format_typestr(self.entity)
         out_str: str = ''
-        out_str += f'w.input("{tag}", {type_str})'
+        out_str += f'w.input("{self.entity.tag}", {datatype_str})'
         #out_str += f'\t"{tag}",\n'
         #out_str += f'\t{datatype}'
         #out_str += f',\n\tdefault={default}' if default else ''  # TODO HERE

@@ -2,13 +2,13 @@
 
 from typing import Optional
 from uuid import uuid4
+import tags
 
 from .step.outputs import StepOutput
 from .step.step import WorkflowStep
 from .metadata import WorkflowMetadata
 from .input import WorkflowInput
 
-import tags
 
 
 class Workflow:
@@ -24,6 +24,14 @@ class Workflow:
         self.inputs: list[WorkflowInput] = []
         self._steps: list[WorkflowStep] = []
         self._metadata: Optional[WorkflowMetadata] = None
+
+    @property
+    def name(self) -> str:
+        return self.metadata.name
+    
+    @property
+    def tag(self) -> str:
+        return tags.get(self.uuid)
     
     @property
     def steps(self) -> list[WorkflowStep]:

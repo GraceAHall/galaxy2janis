@@ -1,19 +1,17 @@
 
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 from uuid import uuid4
-from gx.configfiles.Configfile import Configfile
+import tags
 
+from gx.configfiles.Configfile import Configfile
 from gx.gxtool import ToolXMLMetadata
 from gx.gxtool.param import ParamRegister
 from gx.gxtool.param import Param
-
 from gx.command.components import CommandComponent
 from gx.command.components import InputComponent
 from gx.command.components import OutputComponent
-
-import tags
 
 
 # shouldn't really be a dataclass, just annoying to write __init__ method
@@ -23,7 +21,6 @@ class Tool:
     a Tool() is the final representation of the software tool
     a galaxy XML wrapper is running. Includes metadata, inputs, outputs, a container to execute the tool, base command etc. 
     """
-    uuid: str = field(init=False)
     metadata: ToolXMLMetadata
     gxparam_register: ParamRegister
     configfiles: list[Configfile]
@@ -36,6 +33,14 @@ class Tool:
         self.uuid: str = str(uuid4())
         tags.new_group('tool', self.uuid)
         tags.register(self)
+
+    @property
+    def name(self) -> str:
+        return self.metadata.id
+    
+    @property
+    def tag(self) -> str:
+        return tags.get(self.uuid)
 
     def add_input(self, inp: InputComponent) -> None:
         tags.switch_group(self.uuid)

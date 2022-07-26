@@ -13,8 +13,6 @@ from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
 
-import tags
-import datatypes
 
 ### HELPER METHODS ### 
 
@@ -99,7 +97,7 @@ class ToolInputLineFactory:
     
     def get_datatype_label(self, invalue: InputValue) -> str:
         if invalue.component:
-            return datatypes.get_str(entity=invalue.component, fmt='value')
+            return formatting.format_typestr(invalue.component, fmt='value')
         return ''
 
 
@@ -163,8 +161,8 @@ class StepText(TextRender):
         return out_str
 
     def format_tool(self) -> str:
-        step_tag = tags.get(self.entity.uuid)
-        tool_tag = tags.get(self.entity.tool.uuid)
+        step_tag = self.entity.tag
+        tool_tag = self.entity.tool.tag
         scatter_stmt = self.format_scatter()
         
         out_str: str = ''

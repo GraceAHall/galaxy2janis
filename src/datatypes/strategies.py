@@ -1,15 +1,8 @@
 
 
 
-from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
-if TYPE_CHECKING:
-    from entities.workflow.input import WorkflowInput
-    from gx.command.components import Positional, Flag, Option
-    from gx.command.components import OutputComponent
-
-from gx.gxtool.param import CollectionOutputParam
+from typing import Any
 
 import json
 import expressions
@@ -22,12 +15,12 @@ from . import core
 
 ### SHARED FUNCTIONS ###
 
-def types_from_param(entity: Positional | Option | OutputComponent) -> list[str]:
+def types_from_param(entity: Any) -> list[str]:
     if entity.gxparam and entity.gxparam.formats:
         return entity.gxparam.formats
     return []
 
-def types_from_values(entity: Positional | Option) -> list[str]:
+def types_from_values(entity: Any) -> list[str]:
     values = entity.values.unique
     if all([expressions.is_script(v) for v in values]):
         return ['file']
@@ -39,7 +32,7 @@ def types_from_values(entity: Positional | Option) -> list[str]:
         return ['string']
     return []
 
-def types_from_default(entity: Positional | Option) -> list[str]:
+def types_from_default(entity: Any) -> list[str]:
     default = entity.default_value
     if default:
         if expressions.is_int(default):
@@ -50,17 +43,16 @@ def types_from_default(entity: Positional | Option) -> list[str]:
             return ['string']
     return []
 
-def types_from_extension(output: OutputComponent) -> list[str]:
-    if output.gxparam:
-        if isinstance(output.gxparam, CollectionOutputParam):
-            pattern: str = output.gxparam.discover_pattern # type: ignore
-            if pattern and '.' in pattern:
-                compressed_types = ['gz', 'bz2']
-                p_split = pattern.split('.')
-                while p_split[-1] in compressed_types:
-                    p_split = p_split[:-1]
-                ext = p_split[-1]
-                return [f'.{ext}']
+def types_from_extension(output: Any) -> list[str]:
+    if output.gxparam and hasattr(output.gxparam, 'discover_pattern'):
+        pattern: str = output.gxparam.discover_pattern
+        if pattern and '.' in pattern:
+            compressed_types = ['gz', 'bz2']
+            p_split = pattern.split('.')
+            while p_split[-1] in compressed_types:
+                p_split = p_split[:-1]
+            ext = p_split[-1]
+            return [f'.{ext}']
     return []
 
 
@@ -73,7 +65,7 @@ class DatatypeGetStrategy(ABC):
         ...
 
 class PositionalStrategy(DatatypeGetStrategy):
-    def get(self, entity: Positional) -> list[JanisDatatype]:
+    def get(self, entity: Any) -> list[JanisDatatype]:
         gxtypes = types_from_param(entity)
         if not gxtypes:
             gxtypes = types_from_values(entity)
@@ -84,11 +76,11 @@ class PositionalStrategy(DatatypeGetStrategy):
         return galaxy_to_janis(gxtypes)
 
 class FlagStrategy(DatatypeGetStrategy):
-    def get(self, entity: Flag) -> list[JanisDatatype]:
+    def get(self, entity: Any) -> list[JanisDatatype]:
         return [core.bool_t]
 
 class OptionStrategy(DatatypeGetStrategy):
-    def get(self, entity: Option) -> list[JanisDatatype]:
+    def get(self, entity: Any) -> list[JanisDatatype]:
         gxtypes = types_from_param(entity)
         if not gxtypes:
             gxtypes = types_from_values(entity)
@@ -99,7 +91,7 @@ class OptionStrategy(DatatypeGetStrategy):
         return galaxy_to_janis(gxtypes)
 
 class OutputStrategy(DatatypeGetStrategy):
-    def get(self, entity: OutputComponent) -> list[JanisDatatype]:
+    def get(self, entity: Any) -> list[JanisDatatype]:
         gxtypes = types_from_param(entity)
         if not gxtypes:
             gxtypes = types_from_extension(entity)
@@ -108,7 +100,7 @@ class OutputStrategy(DatatypeGetStrategy):
         return galaxy_to_janis(gxtypes)
 
 class WorkflowInputStrategy(DatatypeGetStrategy):
-    def get(self, entity: WorkflowInput) -> list[JanisDatatype]:
+    def get(self, entity: Any) -> list[JanisDatatype]:
         return [entity.datatype]
 
 class GalaxyInputStepStrategy(DatatypeGetStrategy):

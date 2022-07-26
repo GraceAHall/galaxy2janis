@@ -4,6 +4,7 @@ from typing import Any
 from abc import ABC, abstractmethod
 from . import rules as rules
 
+
 class FormattingStrategy(ABC):
 
     @abstractmethod

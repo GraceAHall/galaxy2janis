@@ -1,7 +1,6 @@
 
 
 from typing import Any
-from gx.command.components import InputComponent
 from .groups import TagGroup
 
 groups: dict[str, TagGroup] = {}
@@ -10,8 +9,7 @@ groups: dict[str, TagGroup] = {}
 def register(entity: Any) -> None:  
     """register a tag in the active TagGroup"""
     group = _get_active()
-    starting_text = _get_starting_text(entity)
-    group.register(starting_text, entity) 
+    group.register(entity.name, entity) 
 
 def get(uuid: str) -> str:
     """get a tag from any TagGroup"""
@@ -57,47 +55,8 @@ def _clear_active():
     for group in groups.values():
         group.active = False
 
-def _get_starting_text(entity: Any) -> str:
-    group = _get_active()
-    if group.section == 'workflow':
-        return _get_starting_text_wflow(entity)
-    elif group.section == 'tool':
-        return _get_starting_text_tool(entity)
-    else:
-        raise RuntimeError()
 
-def _get_starting_text_wflow(entity: Any) -> str:
-    match entity.__class__.__name__:
-        case 'Workflow':
-            return entity.metadata.name
-        case 'WorkflowInput':
-            if not entity.is_runtime:
-                return f'in_{entity.name}'
-            else:
-                return entity.name
-        case 'WorkflowStep':
-            return entity.metadata.wrapper.tool_id
-        case _:
-            raise RuntimeError(f'cannot register a {entity.__class__.__name__}')
 
-def _get_starting_text_tool(entity: Any) -> str:
-    match entity.__class__.__name__:
-        case 'Tool':
-            return entity.metadata.id
-        case 'Positional' | 'Flag' | 'Option':
-            return _get_tool_input_name(entity)
-        case 'RedirectOutput' | 'WildcardOutput' | 'InputOutput':
-            basetag = entity.name
-            if basetag.startswith('out'):
-                return basetag
-            else:
-                return f'out_{basetag}'
-        case _:
-            raise RuntimeError(f'cannot register a {entity.__class__.__name__}')
 
-def _get_tool_input_name(component: InputComponent) -> str:
-    default_name = component.name
-    if default_name.isnumeric() and component.gxparam:
-        return component.gxparam.name.rsplit('.', 1)[-1]  # adv.reference -> reference (gxvarnames)
-    return default_name
+
 

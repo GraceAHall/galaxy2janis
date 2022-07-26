@@ -2,7 +2,6 @@
 
 import settings
 import paths
-import tags
 import shutil
 import expressions
 
@@ -71,10 +70,10 @@ def get_linkable_components(j_step: WorkflowStep) -> list[InputComponent]:
     return out
 
 def create_workflow_input(j_step: WorkflowStep, j_target: InputComponent, filepath: str) -> WorkflowInput:
-    step_tag = tags.get(j_step.uuid)
-    input_tag = tags.get(j_target.uuid)
+    step_tag = j_step.tag
+    input_tag = j_target.tag
     return WorkflowInput(
-        name=f'{step_tag}_{input_tag}',
+        _name=f'{step_tag}_{input_tag}',
         array=j_target.array,
         is_runtime=True,
         datatype=file_t,

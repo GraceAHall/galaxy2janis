@@ -1,7 +1,6 @@
 
 
-from datatypes import JanisDatatype
-
+from .JanisDatatype import JanisDatatype
 from .core import bool_t
 from .core import file_t
 from .core import string_t

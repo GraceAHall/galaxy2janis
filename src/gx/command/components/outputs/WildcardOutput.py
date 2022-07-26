@@ -14,9 +14,12 @@ class WildcardOutput(OutputComponent):
 
     @property
     def name(self) -> str:
+        name = ''
         if self.gxparam:
-            return self.gxparam.name
-        raise RuntimeError('a WildcardOutput must have a gxparam')
+            name = self.gxparam.name
+        if not name.startswith('out'):
+            name = f'out_{name}'
+        return name
 
     @property
     def optional(self) -> bool:

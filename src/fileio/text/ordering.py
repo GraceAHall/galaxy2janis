@@ -9,8 +9,6 @@ from gx.command.components import Flag
 from gx.command.components import Option
 from gx.command.components import Positional
 
-import tags
-
 
 
 def order_positionals(positionals: list[Positional]) -> list[Positional]:
@@ -18,11 +16,11 @@ def order_positionals(positionals: list[Positional]) -> list[Positional]:
     return positionals
 
 def order_flags(flags: list[Flag]) -> list[Flag]:
-    flags.sort(key=lambda x: tags.get(x.uuid))
+    flags.sort(key=lambda x: x.tag)
     return flags
 
 def order_options(options: list[Option]) -> list[Option]:
-    options.sort(key=lambda x: tags.get(x.uuid))
+    options.sort(key=lambda x: x.tag)
     return options
 
 def order_imports(imports: list[Tuple[str, str]]) -> list[Tuple[str, str]]:

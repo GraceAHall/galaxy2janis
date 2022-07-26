@@ -1,7 +1,6 @@
 
 
 
-from __future__ import annotations
 from typing import Any, Optional
 
 from ....gxtool.param.Param import Param
@@ -24,13 +23,13 @@ class Positional(InputComponent):
             return 'script'
         # get name from galaxy param if available
         if self.gxparam:
-            return self.gxparam.name
+            return self.gxparam.name  # what about adv.reference?
         # otherwise, most commonly witnessed option value as name
         pseudo_name = self.values.most_common_value
         if not pseudo_name:
             pseudo_name = 'positional'
         return pseudo_name.strip('$')
-    
+
     @property
     def default_value(self) -> Any:
         """gets the default value for this component"""

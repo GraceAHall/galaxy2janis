@@ -30,7 +30,7 @@ FUTURE
 - move connections to seperate list under workflow
 - output of scattered step isn't always scattered - collection join tool
 - cheetah lexer 
-- antler 
+- antler tool?
 - look into pretty printing library
 - pre/postprocessing:
     - cheetah templating doesn't seem to be happening

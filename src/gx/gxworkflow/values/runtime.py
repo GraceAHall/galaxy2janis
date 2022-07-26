@@ -14,7 +14,6 @@ from entities.workflow import WorkflowInputInputValue
 
 from gx.command.components import InputComponent
 
-import tags
 import mapping
 import datatypes
 import settings
@@ -56,10 +55,10 @@ class RuntimeInputIngestor:
                         j_step.inputs.add(value)
 
     def create_workflow_input(self, j_step: WorkflowStep, j_target: InputComponent) -> WorkflowInput:
-        step_tag = tags.get(j_step.uuid)
-        input_tag = tags.get(j_target.uuid)
+        step_tag = j_step.tag
+        input_tag = j_target.tag
         return WorkflowInput(
-            name=f'{step_tag}_{input_tag}',
+            _name=f'{step_tag}_{input_tag}',
             array=j_target.array,
             is_runtime=True,
             datatype=datatypes.get(j_target),
