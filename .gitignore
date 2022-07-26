@@ -5,6 +5,8 @@ temp
 parsed
 tool-data
 test/data
+test/tools
+test/workflows
 !test/data/cheetah_simplification
 playground
 data/wrappers

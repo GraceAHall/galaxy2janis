@@ -5,124 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "basic tool",
+            "name": "abricate",
             "type": "python",
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "tool",
-                "--local", "test/data/tools/abricate/abricate.xml", 
-            ]
-        },
-        {
-            "name": "--remote",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--remote", "iuc,abricate,abricate,10:c2ef298da409", 
-            ]
-        },
-        {
-            "name": "--outdir",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--remote", "iuc,abricate,abricate,c2ef298da409", 
-                "--outdir", "abricate_parsed"
-            ]
-        },
-        {
-            "name": "cutadapt tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/cutadapt/cutadapt.xml", 
-            ]
-        },
-        {
-            "name": "unicycler tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/unicycler/unicycler.xml", 
-            ]
-        },
-        {
-            "name": "egsea tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/egsea/egsea.xml", 
-            ]
-        },
-        {
-            "name": "bowtie2_index_builder tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/bowtie2_index_builder/bowtie2_index_builder.xml", 
-            ]
-        },
-        {
-            "name": "picard_FilterSamReads tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/picard/picard_FilterSamReads.xml", 
-            ]
-        },
-        {
-            "name": "fastqc tool",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "tool",
-                "--local", "test/data/tools/fastqc/rgFastQC.xml", 
-            ]
-        },
-        {
-            "name": "super simple workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/mine/super_simple_workflow.ga", 
+                "--local", "test/tools/abricate/abricate.xml"
             ]
         },
         {
@@ -131,22 +22,10 @@
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "workflow",
-                "test/data/workflows/mine/simple_workflow.ga", 
-            ]
-        },
-        {
-            "name": "medium workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/mine/medium_workflow.ga", 
+                "test/workflows/simple_workflow.ga"
             ]
         },
         {
@@ -155,22 +34,10 @@
             "request": "launch",
             "program": "src/gxtool2janis.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "workflow",
-                "test/data/workflows/mine/hard_workflow.ga", 
-            ]
-        },
-        {
-            "name": "mrsa-illumina workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "src/gxtool2janis.py",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "args": [
-                "workflow",
-                "test/data/workflows/assembly/mrsa-illumina.ga", 
+                "test/workflows/hard_workflow.ga"
             ]
         },
     ]
