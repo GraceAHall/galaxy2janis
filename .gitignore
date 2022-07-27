@@ -1,15 +1,10 @@
 
 venv
-runs
-temp
 parsed
-tool-data
-test/data
+test/temp
 test/tools
 test/workflows
-!test/data/cheetah_simplification
-playground
-data/wrappers
+galaxy2janis/gx/wrappers/data
 *.log
 *.pyc
 *.tmp

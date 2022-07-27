@@ -1,13 +1,11 @@
 
 
-
-
-# Galaxy to Janis Tool Translation
+# Galaxy to Janis Translation
 
 ## Foreword
 
-gxtool2janis is in active development and has not yet reached a first version release. <br>
-gxtool2janis requires python ≥ 3.10. 
+Galaxy2janis is currently available in pre-release form. <br>
+It requires python ≥ 3.10. 
 
 - [Description](#description)
 - [Quickstart Guide](#quickstart-guide)
@@ -15,29 +13,29 @@ gxtool2janis requires python ≥ 3.10.
 
 ## Description
 
-gxtool2janis is a program which translates software in Galaxy tool wrappers to a Janis tool definition. It parses a Galaxy tool XML file to identify the main software requirement the wrapper is invoking, then determines the inputs, options, and outputs of this software. It then writes an equivalent definition for the software tool in Janis, and provides a link to the relevant biocontainer so the tool may be executed as part of a workflow translated by Janis. 
+Galaxy2janis translates Galaxy tools and workflows into the Janis language. It parses a given Galaxy tool wrapper (.xml) or workflow (.ga) into an equivalent Janis definition (.py).
 
 Galaxy tool wrappers may incorporate multiple tasks when executed, and usually include:
 - preprocessing (symlinks, making directories, formatting inputs)
 - running the main software requirement (actual tool execution)
 - postprocessing (often to create additional outputs for the user)
 
-gxtool2janis translates the main software requirement into a Janis definition. Preprocessing and postprocessing are ignored. 
+Galaxy2janis translates the main software requirement into a Janis definition. Preprocessing and postprocessing are ignored. 
 
 ## Quickstart Guide
 
 ```
 ### translating a single tool
 # local
-python gxtool2janis.py tool --dir path_to_wrapper_folder --xml tool.xml
+python galaxy2janis.py tool --dir path_to_wrapper_folder --xml tool.xml
 # remote url 
-python gxtool2janis.py tool --remote_url https://toolshed.g2.bx.psu.edu/repos/devteam/fastqc/archive/e7b2202befea.tar.gz
+python galaxy2janis.py tool --remote_url https://toolshed.g2.bx.psu.edu/repos/devteam/fastqc/archive/e7b2202befea.tar.gz
 
 ### translating all tools in a Galaxy workflow
-python gxtool2janis.py workflow path_to_workflow.ga
+python galaxy2janis.py workflow path_to_workflow.ga
 ```
 
-gxtool2janis has two main *run modes* - single tool, and workflow mode.
+galaxy2janis has two main *run modes* - single tool, and workflow mode.
 
 When in *tool* mode a single Galaxy wrapper will be translated. The Galaxy wrapper folder (containing the tool XML and any required macro XML files) can be stored locally, or a tarball url download link can be supplied if the wrapper is held in an online repository such as the [main toolshed](https://toolshed.g2.bx.psu.edu/). When the wrapper is local, the wrapper folder `--dir` and the specific XML to translate `--xml` must be referenced. When using a download link, only the `--remote_url` option needs to be supplied. 
 
@@ -46,7 +44,7 @@ When in *workflow* mode, only the path to the Galaxy workflow is required. Each 
 
 ## Program Execution
 
-gxtool2janis has 6 distinct stages
+galaxy2janis has 6 distinct stages
 1. [Loading Runtime Settings](#loading-runtime-settings)
 2. [Parsing Tool XML](#parsing-tool-xml)
 3. [Identifying the Main Software Requirement](#identifying-the-main-software-requirement)

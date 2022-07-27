@@ -22,7 +22,7 @@ from janis_core.types.common_data_types import File
 from janis_core.types.common_data_types import String
 from janis_core.types.common_data_types import Boolean
 from janis_core.types.common_data_types import Float
-from data.datatypes.galaxy import Tabular
+from galaxy2janis.datatypes.galaxy import Tabular
 
 
 metadata = ToolMetadata(
