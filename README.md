@@ -12,6 +12,7 @@ Galaxy2janis is currently available in pre-release form.
 **Bugs:** Please submit any bugs by [raising an issue](https://github.com/GraceAHall/galaxy2janis/issues) to help improve the software!<br>
 **Contributing:**  Please get in touch by [raising an issue](https://github.com/GraceAHall/galaxy2janis/issues) so we can communicate via email or zoom.<br>
 
+<br>
 
 ## Contents
 
@@ -19,7 +20,8 @@ Galaxy2janis is currently available in pre-release form.
 - [Description](#description)
 - [Inputs](#inputs)
 - [Outputs](#outputs)
-- [Translation (CWL / WDL / Nextflow)](#translation-(cwl-/-wdl-/-nextflow))
+- [Producing CWL WDL Nextflow](#producing-cwl-wdl-nextflow)
+- [Making Runnable](#making-runnable)
 - [Supported Features](#supported-features)
 
 ## Quickstart Guide
@@ -50,6 +52,8 @@ galaxy2janis workflow [PATH]
 galaxy2janis workflow hybrid_assembly.ga
 ```
 
+<br>
+
 ## Description
 
 #### What does this program do?
@@ -67,6 +71,8 @@ For workflow translations, the workflow itself will be translated to a Janis def
 Provide *runnable* translations.
 
 Galaxy2janis does not provide translations which are runnable. They are intended to be human readable, and to match the structure of the input workflow. Users are expected to make some ***manual edits*** to finalise the workflow. See the [Manual Edits Section](#manual-edits) for details. 
+
+<br>
 
 ## Inputs
 
@@ -119,6 +125,8 @@ galaxy2janis workflow downloaded_workflow.ga
 
 Each tool used in the workflow will be downloaded and translated automatically during the process. 
 
+<br>
+
 ## Outputs
 
 Tool translations produce a single Janis tool definition for in the input galaxy wrapper. 
@@ -137,7 +145,9 @@ Workflow translations produce an output folder containing multiple files. Workfl
 └── workflow.py             # main workflow file
 ```
 
-## Translation (CWL / WDL / Nextflow)
+<br>
+
+## Producing CWL WDL Nextflow
 
 #### Janis Translate
 
@@ -156,13 +166,21 @@ galaxy2janis tool abricate/abricate.xml         (produces abricate.py)
 janis translate abricate.py > abricate.cwl
 ```
 
-#### Making Runnable
+<br>
+
+## Making Runnable
 
 It is the responsibility of the user to make final edits & bring the workflow to a runnable state.
 
 This tool is designed to increase productivity when migrating workflows; as such, the outputs it produces favour readability over completeness. 
 
 To aid users in this process, some sources files are retained. 
+
+
+# TODO HERE
+`UNLINKED`
+`CONNECTION`
+# TODO HERE
 
 `tools/untranslated`
 
@@ -178,6 +196,7 @@ Galaxy2janis translates the main software requirement into a Janis definition. P
 Contains galaxy tools which were translated. They are the 'source files' which we used to create Janis tool definitions while the workflow was being parsed.  Can be used as reference when tool translations weren't good quality. <br>
 Galaxy wrappers have a distinct style, so see the [galaxy tool xml documentation](https://docs.galaxyproject.org/en/latest/dev/schema.html) for details. 
 
+<br>
 
 ## Supported Features
 
