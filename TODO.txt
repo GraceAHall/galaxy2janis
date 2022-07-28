@@ -1,15 +1,9 @@
 
 
-README.md
-- make this BRIEF but informative. 
-- what is this tool? 
-- what does it require? 
-- how do I run it? 
-- what output do I get? 
-- brief notes on editing the output
-- translation to CWL / WDL with janis translate
-- supported vs unsupported
-- known issues
+sample tool / workflow data to check installation
+
+
+Quickstart 
 
 inputs.yaml
 - extra information like datatypes, mandatory or not etc 
