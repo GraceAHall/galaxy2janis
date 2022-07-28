@@ -2,7 +2,10 @@
 
 # Galaxy to Janis Translation
 
-Galaxy2janis is a productivity tool which translates Galaxy tool wrappers and workflows into the Janis language. It accepts either a Galaxy wrapper (.xml) or workflow (.ga), and will produce a Janis definition (.py).
+Galaxy2janis is a productivity tool which translates Galaxy tool wrappers and workflows into the Janis language. <br>
+It accepts either a Galaxy wrapper (.xml) or workflow (.ga) and will produce a Janis definition (.py).
+
+This software is part the [Portable Pipelines Project](https://www.melbournebioinformatics.org.au/project/ppp/) which produces technologies to make workflow execution and sharing easier. 
 
 Galaxy2janis is currently available in pre-release form.
 
@@ -14,7 +17,9 @@ Galaxy2janis is currently available in pre-release form.
 
 - [Quickstart Guide](#quickstart-guide)
 - [Description](#description)
-- [Translation (CWL / WDL / Nextflow)](#translation)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Translation (CWL / WDL / Nextflow)](#translation-(cwl-/-wdl-/-nextflow))
 - [Supported Features](#supported-features)
 
 ## Quickstart Guide
@@ -63,9 +68,9 @@ Provide *runnable* translations.
 
 Galaxy2janis does not provide translations which are runnable. They are intended to be human readable, and to match the structure of the input workflow. Users are expected to make some ***manual edits*** to finalise the workflow. See the [Manual Edits Section](#manual-edits) for details. 
 
-#### Inputs
+## Inputs
 
-*Tool translation*
+#### Tool translation
 
 A local copy of the galaxy tool wrapper is needed. To download a tool wrapper: 
 - Select the tool in galaxy
@@ -93,7 +98,9 @@ To translate abricate.xml:
 galaxy2janis tool abricate/abricate.xml
 ```
 
-*Workflow Translation*
+<br>
+
+#### Workflow Translation
 
 A local copy of the galaxy workflow is needed. There are two methods to download a workflow:
 
@@ -110,9 +117,9 @@ To translate the workflow:
 galaxy2janis workflow downloaded_workflow.ga
 ```
 
-Each tool used in the workflow will be downloaded from a remote repository automatically. 
+Each tool used in the workflow will be downloaded and translated automatically during the process. 
 
-#### Outputs
+## Outputs
 
 Tool translations produce a single Janis tool definition for in the input galaxy wrapper. 
 
@@ -130,31 +137,63 @@ Workflow translations produce an output folder containing multiple files. Workfl
 └── workflow.py             # main workflow file
 ```
 
-## Translation
+## Translation (CWL / WDL / Nextflow)
 
-#### Janis -> CWL / WDL / Nextflow
+#### Janis Translate
 
-#### Manual Edits
+Galaxy -> Janis -> CWL/WDL/Nextflow
 
-up to you as a workflow developer. expected to be proficient in the target language. 
-that said, you will need to know about the following aspects of galaxy wrappers.
+This program ingests Galaxy definitions to produce Janis definitions. <br>
+Janis' inbuilt `translate` functionality can subsequently output to the languages seen above. 
 
-- wrappers
-    - cheetah
-    - pre/post tasks (untranslated)
-- wrapper scripts
-- inputs.yaml
+For example, translating the `abriate` tool from Galaxy to CWL:
 
-#### Tool Pre/Post Tasks
+```
+# galaxy -> janis
+galaxy2janis tool abricate/abricate.xml         (produces abricate.py)
 
-Galaxy tool wrappers may perform multiple tasks when executed. The main software tool being wrapped will execute, but some preprocessing or postprocessing steps may also be performed. A common structure is as follows:
+# janis -> CWL
+janis translate abricate.py > abricate.cwl
+```
+
+#### Making Runnable
+
+It is the responsibility of the user to make final edits & bring the workflow to a runnable state.
+
+This tool is designed to increase productivity when migrating workflows; as such, the outputs it produces favour readability over completeness. 
+
+To aid users in this process, some sources files are retained. 
+
+`tools/untranslated`
+
+Contains untranslated galaxy tool logic. Galaxy tool wrappers may perform multiple tasks when executed. The main software tool being wrapped will execute, but some preprocessing or postprocessing steps may also be performed. A common structure is as follows:
 - Preprocessing (symlinks / making directories / creating a genome index)
 - Main software requirement (actual tool execution)
 - Postprocessing (index or sort output / create additional output files / summaries)
 
-Galaxy2janis translates the main software requirement into a Janis definition. Preprocessing and postprocessing are ignored. 
+Galaxy2janis translates the main software requirement into a Janis definition. Preprocessing and postprocessing logic are placed into the `tools/untranslated` folder as a reference, so the user can see what has been ignored. 
+
+`tools/wrappers`
+
+Contains galaxy tools which were translated. They are the 'source files' which we used to create Janis tool definitions while the workflow was being parsed.  Can be used as reference when tool translations weren't good quality. <br>
+Galaxy wrappers have a distinct style, so see the [galaxy tool xml documentation](https://docs.galaxyproject.org/en/latest/dev/schema.html) for details. 
+
 
 ## Supported Features
 
-- supported vs unsupported
-- known issues
+This project is in active development. Many features are planned, and will be released over time.
+
+#### unsupported
+
+Features
+
+- \<command> `#def #set #if #for` cheetah logic
+- \<command> `Rscript -e` (inline Rscripts)
+- \<param> `type="color"` params
+- xml features seen in 1% of tools 
+
+Wrappers
+
+- `emboss` suite of tool wrappers known to fail due to legacy features.
+
+
