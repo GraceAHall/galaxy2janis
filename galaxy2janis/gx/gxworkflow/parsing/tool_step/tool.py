@@ -32,7 +32,7 @@ def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
         xml_path = get_builtin_tool_path(tool_id)
         assert(xml_path)
         return {
-            'local': xml_path,
+            'infile': xml_path,
             'remote': None,
             'outdir': None
             #'outdir': f'{paths.manager.wrapper(tool_id, tool_id)}'
@@ -42,7 +42,7 @@ def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
         owner = metadata.wrapper.owner
         repo = metadata.wrapper.repo
         return {
-            'local': None,
+            'infile': None,
             'remote': f'{owner},{repo},{tool_id},{revision}',
             'outdir': None
             #'outdir': f'{paths.manager.wrapper(tool_id, revision)}'

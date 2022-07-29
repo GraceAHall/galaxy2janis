@@ -1,6 +1,7 @@
 
 
 import json
+import os
 from typing import Optional
 from galaxy2janis.gx.wrappers import Wrapper
 
@@ -84,6 +85,9 @@ class WrapperCache:
 
     def _load(self) -> dict[str, list[dict[str, str]]]:
         """loads cache from flat file"""
+        if not os.path.exists(WRAPPER_CACHE):
+            with open(WRAPPER_CACHE, 'w') as fp:
+                fp.write('{}')
         with open(WRAPPER_CACHE, 'r') as fp:
             return json.load(fp)
     

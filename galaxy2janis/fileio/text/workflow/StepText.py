@@ -73,10 +73,11 @@ class ToolInputLineFactory:
 
     def get_special_label(self, invalue: InputValue) -> str:
         if isinstance(invalue, WorkflowInputInputValue):
-            if invalue.is_runtime:
-                return 'RUNTIME VALUE'
-            else:
-                return 'WORKFLOW INPUT'
+            return 'WORKFLOW INPUT'
+            # if invalue.is_runtime:
+            #     return 'RUNTIME VALUE'
+            # else:
+            #     return 'WORKFLOW INPUT'
         if isinstance(invalue, ConnectionInputValue):
             return 'CONNECTION'
         return ''
@@ -92,7 +93,7 @@ class ToolInputLineFactory:
     def get_default_label(self, invalue: InputValue) -> str:
         if isinstance(invalue, StaticInputValue):
             if invalue.default:
-                return 'GALAXY DEFAULT'
+                return 'DEFAULT'
         return ''
     
     def get_datatype_label(self, invalue: InputValue) -> str:

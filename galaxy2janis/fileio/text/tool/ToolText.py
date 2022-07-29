@@ -68,7 +68,7 @@ def builder_snippet(tool: Tool) -> str:
     outputs=outputs
 )
 """
-    
+
 def translate_snippet(tool: Tool) -> str:
     tool_tag = tool.tag
     return textwrap.dedent(f"""\

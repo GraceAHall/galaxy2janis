@@ -40,8 +40,8 @@ def update_args(args: dict[str, Any]) -> None:
     global repo
     global revision
 
-    if args['local']:
-        tool_path = args['local']
+    if args['infile']:
+        tool_path = args['infile']
         tool_id = get_xml_id(tool_path)
         owner = None
         repo = None

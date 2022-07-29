@@ -12,7 +12,7 @@ def workflow_setup(args: dict[str, Any]) -> None:
     validate_workflow_settings()
 
 def update_workflow_settings(args: dict[str, Any]) -> None:
-    settings.workflow.set_path(args['workflow'])
+    settings.workflow.set_path(args['infile'])
     settings.workflow.set_dev_partial_eval(args['dev_partial_eval'])
 
 

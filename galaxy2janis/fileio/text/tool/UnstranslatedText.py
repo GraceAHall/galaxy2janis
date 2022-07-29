@@ -22,9 +22,9 @@ class UntranslatedText(TextRender):
         step = self.entity
         out_str: str = ''
         if step.preprocessing:
-            out_str += '\n# PRE-PROCESSING ---------------------\n\n'
-            out_str += step.preprocessing
+            out_str += '\n# PRE-PROCESSING ---------------------\n'
+            out_str += f'{step.preprocessing}\n'
         if step.postprocessing:
-            out_str += '\n# POST-PROCESSING ---------------------\n\n'
-            out_str += step.postprocessing
+            out_str += '\n# POST-PROCESSING ---------------------\n'
+            out_str += f'{step.postprocessing}\n'
         return out_str

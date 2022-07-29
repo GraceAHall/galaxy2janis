@@ -1,19 +1,22 @@
 
 
-sample tool / workflow data to check installation
 
-
-Quickstart 
-
-inputs.yaml
-- extra information like datatypes, mandatory or not etc 
-- VIGNETTES (examples)
-
-parsing stats 
-- include reporting on # tools with pre/post statments
+DOCUMENTATION -----
 
 release
 - wheel
 - upload to test PyPI
 - upload to PyPI
 
+
+
+
+
+OTHER -------------
+parsing stats 
+- include reporting on # tools with pre/post statments
+
+Cosplay
+Haircut
+Laser hair removal
+Laser tattoo removal

@@ -33,8 +33,7 @@ class CLIparser:
         parser = argparse.ArgumentParser(
             description='Parse single galaxy tool'
         )
-        parser.add_argument("-l",
-                            "--local",
+        parser.add_argument("infile",
                             help="path to tool.xml file to parse.", 
                             type=str,
                             )
@@ -56,7 +55,7 @@ class CLIparser:
     def workflow(self, argv: list[str]):
         parser = argparse.ArgumentParser(
             description='') 
-        parser.add_argument("workflow", 
+        parser.add_argument("infile", 
                             help="path to workflow.ga file to parse.", 
                             type=str)
         parser.add_argument("-o",

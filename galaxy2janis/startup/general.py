@@ -47,15 +47,15 @@ def auto_project_name(args: dict[str, Any]) -> str:
             raise RuntimeError()
 
 def auto_tool_project_name(args: dict[str, Any]) -> str:
-    if args['local']:
-        return args['local'].rsplit('/', 1)[-1].split('.', 1)[0]
+    if args['infile']:
+        return args['infile'].rsplit('/', 1)[-1].split('.', 1)[0]
     elif args['remote']:
         return args['remote'].split(',')[2]
     else:
         raise RuntimeError()
 
 def auto_workflow_project_name(args: dict[str, Any]) -> str:
-    return args['workflow'].rsplit('/', 1)[-1].split('.', 1)[0]
+    return args['infile'].rsplit('/', 1)[-1].split('.', 1)[0]
 
 def setup_file_structure() -> None:
     project_dir = paths.manager.project_dir()
