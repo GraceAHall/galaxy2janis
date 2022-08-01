@@ -3,37 +3,36 @@
 
 import yaml
 from typing import Optional
+from galaxy2janis.paths import USER_DATA_DIR, GALAXY_DATATYPES_YAML
 
 from .JanisDatatype import JanisDatatype
 
-DATATYPES_PATH = './galaxy2janis/datatypes/galaxy_janis_types.yaml'
 
 class DatatypeRegister:
     def __init__(self):
-        self.dtype_map: dict[str, JanisDatatype] = self._load()
+        self.dtype_map: dict[str, JanisDatatype] = {}
 
     def get(self, datatype: str) -> Optional[JanisDatatype]:
         if datatype in self.dtype_map:
             return self.dtype_map[datatype]
 
-    def _load(self) -> dict[str, JanisDatatype]:
+    def populate(self) -> None:
         """
         func loads the combined datatype yaml then converts it to dict with format as keys
         provides structue where we can search all the galaxy and janis types given what we see
         in galaxy 'format' attributes.
         """
-        out: dict[str, JanisDatatype] = {}
-        with open(DATATYPES_PATH, 'r') as fp:
+        path = f'{USER_DATA_DIR}/{GALAXY_DATATYPES_YAML}'
+        with open(path, 'r') as fp:
             datatypes = yaml.safe_load(fp)
         for type_data in datatypes['types']:
             janistype = self._init_type(type_data)
             # multiple keys per datatype
-            out[type_data['format']] = janistype
-            out[type_data['classname']] = janistype 
+            self.dtype_map[type_data['format']] = janistype
+            self.dtype_map[type_data['classname']] = janistype 
             if type_data['extensions']:
                 for ext in type_data['extensions']:
-                    out[ext] = janistype 
-        return out
+                    self.dtype_map[ext] = janistype 
 
     def _init_type(self, dtype: dict[str, str]) -> JanisDatatype:
         return JanisDatatype(

@@ -1,14 +1,10 @@
 
 
-
-
 from typing import Any
 from galaxy2janis.entities.workflow import StepMetadata
 from galaxy2janis.gx.wrappers import Wrapper
 from galaxy2janis.gx.wrappers import WrapperCache
 from galaxy2janis.gx.wrappers.requests.versions import request_installable_revision
-
-from galaxy2janis import paths
 
 
 """

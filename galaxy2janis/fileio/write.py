@@ -45,13 +45,13 @@ def write_workflow(janis: Workflow) -> None:
 def write_tools(janis: Workflow) -> None:
     for step in janis.steps:
         tool_id = step.metadata.wrapper.tool_id
-        write_tool(step.tool, paths.manager.tool(tool_id))
+        write_tool(step.tool, paths.tool(tool_id))
 
 def write_untranslated(janis: Workflow) -> None:
     for step in janis.steps:
         if step.preprocessing or step.postprocessing:
             tool_id = step.metadata.wrapper.tool_id
-            path = paths.manager.untranslated(tool_id)
+            path = paths.untranslated(tool_id)
             text = UntranslatedText(step)
             page = text.render()
             with open(path, 'w') as fp:
@@ -62,7 +62,7 @@ def write_scripts(janis: Workflow) -> None:
         if step.tool.configfiles:
             tool_id = step.metadata.wrapper.tool_id
             for configfile in step.tool.configfiles:
-                path = paths.manager.configfile(tool_id, configfile.name)
+                path = paths.configfile(tool_id, configfile.name)
                 text = ConfigfileText(configfile)
                 page = text.render()
                 with open(path, 'w') as fp:
@@ -91,17 +91,17 @@ def get_wrapper_files_src(step: WorkflowStep) -> list[str]:
 def get_wrapper_files_dest(step: WorkflowStep) -> str:
     tool_id = step.metadata.wrapper.tool_id
     revision = step.metadata.wrapper.revision
-    return paths.manager.wrapper(tool_id, revision)
+    return paths.wrapper(tool_id, revision)
 
 def write_main_workflow(janis: Workflow) -> None:
-    path = paths.manager.workflow()
+    path = paths.workflow()
     text = WorkflowText(janis)
     page = text.render()
     with open(path, 'w') as fp:
         fp.write(page)
 
 def write_inputs(janis: Workflow) -> None:
-    path = paths.manager.inputs(file_format='yaml')
+    path = paths.inputs(file_format='yaml')
     text = InputsText(janis, file_format='yaml')
     page = text.render()
     with open(path, 'w') as fp:

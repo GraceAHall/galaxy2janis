@@ -30,7 +30,7 @@ def handle_step(janis: Workflow, j_step: WorkflowStep) -> None:
             # get filepath for script
             galaxy_path: str = component.values.unique[0] # type: ignore
             local_path = galaxy_path.replace('$__tool_directory__/', '')
-            dest = paths.manager.script(local_path)
+            dest = paths.script(local_path)
             src = get_wrapper_script_path(local_path, j_step)
 
             # copy the script to the destination folder

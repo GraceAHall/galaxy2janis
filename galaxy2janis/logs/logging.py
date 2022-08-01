@@ -13,14 +13,15 @@ from galaxy2janis import settings
 # configuration
 # -------------
 
-LOGGING_CONFIG = './galaxy2janis/logs/logging_config.yaml'
+
 
 # logging 
 def configure_logging() -> None:
-    with open(LOGGING_CONFIG, "r") as fp:
+    config_path = f'{paths.USER_DATA_DIR}/{paths.LOGGING_CONFIG}'
+    with open(config_path, "r") as fp:
         the_dict = yaml.safe_load(fp)
-        the_dict['handlers']['janis_log']['filename'] = paths.manager.janis_log()
-        the_dict['handlers']['message_log']['filename'] = paths.manager.message_log()
+        the_dict['handlers']['janis_log']['filename'] = paths.janis_log()
+        the_dict['handlers']['message_log']['filename'] = paths.message_log()
     config.dictConfig(the_dict)
 
 # warnings configuration

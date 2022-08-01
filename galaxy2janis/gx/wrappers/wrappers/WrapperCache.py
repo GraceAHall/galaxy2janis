@@ -4,7 +4,7 @@ import json
 import os
 from typing import Optional
 from galaxy2janis.gx.wrappers import Wrapper
-
+from galaxy2janis.paths import USER_DATA_DIR, WRAPPER_CACHE
 
 """
 WrapperCache flat file structure:
@@ -26,7 +26,6 @@ WrapperCache flat file structure:
 }
 """
 
-WRAPPER_CACHE = './galaxy2janis/gx/wrappers/wrappers.json'
 
 
 class WrapperCache:
@@ -85,15 +84,17 @@ class WrapperCache:
 
     def _load(self) -> dict[str, list[dict[str, str]]]:
         """loads cache from flat file"""
-        if not os.path.exists(WRAPPER_CACHE):
-            with open(WRAPPER_CACHE, 'w') as fp:
+        path = f'{USER_DATA_DIR}/{WRAPPER_CACHE}'
+        if not os.path.exists(path):
+            with open(path, 'w') as fp:
                 fp.write('{}')
-        with open(WRAPPER_CACHE, 'r') as fp:
+        with open(path, 'r') as fp:
             return json.load(fp)
     
     def _save(self, cache: dict[str, list[dict[str, str]]]) -> None:
         """saves our cache to file"""
-        with open(WRAPPER_CACHE, 'w') as fp:
+        path = f'{USER_DATA_DIR}/{WRAPPER_CACHE}'
+        with open(path, 'w') as fp:
             json.dump(cache, fp)
 
     def _ensure_key(self, key: str, cache: dict[str, list[dict[str, str]]]) -> None:    

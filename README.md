@@ -207,7 +207,7 @@ To aid users in this process, some hints are supplied and sources files are reta
 Some basic hints are provided to help users check the output. This information helps the user confirm everything looks correct, and make edits when it isn't quite right. 
 
 ***quast*** step in translated workflow: 
-<img src='./media/tool_step.png' width='750px'>
+<img src='./media/tool_step.png' width='750px'><br>
 A galaxy workflow was translated to Janis using galaxy2janis. A step within the workflow uses quast, which we see reflected in our output `workflow.py` file.  The actual quast tool being used in the step above is a Janis definition and will appear in the `tools/` output directory. 
 
 #UNKNOWN1=w.unicycler.outAssembly,  # (CONNECTION)

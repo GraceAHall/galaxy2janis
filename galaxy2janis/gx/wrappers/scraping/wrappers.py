@@ -40,7 +40,7 @@ class Revision:
     repo: str
     revision: str
     date_created: str
-    download_folder: str = './temp'
+    download_folder: str = 'temp'
 
     @property
     def url(self) -> str:

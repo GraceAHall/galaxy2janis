@@ -28,17 +28,5 @@
                 "sample_data/assembly.ga"
             ]
         },
-        {
-            "name": "hard workflow",
-            "type": "python",
-            "request": "launch",
-            "program": "galaxy2janis/run.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": [
-                "workflow",
-                "test/workflows/hard_workflow.ga"
-            ]
-        },
     ]
 }

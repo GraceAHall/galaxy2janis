@@ -35,7 +35,7 @@ def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
             'infile': xml_path,
             'remote': None,
             'outdir': None
-            #'outdir': f'{paths.manager.wrapper(tool_id, tool_id)}'
+            #'outdir': f'{paths.wrapper(tool_id, tool_id)}'
         }
     else:
         revision = metadata.wrapper.revision
@@ -45,5 +45,5 @@ def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
             'infile': None,
             'remote': f'{owner},{repo},{tool_id},{revision}',
             'outdir': None
-            #'outdir': f'{paths.manager.wrapper(tool_id, revision)}'
+            #'outdir': f'{paths.wrapper(tool_id, revision)}'
         }

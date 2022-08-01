@@ -124,9 +124,11 @@ class MockApp(di.Container):
 
 
 
+from galaxy2janis.paths import USER_DATA_DIR, GALAXY_CONFIG
 
 def grace_get_config() -> dict[str, Any]:
-    with open("./galaxy2janis/gx/interaction/config.yaml", "r") as fp:
+    config_path = f'{USER_DATA_DIR}/{GALAXY_CONFIG}'
+    with open(config_path, "r") as fp:
         return yaml.safe_load(fp)
 
 class MockAppConfig(Bunch):

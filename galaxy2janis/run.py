@@ -12,7 +12,7 @@ from galaxy2janis.cli import CLIparser
 from galaxy2janis.tool_mode import tool_mode
 from galaxy2janis.workflow_mode import workflow_mode
 
-import sys 
+import sys
 from typing import Optional
 
 
@@ -26,6 +26,7 @@ def main():
     args = load_args()
     general_setup(args)
     run_sub_program(args)
+    
 
 def load_args() -> dict[str, Optional[str]]:
     cli = CLIparser(sys.argv)
@@ -45,7 +46,7 @@ def run_sub_program(args: dict[str, Optional[str]]) -> None:
 def run_tool_mode(args: dict[str, Optional[str]]):
     settings.tool.set(args)
     tool = tool_mode()
-    path = paths.manager.tool(tool.metadata.id)
+    path = paths.tool(tool.metadata.id)
     write_tool(tool, path=path)  # I dont like this design, but it may be necessary
 
 def run_workflow_mode(args: dict[str, Optional[str]]):

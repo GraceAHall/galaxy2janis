@@ -1,23 +1,64 @@
 
-
-from typing import Any
+import os
+import shutil
+from typing import Any, Optional
 
 from galaxy2janis.logs import logging
 from galaxy2janis import settings
 from galaxy2janis import fileio
 from galaxy2janis import paths
+from galaxy2janis import datatypes
 
-from galaxy2janis.paths import DEFAULT_TOOL_OUTDIR
-from galaxy2janis.paths import DEFAULT_WORKFLOW_OUTDIR
 
 def general_setup(args: dict[str, Any]) -> None:
-    outdir = format_outdir(args)
     settings.general.set_command(args['command']) 
-    paths.init_manager(settings.general.command, outdir)
-    setup_file_structure()
+
+    parent_outdir = format_parent_outdir(args)
+    tool_outdir = format_tool_subdir(args)
+
+    paths.set_outdir(parent_outdir)
+    paths.set_tool_subdir(tool_outdir)
+
+    setup_output_folder(args)
+    setup_data_folder()
+    datatypes.populate()
     logging.configure_logging()
 
-def format_outdir(args: dict[str, Any]) -> str:
+
+def setup_data_folder() -> None:
+    # get package data folder path
+    package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    package_data_dir = f'{package_dir}/data'
+
+    # create user data folder if not exists
+    if not os.path.exists(paths.USER_DATA_DIR):
+        os.mkdir(paths.USER_DATA_DIR)
+    
+    # create user wrapper download folder if not exists
+    if not os.path.exists(f'{paths.USER_DATA_DIR}/{paths.DOWNLOADED_WRAPPERS_DIR}'):
+        os.mkdir(f'{paths.USER_DATA_DIR}/{paths.DOWNLOADED_WRAPPERS_DIR}')
+
+    # move files from package to user if they don't exist
+    data_files = [
+        paths.LOGGING_CONFIG,
+        paths.GALAXY_CONFIG,
+        paths.GALAXY_DATATYPES_YAML,
+        paths.CONTAINER_CACHE,
+        paths.WRAPPER_CACHE,
+    ]
+    for f in data_files:
+        package_path = f'{package_data_dir}/{f}'
+        user_path = f'{paths.USER_DATA_DIR}/{f}'
+        if not os.path.exists(user_path):
+            shutil.copyfile(package_path, user_path)
+
+def format_tool_subdir(args: dict[str, Any]) -> Optional[str]:
+    if args['command'] == 'tool':
+        return None
+    else:
+        return 'tools'
+
+def format_parent_outdir(args: dict[str, Any]) -> str:
     # user specified outdir
     if args['outdir']:
         return args['outdir']
@@ -31,9 +72,9 @@ def auto_parent_dir(args: dict[str, Any]) -> str:
     assert(args['outdir'] is None)
     match args['command']:
         case 'tool':
-            return DEFAULT_TOOL_OUTDIR
+            return paths.DEFAULT_TOOL_OUTDIR
         case 'workflow':
-            return DEFAULT_WORKFLOW_OUTDIR
+            return paths.DEFAULT_WORKFLOW_OUTDIR
         case _:
             raise RuntimeError()
 
@@ -57,27 +98,15 @@ def auto_tool_project_name(args: dict[str, Any]) -> str:
 def auto_workflow_project_name(args: dict[str, Any]) -> str:
     return args['infile'].rsplit('/', 1)[-1].split('.', 1)[0]
 
-def setup_file_structure() -> None:
-    project_dir = paths.manager.project_dir()
-    fileio.init_folder(project_dir)
-    for subfolder in paths.manager.subfolders():
-        fileio.init_folder(f'{project_dir}/{subfolder}')
+def setup_output_folder(args: dict[str, Any]) -> None:
+    # create outdir
+    fileio.init_folder(paths.outdir())
+    # create common subfolders
+    for subfolder in paths.common_subfolders():
+        fileio.init_folder(subfolder)
+    # create workflow specific subfolders
+    if args['command'] == 'workflow':
+        for subfolder in paths.workflow_subfolders():
+            fileio.init_folder(subfolder)
 
 
-
-"""
-
-file structure initialisation
-
-tool mode
-- outdir
-- janis.log
-- messages.log
-
-workflow mode
-- outdir
-- janis.log
-- messages.log
-- each item in paths.manager.folder_structure
-
-"""

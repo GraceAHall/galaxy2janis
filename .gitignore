@@ -4,7 +4,7 @@ parsed
 test/temp
 test/tools
 test/workflows
-galaxy2janis/gx/wrappers/data
+galaxy2janis/data/wrappers
 *.log
 *.pyc
 *.tmp

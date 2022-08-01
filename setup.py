@@ -10,11 +10,15 @@ packages = ["galaxy2janis"] + ["galaxy2janis." + p for p in sorted(find_packages
 
 setup(
     name='galaxy2janis',
-    version='0.1.0',
+    version='0.1.3',
     license='MIT',
     author='Grace Hall',
     description='ingestion of galaxy tool wrappers (.xml) and workflows (.ga) into the janis language.',
     packages=packages,
+    package_data={'galaxy2janis': [
+        'data/*.json',
+        'data/*.yaml',
+    ]},
     install_requires=[
         'galaxy-app==21.9.0',
         'janis-pipelines==0.11.6',

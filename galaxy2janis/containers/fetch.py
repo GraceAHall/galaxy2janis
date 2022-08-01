@@ -4,6 +4,7 @@ import tempfile
 from typing import Optional
 
 from galaxy2janis.gx.gxtool.requirements import Requirement, CondaRequirement, ContainerRequirement
+from galaxy2janis.paths import USER_DATA_DIR, CONTAINER_CACHE
 
 from .ContainerCache import ContainerCache
 from .Container import Container
@@ -17,7 +18,8 @@ from .fetching.presets import get_images_preset
 from .selection.selection import select_best_container_match
 
 
-CONTAINER_CACHE = './galaxy2janis/containers/container_url_cache.json'
+
+
 DISABLE_CACHE = False
 
 def fetch_container(requirement: Requirement) -> Optional[str]:
@@ -44,7 +46,7 @@ def _load_cache() -> ContainerCache:
         temp = tempfile.TemporaryFile()
         cache_path = f'{tempfile.gettempdir()}/{temp.name}'
     else:
-        cache_path = CONTAINER_CACHE
+        cache_path = f'{USER_DATA_DIR}/{CONTAINER_CACHE}'
     return ContainerCache(cache_path)
 
 def _fetch_presets(requirement: Requirement) -> list[Container]:
