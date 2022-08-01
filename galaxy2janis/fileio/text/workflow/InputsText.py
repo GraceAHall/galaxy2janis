@@ -1,20 +1,30 @@
 
-from typing import Any, Tuple
+from typing import Tuple
 
 from galaxy2janis.entities.workflow import Workflow
 from galaxy2janis.entities.workflow import WorkflowInput
 from ..TextRender import TextRender
-from ..formatting import format_typestr
+#from ..formatting import format_typestr
 
 def note_snippet(commenter: str) -> str: # TODO
-    return f"""{commenter} This file contains workflow inputs which need to be provided by the user.
-{commenter} Organised as follows: 
-{commenter}     1. input data for the workflow
-{commenter}     2. runtime values for each step
+    return f"""{commenter} WORKFLOW INPUTS
+{commenter} This file contains workflow inputs which need to be provided by the user.
+{commenter} The names of workflow inputs (below) will appear in workflow.py where they are used. 
 
-{commenter} Null values must be replaced by the user to run the workflow. 
-{commenter} VIGNETTES
+{commenter} NULL VALUES
+{commenter} If a value should be left null, ensure the tool input is optional. 
+{commenter} The engine will throw an error otherwise.  
 """
+
+# def note_snippet(commenter: str) -> str: # TODO
+#     return f"""{commenter} This file contains workflow inputs which need to be provided by the user.
+# {commenter} Organised as follows: 
+# {commenter}     1. input data for the workflow
+# {commenter}     2. runtime values for each step
+
+# {commenter} Null values must be replaced by the user to run the workflow. 
+# {commenter} VIGNETTES
+# """
 
 class InputsText(TextRender):
     def __init__(self, entity: Workflow, file_format: str='yaml'):
@@ -46,7 +56,8 @@ def to_yaml(inputs: list[WorkflowInput]) -> str:
     for winp in inputs:
         if winp.value is None:
             winp.value = YAML_NONE
-        out_str += f'{winp.tag}: {winp.value}  {YAML_COMMENTER} [{format_typestr(winp)}]\n'
+        #out_str += f'{winp.tag}: {winp.value}  {YAML_COMMENTER} [{format_typestr(winp)}]\n'
+        out_str += f'{winp.tag}: {winp.value}\n'
 
     return out_str
 
