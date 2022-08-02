@@ -1,3 +1,0 @@
-[console_scripts]
-galaxy2janis = galaxy2janis.run:main
-
