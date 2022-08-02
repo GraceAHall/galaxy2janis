@@ -1,18 +1,6 @@
-galaxy-util@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/util
-galaxy-objectstore@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/objectstore
-galaxy-data@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/data
-galaxy-auth@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/auth
-galaxy-containers@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/containers
-galaxy-job-execution@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/job_execution
-galaxy-job-metrics@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/job_metrics
-galaxy-tool-util@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/tool_util
-galaxy-web-framework@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_framework
-galaxy-web-stack@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/web_stack
-galaxy-app@git+https://github.com/galaxyproject/galaxy.git@release_21.09#subdirectory=packages/app
 
+galaxy-app==21.9.0
 janis-pipelines==0.11.6
 biopython==1.79
-beautifulsoup4==4.11.1
 filelock==3.7.0
-regex==2022.6.2
-refgenconf==0.12.2
+

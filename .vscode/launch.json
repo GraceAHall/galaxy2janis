@@ -8,29 +8,25 @@
             "name": "abricate",
             "type": "python",
             "request": "launch",
-            "program": "src/gxtool2janis.py",
+            "program": "galaxy2janis/run.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "tool",
-                "--dir", "sample/tools/abricate", 
-                "--xml", "abricate.xml",
-                "--dev-no-test-cmdstrs"
+                "sample_data/abricate/abricate.xml"
             ]
         },
         {
             "name": "simple workflow",
             "type": "python",
             "request": "launch",
-            "program": "src/gxtool2janis.py",
+            "program": "galaxy2janis/run.py",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             "args": [
                 "workflow",
-                "sample/workflows/simple_workflow.ga",
-                "--outdir", "parsed/workflows",
-                "--dev-no-test-cmdstrs"
+                "sample_data/assembly.ga"
             ]
-        }
+        },
     ]
 }

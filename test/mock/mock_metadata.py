@@ -1,7 +1,7 @@
 
 
 
-from xmltool.ToolXMLMetadata import ToolXMLMetadata
+from gx.gxtool.ToolXMLMetadata import ToolXMLMetadata
 
 MOCK_METADATA = ToolXMLMetadata(
     id='abricate',

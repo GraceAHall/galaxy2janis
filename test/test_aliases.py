@@ -1,8 +1,9 @@
 
 
 import unittest
-from command.manipulation import resolve_aliases
 import xml.etree.ElementTree as et
+
+from gx.gxtool.text.simplification.aliases import resolve_aliases
 
 
 
