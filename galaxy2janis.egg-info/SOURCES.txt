@@ -93,8 +93,8 @@ galaxy2janis/gx/__init__.py
 galaxy2janis/gx/command/Command.py
 galaxy2janis/gx/command/__init__.py
 galaxy2janis/gx/command/annotation.py
-galaxy2janis/gx/command/command.py
 galaxy2janis/gx/command/factory.py
+galaxy2janis/gx/command/generate.py
 galaxy2janis/gx/command/cmdstr/CommandString.py
 galaxy2janis/gx/command/cmdstr/DynamicCommandStatement.py
 galaxy2janis/gx/command/cmdstr/MainStatementInferrer.py

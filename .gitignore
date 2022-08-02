@@ -10,4 +10,5 @@ galaxy2janis/data/wrappers
 *.log
 *.pyc
 *.tmp
+*egg-info
 __pycache__

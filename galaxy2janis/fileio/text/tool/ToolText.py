@@ -105,16 +105,14 @@ class ToolText(TextRender):
         return ordering.order_imports(imports)
 
     def render(self) -> str:
-        inputs = self.entity.inputs
-        outputs = self.entity.outputs
         out_str: str = ''
         out_str += f'{note_snippet(self.entity)}\n'
         # messages here?
         out_str += f'{syspath_snippet()}\n'
         out_str += f'{formatting.format_imports(self.imports)}\n'
         out_str += f'\n{metadata_snippet(self.entity)}\n'
-        out_str += f'{ToolInputSectionText(inputs).render()}\n'
-        out_str += f'{ToolOutputSectionText(outputs).render()}\n'
+        out_str += f'{ToolInputSectionText(self.entity.inputs).render()}\n'
+        out_str += f'{ToolOutputSectionText(self.entity.outputs).render()}\n'
         out_str += f'{builder_snippet(self.entity)}\n'
         out_str += f'\n{translate_snippet(self.entity)}\n'
         return out_str

@@ -72,7 +72,7 @@ For workflow translations, the workflow itself will be translated to a Janis def
 
 Galaxy2janis is a *productivity tool*. It does not provide *runnable* translations.
 
-It aims to produce a human readable output, and to match the structure of the ingested workflow. Users are expected to make some ***manual edits*** to finalise the workflow. See the [Manual Edits Section](#manual-edits) for details. 
+It aims to produce a human readable output, and to match the structure of the ingested workflow. Users are expected to make some ***manual edits*** to finalise the workflow. See the [Making Runnable Section](#making-runnable) for details. 
 
 <br>
 

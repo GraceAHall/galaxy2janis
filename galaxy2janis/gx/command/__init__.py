@@ -6,6 +6,6 @@
 from .Command import Command
 
 # factories 
-from .command import gen_command
+from .generate import gen_command
 
 
