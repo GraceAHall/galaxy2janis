@@ -1,16 +1,16 @@
 
 
-from xmltool.XMLToolDefinition import XMLToolDefinition
-from xmltool.param.InputParamRegister import InputParamRegister
-from xmltool.param.OutputParamRegister import OutputParamRegister
-from xmltool.TestRegister import TestRegister
-from .mock_metadata import MOCK_METADATA
+from galaxy2janis.gx.gxtool import XMLToolDefinition
+from galaxy2janis.gx.gxtool.param import ParamRegister
+from galaxy2janis.gx.gxtool.TestRegister import TestRegister
+from .mock_metadata import MOCK_TOOL_METADATA
 
 
 MOCK_XMLTOOL = XMLToolDefinition(
-    metadata=MOCK_METADATA,
+    metadata=MOCK_TOOL_METADATA,
     raw_command='',
-    inputs=InputParamRegister([]),
-    outputs=OutputParamRegister([]),
+    configfiles=[],
+    inputs=ParamRegister(),
+    outputs=ParamRegister(),
     tests=TestRegister([])
 )

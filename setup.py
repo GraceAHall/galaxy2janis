@@ -20,7 +20,7 @@ setup(
         'data/*.yaml',
     ]},
     install_requires=[
-        'galaxy-app==21.9.0',
+        'galaxy-app==22.1.1',
         'janis-pipelines==0.11.6',
         'biopython==1.79',
         'filelock==3.7.0',

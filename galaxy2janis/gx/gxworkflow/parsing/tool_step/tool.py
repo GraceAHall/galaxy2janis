@@ -6,12 +6,14 @@ from galaxy2janis.entities.tool import Tool
 from galaxy2janis.entities.workflow import StepMetadata
 from galaxy2janis.entities.workflow import Workflow
 
-from galaxy2janis.tool_mode import tool_mode
+from galaxy2janis.startup import tool_setup
+from galaxy2janis.ingest import ingest_tool
 from galaxy2janis.gx.gxworkflow.parsing.tool_state import load_tool_state
-from galaxy2janis.gx.interaction import get_builtin_tool_path
+from galaxy2janis.gx.wrappers.downloads.wrappers import get_builtin_tool_path
 
 from galaxy2janis import mapping
 from galaxy2janis import settings
+
 
 def ingest_workflow_tools(janis: Workflow, galaxy: dict[str, Any]) -> None:
     for g_step in galaxy['steps'].values():
@@ -23,8 +25,8 @@ def ingest_workflow_tools(janis: Workflow, galaxy: dict[str, Any]) -> None:
 
 def parse_step_tool(metadata: StepMetadata) -> Tool:
     args = create_tool_settings_for_step(metadata)
-    settings.tool.set(args)
-    return tool_mode()
+    tool_setup(args)
+    return ingest_tool(settings.tool.tool_path)
 
 def create_tool_settings_for_step(metadata: StepMetadata) -> dict[str, Any]:
     tool_id = metadata.wrapper.tool_id

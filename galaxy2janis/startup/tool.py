@@ -1,11 +1,14 @@
 
 
+from typing import Optional
+from galaxy2janis.logs import logging
 from galaxy2janis import settings
-
 from galaxy2janis.utils import galaxy as utils
 
 
-def tool_setup() -> None:
+def tool_setup(args: dict[str, Optional[str]]) -> None:
+    settings.tool.set(from_args=args)
+    logging.msg_parsing_tool()
     validate_tool_settings()
 
 

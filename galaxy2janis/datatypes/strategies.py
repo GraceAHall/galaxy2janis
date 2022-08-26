@@ -19,8 +19,7 @@ def types_from_param(entity: Any) -> list[str]:
         return entity.gxparam.formats
     return []
 
-def types_from_values(entity: Any) -> list[str]:
-    values = entity.values.unique
+def types_from_values(values: list[Any]) -> list[str]:
     if all([expressions.is_script(v) for v in values]):
         return ['file']
     elif all([expressions.is_int(v) for v in values]):
@@ -29,7 +28,7 @@ def types_from_values(entity: Any) -> list[str]:
         return ['float']
     elif all([expressions.is_var(v) for v in values]):
         return ['string']
-    return []
+    return ['string']
 
 def types_from_default(entity: Any) -> list[str]:
     default = entity.default_value
@@ -67,11 +66,9 @@ class PositionalStrategy(DatatypeGetStrategy):
     def get(self, entity: Any) -> list[JanisDatatype]:
         gxtypes = types_from_param(entity)
         if not gxtypes:
-            gxtypes = types_from_values(entity)
-        if not gxtypes:
             gxtypes = types_from_default(entity)
         if not gxtypes:
-            gxtypes = ['string']
+            gxtypes = types_from_values(entity.values.unique)
         return galaxy_to_janis(gxtypes)
 
 class FlagStrategy(DatatypeGetStrategy):
@@ -82,11 +79,9 @@ class OptionStrategy(DatatypeGetStrategy):
     def get(self, entity: Any) -> list[JanisDatatype]:
         gxtypes = types_from_param(entity)
         if not gxtypes:
-            gxtypes = types_from_values(entity)
-        if not gxtypes:
             gxtypes = types_from_default(entity)
         if not gxtypes:
-            gxtypes = ['string']
+            gxtypes = types_from_values(entity.values.unique)
         return galaxy_to_janis(gxtypes)
 
 class OutputStrategy(DatatypeGetStrategy):

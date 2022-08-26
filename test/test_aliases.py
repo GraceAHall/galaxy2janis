@@ -3,7 +3,7 @@
 import unittest
 import xml.etree.ElementTree as et
 
-from gx.gxtool.text.simplification.aliases import resolve_aliases
+from galaxy2janis.gx.gxtool.text.simplification.aliases import resolve_aliases
 
 
 

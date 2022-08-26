@@ -1,15 +1,16 @@
 
 
-
 from typing import Any
 
 from galaxy2janis.gx.gxtool import load_xmltool
 from galaxy2janis.gx.gxtool.param import BoolParam
 from galaxy2janis.gx.gxtool import XMLToolDefinition
 
+from galaxy2janis import settings
+
 
 def resolve_values(gxstep: dict[str, Any]) -> dict[str, Any]:
-    xmltool = load_xmltool()
+    xmltool = load_xmltool(settings.tool.tool_path)
     resolver = StepValueResolver(gxstep, xmltool)
     return resolver.resolve()
 

@@ -22,10 +22,10 @@ class WorkflowInput:
 
     @property
     def name(self) -> str:
-        if self.is_runtime:
-            return self._name
-        else:
-            return f'in_{self._name}'
+        if not self.is_runtime:
+            if not self._name.startswith('in'):
+                return f'in_{self._name}'
+        return self._name
     
     @property
     def tag(self) -> str:

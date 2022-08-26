@@ -1,5 +1,6 @@
 
 
+from galaxy2janis.logs import logging
 from galaxy2janis import settings
 
 from typing import Any
@@ -8,13 +9,10 @@ from galaxy2janis.utils import galaxy as utils
 
 
 def workflow_setup(args: dict[str, Any]) -> None:
-    update_workflow_settings(args)
-    validate_workflow_settings()
-
-def update_workflow_settings(args: dict[str, Any]) -> None:
     settings.workflow.set_path(args['infile'])
     settings.workflow.set_dev_partial_eval(args['dev_partial_eval'])
-
+    logging.msg_parsing_workflow()
+    validate_workflow_settings()
 
 ### VALIDATION ###
 

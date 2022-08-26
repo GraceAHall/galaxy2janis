@@ -1,11 +1,13 @@
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, Tuple
+if TYPE_CHECKING:
+    from galaxy2janis.gx.gxtool import XMLToolDefinition
+
 import regex as re
+
 from galaxy2janis import expressions
-
-from typing import Optional, Tuple
-
-from galaxy2janis.gx.gxtool import XMLToolDefinition
 from galaxy2janis.expressions.patterns import (
     INTEGER,
     FLOAT,

@@ -148,7 +148,7 @@ class StepText(TextRender):
         if self.render_runtime_inputs:
             out_str += f'{self.format_runtime_inputs()}\n'
         
-        out_str += f'{self.format_tool()}\n'
+        out_str += f'{self.format_step()}\n'
         return out_str
 
     def format_runtime_inputs(self) -> str:
@@ -161,7 +161,7 @@ class StepText(TextRender):
             out_str += f'{WorkflowInputText(winp).render()}\n'
         return out_str
 
-    def format_tool(self) -> str:
+    def format_step(self) -> str:
         step_tag = self.entity.tag
         tool_tag = self.entity.tool.tag
         scatter_stmt = self.format_scatter()

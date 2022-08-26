@@ -14,10 +14,10 @@ from . import factory
 from galaxy2janis import settings
 
 
-def handle_tool_default_inputs(janis: Workflow) -> None:
+def handle_step_default_inputs(janis: Workflow) -> None:
     # sets tool input values as default
     for j_step in janis.steps:
-        settings.tool.set(wrapper=j_step.metadata.wrapper)
+        settings.tool.set(from_wrapper=j_step.metadata.wrapper)
         ingest_values_defaults(j_step)
 
 def ingest_values_defaults(j_step: WorkflowStep) -> None:

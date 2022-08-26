@@ -1,18 +1,17 @@
 
 
-
-
-from gx.gxtool.param.InputParam import (
+from galaxy2janis.gx.gxtool.param.OutputParam import DataOutputParam
+from galaxy2janis.gx.gxtool.param.InputParam import (
     BoolParam,
     FloatParam,
     SelectOption,
     SelectParam,
     DataParam
 )
-from gx.gxtool.param.OutputParam import DataOutputParam
+from galaxy2janis.gx.gxtool.param.ParamRegister import ParamRegister
 
 
-MOCK_DATAPARAM1 = DataParam('in.infastq')
+MOCK_DATAPARAM1 = DataParam('file_input')
 MOCK_DATAPARAM1.formats = ['fastq']
 MOCK_DATAPARAM1.multiple = False
 MOCK_DATAPARAM1.helptext = "input fastq"
@@ -62,3 +61,6 @@ MOCK_OUTPARAM1 = DataOutputParam('report')
 MOCK_OUTPARAM1.label = 'report file'
 MOCK_OUTPARAM1.formats = ['txt']
 MOCK_OUTPARAM1.from_work_dir = 'report.txt'
+
+MOCK_PARAM_REGISTER = ParamRegister()
+

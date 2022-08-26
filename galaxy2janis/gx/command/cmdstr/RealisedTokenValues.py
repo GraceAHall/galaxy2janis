@@ -1,11 +1,12 @@
 
 
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from galaxy2janis.gx.gxtool import XMLToolDefinition
+    from galaxy2janis.gx.gxtool.param import Param
 
 from galaxy2janis.logs import logging
-from typing import Optional
-
-from galaxy2janis.gx.gxtool import XMLToolDefinition
-from galaxy2janis.gx.gxtool.param import Param
 
 from . import constructs
 from . import utils
