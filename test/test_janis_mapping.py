@@ -30,6 +30,7 @@ from janis_core import (
 from galaxy2janis import datatypes
 
 from galaxy2janis.janis_mapping.workflow import to_janis_workflow
+from galaxy2janis.janis_mapping.workflow import to_janis_inputs_dict
 
 from galaxy2janis.janis_mapping.tool import to_janis_datatype
 from galaxy2janis.janis_mapping.tool import to_janis_selector
@@ -191,9 +192,18 @@ class TestJanisWorkflowMapping(unittest.TestCase):
         datatypes.populate()
         self.workflow = MOCK_WORKFLOW
         self.jworkflow = to_janis_workflow(self.workflow)
+        self.jinputs = to_janis_inputs_dict(self.workflow)
 
     def test_to_janis_workflow(self) -> None:
         self.assertIsInstance(self.jworkflow, WorkflowBuilder)
+    
+    def test_to_janis_inputs_dict(self) -> None:
+        # single input, no value
+        self.assertEquals(self.jinputs['inFasta'], None)
+        # single input, provided value
+        self.workflow.inputs[0].value = 'path/to/file.fasta'
+        jinputs = to_janis_inputs_dict(self.workflow)
+        self.assertEquals(jinputs['inFasta'], 'path/to/file.fasta')
 
     def test_janis_metadata(self) -> None:
         self.assertIsInstance(self.jworkflow.metadata, WorkflowMetadata)

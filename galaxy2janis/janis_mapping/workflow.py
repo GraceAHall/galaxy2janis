@@ -53,7 +53,13 @@ def to_janis_workflow(internal: Workflow) -> WorkflowBuilder:
     return wf
 
 def to_janis_inputs_dict(internal: Workflow) -> dict[str, Any]:
-    raise NotImplementedError
+    out_dict: dict[str, Any] = {}
+    for internal_inp in internal.inputs:
+        key = internal_inp.tag
+        val = internal_inp.value if internal_inp.value else None
+        out_dict[key] = val
+    return out_dict
+
 
 
 ### HELPER METHODS ###
