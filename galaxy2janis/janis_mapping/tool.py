@@ -67,7 +67,7 @@ def to_janis_tool_input(internal_inp: InputComponent) -> ToolInput:
     """
     # these should be the janis ToolInput defaults
     prefix: Optional[str] = None
-    separate: bool = False
+    separate: bool = True
 
     # derive special attributes in case of flag tool input
     if isinstance(internal_inp, Flag):
@@ -75,8 +75,8 @@ def to_janis_tool_input(internal_inp: InputComponent) -> ToolInput:
     
     # derive special attributes in case of option tool input
     elif isinstance(internal_inp, Option):
-        prefix = internal_inp.prefix
         if internal_inp.delim != ' ':
+            prefix = f'{internal_inp.prefix}{internal_inp.delim}'
             separate = False
         
     return ToolInput(

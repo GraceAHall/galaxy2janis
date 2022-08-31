@@ -33,6 +33,7 @@ from galaxy2janis.gx.gxworkflow.values.scripts import handle_step_script_inputs
 
 from galaxy2janis.gx.wrappers.downloads.wrappers import get_builtin_tool_path
 
+from galaxy2janis import datatypes
 
 # TODO future 
 # from galaxy2janis.gx.xmltool.tests import write_tests
@@ -44,6 +45,7 @@ def ingest_tool(path: str) -> Tool:
     'galaxy' is the galaxy tool representation, and
     'internal' is the internal tool representation we will build. 
     """
+    datatypes.populate()
     settings.tool.tool_path = path
     galaxy = load_xmltool(path)
     command = gen_command(galaxy)
@@ -58,6 +60,7 @@ def ingest_workflow(path: str) -> Workflow:
     'internal' is the internal workflow representation we will build. 
     order seems weird but trust me there is reason for this ordering.
     """
+    datatypes.populate()
     galaxy = _load_galaxy_workflow(path)
     internal = Workflow()
 

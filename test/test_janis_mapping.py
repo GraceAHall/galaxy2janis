@@ -123,6 +123,7 @@ class TestJanisToolMapping(unittest.TestCase):
         # check attributes are correct
         self.assertEquals(jinp1.tag, 'fileInput')
         self.assertEquals(jinp1.prefix, None)
+        self.assertEquals(jinp1.separate_value_from_prefix, True)
         self.assertIsInstance(jinp1.input_type, File)
         
         self.assertEquals(jinp2.tag, 'noheader')
@@ -131,11 +132,13 @@ class TestJanisToolMapping(unittest.TestCase):
         self.assertEquals(jinp2.input_type.optional, True)
 
         self.assertEquals(jinp3.tag, 'minid')
-        self.assertEquals(jinp3.prefix, '--minid')
+        self.assertEquals(jinp3.prefix, '--minid=')
+        self.assertEquals(jinp3.separate_value_from_prefix, False)
         self.assertIsInstance(jinp3.input_type, Array)
         
         self.assertEquals(jinp4.tag, 'db')
-        self.assertEquals(jinp4.prefix, '--db')
+        self.assertEquals(jinp4.prefix, '--db=')
+        self.assertEquals(jinp4.separate_value_from_prefix, False)
         self.assertEquals(jinp4.default, 'resfinder')
         self.assertIsInstance(jinp4.input_type, String)
 

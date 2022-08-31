@@ -60,9 +60,9 @@ class ToolInputLineFactory:
     def create(self, invalue: InputValue) -> ToolInputLine:
         if not invalue.component:
             self.unknown_count += 1
-            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.input_value}'
+            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.wrapped_value}'
         else:
-            tag_and_value = f'{invalue.input_tag}={invalue.input_value}'
+            tag_and_value = f'{invalue.input_tag}={invalue.wrapped_value}'
         return ToolInputLine(
             tag_and_value=tag_and_value,
             special_label=self.get_special_label(invalue),

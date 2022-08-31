@@ -1,7 +1,6 @@
 
 
 
-import ast 
 from typing import Any, Optional, Tuple
 from datetime import datetime
 
@@ -123,33 +122,28 @@ def _add_step(internal: WorkflowStep, wf: WorkflowBuilder) -> None:
     )
 
 def _set_tool_input_values(internal: WorkflowStep, tool: CommandToolBuilder, wf: WorkflowBuilder) -> None:
-    unknown_count = 0
     for invalue in internal.inputs.all: # TODO ordering? currently unordered
-        tag = _get_input_tag(invalue, unknown_count)
-        value = _get_input_value(invalue, wf)
-        tool.connections[tag] = value
-
-def _get_input_tag(invalue: InputValue, unknown_count: int) -> str:
-    if invalue.component:
-        return invalue.input_tag
-    else:
-        unknown_count += 1
-        return f'UNKNOWN{unknown_count}'
+        if invalue.component:
+            tag = invalue.input_tag
+            value = _get_input_value(invalue, wf)
+            tool.connections[tag] = value
+        else:
+            # TODO LOG  (unknown input)
+            pass
     
 def _get_input_value(invalue: InputValue, wf: WorkflowBuilder) -> Any | Node | Tuple[Node, str]:
-    # verify_or_try_get_source() 
     match invalue:
         case StaticInputValue():
-            return ast.literal_eval(invalue.input_value)    # Any
+            return invalue.raw_value                        # Any
         case WorkflowInputInputValue():
-            str_value = invalue.input_value
-            in_tag = str_value.split('.')[-1]
-            return wf.input_nodes[in_tag]                   # Node
+            str_value = invalue.wrapped_value
+            node_tag = str_value.split('.')[-1]
+            return wf.input_nodes[node_tag]                 # Node
         case ConnectionInputValue():
-            str_value = invalue.input_value
-            step_tag = str_value.split('.')[-2]
+            str_value = invalue.wrapped_value
+            node_tag = str_value.split('.')[-2]
             out_tag = str_value.split('.')[-1]
-            return (wf.input_nodes[step_tag], out_tag)      # Tuple[Node, str]
+            return (wf.step_nodes[node_tag], out_tag)       # Tuple[Node, str]
         case _:
             return None
 
@@ -158,12 +152,15 @@ def _get_scatter_input_names(internal: WorkflowStep) -> list[str]:
     names: list[str] = []
     invalues = internal.inputs.all
     for val in invalues:
-        if val.scatter:
+        if val.component and val.scatter:
             if not val.component:
                 unknown_count += 1
                 names.append(f'{val.input_tag}{unknown_count}')  # TODO attention
             else:
                 names.append(val.input_tag)
+        else:
+            # TODO LOG  (scatter on unknown input)
+            pass
     return names
 
 def _get_scatter_object(names: list[str]) -> Optional[str | ScatterDescription]:

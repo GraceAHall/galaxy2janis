@@ -40,7 +40,7 @@ def tool_mode(args: dict[str, Optional[str]]) -> None:
     tool_setup(args)
     tool = ingest_tool(settings.tool.tool_path)
     path = paths.tool(tool.metadata.id)
-    write_tool(tool, path=path)  # I dont like this design, but it may be necessary
+    write_tool(tool, path=path) 
 
 def workflow_mode(args: dict[str, Optional[str]]) -> None:
     workflow_setup(args)

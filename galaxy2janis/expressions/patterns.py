@@ -11,7 +11,7 @@ QUOTED_SECTION = r'"([^\"]*?)"|\'([^\']*?)\''
 QUOTED_SECTION_W_NEWLINE = r'\'[^\']*?\n[^\']*?\'|"[^"]*?\n[^"]*?"'
 
 INTEGER = r'^-?\d+$'
-FLOAT   = r'^-?(\.\d+)|-?(\d+\.\d+)$'
+FLOAT   = r'^(-?(\.\d+)|-?(\d+\.\d+))(e-?\d+)?$'
 NUMBER  = r'^-?\.?\d+(\.\d+)?$'
 OPERATOR = r'^[-+\\/*=]?=$'
 VERSION = r'^(\d+)(\.\d+)*$'
