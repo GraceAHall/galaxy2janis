@@ -10,7 +10,7 @@ packages = ["galaxy2janis"] + ["galaxy2janis." + p for p in sorted(find_packages
 
 setup(
     name='galaxy2janis',
-    version='0.1.1',
+    version='0.1.2',
     license='MIT',
     author='Grace Hall',
     description='ingestion of galaxy tool wrappers (.xml) and workflows (.ga) into the janis language.',
