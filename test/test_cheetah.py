@@ -6,8 +6,8 @@ import json
 import unittest
 import xml.etree.ElementTree as et
 
-from gx.gxworkflow.parsing.tool_state import load_tool_state
-from gx.gxtool.text.cheetah.evaluation import sectional_evaluate
+from galaxy2janis.gx.gxworkflow.parsing.tool_state import load_tool_state
+from galaxy2janis.gx.gxtool.text.cheetah.evaluation import sectional_evaluate
 
 
 UNICYCLER_VANILLA_PATH = 'test/data/command/manipulation/template/unicycler/unicycler_command.xml'

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 
 from ..configfiles.Configfile import Configfile
-from .ToolXMLMetadata import ToolXMLMetadata
+from .metadata import ToolXMLMetadata
 from .param.ParamRegister import ParamRegister
 from .TestRegister import TestRegister
 from .requirements import ContainerRequirement, CondaRequirement

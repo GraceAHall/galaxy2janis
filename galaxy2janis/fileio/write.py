@@ -3,8 +3,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from galaxy2janis.fileio.text.workflow.InputsText import InputsText
-
 if TYPE_CHECKING:
     from galaxy2janis.entities.tool import Tool
     from galaxy2janis.entities.workflow import Workflow
@@ -16,14 +14,13 @@ from galaxy2janis import paths
 from galaxy2janis.utils import galaxy as galaxy_utils
 from galaxy2janis.gx.wrappers import fetch_wrapper
 
+from .text.workflow.InputsText import InputsText
 from .text.workflow.WorkflowText import WorkflowText
 from .text.tool.ConfigfileText import ConfigfileText
 from .text.tool.UnstranslatedText import UntranslatedText
 from .text.tool.ToolText import ToolText
 
 from .initialisation import init_folder
-
-
 
 
 def write_tool(tool: Tool, path: str) -> None:

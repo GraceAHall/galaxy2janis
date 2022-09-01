@@ -13,6 +13,7 @@ from galaxy2janis import settings
 # configuration
 # -------------
 
+warnings.filterwarnings("ignore")
 
 
 # logging 
@@ -24,9 +25,6 @@ def configure_logging() -> None:
         the_dict['handlers']['message_log']['filename'] = paths.message_log()
     config.dictConfig(the_dict)
 
-# warnings configuration
-def configure_warnings() -> None:
-    warnings.filterwarnings("ignore")
 
 # -------
 # logging

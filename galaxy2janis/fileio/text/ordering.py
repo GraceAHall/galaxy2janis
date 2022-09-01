@@ -54,7 +54,7 @@ class AlphabeticalStrategy(InputOrderingStrategy):
 
 class NotNullPriority(InputOrderingStrategy):
     def order(self, invalues: list[InputValue]) -> list[InputValue]:
-        invalues.sort(key=lambda x: x.input_value != 'None', reverse=True)
+        invalues.sort(key=lambda x: x.wrapped_value != 'None', reverse=True)
         return invalues
 
 class PositionalsOptsPositionals(InputOrderingStrategy):

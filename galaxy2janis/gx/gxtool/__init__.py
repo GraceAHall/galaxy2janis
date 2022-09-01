@@ -2,8 +2,8 @@
 
 
 from .load import load_xmltool
-from .XMLToolDefinition import XMLToolDefinition
-from .ToolXMLMetadata import ToolXMLMetadata
+from .tool import XMLToolDefinition
+from .metadata import ToolXMLMetadata
 
 
 

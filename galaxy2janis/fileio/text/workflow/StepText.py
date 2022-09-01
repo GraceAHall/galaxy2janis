@@ -60,9 +60,9 @@ class ToolInputLineFactory:
     def create(self, invalue: InputValue) -> ToolInputLine:
         if not invalue.component:
             self.unknown_count += 1
-            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.input_value}'
+            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.wrapped_value}'
         else:
-            tag_and_value = f'{invalue.input_tag}={invalue.input_value}'
+            tag_and_value = f'{invalue.input_tag}={invalue.wrapped_value}'
         return ToolInputLine(
             tag_and_value=tag_and_value,
             special_label=self.get_special_label(invalue),
@@ -148,7 +148,7 @@ class StepText(TextRender):
         if self.render_runtime_inputs:
             out_str += f'{self.format_runtime_inputs()}\n'
         
-        out_str += f'{self.format_tool()}\n'
+        out_str += f'{self.format_step()}\n'
         return out_str
 
     def format_runtime_inputs(self) -> str:
@@ -161,7 +161,7 @@ class StepText(TextRender):
             out_str += f'{WorkflowInputText(winp).render()}\n'
         return out_str
 
-    def format_tool(self) -> str:
+    def format_step(self) -> str:
         step_tag = self.entity.tag
         tool_tag = self.entity.tool.tag
         scatter_stmt = self.format_scatter()

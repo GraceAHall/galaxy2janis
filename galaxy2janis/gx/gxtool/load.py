@@ -1,22 +1,26 @@
 
 from galaxy2janis.logs import logging
-from galaxy2janis import settings
+import os
+import tempfile
+
+from galaxy.tools import Tool as GxTool
+from galaxy.tool_util.parser import get_tool_source
+from galaxy.tools import create_tool_from_source
+from galaxy.model import History
 
 from galaxy.tools import Tool as GxTool
 from galaxy.tools.parameters.basic import ToolParameter
 from galaxy.tool_util.parser.output_objects import ToolOutput
 
-from ..interaction import get_tool
 from ..configfiles.Configfile import Configfile
-
-from .XMLToolDefinition import XMLToolDefinition
-from .ToolXMLMetadata import ToolXMLMetadata
+from .mock import MockApp, MockObjectStore
+from .tool import XMLToolDefinition
+from .metadata import ToolXMLMetadata
 from .citations import Citation
 from .parsing.ParamFlattener import ParamFlattener
 from .param.ParamRegister import ParamRegister
 from .TestRegister import TestRegister
 from .requirements import CondaRequirement, ContainerRequirement
-
 from .parsing.outputs import parse_output_param
 from .parsing.inputs import parse_input_param
 
@@ -24,11 +28,32 @@ from .parsing.inputs import parse_input_param
 Requirement = ContainerRequirement | CondaRequirement
 
 
-def load_xmltool() -> XMLToolDefinition:
-    gxtool = get_tool(settings.tool.tool_path)
+def load_xmltool(path: str) -> XMLToolDefinition:
+    gxtool = _load_galaxy_tool(path)
     factory = GalaxyToolFactory(gxtool)
     return factory.create()
 
+def _load_galaxy_tool(path: str) -> GxTool:
+    app = _get_app()
+    tool_source = get_tool_source(path)
+    tool = create_tool_from_source(app, tool_source)
+    tool.assert_finalized()
+    return tool
+
+def _get_app() -> MockApp:
+    # basic details
+    app = MockApp()
+    app.job_search = None
+    app.object_store = MockObjectStore()
+    # config
+    app.config.new_file_path = os.path.join(tempfile.mkdtemp(), "new_files")
+    app.config.admin_users = "grace@thebest.com"
+    app.config.len_file_path = "moocow"
+    # database
+    
+    app.model.context.add(History())
+    app.model.context.flush()
+    return app
 
 class GalaxyToolFactory:
     def __init__(self, gxtool: GxTool):
@@ -69,7 +94,7 @@ class GalaxyToolFactory:
                 register.add(param)
         return register
 
-    def parse_metadata(self, ) -> ToolXMLMetadata:
+    def parse_metadata(self) -> ToolXMLMetadata:
         """returns a formatted Metadata using the representation"""
         requirements: list[Requirement] = self.get_requirements()
         citations: list[Citation] = self.get_citations()

@@ -19,7 +19,7 @@ from galaxy2janis import datatypes
 from galaxy2janis import settings
 
 
-def handle_tool_runtime_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
+def handle_step_runtime_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
     """runtime user inputs in step 'inputs'"""
     ingestor = RuntimeInputIngestor(janis, galaxy)
     ingestor.ingest()
@@ -37,7 +37,7 @@ class RuntimeInputIngestor:
 
     def ingest_runtime(self, g_step: dict[str, Any]) -> None:
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
-        settings.tool.set(wrapper=j_step.metadata.wrapper)
+        settings.tool.set(from_wrapper=j_step.metadata.wrapper)
         g_targets = [inp['name'] for inp in g_step['inputs']]
         
         for g_target in g_targets:

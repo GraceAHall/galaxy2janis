@@ -2,7 +2,7 @@
 
 from typing import Type
 
-from ...gxtool.XMLToolDefinition import XMLToolDefinition
+from ...gxtool.tool import XMLToolDefinition
 from ..tokens import TokenType
 from ..Command import Command
 from .ExecutionPath import ExecutionPath

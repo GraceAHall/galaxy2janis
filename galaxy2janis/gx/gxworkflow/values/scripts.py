@@ -17,11 +17,11 @@ from ...command.components import Option
 from ...wrappers import fetch_wrapper
 
 
-def handle_tool_script_inputs(janis: Workflow) -> None:
+def handle_step_script_inputs(janis: Workflow) -> None:
     # sets tool input values as default
     # tool components which accepts scripts from the galaxy wrapper $__tool_directory
     for j_step in janis.steps:
-        settings.tool.set(wrapper=j_step.metadata.wrapper)
+        settings.tool.set(from_wrapper=j_step.metadata.wrapper)
         handle_step(janis, j_step)
 
 def handle_step(janis: Workflow, j_step: WorkflowStep) -> None:

@@ -1,5 +1,6 @@
 
 
+import os
 from typing import Any, Optional
 
 from galaxy2janis.gx.wrappers import Wrapper
@@ -25,13 +26,13 @@ def xml_dir() -> str:
 def logfile_path() -> str:
     return f'{xml_basename()}.log'
 
-def set(args: Optional[dict[str, Any]]=None, wrapper: Optional[Wrapper]=None) -> None:
-    if not args and not wrapper:
+def set(from_args: Optional[dict[str, Any]]=None, from_wrapper: Optional[Wrapper]=None) -> None:
+    if not from_args and not from_wrapper:
         raise RuntimeError('supply either args or wrapper to update')
-    if args:
-        update_args(args)
-    elif wrapper:
-        update_wrapper(wrapper)
+    if from_args:
+        update_args(from_args)
+    elif from_wrapper:
+        update_wrapper(from_wrapper)
 
 def update_args(args: dict[str, Any]) -> None:
     global tool_path
@@ -41,7 +42,8 @@ def update_args(args: dict[str, Any]) -> None:
     global revision
 
     if args['infile']:
-        tool_path = args['infile']
+        rel_path = args['infile']
+        tool_path = os.path.relpath(rel_path)
         tool_id = get_xml_id(tool_path)
         owner = None
         repo = None
@@ -53,7 +55,8 @@ def update_args(args: dict[str, Any]) -> None:
         assert(owner)
         assert(repo)
         assert(revision)
-        tool_path = fetch_wrapper(owner, repo, revision, tool_id)
+        rel_path = fetch_wrapper(owner, repo, revision, tool_id)
+        tool_path = os.path.relpath(rel_path)
 
 def update_wrapper(wrapper: Wrapper) -> None:
     global tool_path
@@ -66,5 +69,6 @@ def update_wrapper(wrapper: Wrapper) -> None:
     owner = wrapper.owner
     repo = wrapper.repo
     revision = wrapper.revision
-    tool_path = fetch_wrapper(wrapper.owner, wrapper.repo, wrapper.revision, wrapper.tool_id)
+    rel_path = fetch_wrapper(wrapper.owner, wrapper.repo, wrapper.revision, wrapper.tool_id)
+    tool_path = os.path.relpath(rel_path)
 

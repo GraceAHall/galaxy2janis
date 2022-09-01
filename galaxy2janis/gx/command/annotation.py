@@ -3,7 +3,7 @@
 from galaxy2janis.logs import logging
 from galaxy2janis import expressions
 
-from ..gxtool.XMLToolDefinition import XMLToolDefinition
+from ..gxtool.tool import XMLToolDefinition
 from ..gxtool.param.Param import Param
 from ..gxtool.param.InputParam import BoolParam, SelectParam
 

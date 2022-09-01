@@ -1,7 +1,7 @@
 
 
 
-from ..gxtool.XMLToolDefinition import XMLToolDefinition
+from ..gxtool.tool import XMLToolDefinition
 from ..gxtool.text import load_command
 
 from .cmdstr.CommandString import CommandString

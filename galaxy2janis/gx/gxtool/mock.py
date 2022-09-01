@@ -2,7 +2,11 @@
 import os
 import shutil
 import tempfile
+import yaml
 from typing import Any
+
+from galaxy2janis import settings
+from galaxy2janis.paths import USER_DATA_DIR, GALAXY_CONFIG
 
 from sqlalchemy.orm.scoping import scoped_session
 
@@ -18,7 +22,7 @@ from galaxy.tools.parameters.basic import (
 from galaxy.auth import AuthManager
 from galaxy.datatypes.registry import Registry
 from galaxy.jobs.manager import NoopManager
-from galaxy.jobs import SimpleComputeEnvironment
+from galaxy.jobs import SharedComputeEnvironment
 from galaxy.managers.users import UserManager
 from galaxy.model import mapping, tags
 from galaxy.model.base import SharedModelMapping
@@ -38,11 +42,6 @@ from galaxy.tool_util.biotools import BiotoolsMetadataSource
 from galaxy.tools.data import ToolDataTableManager
 #from galaxy.datatypes.registry import example_datatype_registry_for_sample
 # terrible stuff from galaxy. not planning on a refactor.
-
-import yaml
-from galaxy2janis import settings
-
-
 
 
 class MockApp(di.Container):
@@ -122,9 +121,6 @@ class MockApp(di.Container):
         # need to wait.
         return True
 
-
-
-from galaxy2janis.paths import USER_DATA_DIR, GALAXY_CONFIG
 
 def grace_get_config() -> dict[str, Any]:
     config_path = f'{USER_DATA_DIR}/{GALAXY_CONFIG}'
@@ -277,7 +273,7 @@ class MockObjectStore:
             assert dataset.object_store_id == self.object_store_id
 
 
-class ComputeEnvironment(SimpleComputeEnvironment):
+class ComputeEnvironment(SharedComputeEnvironment):
     def __init__(
         self,
         new_file_path,

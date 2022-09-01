@@ -1,7 +1,7 @@
 
 
 
-from ..gxtool.XMLToolDefinition import XMLToolDefinition
+from ..gxtool.tool import XMLToolDefinition
 from .factory import CommandFactory
 from .Command import Command
 

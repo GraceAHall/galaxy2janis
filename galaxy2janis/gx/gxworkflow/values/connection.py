@@ -15,7 +15,7 @@ from galaxy2janis import mapping
 from galaxy2janis import settings
 
 
-def handle_tool_connection_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
+def handle_step_connection_inputs(janis: Workflow, galaxy: dict[str, Any]) -> None:
     """connections listed in step 'input_connections'"""
     ingestor = ConnectionInputIngestor(janis, galaxy)
     ingestor.ingest()
@@ -45,7 +45,7 @@ class ConnectionInputIngestor:
 
         """
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
-        settings.tool.set(wrapper=j_step.metadata.wrapper)
+        settings.tool.set(from_wrapper=j_step.metadata.wrapper)
         for g_target, g_emitter in g_step['input_connections'].items():
             g_target = g_target.replace('|', '.')
             j_target = mapping.tool_input(g_target, j_step.tool)

@@ -9,7 +9,6 @@ from .InputComponent import InputComponent
 from . import utils
 
 
-
 class Positional(InputComponent):
     def __init__(self) -> None:
         super().__init__()

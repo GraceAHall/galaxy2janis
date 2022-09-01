@@ -21,7 +21,7 @@ def general_setup(args: dict[str, Any]) -> None:
 
     setup_output_folder(args)
     setup_data_folder()
-    datatypes.populate()
+
     logging.configure_logging()
 
 

@@ -4,8 +4,8 @@
 import os
 import unittest
 
-import containers
-from gx.gxtool.requirements import CondaRequirement
+from galaxy2janis import containers
+from galaxy2janis.gx.gxtool.requirements import CondaRequirement
 
 QUERY1 = CondaRequirement(_name='abricate', _version='1.0.1')
 QUERY1_EXPECTED_RESULT = 'quay.io/biocontainers/abricate:1.0.1--ha8f3691_1'
@@ -26,7 +26,7 @@ class TestContainerFetching(unittest.TestCase):
         """
         creates a temp container cache for use. the tearDown() method will remove this after tests have run. 
         """
-        self.temp_cache_dir = 'test/temp/container_cache.json'
+        self.temp_cache_dir = '/tmp/container_cache.json'
         with open(self.temp_cache_dir, 'w') as fp:
             fp.write('{}')
     

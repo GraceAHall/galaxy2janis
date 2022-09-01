@@ -2,7 +2,6 @@
 from typing import Any, Optional
 
 from galaxy2janis.gx.command.components import InputComponent
-from . import utils
 
 from galaxy2janis.entities.workflow import (
     ConnectionInputValue, 
@@ -12,10 +11,10 @@ from galaxy2janis.entities.workflow import (
 
 
 def static(component: Optional[InputComponent], value: Any, default: bool=False) -> StaticInputValue:
+    value = str(value)      # yeaaaaaa um yea. dw about this.
     return StaticInputValue(
         component=component,
-        value=value,
-        _valtypestr=utils.select_input_value_type(component, value),
+        string_value=value,
         default=default
     )
 

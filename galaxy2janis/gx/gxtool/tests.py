@@ -1,8 +1,7 @@
 
 
-from galaxy2janis import settings
 
-from .XMLToolDefinition import XMLToolDefinition
+from .tool import XMLToolDefinition
 
 
 

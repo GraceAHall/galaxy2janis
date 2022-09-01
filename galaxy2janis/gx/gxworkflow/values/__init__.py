@@ -1,7 +1,7 @@
 
 
 
-from .connection import handle_tool_connection_inputs
-from .runtime import handle_tool_runtime_inputs
-from .static import handle_tool_static_inputs
-from .default import handle_tool_default_inputs
+from .connection import handle_step_connection_inputs
+from .runtime import handle_step_runtime_inputs
+from .static import handle_step_static_inputs
+from .default import handle_step_default_inputs
