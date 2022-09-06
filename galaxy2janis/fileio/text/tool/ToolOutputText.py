@@ -46,21 +46,20 @@ class ToolOutputText(TextRender):
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
-        # TODO opportunity for decorator # Stdout class import
+        # Stdout class import
         if isinstance(self.entity, RedirectOutput):
             imports.append(('janis_core', 'Stdout'))
 
-        # TODO opportunity for decorator # Selector class import
+        # Selector class import
         selector_str = format_selector_str(self.entity)
         if selector_str:
             selector = selector_str.split('(', 1)[0]
             imports.append(('janis_core', selector))
         
-        # TODO opportunity for decorator # Array class import
+        # Array class import
         if self.entity.array:
             imports.append(('janis_core', 'Array'))
 
-        # TODO opportunity for decorator
         imports = list(set(imports))
         return ordering.order_imports(imports)
 

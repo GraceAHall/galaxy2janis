@@ -1,6 +1,4 @@
 
-
-
 from typing import Optional
 
 from janis_core import (

@@ -255,7 +255,7 @@ class TeeAnnotator(Annotator):
 
     def handle(self) -> None:
         tee = Tee()
-        ptr = self.ptr + 1 # TODO debug -> does this change self.ptr?
+        ptr = self.ptr + 1 
 
         # tee arguments
         token = self.positions[ptr].token

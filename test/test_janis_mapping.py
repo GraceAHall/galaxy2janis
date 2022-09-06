@@ -29,15 +29,15 @@ from janis_core import (
 
 from galaxy2janis import datatypes
 
-from galaxy2janis.janis_mapping.workflow import to_janis_workflow
-from galaxy2janis.janis_mapping.workflow import to_janis_inputs_dict
+from galaxy2janis.dep_janis_mapping.workflow import to_janis_workflow
+from galaxy2janis.dep_janis_mapping.workflow import to_janis_inputs_dict
 
-from galaxy2janis.janis_mapping.tool import to_janis_datatype
-from galaxy2janis.janis_mapping.tool import to_janis_selector
-from galaxy2janis.janis_mapping.tool import to_janis_metadata
-from galaxy2janis.janis_mapping.tool import to_janis_tool_input
-from galaxy2janis.janis_mapping.tool import to_janis_tool_output
-from galaxy2janis.janis_mapping.tool import to_janis_tool
+from galaxy2janis.dep_janis_mapping.tool import to_janis_datatype
+from galaxy2janis.dep_janis_mapping.tool import to_janis_selector
+from galaxy2janis.dep_janis_mapping.tool import to_janis_metadata
+from galaxy2janis.dep_janis_mapping.tool import to_janis_tool_input
+from galaxy2janis.dep_janis_mapping.tool import to_janis_tool_output
+from galaxy2janis.dep_janis_mapping.tool import to_janis_tool
 
 from mock.mock_tool import MOCK_TOOL_ABRICATE
 from mock.mock_workflow import MOCK_WORKFLOW

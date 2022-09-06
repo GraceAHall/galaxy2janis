@@ -1,6 +1,5 @@
 
 
-
 from typing import Any, Optional, Tuple
 from datetime import datetime
 
@@ -22,6 +21,7 @@ from janis_core import CommandToolBuilder
 from janis_core import ScatterDescription
 from janis_core import ScatterMethods
 from janis_core import WorkflowMetadata as JanisWorkflowMetadata
+from janis_core.ingestion.logging.main import log_message
 
 from .general import to_janis_datatype
 from .tool import to_janis_tool
@@ -112,7 +112,7 @@ def _add_step(internal: WorkflowStep, wf: WorkflowBuilder) -> None:
     step_tag = internal.tag
     tool = to_janis_tool(internal.tool)
     _set_tool_input_values(internal, tool, wf)
-    scatter_names = _get_scatter_input_names(internal)
+    scatter_names = _get_scatter_input_names(internal, step_tag)
     scatter_obj = _get_scatter_object(scatter_names)
     wf.step(
         identifier=step_tag,
@@ -128,8 +128,7 @@ def _set_tool_input_values(internal: WorkflowStep, tool: CommandToolBuilder, wf:
             value = _get_input_value(invalue, wf)
             tool.connections[tag] = value
         else:
-            # TODO LOG  (unknown input)
-            pass
+            log_message(tool.tool(), f'unknown step input: value={invalue.wrapped_value}')
     
 def _get_input_value(invalue: InputValue, wf: WorkflowBuilder) -> Any | Node | Tuple[Node, str]:
     match invalue:
@@ -147,20 +146,17 @@ def _get_input_value(invalue: InputValue, wf: WorkflowBuilder) -> Any | Node | T
         case _:
             return None
 
-def _get_scatter_input_names(internal: WorkflowStep) -> list[str]:
+def _get_scatter_input_names(internal: WorkflowStep, uuid: str) -> list[str]:
     unknown_count: int = 0
     names: list[str] = []
-    invalues = internal.inputs.all
+    invalues = [v for v in internal.inputs.all if v.scatter]
     for val in invalues:
-        if val.component and val.scatter:
-            if not val.component:
-                unknown_count += 1
-                names.append(f'{val.input_tag}{unknown_count}')  # TODO attention
-            else:
-                names.append(val.input_tag)
+        if val.component:
+            names.append(val.input_tag)
         else:
-            # TODO LOG  (scatter on unknown input)
-            pass
+            unknown_count += 1
+            name = f'{val.input_tag}{unknown_count}'
+            log_message(uuid, f'scatter on unknown input: {name}')
     return names
 
 def _get_scatter_object(names: list[str]) -> Optional[str | ScatterDescription]:

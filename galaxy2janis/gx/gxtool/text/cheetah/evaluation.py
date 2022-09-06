@@ -43,7 +43,7 @@ class PartialCheetahEvaluator:
         if block.evaluated:
             self.ptr += 1  # success, go to next line
         else:
-            self.ptr += block.height # TODO CHECK
+            self.ptr += block.height 
 
 
 
