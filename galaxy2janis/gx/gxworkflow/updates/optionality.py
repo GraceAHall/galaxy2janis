@@ -22,6 +22,6 @@ def update_components_optionality(value: InputValue, janis: Workflow) -> None:
             if s_out.tool_output.optional and not value.component.optional:
                 value.component.forced_optionality = True
         elif isinstance(value, StaticInputValue):
-            if value.is_none:
+            if value.value_type == 'none':
                 value.component.forced_optionality = True
 

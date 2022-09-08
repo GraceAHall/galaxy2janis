@@ -14,7 +14,7 @@ def static(component: Optional[InputComponent], value: Any, default: bool=False)
     value = str(value)      # yeaaaaaa um yea. dw about this.
     return StaticInputValue(
         component=component,
-        string_value=value,
+        str_value=value,
         default=default
     )
 
