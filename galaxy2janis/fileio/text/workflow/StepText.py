@@ -108,14 +108,14 @@ class StepText(TextRender):
     def __init__(
         self, 
         entity: WorkflowStep, 
-        janis: Workflow,
+        workflow: Workflow,
         render_note: bool=False,
         render_imports: bool=False,
         render_runtime_inputs: bool=False
     ):
         super().__init__()
         self.entity = entity
-        self.janis = janis
+        self.workflow = workflow
         self.render_note = render_note
         self.render_imports = render_imports
         self.render_runtime_inputs = render_runtime_inputs
@@ -123,6 +123,8 @@ class StepText(TextRender):
     @cached_property
     def lines(self) -> list[ToolInputLine]:
         invalues = self.entity.inputs.all
+        # uncomment following line to show all step input values
+        invalues = [x for x in invalues if not isinstance(x, StaticInputValue)]
         invalues = ordering.order_step_inputs(invalues)
         factory = ToolInputLineFactory()
         return [factory.create(val) for val in invalues]
@@ -155,7 +157,7 @@ class StepText(TextRender):
         inputs = self.entity.inputs.all
         inputs = [x for x in inputs if isinstance(x, WorkflowInputInputValue)]
         inputs = [x for x in inputs if x.is_runtime]
-        winps = [self.janis.get_input(x.input_uuid) for x in inputs]
+        winps = [self.workflow.get_input(x.input_uuid) for x in inputs]
         out_str = ''
         for winp in winps:
             out_str += f'{WorkflowInputText(winp).render()}\n'
