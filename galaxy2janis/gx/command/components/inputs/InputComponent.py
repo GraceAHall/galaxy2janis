@@ -15,6 +15,7 @@ class InputComponent(ABC):
         self.cmd_pos: int = -1
         self.forced_optionality: Optional[bool] = None
         self.forced_array: Optional[bool] = None
+        self.forced_default: Optional[bool] = None
  
     @property
     @abstractmethod

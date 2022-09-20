@@ -73,7 +73,7 @@ def is_float(component: Optional[InputComponent | OutputComponent], value: str) 
 @dataclass
 class StaticInputValue(InputValue):
     str_value: str
-    default: bool
+    is_default: bool
 
     def __post_init__(self):
         self.scatter: bool = False

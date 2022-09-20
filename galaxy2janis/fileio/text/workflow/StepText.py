@@ -92,7 +92,7 @@ class ToolInputLineFactory:
     
     def get_default_label(self, invalue: InputValue) -> str:
         if isinstance(invalue, StaticInputValue):
-            if invalue.default:
+            if invalue.is_default:
                 return 'DEFAULT'
         return ''
     

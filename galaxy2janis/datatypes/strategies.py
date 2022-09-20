@@ -31,7 +31,7 @@ def types_from_values(values: list[Any]) -> list[str]:
     return ['string']
 
 def types_from_default(entity: Any) -> list[str]:
-    default = entity.default_value
+    default = str(entity.default_value)
     if default:
         if expressions.is_int(default):
             return ['integer']
