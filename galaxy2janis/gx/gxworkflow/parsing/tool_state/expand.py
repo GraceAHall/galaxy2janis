@@ -18,8 +18,8 @@ class ToolStateExpander:
         #self.tool_state = json.loads(step['tool_state'])
 
     def load(self) -> dict[str, Any]:
-        self.tool_state = self.explore_node(self.step['tool_state'])
-        return self.tool_state
+        tool_state = self.explore_node(self.step['tool_state'])
+        return tool_state
     
     def explore_node(self, node: Any) -> Any:
         if self.is_quoted(node) or self.is_brackets(node):
