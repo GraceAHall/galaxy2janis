@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from galaxy2janis.gx.gxtool import XMLToolDefinition
-    from galaxy2janis.gx.gxtool.param import Param
 
 from galaxy2janis.logs import logging
 
@@ -24,6 +23,12 @@ class RealisedTokens:
     def __init__(self, values: list[list[Token]], original: Token):
         self.tlists = values
         self.original = original
+        self.set_gxparams()
+
+    def set_gxparams(self) -> None:
+        for tlist in self.tlists:
+            for token in tlist:
+                token.gxparam = self.original.gxparam
         
     def get_original_token(self) -> Token:
         return self.original
@@ -36,10 +41,6 @@ class RealisedTokens:
     
     def get_first_word(self) -> str:
         return self.get_default_token().text
-
-    def get_gx_reference(self) -> Optional[Param]:
-        # every token will have the same gx object
-        return self.get_original_token().gxparam
     
     def __repr__(self) -> str:
         strvalues: list[str] = []

@@ -34,5 +34,17 @@
                 "sample_data/assembly.ga"
             ]
         },
+        {
+            "name": "featurecounts",
+            "type": "python",
+            "request": "launch",
+            "program": "galaxy2janis/run.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "tool",
+                "temp/featurecounts/featurecounts.xml"
+            ]
+        },
     ]
 }

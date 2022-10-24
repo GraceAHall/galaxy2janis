@@ -49,7 +49,7 @@ linux_constructs: list[Type[Annotator]] = [
 
 # annotation order matters ?
 tool_arguments: list[Type[Annotator]] = [
-    OptionAnnotator,   # priority 1?
+    OptionAnnotator,   # priority 1
     CompoundOptionAnnotator,
     FlagAnnotator,
     PositionalAnnotator
