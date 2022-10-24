@@ -13,6 +13,7 @@ class Positional(InputComponent):
     def __init__(self) -> None:
         super().__init__()
         self.before_opts: bool = False
+        self.forced_docstring: Optional[str] = None
         self.values: ValueRecord = ValueRecord()
 
     @property
@@ -67,6 +68,8 @@ class Positional(InputComponent):
     
     @property
     def docstring(self) -> Optional[str]:
+        if self.forced_docstring:
+            return self.forced_docstring
         if self.gxparam:
             return self.gxparam.docstring
         return ''

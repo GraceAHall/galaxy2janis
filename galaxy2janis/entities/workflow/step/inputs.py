@@ -28,7 +28,7 @@ class InputValue(ABC):
         if self.component:
             return self.component.tag
         else:
-            return 'UNKNOWN'
+            return 'unknown'
     
     @property
     @abstractmethod
