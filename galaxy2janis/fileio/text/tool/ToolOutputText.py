@@ -24,7 +24,7 @@ def format_selector_str(output: OutputComponent) -> Optional[str]:
             input_comp_tag = tags.get(input_comp_uuid)
             return f'InputSelector("{input_comp_tag}")'
         case WildcardOutput():
-            pattern = 'UNKNOWN'
+            pattern = 'unknown'
             if hasattr(output.gxparam, 'from_work_dir') and output.gxparam.from_work_dir:
                 pattern = output.gxparam.from_work_dir
             elif output.gxparam.discover_pattern:
