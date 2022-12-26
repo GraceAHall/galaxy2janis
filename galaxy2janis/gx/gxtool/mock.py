@@ -117,8 +117,6 @@ class MockApp(di.Container):
         self.datatypes_registry = datatypes_registry
 
     def wait_for_toolbox_reload(self, toolbox):
-        # TODO: If the tpm test case passes, does the operation really
-        # need to wait.
         return True
 
 

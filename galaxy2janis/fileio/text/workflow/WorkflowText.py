@@ -59,7 +59,7 @@ def builder_snippet(workflow: Workflow) -> str:
     out_str += 'w = WorkflowBuilder(\n'
     out_str += f'\t"{workflow.tag}",\n'
     out_str += f'\tversion="{workflow.metadata.version}",\n'
-    out_str += f'\tdoc="{workflow.metadata.annotation}"\n'
+    out_str += f'\tdoc="{workflow.metadata.annotation}",\n'
     out_str += f'\tmetadata=metadata\n'
     out_str += ')\n'
     return out_str

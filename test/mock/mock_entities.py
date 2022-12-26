@@ -41,21 +41,21 @@ MOCK_STEP_INPUT1 = WorkflowInputInputValue(
 
 MOCK_STEP_INPUT2 = StaticInputValue(
     component=MOCK_TOOL_ABRICATE.inputs[1], # MOCK_FLAG1
-    string_value='False',
-    default=False
+    str_value='False',
+    is_default=False
 )
 
 MOCK_STEP_INPUT3 = StaticInputValue(
     component=MOCK_TOOL_ABRICATE.inputs[2], # MOCK_OPTION1
-    string_value='[80.0, 100.0]',
-    default=False
+    str_value='[80.0, 100.0]',
+    is_default=False
 )
 MOCK_STEP_INPUT3.scatter = True
 
 MOCK_STEP_INPUT4 = StaticInputValue(
     component=MOCK_TOOL_ABRICATE.inputs[3], # MOCK_OPTION2
-    string_value='card',
-    default=False
+    str_value='card',
+    is_default=False
 )
 
 MOCK_STEP1.inputs.add(MOCK_STEP_INPUT1)

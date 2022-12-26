@@ -6,6 +6,8 @@ from typing import Any
 from galaxy2janis import expressions
 import json
 
+from galaxy2janis.gx.command.components.inputs.Option import Option
+
 from .JanisDatatype import JanisDatatype
 from .conversion import galaxy_to_janis
 from . import core
@@ -15,9 +17,16 @@ from . import core
 ### SHARED FUNCTIONS ###
 
 def types_from_param(entity: Any) -> list[str]:
+    types = []
     if entity.gxparam and entity.gxparam.formats:
-        return entity.gxparam.formats
-    return []
+        types = entity.gxparam.formats
+    
+    # edge case: Option with boolean gxparam value
+    # eg ASSUME_SORTED=${assume_sorted}, where ${assume_sorted} is bool param
+    if isinstance(entity, Option) and types == ['boolean']:
+        return []
+    else:
+        return types
 
 def types_from_values(values: list[Any]) -> list[str]:
     if all([expressions.is_script(v) for v in values]):
@@ -31,7 +40,7 @@ def types_from_values(values: list[Any]) -> list[str]:
     return ['string']
 
 def types_from_default(entity: Any) -> list[str]:
-    default = entity.default_value
+    default = str(entity.default_value)
     if default:
         if expressions.is_int(default):
             return ['integer']

@@ -38,8 +38,8 @@ class RuntimeInputIngestor:
     def ingest_runtime(self, g_step: dict[str, Any]) -> None:
         j_step = mapping.step(g_step['id'], self.janis, self.galaxy)
         settings.tool.set(from_wrapper=j_step.metadata.wrapper)
-        g_targets = [inp['name'] for inp in g_step['inputs']]
-        
+        g_targets = [name for name, val in g_step['tool_state'].items() if val == '__RuntimeValue__']
+
         for g_target in g_targets:
             g_target = g_target.replace('|', '.')
             j_target = mapping.tool_input(g_target, j_step.tool)

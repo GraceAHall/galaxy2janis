@@ -30,12 +30,12 @@ def write_tool(tool: Tool, path: str) -> None:
         fp.write(page)
 
 def write_workflow(janis: Workflow) -> None:
-    write_tools(janis)
     write_untranslated(janis)
     write_scripts(janis)
     write_wrappers(janis)
     write_main_workflow(janis)
     write_inputs(janis)
+    write_tools(janis)
     #write_sub_workflows(janis)
     #write_config(janis)
 

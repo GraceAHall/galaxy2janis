@@ -14,8 +14,8 @@ def static(component: Optional[InputComponent], value: Any, default: bool=False)
     value = str(value)      # yeaaaaaa um yea. dw about this.
     return StaticInputValue(
         component=component,
-        string_value=value,
-        default=default
+        str_value=value,
+        is_default=default
     )
 
 def connection(component: Optional[InputComponent], step_uuid: str, out_uuid: str) -> ConnectionInputValue:

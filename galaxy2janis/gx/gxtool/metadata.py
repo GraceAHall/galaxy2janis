@@ -22,7 +22,6 @@ class ToolXMLMetadata:
     requirements: list[Requirement]
     citations: list[Citation]
     creator: Optional[str] = None
-    # TODO
     url: Optional[str] = None
     owner: Optional[str] = None
 

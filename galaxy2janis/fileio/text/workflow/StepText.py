@@ -3,15 +3,20 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional, Tuple
 
+from galaxy2janis.entities.tool.Tool import Tool
+
 from galaxy2janis.entities.workflow import Workflow
 from galaxy2janis.entities.workflow import WorkflowStep
 from galaxy2janis.entities.workflow import InputValue, ConnectionInputValue, StaticInputValue, WorkflowInputInputValue
 from galaxy2janis.gx.command.components import Positional
+from galaxy2janis.gx.command.components import InputComponent
+from galaxy2janis.gx.command.components import factory
 
 from .WorkflowInputText import WorkflowInputText
 from ..TextRender import TextRender
 from .. import formatting
 from .. import ordering
+
 
 
 ### HELPER METHODS ### 
@@ -56,13 +61,26 @@ class ToolInputLine:
 
 class ToolInputLineFactory:
     unknown_count = 0
+    
+    def __init__(self, tool: Tool):
+        self.tool = tool
 
     def create(self, invalue: InputValue) -> ToolInputLine:
+        """
+        Steps call a tool, and provide a list of key=value pairs
+        to feed data to the tool inputs. 
+
+        This func creates a 'key=value,' line to form part of the step call. 
+        Feed the correct [value] to the [key] tool input.
+
+        Note: If we have a value but no known tool input, 
+        create an 'unknown' dummy tool input to handle situation. 
+        """
         if not invalue.component:
-            self.unknown_count += 1
-            tag_and_value = f'#{invalue.input_tag}{self.unknown_count}={invalue.wrapped_value}'
-        else:
-            tag_and_value = f'{invalue.input_tag}={invalue.wrapped_value}'
+            component = self.create_unknown_tool_component(invalue)
+            invalue.component = component
+        
+        tag_and_value = f'{invalue.input_tag}={invalue.wrapped_value}'
         return ToolInputLine(
             tag_and_value=tag_and_value,
             special_label=self.get_special_label(invalue),
@@ -70,6 +88,25 @@ class ToolInputLineFactory:
             default_label=self.get_default_label(invalue),
             datatype_label=self.get_datatype_label(invalue),
         )
+
+    def create_unknown_tool_component(self, invalue: InputValue) -> InputComponent:
+        """
+        create a dummy 'unknown' tool input. 
+        Used in situations where we know a step is supplied this InputValue, 
+        but don't know which underlying tool input it maps to. 
+        """
+        self.unknown_count += 1
+        name = f'unknown{self.unknown_count}'
+        default = None
+        if isinstance(invalue, StaticInputValue):
+            name = invalue.str_value
+            default = invalue.raw_value
+        
+        positional = factory.positional(name)
+        positional.forced_default = default
+        positional.forced_docstring = 'ATTENTION: unknown input. please address.'
+        self.tool.add_input(positional)
+        return positional
 
     def get_special_label(self, invalue: InputValue) -> str:
         if isinstance(invalue, WorkflowInputInputValue):
@@ -92,7 +129,7 @@ class ToolInputLineFactory:
     
     def get_default_label(self, invalue: InputValue) -> str:
         if isinstance(invalue, StaticInputValue):
-            if invalue.default:
+            if invalue.is_default:
                 return 'DEFAULT'
         return ''
     
@@ -108,14 +145,14 @@ class StepText(TextRender):
     def __init__(
         self, 
         entity: WorkflowStep, 
-        janis: Workflow,
+        workflow: Workflow,
         render_note: bool=False,
         render_imports: bool=False,
         render_runtime_inputs: bool=False
     ):
         super().__init__()
         self.entity = entity
-        self.janis = janis
+        self.workflow = workflow
         self.render_note = render_note
         self.render_imports = render_imports
         self.render_runtime_inputs = render_runtime_inputs
@@ -123,8 +160,10 @@ class StepText(TextRender):
     @cached_property
     def lines(self) -> list[ToolInputLine]:
         invalues = self.entity.inputs.all
+        # comment following line to show all step input values
+        invalues = [x for x in invalues if not isinstance(x, StaticInputValue)]
         invalues = ordering.order_step_inputs(invalues)
-        factory = ToolInputLineFactory()
+        factory = ToolInputLineFactory(self.entity.tool)
         return [factory.create(val) for val in invalues]
     
     @cached_property
@@ -155,7 +194,7 @@ class StepText(TextRender):
         inputs = self.entity.inputs.all
         inputs = [x for x in inputs if isinstance(x, WorkflowInputInputValue)]
         inputs = [x for x in inputs if x.is_runtime]
-        winps = [self.janis.get_input(x.input_uuid) for x in inputs]
+        winps = [self.workflow.get_input(x.input_uuid) for x in inputs]
         out_str = ''
         for winp in winps:
             out_str += f'{WorkflowInputText(winp).render()}\n'

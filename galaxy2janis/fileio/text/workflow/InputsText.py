@@ -6,7 +6,7 @@ from galaxy2janis.entities.workflow import WorkflowInput
 from ..TextRender import TextRender
 #from ..formatting import format_typestr
 
-def note_snippet(commenter: str) -> str: # TODO
+def note_snippet(commenter: str) -> str:
     return f"""{commenter} WORKFLOW INPUTS
 {commenter} This file contains workflow inputs which need to be provided by the user.
 {commenter} The names of workflow inputs (below) will appear in workflow.py where they are used. 
@@ -16,7 +16,7 @@ def note_snippet(commenter: str) -> str: # TODO
 {commenter} The engine will throw an error otherwise.  
 """
 
-# def note_snippet(commenter: str) -> str: # TODO
+# def note_snippet(commenter: str) -> str:
 #     return f"""{commenter} This file contains workflow inputs which need to be provided by the user.
 # {commenter} Organised as follows: 
 # {commenter}     1. input data for the workflow

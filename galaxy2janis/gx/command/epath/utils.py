@@ -18,6 +18,8 @@ NON_VALUE_TOKENTYPES = set([
     TokenType.EXCISION,
 ])
 
+# general utils
+
 def is_bool_select(token: Token) -> bool:
     if token.ttype == TokenType.GX_INPUT:
         match token.gxparam:
@@ -30,16 +32,22 @@ def is_bool_select(token: Token) -> bool:
                 pass
     return False
 
+def different_params(ctoken: Token, ntoken: Token) -> bool:
+    # for when boolparam followed by a different gxparam
+    if ctoken.gxparam and ntoken.gxparam:   # curr and next both have gxparams
+        if type(ctoken.gxparam) != type(ntoken.gxparam):  # not same gxparam
+            return True
+    return False
+
 
 # FLAG STUFF
 
 def boolparam_then_gxparam(ctoken: Token, ntoken: Token) -> bool:
     # for when boolparam followed by a different gxparam
     if looks_like_a_flag(ctoken):
-        if isinstance(ctoken.gxparam, BoolParam):
-            if ctoken.gxparam and ntoken.gxparam:  # curr and next both have gxparams
-                if ctoken.gxparam.name != ntoken.gxparam.name:  # ensure not same gxparam
-                    return True
+        if different_params(ctoken, ntoken):
+            if isinstance(ctoken.gxparam, BoolParam):
+                return True
     return False
 
 def flag_then_flag(ctoken: Token, ntoken: Token) -> bool:
@@ -75,7 +83,6 @@ def is_flag(ctoken: Token, ntoken: Token) -> bool:
 
 # OPTION STUFF 
 
-
 def kvlinker(ctoken: Token, ntoken: Token) -> bool:
     if ntoken.ttype == TokenType.KV_LINKER:
         return True 
@@ -110,14 +117,19 @@ option_conditions = [
 
 def is_option(ctoken: Token, ntoken: Token) -> bool:
     """
-    happens 2nd after 'is_flag()'
-    already know that its not a flag, so if the current token
-    looks like a flag/option, it has to be an option. 
+    idetifies whether the current and next token implies an option.
+    want to make sure it follows --prefix value structure (or variations).
+    want to ensure other conditions arent True.
+        - must be in same text construct (normal text, conditional block, loop)
+        - must not be different galaxy params! this implies different tool args. 
     """
-    if not within_different_constructs(ctoken, ntoken):
-        for condition in option_conditions:
-            if condition(ctoken, ntoken):
-                return True
+    if within_different_constructs(ctoken, ntoken):
+        return False
+    if different_params(ctoken, ntoken):
+        return False
+    for condition in option_conditions:
+        if condition(ctoken, ntoken):
+            return True
     return False
 
 def within_different_constructs(ctoken: Token, ntoken: Token) -> bool:

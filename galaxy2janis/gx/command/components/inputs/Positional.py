@@ -13,6 +13,7 @@ class Positional(InputComponent):
     def __init__(self) -> None:
         super().__init__()
         self.before_opts: bool = False
+        self.forced_docstring: Optional[str] = None
         self.values: ValueRecord = ValueRecord()
 
     @property
@@ -32,7 +33,9 @@ class Positional(InputComponent):
     @property
     def default_value(self) -> Any:
         """gets the default value for this component"""
-        if self.gxparam:
+        if self.forced_default is not None:
+            default = self.forced_default
+        elif self.gxparam:
             default = self.gxparam.default
         elif len(self.values.unique) == 1:
             default = self.values.unique[0]
@@ -65,6 +68,8 @@ class Positional(InputComponent):
     
     @property
     def docstring(self) -> Optional[str]:
+        if self.forced_docstring:
+            return self.forced_docstring
         if self.gxparam:
             return self.gxparam.docstring
         return ''

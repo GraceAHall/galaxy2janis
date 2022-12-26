@@ -21,11 +21,9 @@ class WorkflowInputText(TextRender):
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
-        # TODO opportunity for decorator
         if self.entity.array:
             imports.append(('janis_core', 'Array'))
 
-        # TODO opportunity for decorator
         imports = list(set(imports))
         return ordering.order_imports(imports)
 
@@ -35,7 +33,7 @@ class WorkflowInputText(TextRender):
         out_str += f'w.input("{self.entity.tag}", {datatype_str})'
         #out_str += f'\t"{tag}",\n'
         #out_str += f'\t{datatype}'
-        #out_str += f',\n\tdefault={default}' if default else ''  # TODO HERE
+        #out_str += f',\n\tdefault={default}' if default else ''
         #out_str += f',\n\tvalue={value}' if value else ''
         #out_str += f',\n\tdoc="{doc}"' if doc else ''
         #out_str += '\n)\n'

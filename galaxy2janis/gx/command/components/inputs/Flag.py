@@ -19,6 +19,8 @@ class Flag(InputComponent):
 
     @property
     def default_value(self) -> bool:
+        if self.forced_default is not None:
+            return self.forced_default
         if isinstance(self.gxparam, BoolParam):
             if self.gxparam.checked and self.gxparam.truevalue == self.prefix:
                 return True

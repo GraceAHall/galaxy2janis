@@ -26,11 +26,9 @@ class ToolInputText(TextRender):
         imports: list[Tuple[str, str]] = []
         imports.append((jtype.import_path, jtype.classname))
 
-        # TODO opportunity for decorator
         if self.entity.array:
             imports.append(('janis_core', 'Array'))
         
-        # TODO opportunity for decorator
         imports = list(set(imports))
         return ordering.order_imports(imports)
 

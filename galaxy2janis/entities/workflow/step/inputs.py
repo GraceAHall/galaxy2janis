@@ -28,7 +28,7 @@ class InputValue(ABC):
         if self.component:
             return self.component.tag
         else:
-            return 'UNKNOWN'
+            return 'unknown'
     
     @property
     @abstractmethod
@@ -44,61 +44,58 @@ class InputValue(ABC):
 def get_comptype(component: InputComponent | OutputComponent) -> str:
     return type(component).__name__.lower() 
 
-def infer_value_type(component: Optional[InputComponent], value: Any) -> str:
-    """
-    only StaticValueLinkingStrategy and DefaultValueLinkingStrategy 
-    call select_input_value_type(). don't need to worry about CONNECTION and RUNTIME_VALUE
-    """
-    if is_bool(value):
-        return 'boolean'
-    elif is_numeric(component, value):
-        return 'numeric'
-    elif is_none(value):
-        return 'none'
-    elif expressions.is_var(value) or expressions.has_var(value):
-        return 'env_var'
-    else:
-        return 'string'
-
-def is_bool(value: Any) -> bool:
+def is_bool(value: str) -> bool:
     if isinstance(value, bool):
         return True
     return False
 
-def is_none(value: Any) -> bool:
+def is_none(value: str) -> bool:
     if value is None:
         return True
     return False
 
-def is_numeric(component: Optional[InputComponent | OutputComponent], value: Any) -> bool:
-    """does information from the supplied component and/or value suggest a numeric datatype"""
-    if expressions.is_int(str(value)) or expressions.is_float(str(value)):
+def is_int(component: Optional[InputComponent | OutputComponent], value: str) -> bool:
+    if component and component.datatype.classname == 'Int':
         return True
-    elif component and _has_numeric_datatype(component):
+    elif expressions.is_int(str(value)):
         return True
     return False
 
-def _has_numeric_datatype(component: InputComponent | OutputComponent) -> bool:
-    jtype = component.datatype
-    numeric_classes = ['Int', 'Float']
-    if jtype.classname in numeric_classes:
+def is_float(component: Optional[InputComponent | OutputComponent], value: str) -> bool:
+    if component and component.datatype.classname == 'Float':
+        return True
+    elif expressions.is_float(str(value)):
         return True
     return False
+    
     
 
 @dataclass
 class StaticInputValue(InputValue):
-    string_value: str
-    default: bool
+    str_value: str
+    is_default: bool
 
     def __post_init__(self):
         self.scatter: bool = False
     
     @property
-    def is_none(self) -> bool:
-        if infer_value_type(self.component, self.string_value) == 'none':
-            return True
-        return False
+    def value_type(self) -> str:
+        """
+        only StaticValueLinkingStrategy and DefaultValueLinkingStrategy 
+        call select_input_value_type(). don't need to worry about CONNECTION and RUNTIME_VALUE
+        """
+        if is_bool(self.str_value):
+            return 'boolean'
+        elif is_int(self.component, self.str_value):
+            return 'int'
+        elif is_float(self.component, self.str_value):
+            return 'float'
+        elif is_none(self.str_value):
+            return 'none'
+        elif expressions.is_var(self.str_value) or expressions.has_var(self.str_value):
+            return 'env_var'
+        else:
+            return 'string'
     
     @property
     def raw_value(self) -> Any:
@@ -113,7 +110,7 @@ class StaticInputValue(InputValue):
         """
         # None, True / False, string will be taken care of here.
         # try: except needed because literal_eval() will fail on specific strings
-        val = self.string_value
+        val = self.str_value
 
         # empty string
         if val == '':       
@@ -129,11 +126,11 @@ class StaticInputValue(InputValue):
         
         # cast str to int or float if appropriate.
         if isinstance(val, str):
-            if is_numeric(self.component, val):
-                if val.isdecimal():
-                    val = int(val)     # integer 
-                else:
-                    val = float(val)   # not an integer, so must be float
+            if is_float(self.component, val):
+                val = float(val)
+            elif is_int(self.component, val):
+                val = int(val)
+
         return val
 
     @property
@@ -144,9 +141,9 @@ class StaticInputValue(InputValue):
             return f'{self.raw_value}'
         
     def _should_wrap_value(self) -> bool:
-        if infer_value_type(self.component, self.string_value) == 'string':
+        if self.value_type == 'string':
             return True
-        if infer_value_type(self.component, self.string_value) == 'env_var':
+        if self.value_type == 'env_var':
             return True
         return False
 
