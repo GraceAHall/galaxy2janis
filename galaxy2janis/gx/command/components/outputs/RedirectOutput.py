@@ -37,7 +37,6 @@ class RedirectOutput(OutputComponent):
 
     @property
     def optional(self) -> bool:
-        # NOTE - janis does not allow optional outputs
         return False
 
     @property

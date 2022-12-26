@@ -23,7 +23,10 @@ class WildcardOutput(OutputComponent):
 
     @property
     def optional(self) -> bool:
-        # NOTE - janis does not allow optional outputs
+        if self.forced_optionality is not None:
+            return self.forced_optionality
+        elif self.gxparam: 
+            return self.gxparam.optional
         return False
    
     @property
