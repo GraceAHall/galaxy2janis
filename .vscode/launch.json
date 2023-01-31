@@ -11,6 +11,14 @@
             "justMyCode": false,
         },
         {
+            "name": "importlib_metadata",
+            "type": "python",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
             "name": "abricate",
             "type": "python",
             "request": "launch",
