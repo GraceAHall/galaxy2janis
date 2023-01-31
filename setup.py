@@ -20,7 +20,7 @@ setup(
         'data/*.yaml',
     ]},
     install_requires=[
-        'janis-pipelines.core.grace>=0.12.0.2',
+        'janis-pipelines.core>=0.12.0',
         'galaxy-app==22.1.1',
         'biopython==1.79',
         'filelock==3.7.0',
